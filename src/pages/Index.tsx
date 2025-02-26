@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -58,6 +59,11 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold tracking-tight text-primary">Observatório de Desenvolvimento Regional</h1>
+          <p className="text-lg text-muted-foreground mt-2">Monitoramento e Análise de Indicadores Regionais</p>
+        </div>
+
         <Tabs defaultValue="dashboard" className="w-full">
           <TabsList className="grid grid-cols-3 w-full">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
