@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { toast } from "@/components/ui/use-toast";
+import Map from "@/components/Map";
 
 interface MonitoringItem {
   name: string;
   url: string;
   frequency: string;
+  category: string;
 }
 
 const Index = () => {
@@ -29,61 +31,88 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Formulário de Monitoramento */}
+          <Card className="md:col-span-1">
+            <CardHeader>
+              <CardTitle>Sistema de Monitoramento Regional</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nome do Monitoramento</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: Índice de Desmatamento - Amazônia Legal" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="url"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>URL da Fonte</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://dados.gov.br/exemplo" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="category"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Categoria</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: Desmatamento, Legislação, Demografia" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="frequency"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Frequência de Atualização</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: Diário, Semanal, Mensal" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button type="submit">Adicionar Monitoramento</Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+
+          {/* Mapa */}
+          <Card className="md:col-span-1">
+            <CardHeader>
+              <CardTitle>Visualização Geográfica</CardTitle>
+            </CardHeader>
+            <CardContent className="h-[500px]">
+              <Map />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Lista de Monitoramentos */}
         <Card>
           <CardHeader>
-            <CardTitle>Sistema de Monitoramento</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nome do Item</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Ex: Preço do Produto" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="url"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>URL para Monitorar</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://exemplo.com" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="frequency"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Frequência de Monitoramento</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Ex: 30 minutos" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <Button type="submit">Adicionar Monitoramento</Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Itens Monitorados</CardTitle>
+            <CardTitle>Monitoramentos Ativos</CardTitle>
           </CardHeader>
           <CardContent>
             {monitoringItems.length === 0 ? (
@@ -98,7 +127,8 @@ const Index = () => {
                       <div className="flex justify-between items-start">
                         <div>
                           <h3 className="font-semibold">{item.name}</h3>
-                          <p className="text-sm text-muted-foreground">{item.url}</p>
+                          <p className="text-sm text-muted-foreground">Categoria: {item.category}</p>
+                          <p className="text-sm text-muted-foreground">Fonte: {item.url}</p>
                           <p className="text-sm text-muted-foreground">Frequência: {item.frequency}</p>
                         </div>
                       </div>
