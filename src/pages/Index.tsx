@@ -1,14 +1,13 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Map from "@/components/Map";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface MonitoringItem {
   name: string;
@@ -26,8 +25,16 @@ const mockData = [
   { name: 'Mai', desmatamento: 189, legislacao: 480, demografia: 218 },
 ];
 
+const pieData = [
+  { name: 'Amazônia', value: 400 },
+  { name: 'Cerrado', value: 300 },
+  { name: 'Mata Atlântica', value: 200 },
+  { name: 'Caatinga', value: 150 },
+];
+
 const Index = () => {
   const [monitoringItems, setMonitoringItems] = useState<MonitoringItem[]>([]);
+  const [timeRange, setTimeRange] = useState("mensal");
   const form = useForm<MonitoringItem>();
 
   const onSubmit = (data: MonitoringItem) => {
@@ -37,6 +44,15 @@ const Index = () => {
       title: "Item adicionado",
       description: `Monitoramento de ${data.name} foi configurado.`
     });
+  };
+
+  const handleExport = () => {
+    const dataStr = JSON.stringify(monitoringItems, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', 'monitoramento-dados.json');
+    linkElement.click();
   };
 
   return (
@@ -52,56 +68,124 @@ const Index = () => {
           {/* Aba do Dashboard */}
           <TabsContent value="dashboard">
             <div className="grid gap-6">
+              {/* Filtros e Controles */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Visão Geral</CardTitle>
+                  <CardTitle>Controles do Dashboard</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="h-[400px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={mockData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" dataKey="desmatamento" stroke="#8884d8" />
-                        <Line type="monotone" dataKey="legislacao" stroke="#82ca9d" />
-                        <Line type="monotone" dataKey="demografia" stroke="#ffc658" />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
+                <CardContent className="flex gap-4">
+                  <select 
+                    className="rounded-md border p-2"
+                    value={timeRange}
+                    onChange={(e) => setTimeRange(e.target.value)}
+                  >
+                    <option value="diario">Diário</option>
+                    <option value="semanal">Semanal</option>
+                    <option value="mensal">Mensal</option>
+                    <option value="anual">Anual</option>
+                  </select>
+                  <Button onClick={handleExport}>Exportar Dados</Button>
                 </CardContent>
               </Card>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+              {/* Gráficos */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Gráfico de Linhas - Tendências */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Monitoramentos Ativos</CardTitle>
+                    <CardTitle>Tendências de Monitoramento</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-3xl font-bold">{monitoringItems.length}</div>
-                    <p className="text-muted-foreground">Total de fontes monitoradas</p>
+                    <div className="h-[300px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={mockData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="name" />
+                          <YAxis />
+                          <Tooltip />
+                          <Legend />
+                          <Line type="monotone" dataKey="desmatamento" stroke="#8884d8" />
+                          <Line type="monotone" dataKey="legislacao" stroke="#82ca9d" />
+                          <Line type="monotone" dataKey="demografia" stroke="#ffc658" />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
                   </CardContent>
                 </Card>
 
+                {/* Gráfico de Barras - Comparativo */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Alertas Recentes</CardTitle>
+                    <CardTitle>Comparativo por Região</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-3xl font-bold">7</div>
-                    <p className="text-muted-foreground">Últimas 24 horas</p>
+                    <div className="h-[300px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={mockData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="name" />
+                          <YAxis />
+                          <Tooltip />
+                          <Legend />
+                          <Bar dataKey="desmatamento" fill="#8884d8" />
+                          <Bar dataKey="demografia" fill="#82ca9d" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
                   </CardContent>
                 </Card>
 
+                {/* Gráfico de Pizza - Distribuição */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Atualizações</CardTitle>
+                    <CardTitle>Distribuição por Bioma</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-3xl font-bold">24</div>
-                    <p className="text-muted-foreground">Dados atualizados hoje</p>
+                    <div className="h-[300px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={pieData}
+                            dataKey="value"
+                            nameKey="name"
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={80}
+                            fill="#8884d8"
+                            label
+                          />
+                          <Tooltip />
+                          <Legend />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Cards de Métricas */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Métricas Importantes</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 bg-secondary rounded-lg">
+                        <h3 className="font-semibold text-lg">Total Monitorado</h3>
+                        <p className="text-3xl font-bold">{monitoringItems.length}</p>
+                      </div>
+                      <div className="p-4 bg-secondary rounded-lg">
+                        <h3 className="font-semibold text-lg">Alertas Ativos</h3>
+                        <p className="text-3xl font-bold">7</p>
+                      </div>
+                      <div className="p-4 bg-secondary rounded-lg">
+                        <h3 className="font-semibold text-lg">Atualizações</h3>
+                        <p className="text-3xl font-bold">24</p>
+                      </div>
+                      <div className="p-4 bg-secondary rounded-lg">
+                        <h3 className="font-semibold text-lg">Fontes Ativas</h3>
+                        <p className="text-3xl font-bold">12</p>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
