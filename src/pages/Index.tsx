@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,6 +9,8 @@ import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Map from "@/components/Map";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { UserRound, LogIn, LogOut } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface MonitoringItem {
   name: string;
@@ -35,7 +38,10 @@ const pieData = [
 const Index: React.FC = () => {
   const [monitoringItems, setMonitoringItems] = useState<MonitoringItem[]>([]);
   const [timeRange, setTimeRange] = useState("mensal");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const form = useForm<MonitoringItem>();
+  const loginForm = useForm<{ email: string; password: string }>();
 
   const onSubmit = (data: MonitoringItem) => {
     setMonitoringItems([...monitoringItems, data]);
@@ -55,22 +61,64 @@ const Index: React.FC = () => {
     linkElement.click();
   };
 
+  const handleLogin = (data: { email: string; password: string }) => {
+    // Verificar credenciais (odr@2025 / Ppgdas@2025)
+    if (data.email === "odr@2025" && data.password === "Ppgdas@2025") {
+      setIsAuthenticated(true);
+      setIsLoginDialogOpen(false);
+      toast({
+        title: "Login realizado com sucesso",
+        description: "Bem-vindo ao sistema de monitoramento."
+      });
+    } else {
+      toast({
+        title: "Erro de autenticação",
+        description: "Email ou senha incorretos.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    toast({
+      title: "Logout realizado",
+      description: "Você saiu do sistema."
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <header className="text-center mb-8">
-          <h1 className="text-4xl font-bold tracking-tight text-primary">
-            Observatório de Desenvolvimento Regional
-          </h1>
-          <p className="text-lg text-muted-foreground mt-2">
-            Monitoramento e Análise de Indicadores Regionais
-          </p>
+        <header className="flex justify-between items-center mb-8">
+          <div className="text-center flex-1">
+            <h1 className="text-4xl font-bold tracking-tight text-primary">
+              Observatório de Desenvolvimento Regional
+            </h1>
+            <p className="text-lg text-muted-foreground mt-2">
+              Monitoramento e Análise de Indicadores Regionais
+            </p>
+          </div>
+          <div>
+            {isAuthenticated ? (
+              <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2">
+                <UserRound size={18} />
+                <span className="hidden md:inline">Administrador</span>
+                <LogOut size={18} />
+              </Button>
+            ) : (
+              <Button variant="outline" onClick={() => setIsLoginDialogOpen(true)} className="flex items-center gap-2">
+                <LogIn size={18} />
+                <span className="hidden md:inline">Entrar</span>
+              </Button>
+            )}
+          </div>
         </header>
 
         <Tabs defaultValue="dashboard" className="w-full">
           <TabsList className="grid grid-cols-3 w-full">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="monitoring">Monitoramento</TabsTrigger>
+            {isAuthenticated && <TabsTrigger value="monitoring">Monitoramento</TabsTrigger>}
             <TabsTrigger value="map">Mapa Interativo</TabsTrigger>
           </TabsList>
 
@@ -93,7 +141,7 @@ const Index: React.FC = () => {
                     <option value="mensal">Mensal</option>
                     <option value="anual">Anual</option>
                   </select>
-                  <Button onClick={handleExport}>Exportar Dados</Button>
+                  {isAuthenticated && <Button onClick={handleExport}>Exportar Dados</Button>}
                 </CardContent>
               </Card>
 
@@ -201,104 +249,106 @@ const Index: React.FC = () => {
             </div>
           </TabsContent>
 
-          {/* Aba de Monitoramento */}
-          <TabsContent value="monitoring">
-            <Card>
-              <CardHeader>
-                <CardTitle>Adicionar Novo Monitoramento</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nome do Monitoramento</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Ex: Índice de Desmatamento - Amazônia Legal" {...field} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="url"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>URL da Fonte</FormLabel>
-                          <FormControl>
-                            <Input placeholder="https://dados.gov.br/exemplo" {...field} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
+          {/* Aba de Monitoramento - Somente visível para usuários autenticados */}
+          {isAuthenticated && (
+            <TabsContent value="monitoring">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Adicionar Novo Monitoramento</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Nome do Monitoramento</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Ex: Índice de Desmatamento - Amazônia Legal" {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="url"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>URL da Fonte</FormLabel>
+                            <FormControl>
+                              <Input placeholder="https://dados.gov.br/exemplo" {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
 
-                    <FormField
-                      control={form.control}
-                      name="category"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Categoria</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Ex: Desmatamento, Legislação, Demografia" {...field} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
+                      <FormField
+                        control={form.control}
+                        name="category"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Categoria</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Ex: Desmatamento, Legislação, Demografia" {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
 
-                    <FormField
-                      control={form.control}
-                      name="frequency"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Frequência de Atualização</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Ex: Diário, Semanal, Mensal" {...field} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
+                      <FormField
+                        control={form.control}
+                        name="frequency"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Frequência de Atualização</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Ex: Diário, Semanal, Mensal" {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
 
-                    <Button type="submit">Adicionar Monitoramento</Button>
-                  </form>
-                </Form>
-              </CardContent>
-            </Card>
+                      <Button type="submit">Adicionar Monitoramento</Button>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
 
-            {/* Lista de Monitoramentos */}
-            <Card className="mt-6">
-              <CardHeader>
-                <CardTitle>Monitoramentos Ativos</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {monitoringItems.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-4">
-                    Nenhum item sendo monitorado ainda.
-                  </p>
-                ) : (
-                  <div className="grid gap-4">
-                    {monitoringItems.map((item, index) => (
-                      <Card key={index}>
-                        <CardContent className="p-4">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h3 className="font-semibold">{item.name}</h3>
-                              <p className="text-sm text-muted-foreground">Categoria: {item.category}</p>
-                              <p className="text-sm text-muted-foreground">Fonte: {item.url}</p>
-                              <p className="text-sm text-muted-foreground">Frequência: {item.frequency}</p>
+              {/* Lista de Monitoramentos */}
+              <Card className="mt-6">
+                <CardHeader>
+                  <CardTitle>Monitoramentos Ativos</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {monitoringItems.length === 0 ? (
+                    <p className="text-muted-foreground text-center py-4">
+                      Nenhum item sendo monitorado ainda.
+                    </p>
+                  ) : (
+                    <div className="grid gap-4">
+                      {monitoringItems.map((item, index) => (
+                        <Card key={index}>
+                          <CardContent className="p-4">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h3 className="font-semibold">{item.name}</h3>
+                                <p className="text-sm text-muted-foreground">Categoria: {item.category}</p>
+                                <p className="text-sm text-muted-foreground">Fonte: {item.url}</p>
+                                <p className="text-sm text-muted-foreground">Frequência: {item.frequency}</p>
+                              </div>
                             </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
 
           {/* Aba do Mapa */}
           <TabsContent value="map">
@@ -313,6 +363,52 @@ const Index: React.FC = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Diálogo de Login */}
+      <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Acesso ao Sistema</DialogTitle>
+            <DialogDescription>
+              Entre com suas credenciais para acessar funcionalidades de administração.
+            </DialogDescription>
+          </DialogHeader>
+
+          <Form {...loginForm}>
+            <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+              <FormField
+                control={loginForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="email@exemplo.com" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={loginForm.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Senha</FormLabel>
+                    <FormControl>
+                      <Input type="password" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter>
+                <Button type="submit">Entrar</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
