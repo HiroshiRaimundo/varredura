@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,12 +7,13 @@ import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Map from "@/components/Map";
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { UserRound, LogIn, LogOut, MapPin } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 
 interface MonitoringItem {
+  id: string;
   name: string;
   url: string;
   frequency: string;
@@ -24,6 +24,7 @@ interface ResearchStudy {
   id: string;
   title: string;
   author: string;
+  coAuthors: string;
   summary: string;
   repositoryUrl: string;
   location: string;
@@ -31,21 +32,13 @@ interface ResearchStudy {
   type: "artigo" | "dissertacao" | "tese" | "outro";
 }
 
-// Dados de exemplo para o dashboard
-const mockData = [
-  { name: 'Jan', desmatamento: 400, legislacao: 240, demografia: 240 },
-  { name: 'Fev', desmatamento: 300, legislacao: 139, demografia: 221 },
-  { name: 'Mar', desmatamento: 200, legislacao: 980, demografia: 229 },
-  { name: 'Abr', desmatamento: 278, legislacao: 390, demografia: 200 },
-  { name: 'Mai', desmatamento: 189, legislacao: 480, demografia: 218 },
-];
-
-const pieData = [
-  { name: 'Amazônia', value: 400 },
-  { name: 'Cerrado', value: 300 },
-  { name: 'Mata Atlântica', value: 200 },
-  { name: 'Caatinga', value: 150 },
-];
+// Dados iniciais vazios para o dashboard
+const initialMockData = Array.from({ length: 12 }, (_, i) => ({
+  name: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][i],
+  estudos: 0,
+  monitoramentos: 0,
+  atualizacoes: 0
+}));
 
 // Coordenadas de cidades do Amapá para uso na simulação de geocodificação
 const amapaLocations = {
@@ -73,18 +66,9 @@ const Index: React.FC = () => {
   const [timeRange, setTimeRange] = useState("mensal");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
-  const form = useForm<MonitoringItem>();
+  const form = useForm<Omit<MonitoringItem, "id">>();
   const loginForm = useForm<{ email: string; password: string }>();
   const studyForm = useForm<ResearchStudy>();
-
-  const onSubmit = (data: MonitoringItem) => {
-    setMonitoringItems([...monitoringItems, data]);
-    form.reset();
-    toast({
-      title: "Item adicionado",
-      description: `Monitoramento de ${data.name} foi configurado.`
-    });
-  };
 
   const handleExport = () => {
     const dataStr = JSON.stringify(monitoringItems, null, 2);
@@ -164,6 +148,27 @@ const Index: React.FC = () => {
     }
   };
 
+  const handleDeleteMonitoring = (id: string) => {
+    setMonitoringItems(prev => prev.filter(item => item.id !== id));
+    toast({
+      title: "Item removido",
+      description: "O monitoramento foi removido com sucesso."
+    });
+  };
+
+  const onSubmit = (data: Omit<MonitoringItem, "id">) => {
+    const newItem = {
+      ...data,
+      id: Date.now().toString()
+    };
+    setMonitoringItems(prev => [...prev, newItem]);
+    form.reset();
+    toast({
+      title: "Item adicionado",
+      description: `Monitoramento de ${data.name} foi configurado.`
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -200,134 +205,72 @@ const Index: React.FC = () => {
             <TabsTrigger value="map">Mapa Interativo</TabsTrigger>
           </TabsList>
 
-          {/* Aba do Dashboard */}
           <TabsContent value="dashboard">
-            <div className="grid gap-6">
-              {/* Filtros e Controles */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Controles do Dashboard</CardTitle>
-                </CardHeader>
-                <CardContent className="flex gap-4">
-                  <select 
-                    className="rounded-md border p-2"
-                    value={timeRange}
-                    onChange={(e) => setTimeRange(e.target.value)}
-                  >
-                    <option value="diario">Diário</option>
-                    <option value="semanal">Semanal</option>
-                    <option value="mensal">Mensal</option>
-                    <option value="anual">Anual</option>
-                  </select>
-                  {isAuthenticated && <Button onClick={handleExport}>Exportar Dados</Button>}
-                </CardContent>
-              </Card>
+        <div className="grid gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Evolução de Estudos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={initialMockData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Line type="monotone" dataKey="estudos" stroke="#8884d8" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
 
-              {/* Gráficos */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Gráfico de Linhas - Tendências */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Tendências de Monitoramento</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-[300px]">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={mockData}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" />
-                          <YAxis />
-                          <Tooltip />
-                          <Legend />
-                          <Line type="monotone" dataKey="desmatamento" stroke="#8884d8" />
-                          <Line type="monotone" dataKey="legislacao" stroke="#82ca9d" />
-                          <Line type="monotone" dataKey="demografia" stroke="#ffc658" />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </CardContent>
-                </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Monitoramentos por Categoria</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={initialMockData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="monitoramentos" fill="#82ca9d" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
 
-                {/* Gráfico de Barras - Comparativo */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Comparativo por Região</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-[300px]">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={mockData}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" />
-                          <YAxis />
-                          <Tooltip />
-                          <Legend />
-                          <Bar dataKey="desmatamento" fill="#8884d8" />
-                          <Bar dataKey="demografia" fill="#82ca9d" />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </CardContent>
-                </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Atualizações do Sistema</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={initialMockData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Line type="monotone" dataKey="atualizacoes" stroke="#ffc658" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </TabsContent>
 
-                {/* Gráfico de Pizza - Distribuição */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Distribuição por Bioma</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-[300px]">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={pieData}
-                            dataKey="value"
-                            nameKey="name"
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={80}
-                            fill="#8884d8"
-                            label
-                          />
-                          <Tooltip />
-                          <Legend />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Cards de Métricas */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Métricas Importantes</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="p-4 bg-secondary rounded-lg">
-                        <h3 className="font-semibold text-lg">Total Monitorado</h3>
-                        <p className="text-3xl font-bold">{monitoringItems.length}</p>
-                      </div>
-                      <div className="p-4 bg-secondary rounded-lg">
-                        <h3 className="font-semibold text-lg">Alertas Ativos</h3>
-                        <p className="text-3xl font-bold">7</p>
-                      </div>
-                      <div className="p-4 bg-secondary rounded-lg">
-                        <h3 className="font-semibold text-lg">Atualizações</h3>
-                        <p className="text-3xl font-bold">24</p>
-                      </div>
-                      <div className="p-4 bg-secondary rounded-lg">
-                        <h3 className="font-semibold text-lg">Fontes Ativas</h3>
-                        <p className="text-3xl font-bold">12</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* Aba de Monitoramento - Somente visível para usuários autenticados */}
           {isAuthenticated && (
             <TabsContent value="monitoring">
               <Card>
@@ -407,8 +350,8 @@ const Index: React.FC = () => {
                     </p>
                   ) : (
                     <div className="grid gap-4">
-                      {monitoringItems.map((item, index) => (
-                        <Card key={index}>
+                      {monitoringItems.map((item) => (
+                        <Card key={item.id}>
                           <CardContent className="p-4">
                             <div className="flex justify-between items-start">
                               <div>
@@ -417,6 +360,13 @@ const Index: React.FC = () => {
                                 <p className="text-sm text-muted-foreground">Fonte: {item.url}</p>
                                 <p className="text-sm text-muted-foreground">Frequência: {item.frequency}</p>
                               </div>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleDeleteMonitoring(item.id)}
+                              >
+                                Excluir
+                              </Button>
                             </div>
                           </CardContent>
                         </Card>
@@ -428,202 +378,249 @@ const Index: React.FC = () => {
             </TabsContent>
           )}
 
-          {/* Nova Aba de Pesquisa - Somente visível para usuários autenticados */}
           {isAuthenticated && (
-            <TabsContent value="research">
-              <div className="grid gap-6 md:grid-cols-2">
-                {/* Formulário para adicionar estudos */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Registrar Estudo Acadêmico</CardTitle>
-                    <CardDescription>
-                      Adicione informações sobre artigos, dissertações e teses para visualização no mapa.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Form {...studyForm}>
-                      <form onSubmit={studyForm.handleSubmit(handleStudySubmit)} className="space-y-4">
-                        <FormField
-                          control={studyForm.control}
-                          name="title"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Título do Estudo</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Ex: Análise dos impactos ambientais no Amapá" {...field} />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={studyForm.control}
-                          name="author"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Autor</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Nome do autor principal" {...field} />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={studyForm.control}
-                          name="summary"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Resumo</FormLabel>
-                              <FormControl>
-                                <Textarea 
-                                  placeholder="Breve resumo do estudo (até 300 caracteres)" 
-                                  className="resize-none"
-                                  maxLength={300}
-                                  rows={4}
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormDescription>
-                                Máximo de 300 caracteres
-                              </FormDescription>
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={studyForm.control}
-                          name="repositoryUrl"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Link do Repositório</FormLabel>
-                              <FormControl>
-                                <Input placeholder="https://repositorio.exemplo.com/estudo" {...field} />
-                              </FormControl>
-                              <FormDescription>
-                                URL onde o estudo completo pode ser acessado
-                              </FormDescription>
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={studyForm.control}
-                          name="type"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Tipo de Estudo</FormLabel>
-                              <FormControl>
-                                <select 
-                                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-                                  {...field}
-                                >
-                                  <option value="artigo">Artigo</option>
-                                  <option value="dissertacao">Dissertação</option>
-                                  <option value="tese">Tese</option>
-                                  <option value="outro">Outro</option>
-                                </select>
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={studyForm.control}
-                          name="location"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Localização do Estudo</FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <Input placeholder="Ex: Macapá, Santana, Laranjal do Jari..." {...field} />
-                                  <MapPin className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
-                                </div>
-                              </FormControl>
-                              <FormDescription>
-                                Digite o nome do município no Amapá onde o estudo foi realizado
-                              </FormDescription>
-                            </FormItem>
-                          )}
-                        />
-
-                        <Button type="submit" className="w-full">Adicionar ao Mapa</Button>
-                      </form>
-                    </Form>
-                  </CardContent>
-                </Card>
-
-                {/* Lista de estudos */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Estudos Registrados</CardTitle>
-                    <CardDescription>
-                      {studies.length} {studies.length === 1 ? 'estudo acadêmico' : 'estudos acadêmicos'} no sistema
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
-                      {studies.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-8">
-                          Nenhum estudo acadêmico registrado ainda.
-                        </p>
-                      ) : (
-                        studies.map((study) => (
-                          <Card key={study.id}>
-                            <CardContent className="p-4">
-                              <div className="flex flex-col gap-2">
-                                <div className="flex items-center justify-between">
-                                  <h3 className="font-semibold">{study.title}</h3>
-                                  <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">
-                                    {study.type === 'artigo' ? 'Artigo' : 
-                                     study.type === 'dissertacao' ? 'Dissertação' : 
-                                     study.type === 'tese' ? 'Tese' : 'Outro'}
-                                  </span>
-                                </div>
-                                <p className="text-sm">Autor: {study.author}</p>
-                                <p className="text-sm">Localização: {study.location}</p>
-                                <p className="text-sm text-muted-foreground line-clamp-2">{study.summary}</p>
-                                {study.repositoryUrl && (
-                                  <a 
-                                    href={study.repositoryUrl} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-                                  >
-                                    Ver repositório
-                                  </a>
-                                )}
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))
+        <TabsContent value="research">
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Registrar Estudo Acadêmico</CardTitle>
+                <CardDescription>
+                  Adicione informações sobre artigos, dissertações e teses para visualização no mapa.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Form {...studyForm}>
+                  <form onSubmit={studyForm.handleSubmit(handleStudySubmit)} className="space-y-4">
+                    <FormField
+                      control={studyForm.control}
+                      name="title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Título do Estudo</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Ex: Análise dos impactos ambientais no Amapá" {...field} />
+                          </FormControl>
+                        </FormItem>
                       )}
+                    />
+                    
+                    <FormField
+                      control={studyForm.control}
+                      name="author"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Autor Principal</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Nome do autor principal" {...field} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={studyForm.control}
+                      name="coAuthors"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Coautores</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Nome dos coautores (separados por vírgula)" {...field} />
+                          </FormControl>
+                          <FormDescription>
+                            Separe os nomes dos coautores por vírgula
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={studyForm.control}
+                      name="summary"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Resumo</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Breve resumo do estudo (até 300 caracteres)" 
+                              className="resize-none"
+                              maxLength={300}
+                              rows={4}
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Máximo de 300 caracteres
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={studyForm.control}
+                      name="repositoryUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Link do Repositório</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://repositorio.exemplo.com/estudo" {...field} />
+                          </FormControl>
+                          <FormDescription>
+                            URL onde o estudo completo pode ser acessado
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={studyForm.control}
+                      name="type"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Tipo de Estudo</FormLabel>
+                          <FormControl>
+                            <select 
+                              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                              {...field}
+                            >
+                              <option value="artigo">Artigo</option>
+                              <option value="dissertacao">Dissertação</option>
+                              <option value="tese">Tese</option>
+                              <option value="outro">Outro</option>
+                            </select>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={studyForm.control}
+                      name="location"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Localização do Estudo</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Input placeholder="Ex: Macapá, Santana, Laranjal do Jari..." {...field} />
+                              <MapPin className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
+                            </div>
+                          </FormControl>
+                          <FormDescription>
+                            Digite o nome do município no Amapá onde o estudo foi realizado
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button type="submit" className="w-full">Adicionar ao Mapa</Button>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Estudos Registrados</CardTitle>
+                <CardDescription>
+                  {studies.length} {studies.length === 1 ? 'estudo acadêmico' : 'estudos acadêmicos'} no sistema
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                  {studies.length === 0 ? (
+                    <p className="text-muted-foreground text-center py-8">
+                      Nenhum estudo acadêmico registrado ainda.
+                    </p>
+                  ) : (
+                    studies.map((study) => (
+                      <Card key={study.id}>
+                        <CardContent className="p-4">
+                          <div className="flex flex-col gap-2">
+                            <div className="flex items-center justify-between">
+                              <h3 className="font-semibold">{study.title}</h3>
+                              <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">
+                                {study.type === 'artigo' ? 'Artigo' : 
+                                 study.type === 'dissertacao' ? 'Dissertação' : 
+                                 study.type === 'tese' ? 'Tese' : 'Outro'}
+                              </span>
+                            </div>
+                            <p className="text-sm">Autor: {study.author}</p>
+                            <p className="text-sm">Localização: {study.location}</p>
+                            <p className="text-sm text-muted-foreground line-clamp-2">{study.summary}</p>
+                            {study.repositoryUrl && (
+                              <a 
+                                href={study.repositoryUrl} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                              >
+                                Ver repositório
+                              </a>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      )}
+
+          <TabsContent value="map">
+        <Card>
+          <CardHeader>
+            <CardTitle>Visualização Geográfica</CardTitle>
+            <CardDescription>
+              Mapa do Amapá com localização dos estudos registrados. 
+              Clique nos marcadores para ver mais detalhes.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Map points={studies} />
+          </CardContent>
+        </Card>
+      </TabsContent>
+
+          <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>Monitoramentos Ativos</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {monitoringItems.length === 0 ? (
+            <p className="text-muted-foreground text-center py-4">
+              Nenhum item sendo monitorado ainda.
+            </p>
+          ) : (
+            <div className="grid gap-4">
+              {monitoringItems.map((item) => (
+                <Card key={item.id}>
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold">{item.name}</h3>
+                        <p className="text-sm text-muted-foreground">Categoria: {item.category}</p>
+                        <p className="text-sm text-muted-foreground">Fonte: {item.url}</p>
+                        <p className="text-sm text-muted-foreground">Frequência: {item.frequency}</p>
+                      </div>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteMonitoring(item.id)}
+                      >
+                        Excluir
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
-              </div>
-            </TabsContent>
+              ))}
+            </div>
           )}
+        </CardContent>
+      </Card>
 
-          {/* Aba do Mapa */}
-          <TabsContent value="map">
-            <Card>
-              <CardHeader>
-                <CardTitle>Visualização Geográfica</CardTitle>
-                <CardDescription>
-                  Mapa do Amapá com localização dos estudos registrados
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="h-[600px]">
-                <Map points={studies} />
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
-
-      {/* Diálogo de Login */}
-      <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
+          <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Acesso ao Sistema</DialogTitle>

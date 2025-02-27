@@ -1,9 +1,11 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { Card, CardContent } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
+import { ExternalLink, X } from 'lucide-react';
 
-// Interface para os pontos no mapa
 interface MapPoint {
   id: string;
   title: string;
@@ -11,6 +13,7 @@ interface MapPoint {
   location: string;
   coordinates: [number, number];
   repositoryUrl?: string;
+  summary?: string;
 }
 
 interface MapProps {
@@ -21,6 +24,7 @@ const Map: React.FC<MapProps> = ({ points = [] }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const [selectedStudies, setSelectedStudies] = useState<MapPoint[]>([]);
 
   // Coordenadas do centro do Amapá
   const amapaCenterLng = -51.0669;
@@ -75,31 +79,22 @@ const Map: React.FC<MapProps> = ({ points = [] }) => {
   useEffect(() => {
     if (!map.current || !points.length) return;
 
-    // Limpa marcadores existentes
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
 
-    // Adiciona novos marcadores
     points.forEach(point => {
-      // Cria um elemento para o popup
-      const popupContent = document.createElement('div');
-      popupContent.className = 'p-2';
-      popupContent.innerHTML = `
-        <h3 class="font-bold">${point.title}</h3>
-        <p class="text-sm">Autor: ${point.author}</p>
-        <p class="text-sm">Local: ${point.location}</p>
-        ${point.repositoryUrl ? `<a href="${point.repositoryUrl}" target="_blank" class="text-blue-500 hover:underline text-sm">Ver repositório</a>` : ''}
-      `;
-
-      // Cria o popup
-      const popup = new mapboxgl.Popup({ offset: 25 })
-        .setDOMContent(popupContent);
-
-      // Cria o marcador
+      const markerElement = document.createElement('div');
+      markerElement.className = 'cursor-pointer';
+      
       const marker = new mapboxgl.Marker({ color: '#FF0000' })
         .setLngLat(point.coordinates)
-        .setPopup(popup)
         .addTo(map.current!);
+
+      marker.getElement().addEventListener('click', () => {
+        if (!selectedStudies.find(study => study.id === point.id)) {
+          setSelectedStudies(prev => [...prev, point]);
+        }
+      });
       
       markersRef.current.push(marker);
     });
@@ -124,10 +119,53 @@ const Map: React.FC<MapProps> = ({ points = [] }) => {
     }
   }, [points]);
 
+  const removeStudyFromList = (studyId: string) => {
+    setSelectedStudies(prev => prev.filter(study => study.id !== studyId));
+  };
+
   return (
-    <div className="relative w-full h-full rounded-lg overflow-hidden">
-      <div ref={mapContainer} className="absolute inset-0" />
-      <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent to-background/10 rounded-lg" />
+    <div className="flex flex-col gap-4">
+      <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
+        <div ref={mapContainer} className="absolute inset-0" />
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent to-background/10 rounded-lg" />
+      </div>
+      
+      {selectedStudies.length > 0 && (
+        <Card>
+          <ScrollArea className="h-[200px]">
+            <CardContent className="space-y-4 p-4">
+              {selectedStudies.map(study => (
+                <div key={study.id} className="relative bg-muted p-4 rounded-lg">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-2"
+                    onClick={() => removeStudyFromList(study.id)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                  <h3 className="font-semibold mb-2">{study.title}</h3>
+                  <p className="text-sm mb-2">Autor: {study.author}</p>
+                  <p className="text-sm mb-2">Local: {study.location}</p>
+                  {study.summary && (
+                    <p className="text-sm text-muted-foreground mb-2">{study.summary}</p>
+                  )}
+                  {study.repositoryUrl && (
+                    <a
+                      href={study.repositoryUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                    >
+                      Ver repositório <ExternalLink className="h-4 w-4" />
+                    </a>
+                  )}
+                </div>
+              ))}
+            </CardContent>
+          </ScrollArea>
+        </Card>
+      )}
     </div>
   );
 };
