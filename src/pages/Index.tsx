@@ -1,22 +1,34 @@
 
-import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Map from "@/components/Map";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { UserRound, LogIn, LogOut } from "lucide-react";
+import { UserRound, LogIn, LogOut, MapPin } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 interface MonitoringItem {
   name: string;
   url: string;
   frequency: string;
   category: string;
+}
+
+interface ResearchStudy {
+  id: string;
+  title: string;
+  author: string;
+  summary: string;
+  repositoryUrl: string;
+  location: string;
+  coordinates: [number, number];
+  type: "artigo" | "dissertacao" | "tese" | "outro";
 }
 
 // Dados de exemplo para o dashboard
@@ -35,13 +47,35 @@ const pieData = [
   { name: 'Caatinga', value: 150 },
 ];
 
+// Coordenadas de cidades do Amapá para uso na simulação de geocodificação
+const amapaLocations = {
+  "Macapá": [-51.0669, 0.0356],
+  "Santana": [-51.1729, -0.0583],
+  "Laranjal do Jari": [-52.5153, -0.8044],
+  "Oiapoque": [-51.8333, 3.8333],
+  "Porto Grande": [-51.4086, 0.7128],
+  "Mazagão": [-51.2891, -0.1156],
+  "Vitória do Jari": [-52.4247, -1.1275],
+  "Tartarugalzinho": [-51.1492, 1.5064],
+  "Amapá": [-51.0667, 2.0500],
+  "Calçoene": [-50.9500, 2.5000],
+  "Pedra Branca do Amapari": [-51.9472, 0.7772],
+  "Serra do Navio": [-52.0042, 0.9014],
+  "Cutias": [-50.8028, 0.9719],
+  "Ferreira Gomes": [-51.1797, 0.8564],
+  "Itaubal": [-50.6917, 0.6025],
+  "Pracuúba": [-50.7892, 1.7417]
+};
+
 const Index: React.FC = () => {
   const [monitoringItems, setMonitoringItems] = useState<MonitoringItem[]>([]);
+  const [studies, setStudies] = useState<ResearchStudy[]>([]);
   const [timeRange, setTimeRange] = useState("mensal");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const form = useForm<MonitoringItem>();
   const loginForm = useForm<{ email: string; password: string }>();
+  const studyForm = useForm<ResearchStudy>();
 
   const onSubmit = (data: MonitoringItem) => {
     setMonitoringItems([...monitoringItems, data]);
@@ -87,6 +121,49 @@ const Index: React.FC = () => {
     });
   };
 
+  // Função simulada de geocodificação - em uma aplicação real, usaria uma API de geocodificação
+  const geocodeLocation = (location: string): [number, number] | null => {
+    const normalizedLocation = location.trim().toLowerCase();
+    
+    // Verifica se a localização está nas cidades do Amapá
+    for (const [city, coords] of Object.entries(amapaLocations)) {
+      if (normalizedLocation.includes(city.toLowerCase())) {
+        return coords as [number, number];
+      }
+    }
+    
+    // Se não encontrar, retorna coordenadas de Macapá como fallback
+    return amapaLocations["Macapá"] as [number, number];
+  };
+
+  const handleStudySubmit = (data: Omit<ResearchStudy, "id" | "coordinates">) => {
+    // Geocodificar a localização para obter as coordenadas
+    const coordinates = geocodeLocation(data.location);
+    
+    if (coordinates) {
+      // Cria um novo estudo com ID único
+      const newStudy: ResearchStudy = {
+        ...data,
+        id: Date.now().toString(),
+        coordinates
+      };
+      
+      setStudies(prev => [...prev, newStudy]);
+      studyForm.reset();
+      
+      toast({
+        title: "Estudo adicionado",
+        description: `"${data.title}" foi adicionado ao mapa.`
+      });
+    } else {
+      toast({
+        title: "Erro de localização",
+        description: "Não foi possível encontrar as coordenadas para a localização informada.",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -116,9 +193,10 @@ const Index: React.FC = () => {
         </header>
 
         <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid grid-cols-3 w-full">
+          <TabsList className="grid grid-cols-4 w-full">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             {isAuthenticated && <TabsTrigger value="monitoring">Monitoramento</TabsTrigger>}
+            {isAuthenticated && <TabsTrigger value="research">Pesquisa</TabsTrigger>}
             <TabsTrigger value="map">Mapa Interativo</TabsTrigger>
           </TabsList>
 
@@ -350,14 +428,194 @@ const Index: React.FC = () => {
             </TabsContent>
           )}
 
+          {/* Nova Aba de Pesquisa - Somente visível para usuários autenticados */}
+          {isAuthenticated && (
+            <TabsContent value="research">
+              <div className="grid gap-6 md:grid-cols-2">
+                {/* Formulário para adicionar estudos */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Registrar Estudo Acadêmico</CardTitle>
+                    <CardDescription>
+                      Adicione informações sobre artigos, dissertações e teses para visualização no mapa.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Form {...studyForm}>
+                      <form onSubmit={studyForm.handleSubmit(handleStudySubmit)} className="space-y-4">
+                        <FormField
+                          control={studyForm.control}
+                          name="title"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Título do Estudo</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Ex: Análise dos impactos ambientais no Amapá" {...field} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={studyForm.control}
+                          name="author"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Autor</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Nome do autor principal" {...field} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={studyForm.control}
+                          name="summary"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Resumo</FormLabel>
+                              <FormControl>
+                                <Textarea 
+                                  placeholder="Breve resumo do estudo (até 300 caracteres)" 
+                                  className="resize-none"
+                                  maxLength={300}
+                                  rows={4}
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Máximo de 300 caracteres
+                              </FormDescription>
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={studyForm.control}
+                          name="repositoryUrl"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Link do Repositório</FormLabel>
+                              <FormControl>
+                                <Input placeholder="https://repositorio.exemplo.com/estudo" {...field} />
+                              </FormControl>
+                              <FormDescription>
+                                URL onde o estudo completo pode ser acessado
+                              </FormDescription>
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={studyForm.control}
+                          name="type"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Tipo de Estudo</FormLabel>
+                              <FormControl>
+                                <select 
+                                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                                  {...field}
+                                >
+                                  <option value="artigo">Artigo</option>
+                                  <option value="dissertacao">Dissertação</option>
+                                  <option value="tese">Tese</option>
+                                  <option value="outro">Outro</option>
+                                </select>
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={studyForm.control}
+                          name="location"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Localização do Estudo</FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Input placeholder="Ex: Macapá, Santana, Laranjal do Jari..." {...field} />
+                                  <MapPin className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
+                                </div>
+                              </FormControl>
+                              <FormDescription>
+                                Digite o nome do município no Amapá onde o estudo foi realizado
+                              </FormDescription>
+                            </FormItem>
+                          )}
+                        />
+
+                        <Button type="submit" className="w-full">Adicionar ao Mapa</Button>
+                      </form>
+                    </Form>
+                  </CardContent>
+                </Card>
+
+                {/* Lista de estudos */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Estudos Registrados</CardTitle>
+                    <CardDescription>
+                      {studies.length} {studies.length === 1 ? 'estudo acadêmico' : 'estudos acadêmicos'} no sistema
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                      {studies.length === 0 ? (
+                        <p className="text-muted-foreground text-center py-8">
+                          Nenhum estudo acadêmico registrado ainda.
+                        </p>
+                      ) : (
+                        studies.map((study) => (
+                          <Card key={study.id}>
+                            <CardContent className="p-4">
+                              <div className="flex flex-col gap-2">
+                                <div className="flex items-center justify-between">
+                                  <h3 className="font-semibold">{study.title}</h3>
+                                  <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">
+                                    {study.type === 'artigo' ? 'Artigo' : 
+                                     study.type === 'dissertacao' ? 'Dissertação' : 
+                                     study.type === 'tese' ? 'Tese' : 'Outro'}
+                                  </span>
+                                </div>
+                                <p className="text-sm">Autor: {study.author}</p>
+                                <p className="text-sm">Localização: {study.location}</p>
+                                <p className="text-sm text-muted-foreground line-clamp-2">{study.summary}</p>
+                                {study.repositoryUrl && (
+                                  <a 
+                                    href={study.repositoryUrl} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                                  >
+                                    Ver repositório
+                                  </a>
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          )}
+
           {/* Aba do Mapa */}
           <TabsContent value="map">
             <Card>
               <CardHeader>
                 <CardTitle>Visualização Geográfica</CardTitle>
+                <CardDescription>
+                  Mapa do Amapá com localização dos estudos registrados
+                </CardDescription>
               </CardHeader>
               <CardContent className="h-[600px]">
-                <Map />
+                <Map points={studies} />
               </CardContent>
             </Card>
           </TabsContent>
