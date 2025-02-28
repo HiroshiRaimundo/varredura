@@ -12,11 +12,13 @@ interface MonitoringItem {
   frequency: string;
   category: string;
   keywords?: string;
+  responsible?: string;
 }
 
 export const useMonitoring = () => {
   const [monitoringItems, setMonitoringItems] = useState<MonitoringItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [responsibleFilter, setResponsibleFilter] = useState<string>("");
   const form = useForm<Omit<MonitoringItem, "id">>();
 
   const fetchMonitoringItems = async () => {
@@ -36,7 +38,8 @@ export const useMonitoring = () => {
         api_url: item.api_url,
         frequency: item.frequency,
         category: item.category,
-        keywords: item.keywords
+        keywords: item.keywords,
+        responsible: item.responsible
       }));
       
       setMonitoringItems(formattedItems);
@@ -63,7 +66,8 @@ export const useMonitoring = () => {
           api_url: data.api_url || null,
           frequency: data.frequency,
           category: data.category,
-          keywords: data.keywords || null
+          keywords: data.keywords || null,
+          responsible: data.responsible || null
         })
         .select()
         .single();
@@ -78,7 +82,8 @@ export const useMonitoring = () => {
         api_url: newItem.api_url,
         frequency: newItem.frequency,
         category: newItem.category,
-        keywords: newItem.keywords
+        keywords: newItem.keywords,
+        responsible: newItem.responsible
       };
       
       // Atualizar estado
@@ -133,10 +138,28 @@ export const useMonitoring = () => {
     linkElement.click();
   };
 
+  // Obter lista única de responsáveis para o filtro
+  const getUniqueResponsibles = () => {
+    const responsibles = monitoringItems
+      .map(item => item.responsible)
+      .filter(responsible => responsible !== undefined && responsible !== null) as string[];
+    
+    return [...new Set(responsibles)];
+  };
+
+  // Filtrar os itens de monitoramento por responsável
+  const filteredMonitoringItems = responsibleFilter
+    ? monitoringItems.filter(item => item.responsible === responsibleFilter)
+    : monitoringItems;
+
   return {
-    monitoringItems,
+    monitoringItems: filteredMonitoringItems,
+    allMonitoringItems: monitoringItems,
     isLoading,
     form,
+    responsibleFilter,
+    setResponsibleFilter,
+    getUniqueResponsibles,
     fetchMonitoringItems,
     handleAddMonitoring,
     handleDeleteMonitoring,

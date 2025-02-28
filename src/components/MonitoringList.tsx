@@ -2,7 +2,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link2, Link, Trash2 } from "lucide-react";
+import { Link2, Link, Trash2, User } from "lucide-react";
 
 interface MonitoringItem {
   id: string;
@@ -11,19 +11,52 @@ interface MonitoringItem {
   api_url?: string;
   frequency: string;
   category: string;
+  responsible?: string;
+  keywords?: string;
 }
 
 interface MonitoringListProps {
   items: MonitoringItem[];
   onDelete: (id: string) => void;
   isLoading?: boolean;
+  uniqueResponsibles?: string[];
+  responsibleFilter?: string;
+  onFilterChange?: (responsible: string) => void;
 }
 
-const MonitoringList: React.FC<MonitoringListProps> = ({ items, onDelete, isLoading = false }) => {
+const MonitoringList: React.FC<MonitoringListProps> = ({ 
+  items, 
+  onDelete, 
+  isLoading = false,
+  uniqueResponsibles = [],
+  responsibleFilter = "",
+  onFilterChange = () => {}
+}) => {
   return (
     <Card className="mt-6">
       <CardHeader>
-        <CardTitle>Monitoramentos Ativos</CardTitle>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <CardTitle>Monitoramentos Ativos</CardTitle>
+          
+          <div className="flex items-center gap-2">
+            <label htmlFor="responsibleFilter" className="text-sm text-muted-foreground">
+              Filtrar por responsável:
+            </label>
+            <select
+              id="responsibleFilter"
+              className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              value={responsibleFilter}
+              onChange={(e) => onFilterChange(e.target.value)}
+            >
+              <option value="">Todos</option>
+              {uniqueResponsibles.map((responsible, index) => (
+                <option key={index} value={responsible}>
+                  {responsible}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -35,7 +68,9 @@ const MonitoringList: React.FC<MonitoringListProps> = ({ items, onDelete, isLoad
           </div>
         ) : items.length === 0 ? (
           <p className="text-muted-foreground text-center py-4">
-            Nenhum item sendo monitorado ainda.
+            {responsibleFilter 
+              ? "Não foram encontrados monitoramentos para este responsável." 
+              : "Nenhum item sendo monitorado ainda."}
           </p>
         ) : (
           <div className="grid gap-4">
@@ -57,6 +92,12 @@ const MonitoringList: React.FC<MonitoringListProps> = ({ items, onDelete, isLoad
                         </div>
                       )}
                       <p className="text-sm text-muted-foreground mt-1">Frequência: {item.frequency}</p>
+                      {item.responsible && (
+                        <div className="flex items-center text-sm text-muted-foreground gap-1 mt-1">
+                          <User size={14} />
+                          <span>Responsável: {item.responsible}</span>
+                        </div>
+                      )}
                     </div>
                     <Button
                       variant="destructive"

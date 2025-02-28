@@ -24,6 +24,9 @@ interface TabContentProps {
   handleStudySubmit: (data: Omit<ResearchStudy, "id" | "coordinates">) => void;
   handleDeleteStudy: (id: string) => void;
   isLoading: boolean;
+  uniqueResponsibles?: string[];
+  responsibleFilter?: string;
+  setResponsibleFilter?: (responsible: string) => void;
 }
 
 // Dados iniciais vazios para o dashboard
@@ -47,7 +50,10 @@ const TabContent: React.FC<TabContentProps> = ({
   handleDeleteMonitoring,
   handleStudySubmit,
   handleDeleteStudy,
-  isLoading
+  isLoading,
+  uniqueResponsibles = [],
+  responsibleFilter = "",
+  setResponsibleFilter = () => {}
 }) => {
   return (
     <Tabs defaultValue="dashboard" className="w-full">
@@ -81,6 +87,9 @@ const TabContent: React.FC<TabContentProps> = ({
             items={monitoringItems} 
             onDelete={handleDeleteMonitoring} 
             isLoading={isLoading}
+            uniqueResponsibles={uniqueResponsibles}
+            responsibleFilter={responsibleFilter}
+            onFilterChange={setResponsibleFilter}
           />
         </TabsContent>
       )}

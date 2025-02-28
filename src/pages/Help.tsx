@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Home, BookOpen, Link, AlertTriangle, FileSearch, Clock, Calendar, Search, Database, FileJson, BarChart, ArrowLeft } from "lucide-react";
+import { Home, BookOpen, Link, AlertTriangle, FileSearch, Clock, Calendar, Search, Database, FileJson, BarChart, ArrowLeft, User, Filter } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
@@ -182,6 +182,7 @@ const Help: React.FC = () => {
                     <p>• Preencha as palavras-chave para filtrar o conteúdo (separadas por vírgula)</p>
                     <p>• Selecione a categoria apropriada</p>
                     <p>• Escolha a frequência de atualização do monitoramento</p>
+                    <p>• <strong>Informe o nome do pesquisador responsável</strong> pelo monitoramento</p>
                     <p>• Clique em "Adicionar Monitoramento" para salvar</p>
                   </div>
                 </div>
@@ -190,8 +191,27 @@ const Help: React.FC = () => {
 
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <User size={20} className="text-primary" />
+                    6. Gerenciando Responsáveis
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Utilize o sistema de responsáveis para organizar e filtrar os monitoramentos por pesquisador.
+                  </p>
+                  <div className="pl-6 text-sm space-y-1">
+                    <p>• Cada monitoramento deve ter um pesquisador responsável designado</p>
+                    <p>• O nome do responsável aparece nos detalhes do monitoramento</p>
+                    <p>• Use o filtro "Filtrar por responsável" acima da lista de monitoramentos para visualizar apenas os itens de um determinado pesquisador</p>
+                    <p>• Selecione "Todos" no filtro para voltar a visualizar todos os monitoramentos</p>
+                    <p>• O sistema gera automaticamente a lista de responsáveis disponíveis no filtro</p>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
                     <FileSearch size={20} className="text-primary" />
-                    6. Utilizando Exemplos de Código
+                    7. Utilizando Exemplos de Código
                   </h3>
                   <p className="text-muted-foreground">
                     O sistema oferece exemplos pré-configurados para diferentes tipos de monitoramento.
@@ -210,14 +230,15 @@ const Help: React.FC = () => {
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold flex items-center gap-2">
                     <Clock size={20} className="text-primary" />
-                    7. Gerenciando Monitoramentos
+                    8. Gerenciando Monitoramentos
                   </h3>
                   <p className="text-muted-foreground">
                     Gerencie seus monitoramentos ativos, visualize dados e remova itens quando necessário.
                   </p>
                   <div className="pl-6 text-sm space-y-1">
                     <p>• Visualize todos os monitoramentos na lista abaixo do formulário</p>
-                    <p>• Verifique detalhes como categoria, URL e frequência</p>
+                    <p>• Use o filtro por responsável para encontrar rapidamente monitoramentos específicos</p>
+                    <p>• Verifique detalhes como categoria, URL, frequência e responsável</p>
                     <p>• Use o botão "Excluir" para remover um monitoramento</p>
                     <p>• No Dashboard, visualize estatísticas sobre os monitoramentos</p>
                     <p>• Exporte os dados através do botão "Exportar Dados" no Dashboard</p>
@@ -228,8 +249,27 @@ const Help: React.FC = () => {
 
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <Filter size={20} className="text-primary" />
+                    9. Filtrando Monitoramentos
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Utilize os filtros do sistema para encontrar rapidamente os monitoramentos que você precisa.
+                  </p>
+                  <div className="pl-6 text-sm space-y-1">
+                    <p>• O filtro por responsável permite visualizar apenas os monitoramentos de um pesquisador específico</p>
+                    <p>• Útil para ambientes com muitos pesquisadores utilizando a plataforma</p>
+                    <p>• Facilita a identificação de quem é responsável por cada monitoramento</p>
+                    <p>• Permite verificar rapidamente os monitoramentos sob sua responsabilidade</p>
+                    <p>• Ajuda na gestão de equipes de pesquisa com diferentes focos de monitoramento</p>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
                     <AlertTriangle size={20} className="text-primary" />
-                    8. Solucionando Problemas Comuns
+                    10. Solucionando Problemas Comuns
                   </h3>
                   <p className="text-muted-foreground">
                     Dicas para resolver problemas que podem ocorrer durante o monitoramento.
@@ -239,6 +279,7 @@ const Help: React.FC = () => {
                     <p>• Para APIs que retornam erro, confirme se as credenciais estão corretas</p>
                     <p>• Verifique a conexão com a internet em caso de falhas de acesso</p>
                     <p>• Para dados desatualizados, confirme a frequência de atualização</p>
+                    <p>• Se um responsável não aparecer no filtro, verifique se ele possui monitoramentos ativos</p>
                     <p>• Em caso de erros persistentes, contate o suporte técnico</p>
                   </div>
                 </div>

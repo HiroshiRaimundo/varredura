@@ -47,6 +47,9 @@ const Index: React.FC = () => {
           handleStudySubmit={research.handleStudySubmit}
           handleDeleteStudy={research.handleDeleteStudy}
           isLoading={monitoring.isLoading}
+          uniqueResponsibles={monitoring.getUniqueResponsibles()}
+          responsibleFilter={monitoring.responsibleFilter}
+          setResponsibleFilter={monitoring.setResponsibleFilter}
         />
       </div>
 

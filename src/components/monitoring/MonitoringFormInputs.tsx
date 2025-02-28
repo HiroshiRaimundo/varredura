@@ -11,6 +11,8 @@ interface MonitoringItem {
   api_url?: string;
   frequency: string;
   category: string;
+  keywords?: string;
+  responsible?: string;
 }
 
 interface MonitoringFormInputsProps {
@@ -104,6 +106,38 @@ const MonitoringFormInputs: React.FC<MonitoringFormInputsProps> = ({ form, onSub
                   <option value="mensal">Mensal</option>
                 </select>
               </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="keywords"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Palavras-chave (opcional)</FormLabel>
+              <FormControl>
+                <Input placeholder="Desmatamento, meio ambiente, amazônia" {...field} />
+              </FormControl>
+              <FormDescription>
+                Separe as palavras-chave por vírgula
+              </FormDescription>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="responsible"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Responsável</FormLabel>
+              <FormControl>
+                <Input placeholder="Nome do pesquisador ou responsável" {...field} />
+              </FormControl>
+              <FormDescription>
+                Informe o nome do pesquisador responsável por este monitoramento
+              </FormDescription>
             </FormItem>
           )}
         />
