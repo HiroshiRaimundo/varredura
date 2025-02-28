@@ -373,6 +373,32 @@ const Help: React.FC = () => {
                 <Separator />
 
                 <div>
+                  <h3 className="text-lg font-semibold mb-2">Linha de Pesquisa</h3>
+                  <p className="text-muted-foreground">
+                    Meio Ambiente e Planejamento
+                  </p>
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Orientação</h3>
+                  <div className="space-y-2">
+                    <div>
+                      <h4 className="font-medium">Orientador</h4>
+                      <p className="text-muted-foreground">Prof. Dr. Marco Antônio Augusto Chagas</p>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium">Coorientadora</h4>
+                      <p className="text-muted-foreground">Profa. Dra. Lylian Caroline Maciel Rodrigues</p>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div>
                   <h3 className="text-lg font-semibold mb-2">Créditos</h3>
                   <div className="space-y-4">
                     <div>
@@ -383,6 +409,14 @@ const Help: React.FC = () => {
                     <div>
                       <h4 className="font-medium">Desenvolvimento dos Códigos de Monitoramento</h4>
                       <p className="text-muted-foreground">Equipe de Desenvolvimento do PPGDAS</p>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium">Tecnologia de Web Scraping</h4>
+                      <p className="text-muted-foreground">
+                        <a href="https://scrapy.org/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Scrapy</a> - 
+                        Uma estrutura colaborativa e de código aberto para extrair os dados que você precisa de sites.
+                      </p>
                     </div>
                     
                     <div>
