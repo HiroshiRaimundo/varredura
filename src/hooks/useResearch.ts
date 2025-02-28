@@ -55,62 +55,61 @@ export const useResearch = () => {
   };
 
   const handleStudySubmit = async (data: Omit<ResearchStudy, "id" | "coordinates">) => {
-    // Geocodificar a localização para obter as coordenadas
-    const coordinates = geocodeLocation(data.location);
-    
-    if (coordinates) {
-      try {
-        // Inserir no Supabase
-        const { data: newStudy, error } = await supabase
-          .from('research_studies')
-          .insert({
-            title: data.title,
-            author: data.author,
-            co_authors: data.coAuthors,
-            summary: data.summary,
-            repository_url: data.repositoryUrl,
-            location: data.location,
-            coordinates: coordinates,
-            type: data.type
-          })
-          .select()
-          .single();
-        
-        if (error) throw error;
-        
-        // Converter formato do banco para formato da aplicação
-        const formattedStudy: ResearchStudy = {
-          id: newStudy.id,
-          title: newStudy.title,
-          author: newStudy.author,
-          coAuthors: newStudy.co_authors,
-          summary: newStudy.summary,
-          repositoryUrl: newStudy.repository_url,
-          location: newStudy.location,
-          coordinates: newStudy.coordinates as [number, number],
-          type: newStudy.type as "artigo" | "dissertacao" | "tese" | "outro"
-        };
-        
-        // Atualizar estado
-        setStudies(prev => [formattedStudy, ...prev]);
-        form.reset();
-        
-        toast({
-          title: "Estudo adicionado",
-          description: `"${data.title}" foi adicionado ao mapa.`
-        });
-      } catch (error) {
-        console.error('Erro ao adicionar estudo:', error);
-        toast({
-          title: "Erro ao adicionar estudo",
-          description: "Não foi possível adicionar o estudo ao banco de dados.",
-          variant: "destructive"
-        });
+    try {
+      // Geocodificar a localização para obter as coordenadas
+      const coordinates = geocodeLocation(data.location);
+      
+      // Usar coordenadas fixas para o Amapá como fallback
+      // Coordenadas aproximadas de Macapá: [0.0356, -51.0705]
+      const fallbackCoordinates: [number, number] = [0.0356, -51.0705];
+      
+      // Inserir no Supabase
+      const { data: newStudy, error } = await supabase
+        .from('research_studies')
+        .insert({
+          title: data.title,
+          author: data.author,
+          co_authors: data.coAuthors,
+          summary: data.summary,
+          repository_url: data.repositoryUrl,
+          location: data.location,
+          coordinates: coordinates || fallbackCoordinates,
+          type: data.type
+        })
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Erro detalhado:', error);
+        throw error;
       }
-    } else {
+      
+      // Converter formato do banco para formato da aplicação
+      const formattedStudy: ResearchStudy = {
+        id: newStudy.id,
+        title: newStudy.title,
+        author: newStudy.author,
+        coAuthors: newStudy.co_authors,
+        summary: newStudy.summary,
+        repositoryUrl: newStudy.repository_url,
+        location: newStudy.location,
+        coordinates: newStudy.coordinates as [number, number],
+        type: newStudy.type as "artigo" | "dissertacao" | "tese" | "outro"
+      };
+      
+      // Atualizar estado
+      setStudies(prev => [formattedStudy, ...prev]);
+      form.reset();
+      
       toast({
-        title: "Erro de localização",
-        description: "Não foi possível encontrar as coordenadas para a localização informada.",
+        title: "Estudo adicionado",
+        description: `"${data.title}" foi adicionado ao mapa.`
+      });
+    } catch (error) {
+      console.error('Erro ao adicionar estudo:', error);
+      toast({
+        title: "Erro ao adicionar estudo",
+        description: "Não foi possível adicionar o estudo ao banco de dados. Verifique os logs para mais detalhes.",
         variant: "destructive"
       });
     }
