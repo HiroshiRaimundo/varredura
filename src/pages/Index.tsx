@@ -142,14 +142,19 @@ const Index: React.FC = () => {
     }
   };
 
+  const handleDeleteStudy = (id: string) => {
+    setStudies(prev => prev.filter(study => study.id !== id));
+    toast({
+      title: "Análise removida",
+      description: "A análise foi removida com sucesso."
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         <header className="flex justify-between items-center mb-8">
           <div className="text-center flex-1">
-            <h1 className="text-4xl font-bold tracking-tight text-primary">
-              Observatório de Desenvolvimento Regional
-            </h1>
             <p className="text-lg text-muted-foreground mt-2">
               Monitoramento e Análise de Indicadores Regionais
             </p>
@@ -211,7 +216,10 @@ const Index: React.FC = () => {
                   form={studyForm} 
                   onSubmit={handleStudySubmit} 
                 />
-                <ResearchList studies={studies} />
+                <ResearchList 
+                  studies={studies} 
+                  onDelete={handleDeleteStudy}
+                />
               </div>
             </TabsContent>
           )}

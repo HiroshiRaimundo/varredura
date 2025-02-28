@@ -1,6 +1,8 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 
 interface ResearchStudy {
   id: string;
@@ -16,55 +18,66 @@ interface ResearchStudy {
 
 interface ResearchListProps {
   studies: ResearchStudy[];
+  onDelete: (id: string) => void;
 }
 
-const ResearchList: React.FC<ResearchListProps> = ({ studies }) => {
+const ResearchList: React.FC<ResearchListProps> = ({ studies, onDelete }) => {
+  if (studies.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Estudos Cadastrados</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">Nenhum estudo cadastrado.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Estudos Registrados</CardTitle>
-        <CardDescription>
-          {studies.length} {studies.length === 1 ? 'estudo acadêmico' : 'estudos acadêmicos'} no sistema
-        </CardDescription>
+        <CardTitle>Estudos Cadastrados</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
-          {studies.length === 0 ? (
-            <p className="text-muted-foreground text-center py-8">
-              Nenhum estudo acadêmico registrado ainda.
-            </p>
-          ) : (
-            studies.map((study) => (
-              <Card key={study.id}>
-                <CardContent className="p-4">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold">{study.title}</h3>
-                      <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">
-                        {study.type === 'artigo' ? 'Artigo' : 
-                         study.type === 'dissertacao' ? 'Dissertação' : 
-                         study.type === 'tese' ? 'Tese' : 'Outro'}
-                      </span>
-                    </div>
-                    <p className="text-sm">Autor: {study.author}</p>
-                    <p className="text-sm">Localização: {study.location}</p>
-                    <p className="text-sm text-muted-foreground line-clamp-2">{study.summary}</p>
-                    {study.repositoryUrl && (
-                      <a 
-                        href={study.repositoryUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-                      >
-                        Ver repositório
-                      </a>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
+        <ul className="space-y-4">
+          {studies.map((study) => (
+            <li key={study.id} className="border p-4 rounded-md">
+              <div className="flex justify-between">
+                <h3 className="font-medium">{study.title}</h3>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 text-destructive" 
+                  onClick={() => onDelete(study.id)}
+                >
+                  <Trash2 size={16} />
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                <span className="font-medium">Autor:</span> {study.author}
+                {study.coAuthors && <span> | <span className="font-medium">Co-autores:</span> {study.coAuthors}</span>}
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">
+                <span className="font-medium">Local:</span> {study.location}
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">
+                <span className="font-medium">Tipo:</span> {study.type}
+              </p>
+              {study.summary && (
+                <div className="mt-2">
+                  <p className="text-sm">
+                    <span className="font-medium">Resumo:</span>{" "}
+                    {study.summary.length > 150
+                      ? `${study.summary.substring(0, 150)}...`
+                      : study.summary}
+                  </p>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
       </CardContent>
     </Card>
   );

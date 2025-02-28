@@ -3,6 +3,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Button } from "@/components/ui/button";
+import AnalysisTools from "./AnalysisTools";
 
 interface DashboardProps {
   data: Array<{
@@ -108,6 +109,9 @@ const Dashboard: React.FC<DashboardProps> = ({
           </CardContent>
         </Card>
       </div>
+
+      {/* Ferramentas de Análise */}
+      {isAuthenticated && <AnalysisTools />}
     </div>
   );
 };
