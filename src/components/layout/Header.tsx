@@ -18,14 +18,13 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   return (
     <header className="flex justify-between items-center mb-8">
-      {/* Ícone Home com link para o observatório */}
+      {/* Simplified home icon without the text */}
       <div className="flex items-center">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
               <a href="https://observatório.org" target="_blank" rel="noopener noreferrer" className="flex items-center text-primary hover:text-primary/80 transition-colors">
-                <Home size={24} className="mr-2" />
-                <span className="font-medium hidden md:inline">Observatório</span>
+                <Home size={24} />
               </a>
             </TooltipTrigger>
             <TooltipContent>

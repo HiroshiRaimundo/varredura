@@ -7,9 +7,11 @@ interface MapMarkerProps {
   point: MapPoint;
   map: mapboxgl.Map;
   onClick: (point: MapPoint) => void;
+  index: number; // Add index to help with positioning
+  total: number; // Add total number of markers at this location
 }
 
-const MapMarker: React.FC<MapMarkerProps> = ({ point, map, onClick }) => {
+const MapMarker: React.FC<MapMarkerProps> = ({ point, map, onClick, index, total }) => {
   React.useEffect(() => {
     // Create a detailed popup with more information
     const popup = new mapboxgl.Popup({
@@ -47,13 +49,22 @@ const MapMarker: React.FC<MapMarkerProps> = ({ point, map, onClick }) => {
         markerColor = '#808080'; // Grey for 'outro'
     }
 
-    // Apply a small random offset to prevent exact overlay of markers at the same location
+    // Calculate position offset for markers at the same location
+    // This creates a circular pattern around the actual coordinates
+    let offsetX = 0;
+    let offsetY = 0;
+    
+    if (total > 1) {
+      // Calculate positions in a circular pattern
+      const radius = Math.min(total * 5, 25); // Limit the radius
+      const angle = (index / total) * 2 * Math.PI;
+      offsetX = Math.cos(angle) * radius;
+      offsetY = Math.sin(angle) * radius;
+    }
+
     const marker = new mapboxgl.Marker({ 
       color: markerColor,
-      offset: [
-        Math.random() * 10 - 5,
-        Math.random() * 10 - 5
-      ]
+      offset: [offsetX, offsetY]
     })
       .setLngLat(point.coordinates)
       .addTo(map);
@@ -76,7 +87,7 @@ const MapMarker: React.FC<MapMarkerProps> = ({ point, map, onClick }) => {
       marker.remove();
       popup.remove();
     };
-  }, [map, point, onClick]);
+  }, [map, point, onClick, index, total]);
 
   return null;
 };

@@ -93,19 +93,42 @@ const MapContainer: React.FC<MapContainerProps> = ({ points, onSelectPoint }) =>
     }
   }, [points]);
 
+  // Function to group points by coordinates
+  const groupPointsByLocation = () => {
+    const locationGroups: { [key: string]: MapPoint[] } = {};
+    
+    points.forEach(point => {
+      const locationKey = `${point.coordinates[0]},${point.coordinates[1]}`;
+      if (!locationGroups[locationKey]) {
+        locationGroups[locationKey] = [];
+      }
+      locationGroups[locationKey].push(point);
+    });
+    
+    return locationGroups;
+  };
+
   return (
     <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
       <div ref={mapContainer} className="absolute inset-0" />
       <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent to-background/10 rounded-lg" />
       
-      {map.current && points.map(point => (
-        <MapMarker 
-          key={point.id} 
-          point={point} 
-          map={map.current} 
-          onClick={onSelectPoint}
-        />
-      ))}
+      {map.current && (() => {
+        const locationGroups = groupPointsByLocation();
+        
+        return Object.values(locationGroups).flatMap(group => 
+          group.map((point, index) => (
+            <MapMarker 
+              key={point.id} 
+              point={point} 
+              map={map.current!} 
+              onClick={onSelectPoint}
+              index={index}
+              total={group.length}
+            />
+          ))
+        );
+      })()}
     </div>
   );
 };
