@@ -8,7 +8,7 @@ import ResearchForm from "@/components/ResearchForm";
 import ResearchList from "@/components/ResearchList";
 import MapView from "@/components/MapView";
 import { MonitoringItem } from "@/hooks/useMonitoring";
-import { ResearchStudy } from "@/hooks/useResearch";
+import { ResearchStudy } from "@/types/research";
 
 interface TabContentProps {
   isAuthenticated: boolean;
