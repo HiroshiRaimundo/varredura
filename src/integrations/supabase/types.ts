@@ -16,6 +16,7 @@ export type Database = {
           created_at: string
           frequency: string
           id: string
+          keywords: string | null
           name: string
           url: string
         }
@@ -25,6 +26,7 @@ export type Database = {
           created_at?: string
           frequency: string
           id?: string
+          keywords?: string | null
           name: string
           url: string
         }
@@ -34,6 +36,7 @@ export type Database = {
           created_at?: string
           frequency?: string
           id?: string
+          keywords?: string | null
           name?: string
           url?: string
         }
