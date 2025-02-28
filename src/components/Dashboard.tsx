@@ -238,7 +238,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         {/* Distribuição por Responsável - Gráfico de Barras */}
         <Card>
           <CardHeader>
-            <CardTitle>Top 5 Responsáveis</CardTitle>
+            <CardTitle>Top 5 Pesquisadores</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
