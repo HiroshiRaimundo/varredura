@@ -22,6 +22,20 @@ const Index: React.FC = () => {
   useEffect(() => {
     monitoring.fetchMonitoringItems();
     research.fetchResearchStudies();
+    
+    // Set up event listener for storage changes (for cross-tab login/logout synchronization)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "isAuthenticated") {
+        if (e.newValue === "true") {
+          auth.setIsLoginDialogOpen(false);
+        }
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   return (

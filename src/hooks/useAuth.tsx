@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 
@@ -13,13 +13,32 @@ export const useAuth = () => {
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const form = useForm<LoginCredentials>();
 
+  // Check for authentication on component mount
+  useEffect(() => {
+    const checkAuthStatus = () => {
+      // Check for authentication in local storage (for the help page)
+      const storedAuth = localStorage.getItem("isAuthenticated");
+      if (storedAuth === "true") {
+        setIsAuthenticated(true);
+      }
+    };
+
+    checkAuthStatus();
+  }, []);
+
   const handleLogin = (data: LoginCredentials) => {
-    // Verificar credenciais (odr@2025 / Ppgdas@2025)
+    // Verify credentials (now using a shared login: odr@2025 / Ppgdas@2025)
     if (data.email === "odr@2025" && data.password === "Ppgdas@2025") {
       setIsAuthenticated(true);
       setIsLoginDialogOpen(false);
-      // Salvar autenticação no localStorage para a página de ajuda
+      
+      // Save authentication in localStorage for page navigation
       localStorage.setItem("isAuthenticated", "true");
+      
+      // Create a session timestamp to track login
+      const sessionId = Date.now().toString();
+      localStorage.setItem("sessionId", sessionId);
+      
       toast({
         title: "Login realizado com sucesso",
         description: "Bem-vindo ao sistema de monitoramento."
@@ -35,8 +54,10 @@ export const useAuth = () => {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    // Remover autenticação do localStorage
+    // Remove authentication from localStorage
     localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("sessionId");
+    
     toast({
       title: "Logout realizado",
       description: "Você saiu do sistema."
