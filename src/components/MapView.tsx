@@ -23,10 +23,10 @@ const MapView: React.FC<MapViewProps> = ({ studies }) => {
       </CardHeader>
       <CardContent>
         <div className="flex flex-col lg:flex-row gap-4">
-          <div className="w-full lg:w-3/4">
+          <div className="w-full lg:w-4/5">
             <Map points={studies} />
           </div>
-          <div className="w-full lg:w-1/4">
+          <div className="w-full lg:w-1/5">
             <SearchPanel 
               studies={studies} 
               onSearchResults={setSearchResults} 

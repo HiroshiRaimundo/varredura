@@ -109,7 +109,7 @@ const MapContainer: React.FC<MapContainerProps> = ({ points, onSelectPoint }) =>
   };
 
   return (
-    <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
+    <div className="relative w-full h-[500px] rounded-lg overflow-hidden">
       <div ref={mapContainer} className="absolute inset-0" />
       <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent to-background/10 rounded-lg" />
       
