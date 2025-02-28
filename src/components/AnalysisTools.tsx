@@ -3,50 +3,96 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Download, ExternalLink } from "lucide-react";
+import { Download } from "lucide-react";
 
-const pandasScript = `
+interface MonitoringItem {
+  id: string;
+  name: string;
+  url: string;
+  frequency: string;
+  category: string;
+}
+
+interface AnalysisToolsProps {
+  items: MonitoringItem[];
+}
+
+const pandasScriptTemplate = (siteUrl: string, siteName: string) => `
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import requests
+from bs4 import BeautifulSoup
 
-# Carregar dados do monitoramento
-def analisar_dados_monitoramento(arquivo_json):
-    # Carregar dados do JSON
-    dados = pd.read_json(arquivo_json)
+# Configurações do site a ser monitorado
+SITE_URL = "${siteUrl}"
+SITE_NAME = "${siteName}"
+
+# Função para coletar dados do site
+def coletar_dados():
+    try:
+        response = requests.get(SITE_URL)
+        response.raise_for_status()
+        
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Aqui você deve personalizar a extração conforme a estrutura do site
+        # Este é apenas um exemplo genérico
+        dados = []
+        tabelas = soup.find_all('table')
+        
+        for tabela in tabelas:
+            for linha in tabela.find_all('tr'):
+                colunas = linha.find_all('td')
+                if colunas:
+                    dados.append([col.text.strip() for col in colunas])
+        
+        # Criar DataFrame
+        df = pd.DataFrame(dados)
+        return df
+    except Exception as e:
+        print(f"Erro ao coletar dados de {SITE_NAME}: {str(e)}")
+        return pd.DataFrame()
+
+# Análise dos dados
+def analisar_dados(df):
+    if df.empty:
+        print("Sem dados para analisar")
+        return
     
-    # Análise básica
+    # Resumo estatístico
     print("Resumo estatístico:")
-    print(dados.describe())
+    print(df.describe())
     
-    # Agrupar por categoria
-    por_categoria = dados.groupby('category').count()
-    print("\\nContagem por categoria:")
-    print(por_categoria)
-    
-    # Visualização - gráfico de barras por categoria
-    plt.figure(figsize=(10, 6))
-    por_categoria['name'].plot(kind='bar')
-    plt.title('Quantidade de Monitoramentos por Categoria')
-    plt.xlabel('Categoria')
-    plt.ylabel('Quantidade')
-    plt.savefig('monitoramentos_por_categoria.png')
-    
-    return dados
+    # Visualizações básicas
+    try:
+        plt.figure(figsize=(10, 6))
+        df.iloc[:, 0].value_counts().plot(kind='bar')
+        plt.title(f'Análise de {SITE_NAME}')
+        plt.tight_layout()
+        plt.savefig(f'{SITE_NAME.replace(" ", "_")}_analise.png')
+    except Exception as e:
+        print(f"Erro ao gerar visualização: {str(e)}")
 
-# Exemplo de uso
-dados = analisar_dados_monitoramento('monitoramento-dados.json')
+# Execução principal
+if __name__ == "__main__":
+    print(f"Iniciando monitoramento de {SITE_NAME}")
+    df = coletar_dados()
+    if not df.empty:
+        df.to_csv(f'{SITE_NAME.replace(" ", "_")}_dados.csv', index=False)
+        print(f"Dados salvos em {SITE_NAME.replace(' ', '_')}_dados.csv")
+        analisar_dados(df)
 `;
 
-const jupyterNotebook = `
+const jupyterNotebookTemplate = (siteUrl: string, siteName: string) => `
 {
  "cells": [
   {
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "# Análise de Dados do Observatório Regional\\n",
-    "Este notebook demonstra como analisar os dados coletados pelo sistema de monitoramento."
+    "# Análise de Dados: ${siteName}\\n",
+    "Este notebook demonstra como analisar os dados coletados do site ${siteUrl}"
    ]
   },
   {
@@ -59,6 +105,8 @@ const jupyterNotebook = `
     "import numpy as np\\n",
     "import matplotlib.pyplot as plt\\n",
     "import seaborn as sns\\n",
+    "import requests\\n",
+    "from bs4 import BeautifulSoup\\n",
     "\\n",
     "# Configuração visual\\n",
     "plt.style.use('ggplot')\\n",
@@ -72,18 +120,11 @@ const jupyterNotebook = `
    "metadata": {},
    "outputs": [],
    "source": [
-    "# Carregar dados exportados do sistema\\n",
-    "dados_monitoramento = pd.read_json('monitoramento-dados.json')\\n",
+    "# Configurações do site a ser monitorado\\n",
+    "SITE_URL = \\"${siteUrl}\\"\\n",
+    "SITE_NAME = \\"${siteName}\\"\\n",
     "\\n",
-    "# Exibir primeiras linhas\\n",
-    "dados_monitoramento.head()"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "## Análise por Categoria"
+    "print(f\\"Analisando dados de {SITE_NAME}\\")\\n"
    ]
   },
   {
@@ -92,22 +133,69 @@ const jupyterNotebook = `
    "metadata": {},
    "outputs": [],
    "source": [
-    "# Agrupar por categoria\\n",
-    "por_categoria = dados_monitoramento.groupby('category').count()['name']\\n",
+    "# Função para coletar dados do site\\n",
+    "def coletar_dados():\\n",
+    "    try:\\n",
+    "        response = requests.get(SITE_URL)\\n",
+    "        response.raise_for_status()\\n",
+    "        \\n",
+    "        soup = BeautifulSoup(response.text, 'html.parser')\\n",
+    "        \\n",
+    "        # Personalizar a extração para este site específico\\n",
+    "        # Este é apenas um exemplo genérico\\n",
+    "        dados = []\\n",
+    "        tabelas = soup.find_all('table')\\n",
+    "        \\n",
+    "        for tabela in tabelas:\\n",
+    "            for linha in tabela.find_all('tr'):\\n",
+    "                colunas = linha.find_all('td')\\n",
+    "                if colunas:\\n",
+    "                    dados.append([col.text.strip() for col in colunas])\\n",
+    "        \\n",
+    "        # Criar DataFrame\\n",
+    "        df = pd.DataFrame(dados)\\n",
+    "        return df\\n",
+    "    except Exception as e:\\n",
+    "        print(f\\"Erro ao coletar dados: {str(e)}\\")\\n",
+    "        return pd.DataFrame()\\n",
     "\\n",
-    "# Visualizar distribuição por categoria\\n",
-    "plt.figure(figsize=(10, 6))\\n",
-    "por_categoria.plot(kind='pie', autopct='%1.1f%%')\\n",
-    "plt.title('Distribuição de Monitoramentos por Categoria')\\n",
-    "plt.ylabel('')  # Remove label do eixo y\\n",
-    "plt.show()"
+    "# Coletar dados\\n",
+    "df = coletar_dados()\\n",
+    "df.head()"
    ]
   },
   {
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "## Análise Temporal de Monitoramentos"
+    "## Análise Exploratória"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Análise estatística básica\\n",
+    "df.describe()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Visualizações\\n",
+    "plt.figure(figsize=(10, 6))\\n",
+    "try:\\n",
+    "    df.iloc[:, 0].value_counts().plot(kind='bar')\\n",
+    "    plt.title(f'Análise de {SITE_NAME}')\\n",
+    "    plt.tight_layout()\\n",
+    "except:\\n",
+    "    print(\\"Erro ao gerar visualização com os dados disponíveis\\")\\n",
+    "plt.show()"
    ]
   }
  ],
@@ -135,134 +223,203 @@ const jupyterNotebook = `
 }
 `;
 
-const powerBIScript = `
-# Power BI Script - Conexão com os dados do Observatório
+const powerBIScriptTemplate = (siteName: string) => `
+# Power BI Script - Análise de ${siteName}
 
-# 1. Importar os dados JSON
+# 1. Importar os dados do site monitorado
 let
-    Source = Json.Document(File.Contents("C:\\Dados\\monitoramento-dados.json")),
-    #"Convertido para Tabela" = Table.FromList(Source, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
-    #"Colunas Expandidas" = Table.ExpandRecordColumn(#"Convertido para Tabela", "Column1", {"id", "name", "url", "frequency", "category"}, {"id", "name", "url", "frequency", "category"})
+    Source = Csv.Document(File.Contents("C:\\Dados\\${siteName.replace(/ /g, "_")}_dados.csv"),[Delimiter=",", Columns=25, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"Data", type date}})
 in
-    #"Colunas Expandidas"
+    #"Tipo Alterado"
 
 # 2. Criar medidas para análise
-Contagem Total = COUNTROWS('monitoramento-dados')
+Total de Registros = COUNTROWS('${siteName.replace(/ /g, "_")}_dados')
 
-Contagem por Categoria = 
+Registros por Mês = 
 CALCULATE(
-    COUNTROWS('monitoramento-dados'),
-    ALLEXCEPT('monitoramento-dados', 'monitoramento-dados'[category])
-)
-
-Frequência Mensal = 
-CALCULATE(
-    COUNTROWS('monitoramento-dados'),
-    'monitoramento-dados'[frequency] = "mensal"
+    COUNTROWS('${siteName.replace(/ /g, "_")}_dados'),
+    DATESBETWEEN('${siteName.replace(/ /g, "_")}_dados'[Data], STARTOFMONTH('${siteName.replace(/ /g, "_")}_dados'[Data]), ENDOFMONTH('${siteName.replace(/ /g, "_")}_dados'[Data]))
 )
 `;
 
-const AnalysisTools: React.FC = () => {
+const AnalysisTools: React.FC<AnalysisToolsProps> = ({ items }) => {
+  const [activeTab, setActiveTab] = React.useState("pandas");
+  
+  const downloadScript = (item: MonitoringItem, type: string) => {
+    let filename = '';
+    let content = '';
+    let fileType = '';
+    
+    switch (type) {
+      case 'pandas':
+        filename = `${item.name.replace(/ /g, "_")}_analysis.py`;
+        content = pandasScriptTemplate(item.url, item.name);
+        fileType = 'text/plain';
+        break;
+      case 'jupyter':
+        filename = `${item.name.replace(/ /g, "_")}_notebook.ipynb`;
+        content = jupyterNotebookTemplate(item.url, item.name);
+        fileType = 'application/json';
+        break;
+      case 'powerbi':
+        filename = `${item.name.replace(/ /g, "_")}_powerbi.pq`;
+        content = powerBIScriptTemplate(item.name);
+        fileType = 'text/plain';
+        break;
+      default:
+        return;
+    }
+    
+    const blob = new Blob([content], { type: fileType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <Card className="mt-6">
       <CardHeader>
         <CardTitle>Ferramentas de Análise</CardTitle>
         <CardDescription>
-          Integrações com ferramentas analíticas para processamento dos dados coletados
+          Scripts personalizados para análise dos sites monitorados
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="pandas" className="w-full">
+        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-4">
             <TabsTrigger value="pandas">Pandas/Python</TabsTrigger>
             <TabsTrigger value="jupyter">Jupyter Notebook</TabsTrigger>
             <TabsTrigger value="powerbi">Power BI</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="pandas">
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-lg font-medium mb-2">Análise com Pandas</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Script Python utilizando Pandas para análise estatística e visualização dos dados coletados pelo sistema de monitoramento.
-                </p>
-                
-                <div className="bg-muted p-4 rounded-md overflow-auto max-h-[400px] font-mono text-sm">
-                  {pandasScript.split('\n').map((line, i) => (
-                    <div key={i} className="whitespace-pre">
-                      {line}
-                    </div>
-                  ))}
-                </div>
+          <TabsContent value="pandas" className="space-y-4">
+            {items.length === 0 ? (
+              <p className="text-muted-foreground text-center py-4">
+                Adicione sites para monitoramento para gerar scripts de análise.
+              </p>
+            ) : (
+              <div className="border rounded-md overflow-hidden">
+                <table className="min-w-full divide-y">
+                  <thead className="bg-muted">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">Site Monitorado</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">Categoria</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">Frequência</th>
+                      <th className="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider">Script Python</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-card divide-y">
+                    {items.map((item) => (
+                      <tr key={item.id}>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm">{item.name}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm">{item.category}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm">{item.frequency}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-right">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex items-center gap-1" 
+                            onClick={() => downloadScript(item, 'pandas')}
+                          >
+                            <Download size={14} />
+                            <span>Python</span>
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-              
-              <div className="flex justify-between">
-                <Button variant="outline" className="flex items-center gap-2">
-                  <Download size={16} />
-                  Baixar Script Python
-                </Button>
-                <Button className="flex items-center gap-2">
-                  <ExternalLink size={16} />
-                  Executar no Google Colab
-                </Button>
-              </div>
-            </div>
+            )}
           </TabsContent>
           
-          <TabsContent value="jupyter">
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-lg font-medium mb-2">Jupyter Notebook para Análise</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Notebook Jupyter para análise exploratória interativa dos dados coletados. Inclui visualizações e análises estatísticas.
-                </p>
-                
-                <div className="bg-muted p-4 rounded-md overflow-auto max-h-[400px] font-mono text-sm">
-                  <pre>{jupyterNotebook}</pre>
-                </div>
+          <TabsContent value="jupyter" className="space-y-4">
+            {items.length === 0 ? (
+              <p className="text-muted-foreground text-center py-4">
+                Adicione sites para monitoramento para gerar notebooks Jupyter.
+              </p>
+            ) : (
+              <div className="border rounded-md overflow-hidden">
+                <table className="min-w-full divide-y">
+                  <thead className="bg-muted">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">Site Monitorado</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">Categoria</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">Frequência</th>
+                      <th className="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider">Jupyter Notebook</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-card divide-y">
+                    {items.map((item) => (
+                      <tr key={item.id}>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm">{item.name}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm">{item.category}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm">{item.frequency}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-right">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex items-center gap-1" 
+                            onClick={() => downloadScript(item, 'jupyter')}
+                          >
+                            <Download size={14} />
+                            <span>Notebook</span>
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-              
-              <div className="flex justify-between">
-                <Button variant="outline" className="flex items-center gap-2">
-                  <Download size={16} />
-                  Baixar Notebook
-                </Button>
-                <Button className="flex items-center gap-2">
-                  <ExternalLink size={16} />
-                  Abrir no Jupyter
-                </Button>
-              </div>
-            </div>
+            )}
           </TabsContent>
           
-          <TabsContent value="powerbi">
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-lg font-medium mb-2">Integração com Power BI</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Scripts para importação e análise dos dados no Power BI, permitindo a criação de dashboards interativos.
-                </p>
-                
-                <div className="bg-muted p-4 rounded-md overflow-auto max-h-[400px] font-mono text-sm">
-                  {powerBIScript.split('\n').map((line, i) => (
-                    <div key={i} className="whitespace-pre">
-                      {line}
-                    </div>
-                  ))}
-                </div>
+          <TabsContent value="powerbi" className="space-y-4">
+            {items.length === 0 ? (
+              <p className="text-muted-foreground text-center py-4">
+                Adicione sites para monitoramento para gerar scripts Power BI.
+              </p>
+            ) : (
+              <div className="border rounded-md overflow-hidden">
+                <table className="min-w-full divide-y">
+                  <thead className="bg-muted">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">Site Monitorado</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">Categoria</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">Frequência</th>
+                      <th className="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider">Script Power BI</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-card divide-y">
+                    {items.map((item) => (
+                      <tr key={item.id}>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm">{item.name}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm">{item.category}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm">{item.frequency}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-right">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex items-center gap-1" 
+                            onClick={() => downloadScript(item, 'powerbi')}
+                          >
+                            <Download size={14} />
+                            <span>Power BI</span>
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-              
-              <div className="flex justify-between">
-                <Button variant="outline" className="flex items-center gap-2">
-                  <Download size={16} />
-                  Baixar Template Power BI
-                </Button>
-                <Button className="flex items-center gap-2">
-                  <ExternalLink size={16} />
-                  Tutorial de Integração
-                </Button>
-              </div>
-            </div>
+            )}
           </TabsContent>
         </Tabs>
       </CardContent>

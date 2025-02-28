@@ -5,6 +5,14 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, L
 import { Button } from "@/components/ui/button";
 import AnalysisTools from "./AnalysisTools";
 
+interface MonitoringItem {
+  id: string;
+  name: string;
+  url: string;
+  frequency: string;
+  category: string;
+}
+
 interface DashboardProps {
   data: Array<{
     name: string;
@@ -16,6 +24,7 @@ interface DashboardProps {
   setTimeRange: (value: string) => void;
   handleExport: () => void;
   isAuthenticated: boolean;
+  monitoringItems: MonitoringItem[];
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ 
@@ -23,7 +32,8 @@ const Dashboard: React.FC<DashboardProps> = ({
   timeRange, 
   setTimeRange, 
   handleExport, 
-  isAuthenticated 
+  isAuthenticated,
+  monitoringItems
 }) => {
   return (
     <div className="grid gap-6">
@@ -110,8 +120,8 @@ const Dashboard: React.FC<DashboardProps> = ({
         </Card>
       </div>
 
-      {/* Ferramentas de Análise */}
-      {isAuthenticated && <AnalysisTools />}
+      {/* Ferramentas de Análise - apenas para administradores */}
+      {isAuthenticated && <AnalysisTools items={monitoringItems} />}
     </div>
   );
 };

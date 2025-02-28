@@ -191,6 +191,7 @@ const Index: React.FC = () => {
               setTimeRange={setTimeRange}
               handleExport={handleExport}
               isAuthenticated={isAuthenticated}
+              monitoringItems={monitoringItems}
             />
           </TabsContent>
 
