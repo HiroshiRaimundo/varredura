@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import Map from "@/components/Map";
@@ -7,18 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Search, Filter, X } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-
-interface ResearchStudy {
-  id: string;
-  title: string;
-  author: string;
-  coAuthors: string;
-  summary: string;
-  repositoryUrl: string;
-  location: string;
-  coordinates: [number, number];
-  type: "artigo" | "dissertacao" | "tese" | "outro";
-}
+import { ResearchStudy } from "@/types/research";
 
 interface MapViewProps {
   studies: ResearchStudy[];
@@ -27,17 +15,20 @@ interface MapViewProps {
 const MapView: React.FC<MapViewProps> = ({ studies }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState<string>("all");
-  const [filteredStudies, setFilteredStudies] = useState<ResearchStudy[]>(studies);
+  const [filteredStudies, setFilteredStudies] = useState<ResearchStudy[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
-  // Atualiza o filteredStudies quando studies muda
   React.useEffect(() => {
-    setFilteredStudies(studies);
-  }, [studies]);
+    if (!hasSearched) {
+      setFilteredStudies([]);
+    }
+  }, [studies, hasSearched]);
 
   const handleSearch = () => {
     if (!searchTerm.trim()) {
-      setFilteredStudies(studies);
+      setFilteredStudies([]);
+      setHasSearched(false);
       return;
     }
 
@@ -64,20 +55,22 @@ const MapView: React.FC<MapViewProps> = ({ studies }) => {
     });
 
     setFilteredStudies(filtered);
+    setHasSearched(true);
   };
 
   const clearSearch = () => {
     setSearchTerm("");
     setSearchType("all");
-    setFilteredStudies(studies);
+    setFilteredStudies([]);
+    setHasSearched(false);
   };
 
-  // Quando o termo de busca muda
   React.useEffect(() => {
     if (searchTerm === "") {
-      setFilteredStudies(studies);
+      setFilteredStudies([]);
+      setHasSearched(false);
     }
-  }, [searchTerm, studies]);
+  }, [searchTerm]);
 
   return (
     <Card>
@@ -90,17 +83,12 @@ const MapView: React.FC<MapViewProps> = ({ studies }) => {
       </CardHeader>
       <CardContent>
         <div className="flex flex-col lg:flex-row gap-4">
-          {/* Mapa na esquerda (ou em cima em telas menores) */}
           <div className="w-full lg:w-3/4">
-            <Map points={filteredStudies} />
+            <Map points={studies} />
           </div>
-
-          {/* Repositório/Buscador na direita (ou embaixo em telas menores) */}
           <div className="w-full lg:w-1/4 border rounded-md p-4">
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Repositório</h3>
-              
-              {/* Barra de pesquisa */}
               <div className="relative">
                 <Input
                   type="text"
@@ -130,12 +118,9 @@ const MapView: React.FC<MapViewProps> = ({ studies }) => {
                   </Button>
                 </div>
               </div>
-
-              {/* Filtros (exibidos quando showFilters é true) */}
               {showFilters && (
                 <div className="p-2 bg-muted rounded-md space-y-2">
                   <p className="text-sm font-medium mb-2">Filtrar por:</p>
-                  
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div className="flex items-center">
                       <input
@@ -149,7 +134,6 @@ const MapView: React.FC<MapViewProps> = ({ studies }) => {
                       />
                       <Label htmlFor="all">Todos</Label>
                     </div>
-                    
                     <div className="flex items-center">
                       <input
                         type="radio"
@@ -162,7 +146,6 @@ const MapView: React.FC<MapViewProps> = ({ studies }) => {
                       />
                       <Label htmlFor="title">Título</Label>
                     </div>
-                    
                     <div className="flex items-center">
                       <input
                         type="radio"
@@ -175,7 +158,6 @@ const MapView: React.FC<MapViewProps> = ({ studies }) => {
                       />
                       <Label htmlFor="author">Autor</Label>
                     </div>
-                    
                     <div className="flex items-center">
                       <input
                         type="radio"
@@ -188,7 +170,6 @@ const MapView: React.FC<MapViewProps> = ({ studies }) => {
                       />
                       <Label htmlFor="location">Localização</Label>
                     </div>
-                    
                     <div className="flex items-center">
                       <input
                         type="radio"
@@ -204,7 +185,6 @@ const MapView: React.FC<MapViewProps> = ({ studies }) => {
                   </div>
                 </div>
               )}
-
               <Button 
                 className="w-full flex items-center justify-center gap-2" 
                 onClick={handleSearch}
@@ -212,16 +192,15 @@ const MapView: React.FC<MapViewProps> = ({ studies }) => {
                 <Search size={16} />
                 Buscar
               </Button>
-              
               <Separator />
-              
-              {/* Resultados da busca */}
               <div>
                 <h4 className="text-sm font-medium mb-2">
-                  Estudos encontrados: {filteredStudies.length}
+                  {hasSearched ? 
+                    `Estudos encontrados: ${filteredStudies.length}` : 
+                    "Faça uma busca para ver resultados"}
                 </h4>
                 <div className="max-h-[400px] overflow-y-auto space-y-2">
-                  {filteredStudies.length === 0 ? (
+                  {hasSearched && filteredStudies.length === 0 ? (
                     <p className="text-sm text-muted-foreground py-2">
                       Nenhum estudo corresponde à sua busca.
                     </p>
