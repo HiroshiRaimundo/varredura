@@ -20,7 +20,11 @@ interface ResearchStudy {
 export const useResearch = () => {
   const [studies, setStudies] = useState<ResearchStudy[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const form = useForm<Omit<ResearchStudy, "id" | "coordinates">>();
+  const form = useForm<Omit<ResearchStudy, "id" | "coordinates">>({
+    defaultValues: {
+      type: "artigo" // Valor padrão para o campo type
+    }
+  });
 
   // Coordenadas aproximadas de diferentes municípios do Amapá
   const amapaCoordinates: Record<string, [number, number]> = {
@@ -84,6 +88,13 @@ export const useResearch = () => {
   const handleStudySubmit = async (data: Omit<ResearchStudy, "id" | "coordinates">) => {
     setIsLoading(true);
     try {
+      // Verificação para garantir que type não seja nulo
+      if (!data.type) {
+        data.type = "artigo"; // Valor padrão se estiver faltando
+      }
+      
+      console.log("Dados do formulário antes de enviar:", data);
+      
       // Tenta geocodificar o local, mas se falhar, usa coordenadas do dicionário
       let coordinates;
       try {
@@ -135,7 +146,9 @@ export const useResearch = () => {
       
       // Atualizar estado
       setStudies(prev => [formattedStudy, ...prev]);
-      form.reset();
+      form.reset({
+        type: "artigo" // Reinicia o formulário mantendo o valor padrão
+      });
       
       toast({
         title: "Estudo adicionado",
