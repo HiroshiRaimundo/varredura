@@ -4,7 +4,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { UserRound, LogIn, LogOut } from "lucide-react";
+import { UserRound, LogIn, LogOut, Home, HelpCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 // Components
 import Dashboard from "@/components/Dashboard";
@@ -29,6 +30,7 @@ interface MonitoringItem {
   api_url?: string;
   frequency: string;
   category: string;
+  keywords?: string;
 }
 
 interface ResearchStudy {
@@ -86,7 +88,8 @@ const Index: React.FC = () => {
         url: item.url,
         api_url: item.api_url,
         frequency: item.frequency,
-        category: item.category
+        category: item.category,
+        keywords: item.keywords
       }));
       
       setMonitoringItems(formattedItems);
@@ -150,6 +153,8 @@ const Index: React.FC = () => {
     if (data.email === "odr@2025" && data.password === "Ppgdas@2025") {
       setIsAuthenticated(true);
       setIsLoginDialogOpen(false);
+      // Salvar autenticação no localStorage para a página de ajuda
+      localStorage.setItem("isAuthenticated", "true");
       toast({
         title: "Login realizado com sucesso",
         description: "Bem-vindo ao sistema de monitoramento."
@@ -165,6 +170,8 @@ const Index: React.FC = () => {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
+    // Remover autenticação do localStorage
+    localStorage.removeItem("isAuthenticated");
     toast({
       title: "Logout realizado",
       description: "Você saiu do sistema."
@@ -181,7 +188,8 @@ const Index: React.FC = () => {
           url: data.url,
           api_url: data.api_url || null,
           frequency: data.frequency,
-          category: data.category
+          category: data.category,
+          keywords: data.keywords || null
         })
         .select()
         .single();
@@ -195,7 +203,8 @@ const Index: React.FC = () => {
         url: newItem.url,
         api_url: newItem.api_url,
         frequency: newItem.frequency,
-        category: newItem.category
+        category: newItem.category,
+        keywords: newItem.keywords
       };
       
       // Atualizar estado
@@ -329,16 +338,33 @@ const Index: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-background p-6 flex flex-col">
+      <div className="max-w-7xl mx-auto space-y-6 flex-1">
         <header className="flex justify-between items-center mb-8">
-          <div className="w-24"></div> {/* Espaço à esquerda para balancear */}
+          {/* Ícone Home com link para o observatório */}
+          <div className="flex items-center">
+            <a href="https://observatório.org" target="_blank" rel="noopener noreferrer" className="flex items-center text-primary hover:text-primary/80 transition-colors">
+              <Home size={24} className="mr-2" />
+              <span className="font-medium hidden md:inline">Observatório</span>
+            </a>
+          </div>
+          
           <div className="text-center flex-1 flex justify-center">
-            <p className="text-lg text-muted-foreground mt-2 ml-28"> {/* Movido 7cm (≈ 112px) para direita */}
+            <p className="text-lg text-muted-foreground mt-2 ml-4">
               Monitoramento e Análise de Indicadores Regionais
             </p>
           </div>
-          <div>
+          
+          <div className="flex items-center gap-2">
+            {isAuthenticated && (
+              <Link to="/help">
+                <Button variant="outline" size="sm" className="flex items-center gap-2">
+                  <HelpCircle size={16} />
+                  <span className="hidden md:inline">Ajuda</span>
+                </Button>
+              </Link>
+            )}
+            
             {isAuthenticated ? (
               <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2">
                 <UserRound size={18} />
@@ -412,6 +438,20 @@ const Index: React.FC = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Rodapé com copyright e créditos */}
+      <footer className="mt-8 pt-6 border-t border-border max-w-7xl mx-auto w-full">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center text-sm text-muted-foreground">
+            <span className="flex items-center">
+              Copyright ©️ 2024 | Programa de Pós-graduação em Desenvolvimento da Amazônia Sustentável (PPGDAS)
+            </span>
+          </div>
+          <div className="text-sm text-muted-foreground">
+            Desenvolvido por: Hiroshi Koga
+          </div>
+        </div>
+      </footer>
 
       {/* Diálogo de Login */}
       <LoginDialog 
