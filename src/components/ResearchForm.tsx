@@ -7,20 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MapPin } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
-
-interface ResearchStudy {
-  title: string;
-  author: string;
-  coAuthors: string;
-  summary: string;
-  repositoryUrl: string;
-  location: string;
-  type: "artigo" | "dissertacao" | "tese" | "livros" | "ebooks" | "outro";
-}
+import { ResearchStudyFormData } from "@/types/research";
 
 interface ResearchFormProps {
-  form: UseFormReturn<ResearchStudy>;
-  onSubmit: (data: ResearchStudy) => void;
+  form: UseFormReturn<ResearchStudyFormData>;
+  onSubmit: (data: ResearchStudyFormData) => void;
 }
 
 const ResearchForm: React.FC<ResearchFormProps> = ({ form, onSubmit }) => {

@@ -3,18 +3,7 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trash2, ChevronLeft, ChevronRight } from "lucide-react";
-
-interface ResearchStudy {
-  id: string;
-  title: string;
-  author: string;
-  coAuthors: string;
-  summary: string;
-  repositoryUrl: string;
-  location: string;
-  coordinates: [number, number];
-  type: "artigo" | "dissertacao" | "tese" | "outro";
-}
+import { ResearchStudy } from "@/types/research";
 
 interface ResearchListProps {
   studies: ResearchStudy[];

@@ -76,4 +76,5 @@ export const useResearch = () => {
   };
 };
 
-export type { ResearchStudy };
+// We're not exporting the ResearchStudy type from here anymore
+// to avoid type conflicts. Import directly from the types file.
