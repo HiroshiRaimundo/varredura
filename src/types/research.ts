@@ -9,7 +9,7 @@ export interface ResearchStudy {
   repositoryUrl: string;
   location: string;
   coordinates: [number, number];
-  type: "artigo" | "dissertacao" | "tese" | "outro";
+  type: "artigo" | "dissertacao" | "tese" | "livros" | "ebooks" | "outro";
 }
 
 export type ResearchStudyFormData = Omit<ResearchStudy, "id" | "coordinates">;

@@ -15,7 +15,7 @@ interface ResearchStudy {
   summary: string;
   repositoryUrl: string;
   location: string;
-  type: "artigo" | "dissertacao" | "tese" | "outro";
+  type: "artigo" | "dissertacao" | "tese" | "livros" | "ebooks" | "outro";
 }
 
 interface ResearchFormProps {
@@ -85,15 +85,15 @@ const ResearchForm: React.FC<ResearchFormProps> = ({ form, onSubmit }) => {
                   <FormLabel>Resumo</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="Breve resumo do estudo (até 300 caracteres)" 
+                      placeholder="Breve resumo do estudo (até 600 caracteres)" 
                       className="resize-none"
-                      maxLength={300}
+                      maxLength={600}
                       rows={4}
                       {...field} 
                     />
                   </FormControl>
                   <FormDescription>
-                    Máximo de 300 caracteres
+                    Máximo de 600 caracteres
                   </FormDescription>
                 </FormItem>
               )}
@@ -129,6 +129,8 @@ const ResearchForm: React.FC<ResearchFormProps> = ({ form, onSubmit }) => {
                       <option value="artigo">Artigo</option>
                       <option value="dissertacao">Dissertação</option>
                       <option value="tese">Tese</option>
+                      <option value="livros">Livros</option>
+                      <option value="ebooks">E-books</option>
                       <option value="outro">Outro</option>
                     </select>
                   </FormControl>

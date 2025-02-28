@@ -36,6 +36,9 @@ const StudyDetail: React.FC<StudyDetailProps> = ({
               <h3 className="font-semibold mb-2">{study.title}</h3>
               <p className="text-sm mb-2">Autor: {study.author}</p>
               <p className="text-sm mb-2">Local: {study.location}</p>
+              {study.type && (
+                <p className="text-sm mb-2">Tipo: {study.type}</p>
+              )}
               {study.summary && (
                 <p className="text-sm text-muted-foreground mb-2">{study.summary}</p>
               )}

@@ -7,4 +7,5 @@ export interface MapPoint {
   coordinates: [number, number];
   repositoryUrl?: string;
   summary?: string;
+  type?: "artigo" | "dissertacao" | "tese" | "livros" | "ebooks" | "outro";
 }
