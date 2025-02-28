@@ -39,9 +39,8 @@ export const useMonitoring = () => {
         frequency: item.frequency,
         category: item.category,
         keywords: item.keywords,
-        // Use optional chaining to safely access the responsible property
-        // which might not exist in older records
-        responsible: item.responsible || null
+        // Use casting para acessar a propriedade responsible com segurança
+        responsible: (item as any).responsible || null
       }));
       
       setMonitoringItems(formattedItems);
@@ -85,8 +84,8 @@ export const useMonitoring = () => {
         frequency: newItem.frequency,
         category: newItem.category,
         keywords: newItem.keywords,
-        // Use optional chaining or logical OR to safely handle the responsible field
-        responsible: newItem.responsible || null
+        // Use casting para acessar a propriedade responsible com segurança
+        responsible: (newItem as any).responsible || null
       };
       
       // Atualizar estado

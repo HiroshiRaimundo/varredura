@@ -18,6 +18,7 @@ export type Database = {
           id: string
           keywords: string | null
           name: string
+          responsible: string | null
           url: string
         }
         Insert: {
@@ -28,6 +29,7 @@ export type Database = {
           id?: string
           keywords?: string | null
           name: string
+          responsible?: string | null
           url: string
         }
         Update: {
@@ -38,6 +40,7 @@ export type Database = {
           id?: string
           keywords?: string | null
           name?: string
+          responsible?: string | null
           url?: string
         }
         Relationships: []
