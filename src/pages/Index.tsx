@@ -8,7 +8,7 @@ import { UserRound, LogIn, LogOut } from "lucide-react";
 
 // Components
 import Dashboard from "@/components/Dashboard";
-import MonitoringForm from "@/components/MonitoringForm";
+import MonitoringForm from "@/components/monitoring/MonitoringForm";
 import MonitoringList from "@/components/MonitoringList";
 import ResearchForm from "@/components/ResearchForm";
 import ResearchList from "@/components/ResearchList";
