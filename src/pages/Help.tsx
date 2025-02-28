@@ -6,7 +6,6 @@ import { Home, BookOpen, Link, AlertTriangle, FileSearch, Clock, Calendar, Searc
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 
 const Help: React.FC = () => {
@@ -43,6 +42,20 @@ const Help: React.FC = () => {
     checkAuth();
   }, [navigate]);
 
+  // Função para voltar para a área administrativa, garantindo
+  // que o usuário veja a área de monitoramento
+  const handleGoBack = () => {
+    navigate("/");
+    // Usando um pequeno atraso para garantir que a página foi carregada
+    // antes de mudar para a aba de monitoramento
+    setTimeout(() => {
+      const monitoringTab = document.querySelector('[value="monitoring"]');
+      if (monitoringTab) {
+        (monitoringTab as HTMLElement).click();
+      }
+    }, 100);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background p-6 flex items-center justify-center">
@@ -68,11 +81,11 @@ const Help: React.FC = () => {
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={() => navigate("/")} 
+            onClick={handleGoBack} 
             className="flex items-center gap-2"
           >
             <ArrowLeft size={16} />
-            Voltar
+            Voltar para Monitoramento
           </Button>
           
           <div className="text-center flex-1">
