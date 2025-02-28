@@ -1,11 +1,16 @@
-
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, X } from "lucide-react";
+import { Search, Filter, X, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { ResearchStudy } from "@/types/research";
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface SearchPanelProps {
   studies: ResearchStudy[];
@@ -18,6 +23,9 @@ const SearchPanel: React.FC<SearchPanelProps> = ({ studies, onSearchResults }) =
   const [showFilters, setShowFilters] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [filteredStudies, setFilteredStudies] = useState<ResearchStudy[]>([]);
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   React.useEffect(() => {
     if (!hasSearched) {
@@ -59,6 +67,7 @@ const SearchPanel: React.FC<SearchPanelProps> = ({ studies, onSearchResults }) =
     setFilteredStudies(filtered);
     setHasSearched(true);
     onSearchResults(filtered);
+    setCurrentPage(1);
   };
 
   const clearSearch = () => {
@@ -76,6 +85,23 @@ const SearchPanel: React.FC<SearchPanelProps> = ({ studies, onSearchResults }) =
       onSearchResults([]);
     }
   }, [searchTerm, onSearchResults]);
+
+  const totalPages = Math.ceil(filteredStudies.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredStudies.slice(indexOfFirstItem, indexOfLastItem);
+  
+  const goToNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+  
+  const goToPrevPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+  
+  const goToPage = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <div className="w-full border rounded-md p-4">
@@ -197,18 +223,101 @@ const SearchPanel: React.FC<SearchPanelProps> = ({ studies, onSearchResults }) =
                 Nenhum estudo corresponde à sua busca.
               </p>
             ) : (
-              filteredStudies.map((study) => (
+              currentItems.map((study) => (
                 <div key={study.id} className="p-2 border rounded-md text-sm hover:bg-muted">
-                  <p className="font-medium">{study.title}</p>
+                  <div className="flex justify-between items-start">
+                    <p className="font-medium">{study.title}</p>
+                    {study.repositoryUrl && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <a 
+                              href={study.repositoryUrl} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="flex items-center ml-2 text-primary hover:text-primary/80"
+                            >
+                              <ExternalLink size={14} />
+                            </a>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Acessar estudo</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
+                  </div>
                   <div className="text-xs text-muted-foreground">
                     <p>Autor: {study.author}</p>
                     <p>Local: {study.location}</p>
                     <p>Tipo: {study.type}</p>
+                    {study.repositoryUrl && (
+                      <a 
+                        href={study.repositoryUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline inline-flex items-center mt-1"
+                      >
+                        <span>Ver estudo completo</span>
+                        <ExternalLink size={12} className="ml-1" />
+                      </a>
+                    )}
                   </div>
                 </div>
               ))
             )}
           </div>
+          
+          {hasSearched && totalPages > 1 && (
+            <div className="flex items-center justify-center space-x-2 mt-4">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={goToPrevPage} 
+                disabled={currentPage === 1}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronLeft size={16} />
+              </Button>
+              
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else {
+                  if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                }
+                
+                return (
+                  <Button
+                    key={pageNum}
+                    variant={currentPage === pageNum ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => goToPage(pageNum)}
+                    className="h-8 w-8 p-0"
+                  >
+                    {pageNum}
+                  </Button>
+                );
+              })}
+              
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={goToNextPage} 
+                disabled={currentPage === totalPages}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronRight size={16} />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
