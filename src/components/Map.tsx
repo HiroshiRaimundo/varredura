@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -77,11 +78,16 @@ const Map: React.FC<MapProps> = ({ points = [] }) => {
 
   // Atualiza os marcadores quando os pontos mudam
   useEffect(() => {
-    if (!map.current || !points.length) return;
+    if (!map.current || !points) return;
 
+    // Remove os marcadores atuais
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
 
+    // Reset selected studies when points change
+    setSelectedStudies([]);
+
+    // Adiciona novos marcadores para os pontos filtrados
     points.forEach(point => {
       const markerElement = document.createElement('div');
       markerElement.className = 'cursor-pointer';
@@ -115,6 +121,13 @@ const Map: React.FC<MapProps> = ({ points = [] }) => {
       map.current.flyTo({
         center: points[0].coordinates,
         zoom: 12
+      });
+    } else {
+      // Se não há pontos, volta para a visão padrão do Amapá
+      map.current.flyTo({
+        center: [amapaCenterLng, amapaCenterLat],
+        zoom: 7,
+        pitch: 30
       });
     }
   }, [points]);
