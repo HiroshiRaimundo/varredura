@@ -9,7 +9,75 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      monitoring_items: {
+        Row: {
+          api_url: string | null
+          category: string
+          created_at: string
+          frequency: string
+          id: string
+          name: string
+          url: string
+        }
+        Insert: {
+          api_url?: string | null
+          category: string
+          created_at?: string
+          frequency: string
+          id?: string
+          name: string
+          url: string
+        }
+        Update: {
+          api_url?: string | null
+          category?: string
+          created_at?: string
+          frequency?: string
+          id?: string
+          name?: string
+          url?: string
+        }
+        Relationships: []
+      }
+      research_studies: {
+        Row: {
+          author: string
+          co_authors: string | null
+          coordinates: number[]
+          created_at: string
+          id: string
+          location: string
+          repository_url: string | null
+          summary: string | null
+          title: string
+          type: string
+        }
+        Insert: {
+          author: string
+          co_authors?: string | null
+          coordinates: number[]
+          created_at?: string
+          id?: string
+          location: string
+          repository_url?: string | null
+          summary?: string | null
+          title: string
+          type: string
+        }
+        Update: {
+          author?: string
+          co_authors?: string | null
+          coordinates?: number[]
+          created_at?: string
+          id?: string
+          location?: string
+          repository_url?: string | null
+          summary?: string | null
+          title?: string
+          type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

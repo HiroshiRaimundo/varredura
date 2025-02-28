@@ -1,7 +1,6 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { UseFormReturn } from "react-hook-form";
@@ -12,6 +11,7 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 interface MonitoringItem {
   name: string;
   url: string;
+  api_url?: string;
   frequency: string;
   category: string;
 }
@@ -201,6 +201,64 @@ class IBGESpider(scrapy.Spider):
             self.logger.error(f"Erro ao processar dados: {str(e)}")
 `;
 
+const apiExampleCode = `
+import axios from 'axios';
+
+// Configuração da API para monitoramento
+const API_URL = "https://api.exemplo.com/dados";
+const API_KEY = process.env.API_KEY; // Chave armazenada em variável de ambiente
+
+// Função para buscar dados da API
+async function fetchApiData() {
+  try {
+    const response = await axios.get(API_URL, {
+      headers: {
+        'Authorization': \`Bearer \${API_KEY}\`,
+        'Content-Type': 'application/json'
+      },
+      params: {
+        region: 'amapa',
+        from_date: '2023-01-01',
+        to_date: '2023-12-31'
+      }
+    });
+    
+    // Processar os dados recebidos
+    const data = response.data;
+    console.log('Dados obtidos com sucesso:', data);
+    
+    // Salvar os dados processados
+    await saveDataToDatabase(data);
+    
+    return data;
+  } catch (error) {
+    console.error('Erro ao buscar dados da API:', error);
+    throw error;
+  }
+}
+
+// Função para salvar os dados em banco
+async function saveDataToDatabase(data) {
+  // Implementação do armazenamento dos dados
+  // Pode usar PostgreSQL, MongoDB, etc.
+  console.log('Salvando dados no banco...');
+}
+
+// Agendamento da execução do monitoramento
+const schedule = require('node-schedule');
+
+// Executa todos os dias às 3:00 da manhã
+schedule.scheduleJob('0 3 * * *', async () => {
+  console.log('Iniciando coleta de dados agendada...');
+  try {
+    await fetchApiData();
+    console.log('Coleta de dados concluída com sucesso!');
+  } catch (err) {
+    console.error('Erro na coleta agendada:', err);
+  }
+});
+`;
+
 const MonitoringForm: React.FC<MonitoringFormProps> = ({ form, onSubmit }) => {
   const [activeSpider, setActiveSpider] = React.useState("transparencia");
 
@@ -222,6 +280,12 @@ const MonitoringForm: React.FC<MonitoringFormProps> = ({ form, onSubmit }) => {
       description: "Spider para coleta de indicadores socioeconômicos via API do IBGE",
       code: ibgeSpiderCode,
       path: "observatorio/spiders/indicadores/ibge.py"
+    },
+    api: {
+      title: "Monitoramento via API",
+      description: "Exemplo de código para monitoramento via endpoints de API",
+      code: apiExampleCode,
+      path: "observatorio/api/monitoring.js"
     }
   };
 
@@ -271,6 +335,22 @@ const MonitoringForm: React.FC<MonitoringFormProps> = ({ form, onSubmit }) => {
 
                 <FormField
                   control={form.control}
+                  name="api_url"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>URL da API (opcional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://api.exemplo.com/dados" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Insira o endpoint da API para monitoramento via integração direta
+                      </FormDescription>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
                   name="category"
                   render={({ field }) => (
                     <FormItem>
@@ -284,6 +364,7 @@ const MonitoringForm: React.FC<MonitoringFormProps> = ({ form, onSubmit }) => {
                           <option value="governo">Governo</option>
                           <option value="indicadores">Indicadores</option>
                           <option value="legislacao">Legislação</option>
+                          <option value="api">API</option>
                         </select>
                       </FormControl>
                     </FormItem>
@@ -338,6 +419,12 @@ const MonitoringForm: React.FC<MonitoringFormProps> = ({ form, onSubmit }) => {
                 >
                   IBGE
                 </Button>
+                <Button 
+                  variant={activeSpider === "api" ? "default" : "outline"}
+                  onClick={() => setActiveSpider("api")}
+                >
+                  API
+                </Button>
               </div>
               
               <div>
@@ -347,7 +434,7 @@ const MonitoringForm: React.FC<MonitoringFormProps> = ({ form, onSubmit }) => {
                 
                 <div className="bg-muted rounded-md overflow-hidden">
                   <SyntaxHighlighter 
-                    language="python" 
+                    language={activeSpider === "api" ? "javascript" : "python"} 
                     style={vscDarkPlus}
                     customStyle={{ margin: 0, borderRadius: '0.375rem' }}
                     showLineNumbers={true}
