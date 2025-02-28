@@ -23,7 +23,7 @@ export const fetchResearchStudies = async (): Promise<ResearchStudy[]> => {
       repositoryUrl: study.repository_url,
       location: study.location,
       coordinates: study.coordinates as [number, number],
-      type: study.type as "artigo" | "dissertacao" | "tese" | "outro"
+      type: study.type as "artigo" | "dissertacao" | "tese" | "livros" | "ebooks" | "outro"
     }));
   } catch (error) {
     handleApiError(error, 'Erro ao buscar estudos');
@@ -75,7 +75,7 @@ export const addResearchStudy = async (data: ResearchStudyFormData): Promise<Res
       repositoryUrl: newStudy.repository_url,
       location: newStudy.location,
       coordinates: newStudy.coordinates as [number, number],
-      type: newStudy.type as "artigo" | "dissertacao" | "tese" | "outro"
+      type: newStudy.type as "artigo" | "dissertacao" | "tese" | "livros" | "ebooks" | "outro"
     };
   } catch (error) {
     handleApiError(error, 'Erro ao adicionar estudo');

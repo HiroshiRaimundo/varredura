@@ -43,6 +43,13 @@ export const useResearch = () => {
           description: `"${data.title}" foi adicionado ao mapa.`
         });
       }
+    } catch (error) {
+      console.error('Erro ao adicionar estudo:', error);
+      toast({
+        title: "Erro ao adicionar estudo",
+        description: "Verifique os dados e tente novamente.",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
