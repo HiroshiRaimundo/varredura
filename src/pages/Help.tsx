@@ -2,11 +2,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Home, BookOpen, Link, AlertTriangle, FileSearch, Clock, Calendar, Search, Database, FileJson, BarChart } from "lucide-react";
+import { Home, BookOpen, Link, AlertTriangle, FileSearch, Clock, Calendar, Search, Database, FileJson, BarChart, ArrowLeft } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 
 const Help: React.FC = () => {
   const navigate = useNavigate();
@@ -62,11 +63,23 @@ const Help: React.FC = () => {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header com título centralizado */}
-        <header className="mb-8">
-          <div className="text-center">
+        {/* Header com título centralizado e botão Voltar */}
+        <header className="mb-8 flex items-center justify-between">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => navigate("/")} 
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft size={16} />
+            Voltar
+          </Button>
+          
+          <div className="text-center flex-1">
             <h1 className="text-2xl font-bold">Página de Ajuda</h1>
           </div>
+          
+          <div className="w-[80px]"></div> {/* Espaço para balancear o layout */}
         </header>
 
         <Tabs defaultValue="monitoring" className="w-full">
