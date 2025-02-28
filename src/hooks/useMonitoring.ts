@@ -39,7 +39,9 @@ export const useMonitoring = () => {
         frequency: item.frequency,
         category: item.category,
         keywords: item.keywords,
-        responsible: item.responsible
+        // Use optional chaining to safely access the responsible property
+        // which might not exist in older records
+        responsible: item.responsible || null
       }));
       
       setMonitoringItems(formattedItems);
@@ -83,7 +85,8 @@ export const useMonitoring = () => {
         frequency: newItem.frequency,
         category: newItem.category,
         keywords: newItem.keywords,
-        responsible: newItem.responsible
+        // Use optional chaining or logical OR to safely handle the responsible field
+        responsible: newItem.responsible || null
       };
       
       // Atualizar estado
