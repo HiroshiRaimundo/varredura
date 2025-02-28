@@ -2,8 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Home, BookOpen, Link, AlertTriangle, FileSearch, Clock, Calendar, Search } from "lucide-react";
+import { Home, BookOpen, Link, AlertTriangle, FileSearch, Clock, Calendar, Search, Database, FileJson, BarChart } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
@@ -63,16 +62,11 @@ const Help: React.FC = () => {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header com ícone de home */}
-        <header className="flex justify-between items-center mb-8">
-          <Button variant="ghost" onClick={() => navigate("/")} className="flex items-center gap-2">
-            <Home size={18} />
-            <span>Voltar ao Dashboard</span>
-          </Button>
-          <div className="text-center flex-1">
+        {/* Header com título centralizado */}
+        <header className="mb-8">
+          <div className="text-center">
             <h1 className="text-2xl font-bold">Página de Ajuda</h1>
           </div>
-          <div className="w-[120px]"></div> {/* Espaço para balancear o layout */}
         </header>
 
         <Tabs defaultValue="monitoring" className="w-full">
@@ -86,16 +80,67 @@ const Help: React.FC = () => {
           <TabsContent value="monitoring">
             <Card>
               <CardHeader>
-                <CardTitle>Como Realizar o Monitoramento</CardTitle>
+                <CardTitle>Como Funciona o Monitoramento</CardTitle>
                 <CardDescription>
-                  Guia passo a passo para configurar e gerenciar monitoramentos no sistema
+                  Entenda o funcionamento do sistema de monitoramento e aprenda a utilizá-lo
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-8">
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <Database size={20} className="text-primary" />
+                    1. Coleta automatizada de dados
+                  </h3>
+                  <p className="text-muted-foreground pl-6">
+                    <strong>Monitoramento de sites governamentais:</strong> Extração regular de dados de portais de transparência, diários oficiais e sites de órgãos públicos.
+                  </p>
+                  <p className="text-muted-foreground pl-6">
+                    <strong>Captura de indicadores socioeconômicos:</strong> Coleta automática de estatísticas, índices e outros indicadores de desenvolvimento regional.
+                  </p>
+                  <p className="text-muted-foreground pl-6">
+                    <strong>Acompanhamento de legislação:</strong> Monitoramento de novas leis, decretos e normas relacionadas a políticas públicas.
+                  </p>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <FileJson size={20} className="text-primary" />
+                    2. Tratamento e estruturação de dados
+                  </h3>
+                  <p className="text-muted-foreground pl-6">
+                    <strong>Padronização:</strong> Transformação de dados não estruturados (HTML) em formatos estruturados (JSON, CSV).
+                  </p>
+                  <p className="text-muted-foreground pl-6">
+                    <strong>Limpeza:</strong> Remoção de informações irrelevantes e tratamento de inconsistências.
+                  </p>
+                  <p className="text-muted-foreground pl-6">
+                    <strong>Integração:</strong> Possibilidade de combinar dados de múltiplas fontes em um único dataset.
+                  </p>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <BarChart size={20} className="text-primary" />
+                    3. Criação de séries históricas
+                  </h3>
+                  <p className="text-muted-foreground pl-6">
+                    <strong>Agendamento:</strong> Execução periódica para criar séries temporais de indicadores.
+                  </p>
+                  <p className="text-muted-foreground pl-6">
+                    <strong>Versionamento:</strong> Acompanhamento da evolução de políticas e seus resultados ao longo do tempo.
+                  </p>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
                     <BookOpen size={20} className="text-primary" />
-                    1. Acessando o Sistema de Monitoramento
+                    4. Acessando o Sistema de Monitoramento
                   </h3>
                   <p className="text-muted-foreground">
                     Para acessar o sistema de monitoramento, faça login com suas credenciais e selecione a aba "Monitoramento" no painel principal.
@@ -112,7 +157,7 @@ const Help: React.FC = () => {
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold flex items-center gap-2">
                     <Link size={20} className="text-primary" />
-                    2. Adicionando um Novo Monitoramento
+                    5. Adicionando um Novo Monitoramento
                   </h3>
                   <p className="text-muted-foreground">
                     Configure um novo monitoramento preenchendo o formulário com todos os detalhes necessários.
@@ -133,7 +178,7 @@ const Help: React.FC = () => {
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold flex items-center gap-2">
                     <FileSearch size={20} className="text-primary" />
-                    3. Utilizando Exemplos de Código
+                    6. Utilizando Exemplos de Código
                   </h3>
                   <p className="text-muted-foreground">
                     O sistema oferece exemplos pré-configurados para diferentes tipos de monitoramento.
@@ -152,7 +197,7 @@ const Help: React.FC = () => {
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold flex items-center gap-2">
                     <Clock size={20} className="text-primary" />
-                    4. Gerenciando Monitoramentos
+                    7. Gerenciando Monitoramentos
                   </h3>
                   <p className="text-muted-foreground">
                     Gerencie seus monitoramentos ativos, visualize dados e remova itens quando necessário.
@@ -171,7 +216,7 @@ const Help: React.FC = () => {
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold flex items-center gap-2">
                     <AlertTriangle size={20} className="text-primary" />
-                    5. Solucionando Problemas Comuns
+                    8. Solucionando Problemas Comuns
                   </h3>
                   <p className="text-muted-foreground">
                     Dicas para resolver problemas que podem ocorrer durante o monitoramento.
