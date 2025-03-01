@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { FileText, ExternalLink, AlertCircle, BarChart2, Calendar, Clock, PieChart, RefreshCw } from "lucide-react";
+import { FileText, ExternalLink, AlertCircle, BarChart2, Calendar, Clock, PieChart, RefreshCw, CheckCircle } from "lucide-react";
 import { ReleaseMonitoringItem } from "@/hooks/monitoring/types";
 import DashboardCard from './DashboardCard';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Cell, Pie, PieChart as RePieChart } from 'recharts';
