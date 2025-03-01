@@ -16,6 +16,9 @@ import {
   getRadarData,
   generateTrendData
 } from "./dashboard/DashboardUtils";
+import { useNavigate } from "react-router-dom";
+import { Button } from "./ui/button";
+import { Users } from "lucide-react";
 
 interface DashboardProps {
   data: Array<{
@@ -29,6 +32,7 @@ interface DashboardProps {
   handleExport: () => void;
   isAuthenticated: boolean;
   monitoringItems: MonitoringItem[];
+  showClientButton?: boolean;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ 
@@ -37,8 +41,11 @@ const Dashboard: React.FC<DashboardProps> = ({
   setTimeRange, 
   handleExport, 
   isAuthenticated,
-  monitoringItems
+  monitoringItems,
+  showClientButton = false
 }) => {
+  const navigate = useNavigate();
+  
   // Gerar dados dinâmicos com base no período selecionado
   const trendData = useMemo(() => 
     generateTrendData(monitoringItems, timeRange), 
@@ -53,6 +60,19 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <div className="grid gap-6">
+      {/* Botão para área do cliente */}
+      {showClientButton && (
+        <div className="flex justify-end">
+          <Button 
+            onClick={() => navigate('/client')}
+            className="flex items-center gap-2"
+          >
+            <Users className="h-4 w-4" />
+            Área do Cliente
+          </Button>
+        </div>
+      )}
+
       {/* Filtros e Controles */}
       <DashboardControls 
         timeRange={timeRange}

@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import DashboardPage from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
+import Client from "./pages/Client";
 import NotFound from "./pages/NotFound";
 import Help from "./pages/Help";
 
@@ -21,6 +22,10 @@ const App = () => (
         <Routes>
           {/* Dashboard (público) */}
           <Route path="/" element={<DashboardPage />} />
+          
+          {/* Área do cliente */}
+          <Route path="/client" element={<Client />} />
+          <Route path="/client/:clientType" element={<Client />} />
           
           {/* Autenticação */}
           <Route path="/login" element={<Login />} />
