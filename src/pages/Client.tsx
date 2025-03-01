@@ -5,8 +5,12 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ClientDashboard from "@/components/client/ClientDashboard";
 import ClientSelection from "@/components/client/ClientSelection";
+import MonitoringForm from "@/components/monitoring/MonitoringForm";
+import MonitoringList from "@/components/MonitoringList";
 import { useMonitoring } from "@/hooks/useMonitoring";
 import { useAuth } from "@/hooks/useAuth";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Client: React.FC = () => {
   const { clientType } = useParams<{ clientType?: string }>();
@@ -39,14 +43,44 @@ const Client: React.FC = () => {
           />
 
           {isValidClientType ? (
-            <ClientDashboard 
-              clientType={clientType as "observatory" | "researcher" | "politician" | "institution" | "journalist"}
-              monitoringItems={monitoring.monitoringItems}
-              timeRange={timeRange}
-              setTimeRange={setTimeRange}
-              handleExport={monitoring.handleExport}
-              isAuthenticated={auth.isAuthenticated}
-            />
+            <div className="space-y-6">
+              <Tabs defaultValue="dashboard" className="w-full">
+                <TabsList className="mb-4">
+                  <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+                  <TabsTrigger value="monitoring">Monitoramento</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="dashboard">
+                  <ClientDashboard 
+                    clientType={clientType as "observatory" | "researcher" | "politician" | "institution" | "journalist"}
+                    monitoringItems={monitoring.monitoringItems}
+                    timeRange={timeRange}
+                    setTimeRange={setTimeRange}
+                    handleExport={monitoring.handleExport}
+                    isAuthenticated={auth.isAuthenticated}
+                  />
+                </TabsContent>
+                
+                <TabsContent value="monitoring">
+                  <div className="space-y-6">
+                    <MonitoringForm 
+                      form={monitoring.form} 
+                      onSubmit={monitoring.handleAddMonitoring}
+                      clientType={clientType as "observatory" | "researcher" | "politician" | "institution" | "journalist"}
+                    />
+                    
+                    <MonitoringList 
+                      items={monitoring.monitoringItems} 
+                      onDelete={monitoring.handleDeleteMonitoring}
+                      isLoading={monitoring.isLoading}
+                      uniqueResponsibles={monitoring.getUniqueResponsibles()}
+                      responsibleFilter={monitoring.responsibleFilter}
+                      onFilterChange={monitoring.setResponsibleFilter}
+                    />
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
           ) : (
             <ClientSelection />
           )}

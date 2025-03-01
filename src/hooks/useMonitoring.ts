@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
@@ -13,6 +14,7 @@ interface MonitoringItem {
   category: string;
   keywords?: string;
   responsible?: string;
+  notes?: string;
 }
 
 export const useMonitoring = () => {
@@ -38,7 +40,8 @@ export const useMonitoring = () => {
         frequency: item.frequency,
         category: item.category,
         keywords: item.keywords,
-        responsible: (item as any).responsible || null
+        responsible: (item as any).responsible || null,
+        notes: (item as any).notes || null
       }));
       
       setMonitoringItems(formattedItems);
@@ -65,7 +68,8 @@ export const useMonitoring = () => {
           frequency: data.frequency,
           category: data.category,
           keywords: data.keywords || null,
-          responsible: data.responsible || null
+          responsible: data.responsible || null,
+          notes: data.notes || null
         })
         .select()
         .single();
@@ -80,7 +84,8 @@ export const useMonitoring = () => {
         frequency: newItem.frequency,
         category: newItem.category,
         keywords: newItem.keywords,
-        responsible: (newItem as any).responsible || null
+        responsible: (newItem as any).responsible || null,
+        notes: (newItem as any).notes || null
       };
       
       setMonitoringItems(prev => [formattedItem, ...prev]);

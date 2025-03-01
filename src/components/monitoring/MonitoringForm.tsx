@@ -1,11 +1,8 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UseFormReturn } from "react-hook-form";
 import MonitoringFormInputs from "./MonitoringFormInputs";
-import CodeExampleViewer from "./CodeExampleViewer";
-import { spiderExamples } from "./code-examples";
 
 interface MonitoringItem {
   name: string;
@@ -13,16 +10,18 @@ interface MonitoringItem {
   api_url?: string;
   frequency: string;
   category: string;
+  keywords?: string;
+  responsible?: string;
+  notes?: string;
 }
 
 interface MonitoringFormProps {
   form: UseFormReturn<MonitoringItem>;
   onSubmit: (data: MonitoringItem) => void;
+  clientType?: "observatory" | "researcher" | "politician" | "institution" | "journalist";
 }
 
-const MonitoringForm: React.FC<MonitoringFormProps> = ({ form, onSubmit }) => {
-  const [activeSpider, setActiveSpider] = useState("transparencia");
-
+const MonitoringForm: React.FC<MonitoringFormProps> = ({ form, onSubmit, clientType }) => {
   return (
     <Card>
       <CardHeader>
@@ -32,24 +31,7 @@ const MonitoringForm: React.FC<MonitoringFormProps> = ({ form, onSubmit }) => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="form" className="w-full">
-          <TabsList className="mb-4">
-            <TabsTrigger value="form">Adicionar Monitoramento</TabsTrigger>
-            <TabsTrigger value="examples">Exemplos de Spiders</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="form">
-            <MonitoringFormInputs form={form} onSubmit={onSubmit} />
-          </TabsContent>
-          
-          <TabsContent value="examples">
-            <CodeExampleViewer 
-              examples={spiderExamples}
-              activeExample={activeSpider}
-              onExampleChange={setActiveSpider}
-            />
-          </TabsContent>
-        </Tabs>
+        <MonitoringFormInputs form={form} onSubmit={onSubmit} clientType={clientType} />
       </CardContent>
     </Card>
   );
