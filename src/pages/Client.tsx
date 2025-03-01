@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
@@ -14,7 +15,7 @@ const Client: React.FC = () => {
   const auth = useAuth();
   const [timeRange, setTimeRange] = useState("mensal");
 
-  const validClientTypes = ["observatory", "researcher", "politician", "institution"];
+  const validClientTypes = ["observatory", "researcher", "politician", "institution", "journalist"];
   const isValidClientType = clientType && validClientTypes.includes(clientType);
 
   useEffect(() => {
@@ -39,7 +40,7 @@ const Client: React.FC = () => {
 
           {isValidClientType ? (
             <ClientDashboard 
-              clientType={clientType as "observatory" | "researcher" | "politician" | "institution"}
+              clientType={clientType as "observatory" | "researcher" | "politician" | "institution" | "journalist"}
               monitoringItems={monitoring.monitoringItems}
               timeRange={timeRange}
               setTimeRange={setTimeRange}

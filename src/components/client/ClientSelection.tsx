@@ -3,7 +3,7 @@ import React from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Eye, Users, GraduationCap, Building2, Landmark } from "lucide-react";
+import { Eye, Users, GraduationCap, Building2, Landmark, Newspaper } from "lucide-react";
 
 const ClientSelection: React.FC = () => {
   const navigate = useNavigate();
@@ -56,6 +56,18 @@ const ClientSelection: React.FC = () => {
         "Distribuição de indicadores por setor",
         "Acompanhamento de projetos em andamento"
       ]
+    },
+    {
+      id: "journalist",
+      title: "Jornalista",
+      description: "Dashboards com foco em dados para reportagens e matérias.",
+      icon: Newspaper,
+      color: "bg-red-100 text-red-700",
+      features: [
+        "Visualização de dados para produção de matérias",
+        "Tendências atualizadas para reportagens",
+        "Acesso rápido a indicadores-chave"
+      ]
     }
   ];
 
@@ -69,13 +81,15 @@ const ClientSelection: React.FC = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         {clientTypes.map((type) => (
           <Card key={type.id} className="overflow-hidden transition-all hover:shadow-md border-t-4" style={{ borderTopColor: 
             type.id === "observatory" ? "#3b82f6" : 
             type.id === "researcher" ? "#10b981" : 
             type.id === "politician" ? "#8b5cf6" : 
-            "#f59e0b" 
+            type.id === "institution" ? "#f59e0b" :
+            type.id === "journalist" ? "#ef4444" :
+            "#64748b"
           }}>
             <CardHeader className="pb-2">
               <div className={`w-12 h-12 rounded-lg ${type.color} flex items-center justify-center mb-2`}>

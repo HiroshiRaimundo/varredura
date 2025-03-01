@@ -15,9 +15,10 @@ import ObservatoryDashboard from "./dashboards/ObservatoryDashboard";
 import ResearcherDashboard from "./dashboards/ResearcherDashboard";
 import PoliticianDashboard from "./dashboards/PoliticianDashboard";
 import InstitutionDashboard from "./dashboards/InstitutionDashboard";
+import JournalistDashboard from "./dashboards/JournalistDashboard";
 
 interface ClientDashboardProps {
-  clientType: "observatory" | "researcher" | "politician" | "institution";
+  clientType: "observatory" | "researcher" | "politician" | "institution" | "journalist";
   monitoringItems: MonitoringItem[];
   timeRange: string;
   setTimeRange: (value: string) => void;
@@ -84,6 +85,16 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({
             categoryData={categoryData}
             radarData={radarData}
             responsibleData={responsibleData}
+          />
+        );
+        
+      case "journalist":
+        return (
+          <JournalistDashboard
+            trendData={trendData}
+            categoryData={categoryData}
+            frequencyData={frequencyData}
+            radarData={radarData}
           />
         );
       
