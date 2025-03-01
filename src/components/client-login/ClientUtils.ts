@@ -27,6 +27,8 @@ export const asClientType = (type: string): ClientType => {
  * @returns The valid client or null if not found
  */
 export const validateClient = (data: ClientLoginFormValues) => {
+  console.log("Validating client credentials for:", data.email);
+  
   const client = validClients.find(
     c => c.email === data.email && c.password === data.password
   );
@@ -42,13 +44,16 @@ export const validateClient = (data: ClientLoginFormValues) => {
  * @returns ClientInfo object
  */
 export const createClientInfo = (email: string, clientType: string): ClientInfo => {
-  return {
+  const clientInfo = {
     email,
     clientType,
     name: email.split('@')[0],
     isLoggedIn: true,
     loginTime: new Date().toISOString()
   };
+  
+  console.log("Created client info:", clientInfo);
+  return clientInfo;
 };
 
 /**
@@ -57,7 +62,7 @@ export const createClientInfo = (email: string, clientType: string): ClientInfo 
  */
 export const saveClientInfo = (clientInfo: ClientInfo) => {
   localStorage.setItem('clientInfo', JSON.stringify(clientInfo));
-  console.log("Saved client info:", clientInfo);
+  console.log("Saved client info to localStorage:", clientInfo);
 };
 
 /**
@@ -66,7 +71,9 @@ export const saveClientInfo = (clientInfo: ClientInfo) => {
  */
 export const getClientInfo = (): ClientInfo | null => {
   const clientInfoString = localStorage.getItem('clientInfo');
-  return clientInfoString ? JSON.parse(clientInfoString) : null;
+  const clientInfo = clientInfoString ? JSON.parse(clientInfoString) : null;
+  console.log("Retrieved client info from localStorage:", clientInfo);
+  return clientInfo;
 };
 
 /**
@@ -83,4 +90,5 @@ export const isClientLoggedIn = (): boolean => {
  */
 export const logoutClient = () => {
   localStorage.removeItem('clientInfo');
+  console.log("Client logged out, removed client info from localStorage");
 };

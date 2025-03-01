@@ -3,7 +3,6 @@ import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { ClientType, getClientTypeInfo } from "./utils/clientTypeUtils";
 
 interface MonitoringItem {
@@ -23,7 +22,11 @@ interface BasicFormFieldsProps {
 }
 
 const BasicFormFields: React.FC<BasicFormFieldsProps> = ({ form, clientType }) => {
-  const clientInfo = getClientTypeInfo(clientType);
+  console.log("BasicFormFields rendering with clientType:", clientType);
+  
+  // Use Observatory as default client type if none is provided
+  const effectiveClientType = clientType || "observatory";
+  const clientInfo = getClientTypeInfo(effectiveClientType);
   
   return (
     <>

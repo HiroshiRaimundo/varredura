@@ -1,3 +1,4 @@
+
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "@/pages/Index";
@@ -12,6 +13,8 @@ import Payment from "@/pages/Payment";
 import NotFound from "@/pages/NotFound";
 
 function App() {
+  console.log("App component rendered with routes");
+  
   return (
     <BrowserRouter>
       <Routes>

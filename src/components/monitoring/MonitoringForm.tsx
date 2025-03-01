@@ -23,6 +23,23 @@ interface MonitoringFormProps {
 }
 
 const MonitoringForm: React.FC<MonitoringFormProps> = ({ form, onSubmit, clientType }) => {
+  console.log("MonitoringForm rendering with clientType:", clientType);
+  
+  // Ensure form is valid before rendering
+  if (!form) {
+    console.error("MonitoringForm received undefined form");
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Erro no Formulário</CardTitle>
+          <CardDescription>
+            Ocorreu um erro ao carregar o formulário de monitoramento. Por favor, recarregue a página.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+  
   return (
     <Card>
       <CardHeader>

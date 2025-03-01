@@ -11,6 +11,7 @@ export const useClientLogin = () => {
 
   const handleLogin = async (data: ClientLoginFormValues) => {
     setIsLoggingIn(true);
+    console.log("Attempting client login with:", data.email);
     
     try {
       // Simulate API call
@@ -19,6 +20,8 @@ export const useClientLogin = () => {
       const client = validateClient(data);
       
       if (client) {
+        console.log("Client validated successfully:", client);
+        
         // Store client info in localStorage
         const clientInfo = createClientInfo(data.email, client.type);
         saveClientInfo(clientInfo);
@@ -32,6 +35,7 @@ export const useClientLogin = () => {
         navigate(`/client/${client.type}`);
         console.log(`Redirecting to client/${client.type}`);
       } else {
+        console.error("Client validation failed for:", data.email);
         toast({
           title: "Erro de autenticação",
           description: "Email ou senha incorretos.",

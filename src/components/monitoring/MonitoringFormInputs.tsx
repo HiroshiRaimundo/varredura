@@ -27,16 +27,18 @@ interface MonitoringFormInputsProps {
 }
 
 const MonitoringFormInputs: React.FC<MonitoringFormInputsProps> = ({ form, onSubmit, clientType }) => {
-  const [allCategories, setAllCategories] = useState<string[]>(getDefaultCategories(clientType));
-  const clientInfo = clientType ? getClientTypeInfo(clientType) : {
-    type: "observatory" as ClientType,
-    label: "Geral",
-    description: "Monitoramento geral",
-    icon: "database",
-    color: "bg-blue-500"
-  };
+  console.log("MonitoringFormInputs rendering with clientType:", clientType);
+  
+  // Use Observatory as default client type if none is provided
+  const effectiveClientType = clientType || "observatory";
+  
+  const [allCategories, setAllCategories] = useState<string[]>(getDefaultCategories(effectiveClientType));
+  const clientInfo = getClientTypeInfo(effectiveClientType);
+  
+  console.log("MonitoringFormInputs initialized with categories:", allCategories);
   
   const handleCategoriesUpdated = (categories: string[]) => {
+    console.log("Categories updated:", categories);
     setAllCategories(categories);
   };
 
@@ -45,7 +47,7 @@ const MonitoringFormInputs: React.FC<MonitoringFormInputsProps> = ({ form, onSub
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <ClientAlert alertText={clientInfo.alert || null} />
         
-        <BasicFormFields form={form} clientType={clientType} />
+        <BasicFormFields form={form} clientType={effectiveClientType} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
@@ -72,7 +74,7 @@ const MonitoringFormInputs: React.FC<MonitoringFormInputsProps> = ({ form, onSub
           />
 
           <CategoryManager 
-            clientType={clientType} 
+            clientType={effectiveClientType} 
             onCategoryAdded={handleCategoriesUpdated}
           />
         </div>
@@ -101,7 +103,7 @@ const MonitoringFormInputs: React.FC<MonitoringFormInputsProps> = ({ form, onSub
 
         <AdvancedFormFields form={form} />
 
-        <Button type="submit">Adicionar Monitoramento</Button>
+        <Button type="submit" className="w-full">Adicionar Monitoramento</Button>
       </form>
     </Form>
   );

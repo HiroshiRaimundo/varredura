@@ -12,11 +12,16 @@ interface CategoryManagerProps {
 }
 
 const CategoryManager: React.FC<CategoryManagerProps> = ({ clientType, onCategoryAdded }) => {
+  console.log("CategoryManager rendering with clientType:", clientType);
+  
+  // Use Observatory as default client type if none is provided
+  const effectiveClientType = clientType || "observatory";
+  
   const [newCategory, setNewCategory] = useState("");
   const [customCategories, setCustomCategories] = useState<string[]>([]);
   
   const handleAddCategory = () => {
-    const defaultCategories = getDefaultCategories(clientType);
+    const defaultCategories = getDefaultCategories(effectiveClientType);
     const allCategories = [...defaultCategories, ...customCategories];
     
     if (newCategory && !allCategories.includes(newCategory)) {
@@ -24,6 +29,7 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({ clientType, onCategor
       setCustomCategories(updatedCustomCategories);
       setNewCategory("");
       onCategoryAdded([...defaultCategories, ...updatedCustomCategories]);
+      console.log("Added new category:", newCategory);
     }
   };
 

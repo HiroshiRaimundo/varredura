@@ -49,13 +49,15 @@ const TabContent: React.FC<TabContentProps> = ({
   setResponsibleFilter = () => {}
 }) => {
   // Gerar dados de tendência com base nos itens de monitoramento
-  const trendData = generateTrendData(monitoringItems, timeRange);
+  const trendData = generateTrendData(monitoringItems || [], timeRange);
+  const safeMonitoringItems = monitoringItems || [];
 
   // Log para debugging
   console.log("TabContent rendering", { 
     isAuthenticated, 
-    itemCount: monitoringItems?.length || 0,
-    form: monitoringForm 
+    itemCount: safeMonitoringItems.length,
+    hasMonitoringForm: !!monitoringForm,
+    hasStudyForm: !!studyForm
   });
 
   return (
@@ -75,33 +77,35 @@ const TabContent: React.FC<TabContentProps> = ({
           setTimeRange={setTimeRange}
           handleExport={handleExport}
           isAuthenticated={isAuthenticated}
-          monitoringItems={monitoringItems}
+          monitoringItems={safeMonitoringItems}
         />
       </TabsContent>
 
       {/* Aba de Monitoramento */}
       {isAuthenticated && (
         <TabsContent value="monitoring">
-          {monitoringForm ? (
-            <>
-              <MonitoringForm 
-                form={monitoringForm} 
-                onSubmit={handleAddMonitoring} 
-              />
-              <MonitoringList 
-                items={monitoringItems || []} 
-                onDelete={handleDeleteMonitoring} 
-                isLoading={isLoading}
-                uniqueResponsibles={uniqueResponsibles}
-                responsibleFilter={responsibleFilter}
-                onFilterChange={setResponsibleFilter}
-              />
-            </>
-          ) : (
-            <div className="p-6 text-center">
-              <p>Carregando formulário de monitoramento...</p>
-            </div>
-          )}
+          <div className="space-y-6">
+            {monitoringForm ? (
+              <>
+                <MonitoringForm 
+                  form={monitoringForm} 
+                  onSubmit={handleAddMonitoring} 
+                />
+                <MonitoringList 
+                  items={safeMonitoringItems} 
+                  onDelete={handleDeleteMonitoring} 
+                  isLoading={isLoading}
+                  uniqueResponsibles={uniqueResponsibles}
+                  responsibleFilter={responsibleFilter}
+                  onFilterChange={setResponsibleFilter}
+                />
+              </>
+            ) : (
+              <div className="p-6 text-center bg-gray-50 rounded-md">
+                <p className="text-gray-500">Carregando formulário de monitoramento...</p>
+              </div>
+            )}
+          </div>
         </TabsContent>
       )}
 
@@ -109,22 +113,30 @@ const TabContent: React.FC<TabContentProps> = ({
       {isAuthenticated && (
         <TabsContent value="research">
           <div className="grid gap-6 md:grid-cols-2">
-            <ResearchForm 
-              form={studyForm} 
-              onSubmit={handleStudySubmit} 
-            />
-            <ResearchList 
-              studies={studies} 
-              onDelete={handleDeleteStudy}
-              isLoading={isLoading}
-            />
+            {studyForm ? (
+              <>
+                <ResearchForm 
+                  form={studyForm} 
+                  onSubmit={handleStudySubmit} 
+                />
+                <ResearchList 
+                  studies={studies || []} 
+                  onDelete={handleDeleteStudy}
+                  isLoading={isLoading}
+                />
+              </>
+            ) : (
+              <div className="col-span-2 p-6 text-center bg-gray-50 rounded-md">
+                <p className="text-gray-500">Carregando formulário de pesquisa...</p>
+              </div>
+            )}
           </div>
         </TabsContent>
       )}
 
       {/* Aba do Mapa */}
       <TabsContent value="map">
-        <MapView studies={studies} />
+        <MapView studies={studies || []} />
       </TabsContent>
     </Tabs>
   );
