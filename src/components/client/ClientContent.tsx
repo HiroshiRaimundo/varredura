@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ClientDashboard from "@/components/client/ClientDashboard";
@@ -9,7 +8,7 @@ import AlertButton from "./AlertButton";
 import LegislationAlerts from "./LegislationAlerts";
 import AnalysisToolsCard from "./AnalysisToolsCard";
 import PressReleaseTab from "./PressReleaseTab";
-import { LegislationAlert } from "@/hooks/useMonitoring";
+import { LegislationAlert } from "@/hooks/monitoring/types";
 
 interface ClientContentProps {
   clientType: ClientType;
@@ -52,7 +51,6 @@ const ClientContent: React.FC<ClientContentProps> = ({
 }) => {
   const [showAlerts, setShowAlerts] = useState(false);
   
-  // Client types that should see legislation alerts
   const showLegislationAlerts = ["politician", "researcher", "observatory"].includes(clientType || "");
 
   return (

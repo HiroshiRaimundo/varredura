@@ -1,10 +1,9 @@
-
 import React from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LegislationAlert } from "@/hooks/useMonitoring";
+import { LegislationAlert } from "@/hooks/monitoring/types";
 
 interface LegislationAlertsProps {
   alerts: LegislationAlert[];

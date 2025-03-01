@@ -2,40 +2,23 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { convertToCSV } from "@/components/dashboard/DashboardUtils";
-
-interface MonitoringItem {
-  id: string;
-  name: string;
-  url: string;
-  api_url?: string;
-  frequency: string;
-  category: string;
-  keywords?: string;
-  responsible?: string;
-  notes?: string;
-}
-
-interface LegislationAlert {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  url: string;
-  isRead: boolean;
-}
-
-// New interface for release monitoring results
-interface ReleaseMonitoringItem {
-  id: string;
-  releaseTitle: string;
-  websiteName: string;
-  publishedDate: string;
-  publishedTime: string;
-  url: string;
-  isVerified: boolean;
-}
+import { 
+  MonitoringItem, 
+  LegislationAlert, 
+  ReleaseMonitoringItem 
+} from "./monitoring/types";
+import { 
+  fetchMonitoringItemsFromDB, 
+  addMonitoringItemToDB, 
+  deleteMonitoringItemFromDB, 
+  fetchLegislationAlertsFromDB, 
+  fetchReleaseMonitoringFromDB 
+} from "./monitoring/api";
+import { 
+  exportMonitoringItems, 
+  getUniqueResponsibles, 
+  filterMonitoringItemsByResponsible 
+} from "./monitoring/utils";
 
 export const useMonitoring = () => {
   const [monitoringItems, setMonitoringItems] = useState<MonitoringItem[]>([]);
@@ -48,111 +31,21 @@ export const useMonitoring = () => {
   // Fetch monitoring items
   const fetchMonitoringItems = async () => {
     try {
-      const { data, error } = await supabase
-        .from('monitoring_items')
-        .select('*')
-        .order('created_at', { ascending: false });
+      setIsLoading(true);
+      const items = await fetchMonitoringItemsFromDB();
+      setMonitoringItems(items);
       
-      if (error) throw error;
+      // Fetch legislation alerts and release monitoring data
+      const alerts = fetchLegislationAlertsFromDB();
+      setLegislationAlerts(alerts);
       
-      const formattedItems = data.map(item => ({
-        id: item.id,
-        name: item.name,
-        url: item.url,
-        api_url: item.api_url,
-        frequency: item.frequency,
-        category: item.category,
-        keywords: item.keywords,
-        responsible: (item as any).responsible || null,
-        notes: (item as any).notes || null
-      }));
-      
-      setMonitoringItems(formattedItems);
-      
-      // Simulate fetching legislation alerts (would come from a real API in production)
-      fetchLegislationAlerts();
-      // Fetch release monitoring results
-      fetchReleaseMonitoring();
+      const releases = fetchReleaseMonitoringFromDB();
+      setReleaseMonitoring(releases);
     } catch (error) {
-      console.error('Erro ao buscar itens de monitoramento:', error);
-      toast({
-        title: "Erro ao carregar dados",
-        description: "Não foi possível carregar os monitoramentos.",
-        variant: "destructive"
-      });
+      console.error('Error fetching monitoring items:', error);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // Simulate fetching legislation alerts
-  const fetchLegislationAlerts = () => {
-    // In a real app, this would come from an API
-    const mockAlerts: LegislationAlert[] = [
-      {
-        id: "1",
-        title: "Nova Lei de Proteção Ambiental",
-        description: "Lei Nº 14.522/2023 sobre medidas de proteção a áreas ambientais",
-        date: "2023-06-10",
-        url: "https://www.gov.br/exemplo",
-        isRead: false
-      },
-      {
-        id: "2",
-        title: "Atualização do Código Florestal",
-        description: "Alteração nos artigos 23 e 24 relacionados a reservas legais",
-        date: "2023-05-15",
-        url: "https://www.gov.br/exemplo2",
-        isRead: true
-      },
-      {
-        id: "3",
-        title: "Resolução sobre Qualidade do Ar",
-        description: "Novas métricas para monitoramento da qualidade do ar em centros urbanos",
-        date: "2023-04-22",
-        url: "https://www.gov.br/exemplo3",
-        isRead: false
-      }
-    ];
-    
-    setLegislationAlerts(mockAlerts);
-  };
-
-  // Fetch release monitoring results
-  const fetchReleaseMonitoring = () => {
-    // In a real app, this would come from an API
-    // Mock data for release monitoring
-    const mockReleaseMonitoring: ReleaseMonitoringItem[] = [
-      {
-        id: "1",
-        releaseTitle: "Nova tecnologia ambiental lançada no mercado",
-        websiteName: "Folha de São Paulo",
-        publishedDate: "2023-06-12",
-        publishedTime: "14:30",
-        url: "https://folha.com/tecnologia-ambiental",
-        isVerified: true
-      },
-      {
-        id: "2",
-        releaseTitle: "Resultados do estudo sobre qualidade do ar divulgados",
-        websiteName: "G1",
-        publishedDate: "2023-05-18",
-        publishedTime: "10:15",
-        url: "https://g1.com/qualidade-ar-estudo",
-        isVerified: true
-      },
-      {
-        id: "3",
-        releaseTitle: "Novo programa de monitoramento ambiental",
-        websiteName: "Estadão",
-        publishedDate: "2023-06-22",
-        publishedTime: "09:45",
-        url: "https://estadao.com/programa-monitoramento",
-        isVerified: false
-      }
-    ];
-    
-    setReleaseMonitoring(mockReleaseMonitoring);
   };
 
   // Mark a legislation alert as read
@@ -169,38 +62,11 @@ export const useMonitoring = () => {
     });
   };
 
+  // Add a new monitoring item
   const handleAddMonitoring = async (data: Omit<MonitoringItem, "id">) => {
     try {
-      const { data: newItem, error } = await supabase
-        .from('monitoring_items')
-        .insert({
-          name: data.name,
-          url: data.url,
-          api_url: data.api_url || null,
-          frequency: data.frequency,
-          category: data.category,
-          keywords: data.keywords || null,
-          responsible: data.responsible || null,
-          notes: data.notes || null
-        })
-        .select()
-        .single();
-      
-      if (error) throw error;
-      
-      const formattedItem: MonitoringItem = {
-        id: newItem.id,
-        name: newItem.name,
-        url: newItem.url,
-        api_url: newItem.api_url,
-        frequency: newItem.frequency,
-        category: newItem.category,
-        keywords: newItem.keywords,
-        responsible: (newItem as any).responsible || null,
-        notes: (newItem as any).notes || null
-      };
-      
-      setMonitoringItems(prev => [formattedItem, ...prev]);
+      const newItem = await addMonitoringItemToDB(data);
+      setMonitoringItems(prev => [newItem, ...prev]);
       form.reset();
       
       toast({
@@ -208,24 +74,15 @@ export const useMonitoring = () => {
         description: `Monitoramento de ${data.name} foi configurado.`
       });
     } catch (error) {
-      console.error('Erro ao adicionar monitoramento:', error);
-      toast({
-        title: "Erro ao adicionar item",
-        description: "Não foi possível adicionar o monitoramento.",
-        variant: "destructive"
-      });
+      // Error is already handled in the API function
+      console.error('Error in handleAddMonitoring:', error);
     }
   };
 
+  // Delete a monitoring item
   const handleDeleteMonitoring = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from('monitoring_items')
-        .delete()
-        .eq('id', id);
-      
-      if (error) throw error;
-      
+      await deleteMonitoringItemFromDB(id);
       setMonitoringItems(prev => prev.filter(item => item.id !== id));
       
       toast({
@@ -233,53 +90,21 @@ export const useMonitoring = () => {
         description: "O monitoramento foi removido com sucesso."
       });
     } catch (error) {
-      console.error('Erro ao remover monitoramento:', error);
-      toast({
-        title: "Erro ao remover item",
-        description: "Não foi possível remover o monitoramento.",
-        variant: "destructive"
-      });
+      // Error is already handled in the API function
+      console.error('Error in handleDeleteMonitoring:', error);
     }
   };
 
+  // Export monitoring items
   const handleExport = () => {
-    const exportFormat = window.confirm(
-      "Clique em OK para exportar como JSON ou Cancelar para exportar como CSV"
-    ) ? "json" : "csv";
-    
-    if (exportFormat === "json") {
-      const dataStr = JSON.stringify(monitoringItems, null, 2);
-      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-      const linkElement = document.createElement('a');
-      linkElement.setAttribute('href', dataUri);
-      linkElement.setAttribute('download', 'monitoramento-dados.json');
-      linkElement.click();
-    } else {
-      const csvData = convertToCSV(monitoringItems);
-      const dataUri = 'data:text/csv;charset=utf-8,'+ encodeURIComponent(csvData);
-      const linkElement = document.createElement('a');
-      linkElement.setAttribute('href', dataUri);
-      linkElement.setAttribute('download', 'monitoramento-dados.csv');
-      linkElement.click();
-    }
-    
-    toast({
-      title: "Dados exportados",
-      description: `Seus dados foram exportados com sucesso no formato ${exportFormat.toUpperCase()}.`
-    });
+    exportMonitoringItems(monitoringItems);
   };
 
-  const getUniqueResponsibles = () => {
-    const responsibles = monitoringItems
-      .map(item => item.responsible)
-      .filter(responsible => responsible !== undefined && responsible !== null) as string[];
-    
-    return [...new Set(responsibles)];
-  };
-
-  const filteredMonitoringItems = responsibleFilter
-    ? monitoringItems.filter(item => item.responsible === responsibleFilter)
-    : monitoringItems;
+  // Get filtered monitoring items based on responsible filter
+  const filteredMonitoringItems = filterMonitoringItemsByResponsible(
+    monitoringItems, 
+    responsibleFilter
+  );
 
   return {
     monitoringItems: filteredMonitoringItems,
@@ -288,7 +113,7 @@ export const useMonitoring = () => {
     form,
     responsibleFilter,
     setResponsibleFilter,
-    getUniqueResponsibles,
+    getUniqueResponsibles: () => getUniqueResponsibles(monitoringItems),
     fetchMonitoringItems,
     handleAddMonitoring,
     handleDeleteMonitoring,
