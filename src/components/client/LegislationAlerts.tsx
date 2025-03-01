@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Bell } from "lucide-react";
@@ -23,7 +24,7 @@ const LegislationAlerts: React.FC<LegislationAlertsProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center">
           <Bell className="h-5 w-5 mr-2" />
-          Alertas de Legislação e Indicadores-Chave
+          Alertas de Monitoramento
         </CardTitle>
       </CardHeader>
       <CardContent>

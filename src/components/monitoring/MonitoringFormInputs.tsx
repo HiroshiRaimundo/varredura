@@ -28,7 +28,13 @@ interface MonitoringFormInputsProps {
 
 const MonitoringFormInputs: React.FC<MonitoringFormInputsProps> = ({ form, onSubmit, clientType }) => {
   const [allCategories, setAllCategories] = useState<string[]>(getDefaultCategories(clientType));
-  const clientInfo = getClientTypeInfo(clientType);
+  const clientInfo = clientType ? getClientTypeInfo(clientType) : {
+    type: "observatory" as ClientType,
+    label: "Geral",
+    description: "Monitoramento geral",
+    icon: "database",
+    color: "bg-blue-500"
+  };
   
   const handleCategoriesUpdated = (categories: string[]) => {
     setAllCategories(categories);
@@ -37,7 +43,7 @@ const MonitoringFormInputs: React.FC<MonitoringFormInputsProps> = ({ form, onSub
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <ClientAlert alertText={clientInfo.alert} />
+        <ClientAlert alertText={clientInfo.alert || null} />
         
         <BasicFormFields form={form} clientType={clientType} />
 

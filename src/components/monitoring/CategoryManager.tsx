@@ -4,10 +4,10 @@ import { FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
-import { getDefaultCategories } from "./utils/clientTypeUtils";
+import { ClientType, getDefaultCategories } from "./utils/clientTypeUtils";
 
 interface CategoryManagerProps {
-  clientType?: "observatory" | "researcher" | "politician" | "institution" | "journalist";
+  clientType?: ClientType;
   onCategoryAdded: (newCategories: string[]) => void;
 }
 
