@@ -33,14 +33,14 @@ const Client: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Header 
-        isAuthenticated={auth.isAuthenticated} 
-        onLoginClick={() => navigate("/login")} 
-        onLogoutClick={auth.handleLogout} 
-      />
-
-      <div className="flex-1 p-6">
+      <div className="p-6">
         <div className="max-w-7xl mx-auto">
+          <Header 
+            isAuthenticated={auth.isAuthenticated} 
+            onLoginClick={() => navigate("/login")} 
+            onLogoutClick={auth.handleLogout} 
+          />
+
           {isValidClientType ? (
             <ClientDashboard 
               clientType={clientType as "observatory" | "researcher" | "politician" | "institution"}
@@ -56,7 +56,9 @@ const Client: React.FC = () => {
         </div>
       </div>
 
-      <Footer />
+      <div className="mt-auto">
+        <Footer />
+      </div>
     </div>
   );
 };

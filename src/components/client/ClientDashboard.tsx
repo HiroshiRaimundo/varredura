@@ -52,6 +52,22 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({
   const responsibleData = React.useMemo(() => getResponsibleData(monitoringItems), [monitoringItems]);
   const radarData = React.useMemo(() => getRadarData(monitoringItems), [monitoringItems]);
 
+  // Client-specific dashboard descriptions
+  const getClientDescription = () => {
+    switch (clientType) {
+      case "observatory":
+        return "Acesso a indicadores agregados e análises de tendências para monitoramento estratégico de políticas públicas e dados socioeconômicos regionais.";
+      case "researcher":
+        return "Visualização detalhada de dados para análises acadêmicas, com acesso a séries históricas e possibilidade de download para processamento complementar.";
+      case "politician":
+        return "Resumo executivo de indicadores-chave para tomada de decisão estratégica, com foco em tendências e impactos de políticas públicas.";
+      case "institution":
+        return "Monitoramento de dados institucionais para gestão de responsabilidades e acompanhamento de projetos por área de atuação.";
+      default:
+        return "";
+    }
+  };
+
   // Customize dashboard based on client type
   const renderDashboard = () => {
     switch (clientType) {
@@ -149,6 +165,17 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({
           <h1 className="text-2xl font-bold">Dashboard {getClientTypeTitle()}</h1>
         </div>
       </div>
+
+      <Card className="border-l-4" style={{ borderLeftColor: 
+        clientType === "observatory" ? "#3b82f6" : 
+        clientType === "researcher" ? "#10b981" : 
+        clientType === "politician" ? "#8b5cf6" : 
+        "#f59e0b" 
+      }}>
+        <CardContent className="pt-6">
+          <p>{getClientDescription()}</p>
+        </CardContent>
+      </Card>
 
       <DashboardControls
         timeRange={timeRange}

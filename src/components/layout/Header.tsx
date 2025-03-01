@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { UserRound, LogIn, LogOut, Home, HelpCircle } from "lucide-react";
+import { UserRound, LogIn, LogOut, HelpCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -18,22 +18,6 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   return (
     <header className="flex justify-between items-center mb-8">
-      {/* Simplified home icon without the text */}
-      <div className="flex items-center">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>
-              <a href="https://observatório.org" target="_blank" rel="noopener noreferrer" className="flex items-center text-primary hover:text-primary/80 transition-colors">
-                <Home size={24} />
-              </a>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Ir para o site do Observatório</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-      
       <div className="text-center flex-1 flex justify-center">
         <h1 className="text-lg md:text-xl font-semibold text-primary">
           Monitoramento e Análise de Indicadores Regionais
