@@ -1,68 +1,65 @@
 
-// Re-export ClientType from ClientUtils.ts
-export type { ClientType } from "@/components/client/ClientUtils";
-export { 
-  getDefaultCategories,
-  getMonitoringFormTitle, 
-  getMonitoringFormDescription 
-} from "@/components/client/ClientUtils";
+export type ClientType = "observatory" | "researcher" | "politician" | "institution" | "journalist" | "press";
 
-// Add interface for ClientTypeInfo that includes alert property
 export interface ClientTypeInfo {
-  id: string;
-  name: string;
+  type: ClientType;
+  label: string;
   description: string;
   icon: string;
+  color: string;
   alert?: string;
 }
 
-// List of available client types
 export const clientTypes: ClientTypeInfo[] = [
   {
-    id: "observatory",
-    name: "Observatório",
-    description: "Acesso a dados e informações para observatórios e institutos de monitoramento.",
-    icon: "search",
-    alert: "Novas fontes de dados disponíveis"
+    type: "observatory",
+    label: "Observatório",
+    description: "Acesso a dados e visualizações para observatórios de políticas públicas",
+    icon: "database",
+    color: "bg-blue-500"
   },
   {
-    id: "researcher",
-    name: "Pesquisador",
-    description: "Ferramentas de pesquisa e análise de dados para pesquisadores e acadêmicos.",
-    icon: "book",
-    alert: "Novos datasets disponíveis para análise"
+    type: "researcher",
+    label: "Pesquisador",
+    description: "Recursos para pesquisadores acadêmicos e científicos",
+    icon: "microscope",
+    color: "bg-purple-500"
   },
   {
-    id: "politician",
-    name: "Político",
-    description: "Monitoramento de legislação e informações relevantes para mandatos políticos.",
+    type: "politician",
+    label: "Político",
+    description: "Ferramentas para acompanhamento de políticas e legislação",
     icon: "landmark",
-    alert: "Novos projetos de lei cadastrados"
+    color: "bg-green-500"
   },
   {
-    id: "institution",
-    name: "Instituição",
-    description: "Gestão de informações e documentos para instituições governamentais e não-governamentais.",
+    type: "institution",
+    label: "Instituição",
+    description: "Recursos para instituições governamentais e não-governamentais",
     icon: "building",
-    alert: "Novos documentos oficiais disponíveis"
+    color: "bg-amber-500"
   },
   {
-    id: "journalist",
-    name: "Jornalista",
-    description: "Acesso a dados e informações para jornalistas e veículos de comunicação.",
+    type: "journalist",
+    label: "Jornalista",
+    description: "Fontes de dados e indicadores para reportagens",
     icon: "newspaper",
-    alert: "Novas pautas sugeridas pelo sistema"
+    color: "bg-rose-500"
   },
   {
-    id: "press",
-    name: "Assessoria de Imprensa",
-    description: "Gerenciamento de releases e monitoramento de mídia para assessorias de imprensa.",
-    icon: "mic",
-    alert: "Novas publicações do seu conteúdo detectadas"
+    type: "press",
+    label: "Assessoria de Imprensa",
+    description: "Ferramentas para criação e distribuição de releases",
+    icon: "megaphone",
+    color: "bg-indigo-500",
+    alert: "Novo"
   }
 ];
 
-// Function to get client type info by id
-export const getClientTypeInfo = (clientType: string): ClientTypeInfo | undefined => {
-  return clientTypes.find(type => type.id === clientType);
+export const getClientTypeInfo = (type: ClientType): ClientTypeInfo => {
+  const info = clientTypes.find(ct => ct.type === type);
+  if (!info) {
+    throw new Error(`Client type "${type}" not found`);
+  }
+  return info;
 };

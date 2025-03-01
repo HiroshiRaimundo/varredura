@@ -1,134 +1,118 @@
 
 import React from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertCircle, BarChart2, Building, Database, Globe, Landmark, Newspaper, Search, User, Megaphone } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Eye, Users, GraduationCap, Building2, Landmark, Newspaper, MessagesSquare } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ClientType, clientTypes } from "@/components/monitoring/utils/clientTypeUtils";
 
 const ClientSelection: React.FC = () => {
   const navigate = useNavigate();
 
-  const clientTypes = [
-    {
-      id: "observatory",
-      title: "Observatório",
-      description: "Dashboards com foco em análise de indicadores e tendências de dados.",
-      icon: Eye,
-      color: "bg-blue-100 text-blue-700",
-      features: [
-        "Visualizações agregadas de indicadores",
-        "Análise de tendências temporais",
-        "Comparativos regionais"
-      ]
-    },
-    {
-      id: "researcher",
-      title: "Pesquisador",
-      description: "Dashboards com foco em dados detalhados e análises avançadas.",
-      icon: GraduationCap,
-      color: "bg-green-100 text-green-700",
-      features: [
-        "Dados detalhados para análise científica",
-        "Séries históricas completas",
-        "Exportação para processamento adicional"
-      ]
-    },
-    {
-      id: "politician",
-      title: "Político",
-      description: "Dashboards com foco em tendências e resumos estratégicos.",
-      icon: Landmark,
-      color: "bg-purple-100 text-purple-700",
-      features: [
-        "Resumos executivos para tomada de decisão",
-        "Indicadores de impacto de políticas públicas",
-        "Análises comparativas simplificadas"
-      ]
-    },
-    {
-      id: "institution",
-      title: "Instituição",
-      description: "Dashboards com foco em métricas e distribuição de responsabilidades.",
-      icon: Building2,
-      color: "bg-amber-100 text-amber-700",
-      features: [
-        "Monitoramento de responsabilidades institucionais",
-        "Distribuição de indicadores por setor",
-        "Acompanhamento de projetos em andamento"
-      ]
-    },
-    {
-      id: "journalist",
-      title: "Jornalista",
-      description: "Dashboards com foco em dados para reportagens e matérias.",
-      icon: Newspaper,
-      color: "bg-red-100 text-red-700",
-      features: [
-        "Visualização de dados para produção de matérias",
-        "Tendências atualizadas para reportagens",
-        "Acesso rápido a indicadores-chave"
-      ]
-    },
-    {
-      id: "press",
-      title: "Assessoria de Imprensa",
-      description: "Serviços exclusivos de assessoria de imprensa e gestão de releases.",
-      icon: MessagesSquare,
-      color: "bg-indigo-100 text-indigo-700",
-      features: [
-        "Gestão completa de releases",
-        "Monitoramento de veiculação na mídia",
-        "Relacionamento com jornalistas e veículos"
-      ]
-    }
-  ];
+  const handleClientSelect = (clientType: string) => {
+    // Go to login page instead of directly to client type
+    navigate("/client-login");
+  };
 
   return (
-    <div className="container mx-auto py-10">
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold mb-2">Área do Cliente</h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Bem-vindo à área de cliente do sistema de Monitoramento e Análise de Indicadores Regionais. 
-          Selecione o perfil que melhor se adequa às suas necessidades para acessar dashboards personalizados.
-        </p>
+    <>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+        <div>
+          <h2 className="text-3xl font-bold mb-2 flex items-center gap-2">
+            <User className="h-8 w-8 text-primary" />
+            Área do Cliente
+          </h2>
+          <p className="text-muted-foreground">
+            Selecione seu perfil para acessar funcionalidades específicas
+          </p>
+        </div>
+
+        <Button 
+          onClick={() => navigate("/client-login")}
+          className="mt-4 md:mt-0 w-full md:w-auto flex items-center gap-2"
+        >
+          <User className="h-4 w-4" />
+          Acessar Área do Cliente
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
-        {clientTypes.map((type) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {clientTypes.map((client) => (
           <Card 
-            key={type.id} 
-            className="overflow-hidden transition-all hover:shadow-md border-t-4 cursor-pointer"
-            onClick={() => navigate(`/client/${type.id}`)}
-            style={{ borderTopColor: 
-              type.id === "observatory" ? "#3b82f6" : 
-              type.id === "researcher" ? "#10b981" : 
-              type.id === "politician" ? "#8b5cf6" : 
-              type.id === "institution" ? "#f59e0b" :
-              type.id === "journalist" ? "#ef4444" :
-              type.id === "press" ? "#6366f1" :
-              "#64748b"
-            }}
+            key={client.type}
+            className="hover:shadow-md transition-shadow cursor-pointer border border-border"
+            onClick={() => handleClientSelect(client.type)}
           >
             <CardHeader className="pb-2">
-              <div className={`w-12 h-12 rounded-lg ${type.color} flex items-center justify-center mb-2`}>
-                <type.icon className="h-6 w-6" />
+              <div className="flex justify-between items-start">
+                <CardTitle className="flex items-center gap-2">
+                  {client.type === "observatory" && <Database className="h-5 w-5 text-blue-500" />}
+                  {client.type === "researcher" && <Search className="h-5 w-5 text-purple-500" />}
+                  {client.type === "politician" && <Landmark className="h-5 w-5 text-green-500" />}
+                  {client.type === "institution" && <Building className="h-5 w-5 text-amber-500" />}
+                  {client.type === "journalist" && <Newspaper className="h-5 w-5 text-rose-500" />}
+                  {client.type === "press" && <Megaphone className="h-5 w-5 text-indigo-500" />}
+                  {client.label}
+                </CardTitle>
+                {client.alert && (
+                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                    {client.alert}
+                  </Badge>
+                )}
               </div>
-              <CardTitle>{type.title}</CardTitle>
-              <CardDescription>{type.description}</CardDescription>
+              <CardDescription>{client.description}</CardDescription>
             </CardHeader>
             <CardContent>
-              <ul className="text-sm space-y-2">
-                {type.features.map((feature, index) => (
-                  <li key={index} className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
+              <div className="flex flex-wrap gap-2 text-sm">
+                {client.type === "observatory" && (
+                  <>
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-800 hover:bg-blue-200">Dashboards</Badge>
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-800 hover:bg-blue-200">Indicadores</Badge>
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-800 hover:bg-blue-200">Monitoramento</Badge>
+                  </>
+                )}
+                {client.type === "researcher" && (
+                  <>
+                    <Badge variant="secondary" className="bg-purple-100 text-purple-800 hover:bg-purple-200">Datasets</Badge>
+                    <Badge variant="secondary" className="bg-purple-100 text-purple-800 hover:bg-purple-200">Análises</Badge>
+                    <Badge variant="secondary" className="bg-purple-100 text-purple-800 hover:bg-purple-200">Publicações</Badge>
+                  </>
+                )}
+                {client.type === "politician" && (
+                  <>
+                    <Badge variant="secondary" className="bg-green-100 text-green-800 hover:bg-green-200">Legislação</Badge>
+                    <Badge variant="secondary" className="bg-green-100 text-green-800 hover:bg-green-200">Alertas</Badge>
+                    <Badge variant="secondary" className="bg-green-100 text-green-800 hover:bg-green-200">Políticas</Badge>
+                  </>
+                )}
+                {client.type === "institution" && (
+                  <>
+                    <Badge variant="secondary" className="bg-amber-100 text-amber-800 hover:bg-amber-200">Relatórios</Badge>
+                    <Badge variant="secondary" className="bg-amber-100 text-amber-800 hover:bg-amber-200">Planejamento</Badge>
+                    <Badge variant="secondary" className="bg-amber-100 text-amber-800 hover:bg-amber-200">Dados</Badge>
+                  </>
+                )}
+                {client.type === "journalist" && (
+                  <>
+                    <Badge variant="secondary" className="bg-rose-100 text-rose-800 hover:bg-rose-200">Fontes</Badge>
+                    <Badge variant="secondary" className="bg-rose-100 text-rose-800 hover:bg-rose-200">Estatísticas</Badge>
+                    <Badge variant="secondary" className="bg-rose-100 text-rose-800 hover:bg-rose-200">Contatos</Badge>
+                  </>
+                )}
+                {client.type === "press" && (
+                  <>
+                    <Badge variant="secondary" className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200">Releases</Badge>
+                    <Badge variant="secondary" className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200">Distribuição</Badge>
+                    <Badge variant="secondary" className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200">Métricas</Badge>
+                  </>
+                )}
+              </div>
             </CardContent>
           </Card>
         ))}
       </div>
-    </div>
+    </>
   );
 };
 

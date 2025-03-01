@@ -27,10 +27,10 @@ const App = () => (
           {/* Área do cliente */}
           <Route path="/client" element={<Client />} />
           <Route path="/client/:clientType" element={<Client />} />
+          <Route path="/client-login" element={<ClientLogin />} />
           
           {/* Autenticação */}
           <Route path="/login" element={<Login />} />
-          <Route path="/client-login" element={<ClientLogin />} />
           
           {/* Área administrativa */}
           <Route path="/admin" element={<Admin />} />
