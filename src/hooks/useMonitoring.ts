@@ -1,8 +1,8 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { convertToCSV } from "@/components/dashboard/DashboardUtils";
 
 interface MonitoringItem {
   id: string;
@@ -30,7 +30,6 @@ export const useMonitoring = () => {
       
       if (error) throw error;
       
-      // Converter o formato do banco para o formato da aplicação
       const formattedItems = data.map(item => ({
         id: item.id,
         name: item.name,
@@ -39,7 +38,6 @@ export const useMonitoring = () => {
         frequency: item.frequency,
         category: item.category,
         keywords: item.keywords,
-        // Use casting para acessar a propriedade responsible com segurança
         responsible: (item as any).responsible || null
       }));
       
@@ -58,7 +56,6 @@ export const useMonitoring = () => {
 
   const handleAddMonitoring = async (data: Omit<MonitoringItem, "id">) => {
     try {
-      // Inserir no Supabase
       const { data: newItem, error } = await supabase
         .from('monitoring_items')
         .insert({
@@ -75,7 +72,6 @@ export const useMonitoring = () => {
       
       if (error) throw error;
       
-      // Converter formato do banco para formato da aplicação
       const formattedItem: MonitoringItem = {
         id: newItem.id,
         name: newItem.name,
@@ -84,11 +80,9 @@ export const useMonitoring = () => {
         frequency: newItem.frequency,
         category: newItem.category,
         keywords: newItem.keywords,
-        // Use casting para acessar a propriedade responsible com segurança
         responsible: (newItem as any).responsible || null
       };
       
-      // Atualizar estado
       setMonitoringItems(prev => [formattedItem, ...prev]);
       form.reset();
       
@@ -132,15 +126,32 @@ export const useMonitoring = () => {
   };
 
   const handleExport = () => {
-    const dataStr = JSON.stringify(monitoringItems, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', 'monitoramento-dados.json');
-    linkElement.click();
+    const exportFormat = window.confirm(
+      "Clique em OK para exportar como JSON ou Cancelar para exportar como CSV"
+    ) ? "json" : "csv";
+    
+    if (exportFormat === "json") {
+      const dataStr = JSON.stringify(monitoringItems, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', 'monitoramento-dados.json');
+      linkElement.click();
+    } else {
+      const csvData = convertToCSV(monitoringItems);
+      const dataUri = 'data:text/csv;charset=utf-8,'+ encodeURIComponent(csvData);
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', 'monitoramento-dados.csv');
+      linkElement.click();
+    }
+    
+    toast({
+      title: "Dados exportados",
+      description: `Seus dados foram exportados com sucesso no formato ${exportFormat.toUpperCase()}.`
+    });
   };
 
-  // Obter lista única de responsáveis para o filtro
   const getUniqueResponsibles = () => {
     const responsibles = monitoringItems
       .map(item => item.responsible)
@@ -149,7 +160,6 @@ export const useMonitoring = () => {
     return [...new Set(responsibles)];
   };
 
-  // Filtrar os itens de monitoramento por responsável
   const filteredMonitoringItems = responsibleFilter
     ? monitoringItems.filter(item => item.responsible === responsibleFilter)
     : monitoringItems;

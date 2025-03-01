@@ -23,11 +23,11 @@ const Admin: React.FC = () => {
   useEffect(() => {
     if (!auth.isAuthenticated) {
       navigate("/login");
+    } else {
+      // Carregar dados do Supabase ao iniciar, somente se estiver autenticado
+      monitoring.fetchMonitoringItems();
+      research.fetchResearchStudies();
     }
-    
-    // Carregar dados do Supabase ao iniciar
-    monitoring.fetchMonitoringItems();
-    research.fetchResearchStudies();
   }, [auth.isAuthenticated, navigate]);
 
   if (!auth.isAuthenticated) {

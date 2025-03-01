@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Dashboard from "@/components/Dashboard";
@@ -9,6 +8,7 @@ import ResearchList from "@/components/ResearchList";
 import MapView from "@/components/MapView";
 import { MonitoringItem } from "@/hooks/useMonitoring";
 import { ResearchStudy } from "@/types/research";
+import { generateTrendData } from "./DashboardUtils";
 
 interface TabContentProps {
   isAuthenticated: boolean;
@@ -29,14 +29,6 @@ interface TabContentProps {
   setResponsibleFilter?: (responsible: string) => void;
 }
 
-// Dados iniciais vazios para o dashboard
-const initialMockData = Array.from({ length: 12 }, (_, i) => ({
-  name: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][i],
-  estudos: 0,
-  monitoramentos: 0,
-  atualizacoes: 0
-}));
-
 const TabContent: React.FC<TabContentProps> = ({
   isAuthenticated,
   timeRange,
@@ -55,6 +47,9 @@ const TabContent: React.FC<TabContentProps> = ({
   responsibleFilter = "",
   setResponsibleFilter = () => {}
 }) => {
+  // Gerar dados de tendência com base nos itens de monitoramento
+  const trendData = generateTrendData(monitoringItems, timeRange);
+
   return (
     <Tabs defaultValue="dashboard" className="w-full">
       <TabsList className="grid grid-cols-4 w-full">
@@ -67,7 +62,7 @@ const TabContent: React.FC<TabContentProps> = ({
       {/* Aba do Dashboard */}
       <TabsContent value="dashboard">
         <Dashboard 
-          data={initialMockData}
+          data={trendData}
           timeRange={timeRange}
           setTimeRange={setTimeRange}
           handleExport={handleExport}

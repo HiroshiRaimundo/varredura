@@ -13,7 +13,8 @@ import {
   getCategoryData,
   getFrequencyData,
   getResponsibleData,
-  getRadarData
+  getRadarData,
+  generateTrendData
 } from "./dashboard/DashboardUtils";
 
 interface DashboardProps {
@@ -38,6 +39,12 @@ const Dashboard: React.FC<DashboardProps> = ({
   isAuthenticated,
   monitoringItems
 }) => {
+  // Gerar dados dinâmicos com base no período selecionado
+  const trendData = useMemo(() => 
+    generateTrendData(monitoringItems, timeRange), 
+    [monitoringItems, timeRange]
+  );
+  
   // Preparar dados para gráficos adicionais baseados nos monitoringItems
   const categoryData = useMemo(() => getCategoryData(monitoringItems), [monitoringItems]);
   const frequencyData = useMemo(() => getFrequencyData(monitoringItems), [monitoringItems]);
@@ -58,7 +65,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       {/* Gráficos Principais - Layout em Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Evolução de Estudos - Gráfico de Linha */}
-        <StudiesChart data={data} />
+        <StudiesChart data={trendData} />
 
         {/* Distribuição por Categoria - Gráfico de Pizza */}
         <CategoryChart data={categoryData} />
@@ -77,7 +84,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       </div>
 
       {/* Atualizações do Sistema - Gráfico de Área */}
-      <SystemUpdatesChart data={data} />
+      <SystemUpdatesChart data={trendData} />
 
       {/* Ferramentas de Análise - apenas para administradores */}
       {isAuthenticated && <AnalysisTools items={monitoringItems} />}
