@@ -114,7 +114,7 @@ const PressReleaseHelp: React.FC = () => {
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                <!-- Barra de progresso vertical -->
+                {/* Barra de progresso vertical */}
                 <div className="md:col-span-3 space-y-8 hidden md:block">
                   <div className="bg-gray-100 p-4 rounded-lg border border-gray-200">
                     <h4 className="font-medium text-sm mb-3">Progresso do Release</h4>
@@ -147,7 +147,7 @@ const PressReleaseHelp: React.FC = () => {
                   </div>
                 </div>
 
-                <!-- Conteúdo do passo a passo -->
+                {/* Conteúdo do passo a passo */}
                 <div className="md:col-span-9">
                   <div className="space-y-8">
                     <div className="relative pl-8 pb-8 border-l-2 border-gray-200">
