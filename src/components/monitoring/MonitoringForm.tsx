@@ -3,6 +3,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { UseFormReturn } from "react-hook-form";
 import MonitoringFormInputs from "./MonitoringFormInputs";
+import { ClientType } from "./utils/clientTypeUtils";
 
 interface MonitoringItem {
   name: string;
@@ -18,7 +19,7 @@ interface MonitoringItem {
 interface MonitoringFormProps {
   form: UseFormReturn<MonitoringItem>;
   onSubmit: (data: MonitoringItem) => void;
-  clientType?: "observatory" | "researcher" | "politician" | "institution" | "journalist";
+  clientType?: ClientType;
 }
 
 const MonitoringForm: React.FC<MonitoringFormProps> = ({ form, onSubmit, clientType }) => {
