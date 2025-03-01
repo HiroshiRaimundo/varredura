@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import PressReleaseForm from "./press/PressReleaseForm";
 import PressReleaseHelp from "./press/PressReleaseHelp";
 import PressReleaseDashboard from "./press/PressReleaseDashboard";
+import PressDashboard from "./press/PressDashboard";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -44,18 +45,23 @@ const PressReleaseTab: React.FC<PressReleaseTabProps> = ({ clientType }) => {
           </Alert>
         )}
         
-        <Tabs defaultValue="create" className="w-full">
+        <Tabs defaultValue="dashboard" className="w-full">
           <TabsList className="mb-4">
+            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="create">Criar Release</TabsTrigger>
-            <TabsTrigger value="dashboard">Acompanhamento</TabsTrigger>
+            <TabsTrigger value="monitor">Acompanhamento</TabsTrigger>
             <TabsTrigger value="help">Ajuda</TabsTrigger>
           </TabsList>
+          
+          <TabsContent value="dashboard">
+            <PressDashboard clientType={clientType} />
+          </TabsContent>
           
           <TabsContent value="create">
             <PressReleaseForm clientType={clientType} />
           </TabsContent>
           
-          <TabsContent value="dashboard">
+          <TabsContent value="monitor">
             <PressReleaseDashboard clientType={clientType} />
           </TabsContent>
           

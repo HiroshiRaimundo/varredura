@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import DashboardPage from "./pages/Dashboard";
 import Login from "./pages/Login";
+import ClientLogin from "./pages/ClientLogin";
 import Admin from "./pages/Admin";
 import Client from "./pages/Client";
 import NotFound from "./pages/NotFound";
@@ -29,6 +30,7 @@ const App = () => (
           
           {/* Autenticação */}
           <Route path="/login" element={<Login />} />
+          <Route path="/client-login" element={<ClientLogin />} />
           
           {/* Área administrativa */}
           <Route path="/admin" element={<Admin />} />

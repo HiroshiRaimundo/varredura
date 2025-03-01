@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import ClientContent from "@/components/client/ClientContent";
 import { ClientType } from "@/components/monitoring/utils/clientTypeUtils";
+import { Button } from "@/components/ui/button";
 
 const Client: React.FC = () => {
   const { clientType } = useParams<{ clientType?: string }>();

@@ -33,6 +33,12 @@ const ReleaseManagement: React.FC = () => {
   const handleDelete = (id: string) => {
     if (window.confirm('Tem certeza que deseja excluir este release?')) {
       setReleases(releases.filter(release => release.id !== id));
+      
+      // If the deleted release was selected, clear the selection
+      if (selectedRelease && selectedRelease.id === id) {
+        setSelectedRelease(null);
+        setViewingRelease(false);
+      }
     }
   };
 
@@ -42,9 +48,17 @@ const ReleaseManagement: React.FC = () => {
   };
 
   const handleApprove = (id: string) => {
-    setReleases(releases.map(release => 
-      release.id === id ? { ...release, status: 'approved' } : release
-    ));
+    // Fix: Only update the status of the release with matching id
+    setReleases(prevReleases => 
+      prevReleases.map(release => 
+        release.id === id ? { ...release, status: 'approved' } : release
+      )
+    );
+    
+    // Update selected release if it's the one being approved
+    if (selectedRelease && selectedRelease.id === id) {
+      setSelectedRelease({...selectedRelease, status: 'approved'});
+    }
     
     toast({
       title: "Release aprovado",
@@ -53,9 +67,17 @@ const ReleaseManagement: React.FC = () => {
   };
 
   const handleReject = (id: string) => {
-    setReleases(releases.map(release => 
-      release.id === id ? { ...release, status: 'rejected' } : release
-    ));
+    // Fix: Only update the status of the release with matching id
+    setReleases(prevReleases => 
+      prevReleases.map(release => 
+        release.id === id ? { ...release, status: 'rejected' } : release
+      )
+    );
+    
+    // Update selected release if it's the one being rejected
+    if (selectedRelease && selectedRelease.id === id) {
+      setSelectedRelease({...selectedRelease, status: 'rejected'});
+    }
     
     toast({
       title: "Release rejeitado",

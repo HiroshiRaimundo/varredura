@@ -29,4 +29,36 @@ export interface ReleaseMonitoringItem {
   publishedTime: string;
   url: string;
   isVerified: boolean;
+  clientId?: string;
+  clientType?: string;
+  clientName?: string;
+  status?: string;
+  submittedDate?: string;
+  approvedDate?: string;
+  notes?: string;
+}
+
+export interface ClientCredentials {
+  id: string;
+  email: string;
+  name: string;
+  clientType: string;
+  clientId: string;
+  lastLogin?: string;
+}
+
+export interface PressReleaseMonitoring {
+  id: string;
+  releaseId: string;
+  title: string;
+  status: string;
+  targetOutlets: string[];
+  publishedOutlets: string[];
+  createdDate: string;
+  lastCheckedDate: string;
+  publishedUrls: {
+    outlet: string;
+    url: string;
+    date: string;
+  }[];
 }
