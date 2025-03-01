@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ClientType, clientTypeDetails } from "@/components/client/ClientTypes";
 import { getColorClasses } from "@/components/service/utils/colorUtils";
-import { Eye, Edit, Settings } from "lucide-react";
+import { Eye, Edit, Settings, BarChart, FileText, Users, Link, ExternalLink } from "lucide-react";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 const ClientAreaPreview: React.FC = () => {
   const navigate = useNavigate();
@@ -18,6 +19,11 @@ const ClientAreaPreview: React.FC = () => {
   // Navigate to the client example area for preview
   const handlePreviewClientArea = (clientType: ClientType) => {
     navigate(`/example-client?type=${clientType}`);
+  };
+
+  // Navigate to the actual client area
+  const handleAccessClientArea = (clientType: ClientType) => {
+    navigate(`/client?type=${clientType}`);
   };
 
   // Simulated edit function - in a real app this would open an editor
@@ -43,6 +49,13 @@ const ClientAreaPreview: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <Alert className="mb-4 bg-amber-50 border-amber-200">
+            <AlertTitle className="text-amber-800">Gerenciamento de Áreas de Clientes</AlertTitle>
+            <AlertDescription className="text-amber-700">
+              Você pode visualizar e editar as áreas de clientes reais ou acessar o exemplo interativo para simulação.
+            </AlertDescription>
+          </Alert>
+
           <Tabs 
             defaultValue="observatory" 
             value={selectedClientType}
@@ -63,6 +76,7 @@ const ClientAreaPreview: React.FC = () => {
                 <ClientTypePreview 
                   clientType={type} 
                   onPreview={handlePreviewClientArea}
+                  onAccess={handleAccessClientArea}
                   onEdit={handleEditClientArea}
                   onSettings={handleClientSettings}
                 />
@@ -79,6 +93,7 @@ const ClientAreaPreview: React.FC = () => {
 interface ClientTypePreviewProps {
   clientType: ClientType;
   onPreview: (clientType: ClientType) => void;
+  onAccess: (clientType: ClientType) => void;
   onEdit: (clientType: ClientType) => void;
   onSettings: (clientType: ClientType) => void;
 }
@@ -86,11 +101,24 @@ interface ClientTypePreviewProps {
 const ClientTypePreview: React.FC<ClientTypePreviewProps> = ({ 
   clientType, 
   onPreview,
+  onAccess,
   onEdit,
   onSettings
 }) => {
   const colorClasses = getColorClasses(clientType);
   const details = clientTypeDetails[clientType];
+
+  const getClientTypeIcon = () => {
+    switch(clientType) {
+      case "observatory": return <BarChart className="h-10 w-10 mb-2" />;
+      case "researcher": return <FileText className="h-10 w-10 mb-2" />;
+      case "politician": return <Users className="h-10 w-10 mb-2" />;
+      case "institution": return <Users className="h-10 w-10 mb-2" />;
+      case "journalist": return <FileText className="h-10 w-10 mb-2" />;
+      case "press": return <Link className="h-10 w-10 mb-2" />;
+      default: return <BarChart className="h-10 w-10 mb-2" />;
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -107,6 +135,16 @@ const ClientTypePreview: React.FC<ClientTypePreviewProps> = ({
             </CardHeader>
             <CardContent className="p-4">
               <div className="space-y-4">
+                <div className="flex flex-col items-center justify-center py-4">
+                  <div className={`${colorClasses.light} p-4 rounded-full`}>
+                    {getClientTypeIcon()}
+                  </div>
+                  <h3 className="font-medium mt-2 text-lg">{details.title}</h3>
+                  <p className="text-center text-sm text-muted-foreground mt-1">
+                    {details.description}
+                  </p>
+                </div>
+
                 <h3 className="font-medium">Recursos Disponíveis:</h3>
                 <ul className="space-y-2">
                   {details.features.slice(0, 3).map((feature, index) => (
@@ -135,7 +173,15 @@ const ClientTypePreview: React.FC<ClientTypePreviewProps> = ({
                 onClick={() => onPreview(clientType)}
               >
                 <Eye className="mr-2 h-4 w-4" />
-                Visualizar Área
+                Visualizar Exemplo
+              </Button>
+              <Button 
+                variant="default"
+                className={`w-full justify-start ${colorClasses.bg}`}
+                onClick={() => onAccess(clientType)}
+              >
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Acessar Área Real
               </Button>
               <Button 
                 variant="outline" 
