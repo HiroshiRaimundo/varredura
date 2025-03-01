@@ -1,11 +1,15 @@
 
-import { ClientType } from "../../../components/client/ClientUtils";
+import { ClientType } from "../../client/ClientUtils";
+
+// Re-export ClientType to maintain compatibility
+export { ClientType };
 
 // Client type information
 export interface ClientTypeInfo {
   label: string;
   description: string;
   icon: string;
+  alert?: string; // Added alert property to fix error
 }
 
 // Map client types to their display information
@@ -14,32 +18,38 @@ export const getClientTypeInfo = (clientType: ClientType): ClientTypeInfo => {
     observatory: {
       label: "Observatório",
       description: "Monitoramento de dados para observatórios",
-      icon: "search"
+      icon: "search",
+      alert: "Configure seu observatório para monitorar dados importantes"
     },
     researcher: {
       label: "Pesquisador",
       description: "Monitoramento de dados para pesquisadores",
-      icon: "book"
+      icon: "book",
+      alert: "Configure seus alertas de pesquisa para ficar atualizado"
     },
     politician: {
       label: "Político",
       description: "Monitoramento de dados para políticos",
-      icon: "landmark"
+      icon: "landmark",
+      alert: "Monitore legislação e informações importantes para seu mandato"
     },
     institution: {
       label: "Instituição",
       description: "Monitoramento de dados para instituições",
-      icon: "building"
+      icon: "building",
+      alert: "Configure o monitoramento de dados para sua instituição"
     },
     journalist: {
       label: "Jornalista",
       description: "Monitoramento de dados para jornalistas",
-      icon: "newspaper"
+      icon: "newspaper",
+      alert: "Configure alertas de notícias e fontes de informação"
     },
     press: {
       label: "Assessoria de Imprensa",
       description: "Gerenciamento de releases e monitoramento de mídia",
-      icon: "mic"
+      icon: "mic",
+      alert: "Configure seu sistema de monitoramento de mídia e gestão de releases"
     }
   };
 

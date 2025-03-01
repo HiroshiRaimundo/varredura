@@ -41,3 +41,28 @@ export const getClientIcon = (clientType: ClientType): string => {
       return "user";
   }
 };
+
+// Function to get client type title - added for ClientHeader.tsx
+export const getClientTypeTitle = (clientType: ClientType): string => {
+  return getClientName(clientType);
+};
+
+// Function to get client description - added for ClientHeader.tsx
+export const getClientDescription = (clientType: ClientType): string => {
+  switch (clientType) {
+    case "observatory":
+      return "Acesso a dados e informações para observatórios e institutos de monitoramento.";
+    case "researcher":
+      return "Ferramentas de pesquisa e análise de dados para pesquisadores e acadêmicos.";
+    case "politician":
+      return "Monitoramento de legislação e informações relevantes para mandatos políticos.";
+    case "institution":
+      return "Gestão de informações e documentos para instituições governamentais e não-governamentais.";
+    case "journalist":
+      return "Acesso a dados e informações para jornalistas e veículos de comunicação.";
+    case "press":
+      return "Gerenciamento de releases e monitoramento de mídia para assessorias de imprensa.";
+    default:
+      return "Acesso a ferramentas e informações personalizadas.";
+  }
+};

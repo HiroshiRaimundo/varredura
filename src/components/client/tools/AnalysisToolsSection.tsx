@@ -1,6 +1,6 @@
 
 import React from "react";
-import { ClientType } from "@/components/monitoring/utils/clientTypeUtils";
+import { ClientType } from "@/components/client/ClientUtils";
 import AnalysisToolsCard from "@/components/client/AnalysisToolsCard";
 
 interface AnalysisToolsSectionProps {
