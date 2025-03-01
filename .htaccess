@@ -51,12 +51,18 @@
   ExpiresByType application/x-font-woff "access plus 1 year"
 </IfModule>
 
-# Verificar se mod_php está ativado
+# Verificar se mod_php está ativado e configurar para exibir todos os erros
 <IfModule mod_php7.c>
   php_flag display_errors on
   php_value error_reporting E_ALL
+  php_flag display_startup_errors on
+  php_flag log_errors on
+  php_value error_log php-error.log
 </IfModule>
 <IfModule mod_php.c>
   php_flag display_errors on
   php_value error_reporting E_ALL
+  php_flag display_startup_errors on
+  php_flag log_errors on
+  php_value error_log php-error.log
 </IfModule>
