@@ -7,45 +7,46 @@ import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, ServiceCard, ServiceIconWrapper, FeatureCard } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
+import { ClientType } from "@/components/client/ClientTypes";
 
 const clientTypes = [
   {
-    id: "observatory",
+    id: "observatory" as ClientType,
     title: "Observatório",
     icon: <BookOpen className="h-8 w-8 text-blue-600" />,
     color: "blue" as const,
     description: "Plataforma completa para observatórios de políticas públicas acompanharem indicadores, integrarem dados e gerarem relatórios automatizados com visualizações avançadas.",
   },
   {
-    id: "researcher",
+    id: "researcher" as ClientType,
     title: "Pesquisador",
     icon: <BarChart2 className="h-8 w-8 text-indigo-600" />,
     color: "indigo" as const,
     description: "Acesso a datasets completos, APIs para integração com ferramentas estatísticas, histórico de séries temporais e capacidade de compartilhamento de dados com outros pesquisadores.",
   },
   {
-    id: "politician",
+    id: "politician" as ClientType,
     title: "Político",
     icon: <FileText className="h-8 w-8 text-green-600" />,
     color: "green" as const,
     description: "Alertas sobre novas legislações, análise de impacto de políticas públicas, resumos executivos de dados governamentais e comparativos de indicadores por região.",
   },
   {
-    id: "institution",
+    id: "institution" as ClientType,
     title: "Instituição",
     icon: <Users className="h-8 w-8 text-purple-600" />,
     color: "purple" as const,
     description: "Ferramentas para gestão de dados institucionais, monitoramento de programas, dashboards personalizados e relatórios de acompanhamento para instituições de diversos setores.",
   },
   {
-    id: "journalist",
+    id: "journalist" as ClientType,
     title: "Jornalista",
     icon: <FileText className="h-8 w-8 text-red-600" />,
     color: "red" as const,
     description: "Acesso a indicadores atualizados, visualizações prontas para publicação, verificação de dados e comparativos históricos para embasar reportagens investigativas e especiais.",
   },
   {
-    id: "press",
+    id: "press" as ClientType,
     title: "Assessoria de Imprensa",
     icon: <MessageSquare className="h-8 w-8 text-amber-600" />,
     color: "amber" as const,
@@ -80,8 +81,8 @@ const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const auth = useAuth();
 
-  const handleServiceClick = (serviceId: string) => {
-    navigate(`/client/${serviceId}`);
+  const handleServiceClick = (serviceId: ClientType) => {
+    navigate(`/service/${serviceId}`);
   };
 
   const getButtonColorClass = (color: string) => {

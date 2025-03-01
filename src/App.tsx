@@ -11,6 +11,7 @@ import Admin from "./pages/Admin";
 import Client from "./pages/Client";
 import NotFound from "./pages/NotFound";
 import Help from "./pages/Help";
+import ServiceLanding from "./pages/ServiceLanding";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,9 @@ const App = () => (
         <Routes>
           {/* Dashboard (público) */}
           <Route path="/" element={<DashboardPage />} />
+          
+          {/* Páginas de serviços */}
+          <Route path="/service/:serviceId" element={<ServiceLanding />} />
           
           {/* Área do cliente */}
           <Route path="/client" element={<Client />} />
