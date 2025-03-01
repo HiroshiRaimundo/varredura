@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
-import { LogIn, LogOut, User } from "lucide-react";
+import { LogIn, LogOut, User, Home, ArrowLeft } from "lucide-react";
 
 interface HeaderProps {
   isAuthenticated: boolean;
@@ -45,7 +45,9 @@ const Header = ({
           onClick={() => navigate("/")} 
           className="cursor-pointer flex items-center"
         >
-          <span className="text-xl font-bold">Serviços Especializados</span>
+          {!isClientPage && (
+            <span className="text-xl font-bold">Serviços Especializados</span>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
@@ -59,21 +61,44 @@ const Header = ({
             </div>
           )}
 
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/")}
-          >
-            Dashboard
-          </Button>
+          {isClientPage ? (
+            <>
+              <Button
+                variant="outline"
+                className="flex items-center gap-2"
+                onClick={() => navigate(-1)}
+              >
+                <ArrowLeft className="h-4 w-4" />
+                <span className="hidden sm:inline">Voltar</span>
+              </Button>
+              <Button
+                variant="ghost"
+                className="flex items-center gap-2"
+                onClick={() => navigate("/")}
+              >
+                <Home className="h-4 w-4" />
+                <span className="hidden sm:inline">Início</span>
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/")}
+              >
+                Dashboard
+              </Button>
+              
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/help")}
+              >
+                Ajuda
+              </Button>
+            </>
+          )}
           
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/help")}
-          >
-            Ajuda
-          </Button>
-          
-          {isAuthenticated ? (
+          {isAuthenticated && !isClientPage && (
             <Button
               variant="outline"
               className="flex items-center gap-2"
@@ -82,28 +107,17 @@ const Header = ({
               <LogOut className="h-4 w-4" />
               <span className="hidden sm:inline">Sair</span>
             </Button>
-          ) : (
-            <>
-              {isClientPage ? (
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-2"
-                  onClick={() => navigate("/client-login")}
-                >
-                  <User className="h-4 w-4" />
-                  <span className="hidden sm:inline">Área do Cliente</span>
-                </Button>
-              ) : (
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-2"
-                  onClick={() => navigate("/client-login")}
-                >
-                  <User className="h-4 w-4" />
-                  <span className="hidden sm:inline">Área do Cliente</span>
-                </Button>
-              )}
-            </>
+          )}
+          
+          {!isAuthenticated && !isClientPage && (
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+              onClick={() => navigate("/client-login")}
+            >
+              <User className="h-4 w-4" />
+              <span className="hidden sm:inline">Área do Cliente</span>
+            </Button>
           )}
         </div>
       </div>
