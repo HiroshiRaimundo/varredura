@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
@@ -20,6 +21,10 @@ const ServicePricing: React.FC = () => {
     }
     
     navigate("/payment");
+  };
+
+  const handleExampleClientClick = () => {
+    navigate("/example-client");
   };
 
   const servicePricing = [
@@ -76,6 +81,14 @@ const ServicePricing: React.FC = () => {
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Escolha o plano ideal para suas necessidades e comece a utilizar nossos serviços especializados de dados.
             </p>
+            <div className="mt-4">
+              <Button 
+                onClick={handleExampleClientClick}
+                className="bg-amber-600 hover:bg-amber-700"
+              >
+                Ver exemplo da área do cliente
+              </Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Check, Users, BarChart2, Zap } from "lucide-react";
@@ -29,6 +30,11 @@ const ServiceLanding: React.FC = () => {
   const handleContractServiceClick = () => {
     // Navigate directly to client page with the specific service type
     navigate(`/client/${validServiceId}`);
+  };
+
+  const handleExampleClientClick = () => {
+    // Navigate to the example client page
+    navigate("/example-client");
   };
 
   // Get color classes based on service type
@@ -73,13 +79,24 @@ const ServiceLanding: React.FC = () => {
             {serviceDetails.description}
           </p>
           
-          <Button 
-            onClick={handleContractServiceClick}
-            size="lg"
-            className={`${colorClasses.bg} hover:opacity-90 shadow-lg`}
-          >
-            Contratar agora
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button 
+              onClick={handleContractServiceClick}
+              size="lg"
+              className={`${colorClasses.bg} hover:opacity-90 shadow-lg`}
+            >
+              Contratar agora
+            </Button>
+            
+            <Button 
+              onClick={handleExampleClientClick}
+              variant="outline"
+              size="lg"
+              className="border-gray-300"
+            >
+              Ver exemplo da área do cliente
+            </Button>
+          </div>
         </div>
         
         {/* Background abstract shape */}

@@ -10,6 +10,7 @@ import Client from "@/pages/Client";
 import ClientLogin from "@/pages/ClientLogin";
 import ServiceLanding from "@/pages/ServiceLanding";
 import Payment from "@/pages/Payment";
+import ExampleClient from "@/pages/ExampleClient";
 import NotFound from "@/pages/NotFound";
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
         <Route path="/client-login" element={<ClientLogin />} />
         <Route path="/service/:serviceId" element={<ServiceLanding />} />
         <Route path="/payment" element={<Payment />} /> 
+        <Route path="/example-client" element={<ExampleClient />} />
         <Route path="/*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
