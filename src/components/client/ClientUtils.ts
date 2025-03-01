@@ -42,12 +42,12 @@ export const getClientIcon = (clientType: ClientType): string => {
   }
 };
 
-// Function to get client type title
+// Function to get client type title (re-exported for compatibility)
 export const getClientTypeTitle = (clientType: ClientType): string => {
   return getClientName(clientType);
 };
 
-// Function to get client description
+// Function to get client description (re-exported for compatibility)
 export const getClientDescription = (clientType: ClientType): string => {
   switch (clientType) {
     case "observatory":
@@ -64,5 +64,65 @@ export const getClientDescription = (clientType: ClientType): string => {
       return "Gerenciamento de releases e monitoramento de mídia para assessorias de imprensa.";
     default:
       return "Acesso a ferramentas e informações personalizadas.";
+  }
+};
+
+// Get default categories for monitoring forms
+export const getDefaultCategories = (clientType: ClientType): string[] => {
+  switch (clientType) {
+    case "observatory":
+      return ["Dados Públicos", "Relatórios", "Estatísticas", "Pesquisas"];
+    case "researcher":
+      return ["Artigos Científicos", "Bases de Dados", "Metodologias", "Publicações"];
+    case "politician":
+      return ["Legislação", "Projetos de Lei", "Políticas Públicas", "Orçamento"];
+    case "institution":
+      return ["Regulamentações", "Documentos Oficiais", "Portarias", "Editais"];
+    case "journalist":
+      return ["Notícias", "Reportagens", "Entrevistas", "Pautas"];
+    case "press":
+      return ["Releases", "Coberturas", "Mídia", "Publicações"];
+    default:
+      return ["Geral", "Específico", "Temático", "Personalizado"];
+  }
+};
+
+// Get monitoring form title
+export const getMonitoringFormTitle = (clientType: ClientType): string => {
+  switch (clientType) {
+    case "observatory":
+      return "Cadastro de Monitoramento - Observatório";
+    case "researcher":
+      return "Cadastro de Pesquisa Monitorada";
+    case "politician":
+      return "Monitoramento Legislativo";
+    case "institution":
+      return "Monitoramento Institucional";
+    case "journalist":
+      return "Monitoramento de Pautas";
+    case "press":
+      return "Monitoramento de Mídia";
+    default:
+      return "Cadastro de Monitoramento";
+  }
+};
+
+// Get monitoring form description
+export const getMonitoringFormDescription = (clientType: ClientType): string => {
+  switch (clientType) {
+    case "observatory":
+      return "Configure o monitoramento de dados e informações para seu observatório";
+    case "researcher":
+      return "Cadastre pesquisas para monitoramento contínuo de dados";
+    case "politician":
+      return "Configure o monitoramento de legislação e temas relevantes para seu mandato";
+    case "institution":
+      return "Configure o monitoramento de temas relevantes para sua instituição";
+    case "journalist":
+      return "Configure o monitoramento de temas para futuras pautas";
+    case "press":
+      return "Configure o monitoramento de mídia para releases e coberturas";
+    default:
+      return "Configure seu monitoramento personalizado";
   }
 };
