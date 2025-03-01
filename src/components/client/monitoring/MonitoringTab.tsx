@@ -1,45 +1,25 @@
 
 import React from "react";
-import MonitoringForm from "@/components/monitoring/MonitoringForm";
-import MonitoringList from "@/components/MonitoringList";
-import { ClientType } from "@/components/monitoring/utils/clientTypeUtils";
+import { MonitoringItem } from "@/hooks/useMonitoring";
+import MonitoringList from "@/components/monitoring-list";
 
 interface MonitoringTabProps {
-  clientType: ClientType;
-  monitoringItems: any[];
-  form: any;
-  handleAddMonitoring: (data: any) => void;
-  isLoading: boolean;
-  responsibleFilter: string;
-  setResponsibleFilter: (filter: string) => void;
-  getUniqueResponsibles: () => string[];
+  items: MonitoringItem[];
+  onDelete: (id: string) => void;
+  isLoading?: boolean;
 }
 
-const MonitoringTab: React.FC<MonitoringTabProps> = ({
-  clientType,
-  monitoringItems,
-  form,
-  handleAddMonitoring,
-  isLoading,
-  responsibleFilter,
-  setResponsibleFilter,
-  getUniqueResponsibles
+const MonitoringTab: React.FC<MonitoringTabProps> = ({ 
+  items, 
+  onDelete,
+  isLoading = false
 }) => {
   return (
-    <div className="space-y-6">
-      <MonitoringForm 
-        form={form} 
-        onSubmit={handleAddMonitoring}
-        clientType={clientType}
-      />
-      
+    <div className="grid gap-6">
       <MonitoringList 
-        items={monitoringItems} 
-        onDelete={() => {}} // We'll pass this in the main component
+        items={items}
+        onDelete={onDelete}
         isLoading={isLoading}
-        uniqueResponsibles={getUniqueResponsibles()}
-        responsibleFilter={responsibleFilter}
-        onFilterChange={setResponsibleFilter}
       />
     </div>
   );

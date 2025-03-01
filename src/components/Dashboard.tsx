@@ -3,11 +3,8 @@ import React, { useMemo } from "react";
 import { MonitoringItem } from "@/hooks/useMonitoring";
 import AnalysisTools from "./AnalysisTools";
 import DashboardControls from "./dashboard/DashboardControls";
-import StudiesChart from "./dashboard/StudiesChart";
-import CategoryChart from "./dashboard/CategoryChart";
-import FrequencyChart from "./dashboard/FrequencyChart";
-import ResearchersChart from "./dashboard/ResearchersChart";
-import SourceTypeChart from "./dashboard/SourceTypeChart";
+import { DashboardChartsGrid } from "./dashboard/DashboardChartsGrid";
+import { DashboardSecondaryCharts } from "./dashboard/DashboardSecondaryCharts";
 import SystemUpdatesChart from "./dashboard/SystemUpdatesChart";
 import { 
   getCategoryData,
@@ -64,25 +61,17 @@ const Dashboard: React.FC<DashboardProps> = ({
       />
 
       {/* Gráficos Principais - Layout em Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Evolução de Estudos - Gráfico de Linha */}
-        <StudiesChart data={trendData} />
-
-        {/* Distribuição por Categoria - Gráfico de Pizza */}
-        <CategoryChart data={categoryData} />
-
-        {/* Frequência de Atualização - Gráfico de Barras */}
-        <FrequencyChart data={frequencyData} />
-      </div>
+      <DashboardChartsGrid 
+        trendData={trendData}
+        categoryData={categoryData}
+        frequencyData={frequencyData}
+      />
 
       {/* Gráficos Secundários - 2 em uma linha */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Distribuição por Responsável - Gráfico de Barras */}
-        <ResearchersChart data={responsibleData} />
-
-        {/* Cobertura por Tipo - Gráfico Radar */}
-        <SourceTypeChart data={radarData} />
-      </div>
+      <DashboardSecondaryCharts 
+        responsibleData={responsibleData}
+        radarData={radarData}
+      />
 
       {/* Atualizações do Sistema - Gráfico de Área */}
       <SystemUpdatesChart data={trendData} />
