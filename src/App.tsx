@@ -3,8 +3,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import DashboardPage from "./pages/Dashboard";
+import Login from "./pages/Login";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import Help from "./pages/Help";
 
@@ -17,9 +19,22 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+          {/* Dashboard (público) */}
+          <Route path="/" element={<DashboardPage />} />
+          
+          {/* Autenticação */}
+          <Route path="/login" element={<Login />} />
+          
+          {/* Área administrativa */}
+          <Route path="/admin" element={<Admin />} />
+          
+          {/* Página de ajuda */}
           <Route path="/help" element={<Help />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          
+          {/* Rota antiga - redirecionar para a nova estrutura */}
+          <Route path="/index" element={<Navigate to="/" replace />} />
+          
+          {/* Rota 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
