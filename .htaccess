@@ -4,6 +4,10 @@
   RewriteEngine On
   RewriteBase /
   
+  # Registrar todas as requisições para debug (descomente se necessário)
+  # RewriteLog "/path/to/rewrite.log"
+  # RewriteLogLevel 3
+  
   # Não aplicar regras a arquivos existentes ou diretórios
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
@@ -11,11 +15,12 @@
   # Se a requisição for para index.php, não fazer nada
   RewriteRule ^index\.php$ - [L]
   
-  # Para PHP-based hosts, reescreva para index.php
-  RewriteRule ^(api|admin)($|/) index.php [L]
+  # Para requisições de API, redirecionar para index.php
+  RewriteRule ^api/(.*)$ index.php [L]
+  RewriteRule ^admin/(.*)$ index.php [L]
   
   # Para todas as outras requisições, reescreva para index.html (SPA React)
-  RewriteRule . /index.html [L]
+  RewriteRule . index.html [L]
 </IfModule>
 
 # Configurar MIME types corretamente
@@ -66,3 +71,10 @@
   php_flag log_errors on
   php_value error_log php-error.log
 </IfModule>
+
+# Fallback para erros comuns
+ErrorDocument 404 /index.html
+ErrorDocument 500 "Erro interno do servidor. Verifique os logs para mais detalhes."
+
+# Desativar listagem de diretórios
+Options -Indexes
