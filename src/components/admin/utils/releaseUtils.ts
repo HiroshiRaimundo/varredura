@@ -1,4 +1,11 @@
 
+import { 
+  ReleaseData, 
+  JournalistContact, 
+  ReleaseMonitoring, 
+  ReleaseMonitoringResult 
+} from '../types/releaseTypes';
+
 export const getStatusLabel = (status: string) => {
   switch (status) {
     case 'published':
