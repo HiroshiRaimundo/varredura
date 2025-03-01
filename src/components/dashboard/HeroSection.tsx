@@ -28,13 +28,6 @@ const HeroSection: React.FC = () => {
             
             <div className="flex flex-col sm:flex-row gap-4">
               <Button 
-                size="lg"
-                className="bg-green-600 hover:bg-green-700"
-                onClick={() => navigate("/client")}
-              >
-                Conheça Nossos Serviços
-              </Button>
-              <Button 
                 variant="outline" 
                 size="lg"
                 onClick={() => navigate("/help")}

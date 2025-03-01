@@ -1,6 +1,6 @@
 
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
+import { ClientType } from "@/components/monitoring/utils/clientTypeUtils";
 
 interface PaymentFormValues {
   cardName: string;
@@ -21,7 +22,13 @@ interface PaymentFormValues {
 
 const Payment: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const auth = useAuth();
+  
+  // Get the client type from the URL or use default
+  const clientType: ClientType = (location.state?.clientType as ClientType) || "observatory";
+  
+  console.log("Payment page for client type:", clientType);
   
   const form = useForm<PaymentFormValues>({
     defaultValues: {
@@ -41,9 +48,9 @@ const Payment: React.FC = () => {
       description: "Você será redirecionado para a área do cliente."
     });
     
-    // Redirect to client login after "payment"
+    // Redirect to client area with the specific client type after "payment"
     setTimeout(() => {
-      navigate("/client-login");
+      navigate(`/client/${clientType}`);
     }, 1500);
   };
 

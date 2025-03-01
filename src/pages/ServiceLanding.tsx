@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Check, Users, BarChart2, Zap } from "lucide-react";
@@ -28,8 +27,8 @@ const ServiceLanding: React.FC = () => {
   };
 
   const handleContractServiceClick = () => {
-    // Navigate to payment page instead of client login
-    navigate("/payment");
+    // Navigate directly to client page with the specific service type
+    navigate(`/client/${validServiceId}`);
   };
 
   // Get color classes based on service type
