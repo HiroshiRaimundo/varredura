@@ -9,9 +9,12 @@ interface MonitoringCardListProps {
 }
 
 const MonitoringCardList: React.FC<MonitoringCardListProps> = ({ items, onDelete }) => {
+  // Ensure items is always an array
+  const safeItems = Array.isArray(items) ? items : [];
+  
   return (
     <div className="grid gap-4">
-      {items.map((item) => (
+      {safeItems.map((item) => (
         <MonitoringCard key={item.id} item={item} onDelete={onDelete} />
       ))}
     </div>

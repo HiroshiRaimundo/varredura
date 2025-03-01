@@ -26,14 +26,26 @@ export const useMonitoring = () => {
   const [responsibleFilter, setResponsibleFilter] = useState<string>("");
   const [legislationAlerts, setLegislationAlerts] = useState<LegislationAlert[]>([]);
   const [releaseMonitoring, setReleaseMonitoring] = useState<ReleaseMonitoringItem[]>([]);
-  const form = useForm<Omit<MonitoringItem, "id">>();
+  const form = useForm<Omit<MonitoringItem, "id">>({
+    defaultValues: {
+      name: "",
+      url: "",
+      frequency: "diária",
+      category: "Legislação",
+      responsible: "",
+      keywords: "",
+      notes: ""
+    }
+  });
 
   // Fetch monitoring items
   const fetchMonitoringItems = async () => {
     try {
       setIsLoading(true);
+      console.log("Fetching monitoring items...");
       const items = await fetchMonitoringItemsFromDB();
-      setMonitoringItems(items);
+      console.log("Monitoring items fetched:", items?.length || 0);
+      setMonitoringItems(items || []);
       
       // Fetch legislation alerts and release monitoring data
       const alerts = fetchLegislationAlertsFromDB();
@@ -65,6 +77,7 @@ export const useMonitoring = () => {
   // Add a new monitoring item
   const handleAddMonitoring = async (data: Omit<MonitoringItem, "id">) => {
     try {
+      console.log("Adding monitoring item:", data);
       const newItem = await addMonitoringItemToDB(data);
       setMonitoringItems(prev => [newItem, ...prev]);
       form.reset();

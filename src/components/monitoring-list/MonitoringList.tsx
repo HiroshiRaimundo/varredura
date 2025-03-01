@@ -7,13 +7,23 @@ import MonitoringCardList from "./MonitoringCardList";
 import { MonitoringListProps } from "./types";
 
 const MonitoringList: React.FC<MonitoringListProps> = ({ 
-  items, 
+  items = [], 
   onDelete, 
   isLoading = false,
   uniqueResponsibles = [],
   responsibleFilter = "",
   onFilterChange = () => {}
 }) => {
+  // Ensure items is always an array
+  const safeItems = Array.isArray(items) ? items : [];
+  
+  // Log for debugging
+  console.log("MonitoringList rendering", { 
+    itemCount: safeItems.length, 
+    isLoading, 
+    hasFilter: Boolean(responsibleFilter) 
+  });
+
   return (
     <Card className="mt-6">
       <CardHeader>
@@ -21,7 +31,7 @@ const MonitoringList: React.FC<MonitoringListProps> = ({
           <div className="flex items-center gap-2">
             <CardTitle>Monitoramentos Ativos</CardTitle>
             <span className="text-sm bg-primary/10 text-primary px-2 py-1 rounded-full">
-              {items.length} item{items.length !== 1 ? 's' : ''}
+              {safeItems.length} item{safeItems.length !== 1 ? 's' : ''}
             </span>
           </div>
           
@@ -35,12 +45,12 @@ const MonitoringList: React.FC<MonitoringListProps> = ({
       <CardContent>
         <MonitoringListStatus 
           isLoading={isLoading}
-          isEmpty={items.length === 0}
+          isEmpty={safeItems.length === 0}
           responsibleFilter={responsibleFilter}
         />
         
-        {!isLoading && items.length > 0 && (
-          <MonitoringCardList items={items} onDelete={onDelete} />
+        {!isLoading && safeItems.length > 0 && (
+          <MonitoringCardList items={safeItems} onDelete={onDelete} />
         )}
       </CardContent>
     </Card>

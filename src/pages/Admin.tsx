@@ -22,6 +22,11 @@ const Admin: React.FC = () => {
   const monitoring = useMonitoring();
   const research = useResearch();
 
+  // Para debug - verificar estado dos itens de monitoramento
+  useEffect(() => {
+    console.log("Admin monitoring items:", monitoring.monitoringItems);
+  }, [monitoring.monitoringItems]);
+
   // Verificar autenticação e redirecionar se não estiver autenticado
   useEffect(() => {
     if (!auth.isAuthenticated) {

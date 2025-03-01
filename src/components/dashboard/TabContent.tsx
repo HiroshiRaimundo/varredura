@@ -51,6 +51,13 @@ const TabContent: React.FC<TabContentProps> = ({
   // Gerar dados de tendência com base nos itens de monitoramento
   const trendData = generateTrendData(monitoringItems, timeRange);
 
+  // Log para debugging
+  console.log("TabContent rendering", { 
+    isAuthenticated, 
+    itemCount: monitoringItems?.length || 0,
+    form: monitoringForm 
+  });
+
   return (
     <Tabs defaultValue="dashboard" className="w-full">
       <TabsList className="grid grid-cols-4 w-full">
@@ -75,18 +82,26 @@ const TabContent: React.FC<TabContentProps> = ({
       {/* Aba de Monitoramento */}
       {isAuthenticated && (
         <TabsContent value="monitoring">
-          <MonitoringForm 
-            form={monitoringForm} 
-            onSubmit={handleAddMonitoring} 
-          />
-          <MonitoringList 
-            items={monitoringItems} 
-            onDelete={handleDeleteMonitoring} 
-            isLoading={isLoading}
-            uniqueResponsibles={uniqueResponsibles}
-            responsibleFilter={responsibleFilter}
-            onFilterChange={setResponsibleFilter}
-          />
+          {monitoringForm ? (
+            <>
+              <MonitoringForm 
+                form={monitoringForm} 
+                onSubmit={handleAddMonitoring} 
+              />
+              <MonitoringList 
+                items={monitoringItems || []} 
+                onDelete={handleDeleteMonitoring} 
+                isLoading={isLoading}
+                uniqueResponsibles={uniqueResponsibles}
+                responsibleFilter={responsibleFilter}
+                onFilterChange={setResponsibleFilter}
+              />
+            </>
+          ) : (
+            <div className="p-6 text-center">
+              <p>Carregando formulário de monitoramento...</p>
+            </div>
+          )}
         </TabsContent>
       )}
 
