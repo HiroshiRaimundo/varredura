@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Check, Users, BarChart2, Zap } from "lucide-react";

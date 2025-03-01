@@ -1,5 +1,6 @@
 
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,12 +11,13 @@ import CTASection from "@/components/dashboard/CTASection";
 
 const DashboardPage: React.FC = () => {
   const auth = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header 
         isAuthenticated={auth.isAuthenticated}
-        onLoginClick={() => auth.navigate('/login')}
+        onLoginClick={() => navigate('/login')}
         onLogoutClick={auth.handleLogout}
       />
 

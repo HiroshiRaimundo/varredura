@@ -24,6 +24,9 @@ interface ClientDashboardProps {
   setTimeRange: (value: string) => void;
   handleExport: () => void;
   isAuthenticated: boolean;
+  unreadAlertCount?: number;
+  onAlertClick?: () => void;
+  onLogout?: () => void;
 }
 
 const ClientDashboard: React.FC<ClientDashboardProps> = ({
@@ -32,7 +35,10 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({
   timeRange,
   setTimeRange,
   handleExport,
-  isAuthenticated
+  isAuthenticated,
+  unreadAlertCount = 0,
+  onAlertClick = () => {},
+  onLogout = () => {}
 }) => {
   // Generate data based on the selected time range
   const trendData = useMemo(() => 
@@ -111,7 +117,12 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({
 
   return (
     <div className="grid gap-6">
-      <ClientHeader clientType={clientType} />
+      <ClientHeader 
+        clientType={clientType} 
+        unreadAlertCount={unreadAlertCount}
+        onAlertClick={onAlertClick}
+        onLogout={onLogout}
+      />
 
       <DashboardControls
         timeRange={timeRange}

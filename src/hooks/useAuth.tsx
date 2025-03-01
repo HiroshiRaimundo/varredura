@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface LoginCredentials {
   email: string;
@@ -9,6 +10,7 @@ interface LoginCredentials {
 }
 
 export const useAuth = () => {
+  const navigate = useNavigate();
   // Initialize isAuthenticated from localStorage to prevent flickering
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return localStorage.getItem("isAuthenticated") === "true";
@@ -79,6 +81,7 @@ export const useAuth = () => {
     isLoggingIn,
     form,
     handleLogin,
-    handleLogout
+    handleLogout,
+    navigate // Add the navigate function to the return object
   };
 };
