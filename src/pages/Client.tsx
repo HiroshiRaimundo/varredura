@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
@@ -15,18 +14,15 @@ const Client: React.FC = () => {
   const auth = useAuth();
   const [timeRange, setTimeRange] = useState("mensal");
 
-  // Validate client type
   const validClientTypes = ["observatory", "researcher", "politician", "institution"];
   const isValidClientType = clientType && validClientTypes.includes(clientType);
 
-  // Redirect if invalid client type
   useEffect(() => {
     if (clientType && !isValidClientType) {
       navigate("/client");
     }
   }, [clientType, isValidClientType, navigate]);
 
-  // Load monitoring data
   useEffect(() => {
     monitoring.fetchMonitoringItems();
   }, []);
