@@ -38,9 +38,9 @@ const LoginCard: React.FC<LoginCardProps> = ({ onLogin, isLoggingIn }) => {
         <Button 
           variant="outline" 
           className="w-full" 
-          onClick={() => navigate("/")}
+          onClick={() => navigate(-1)}
         >
-          Voltar para o Dashboard
+          Voltar
         </Button>
       </CardFooter>
     </Card>

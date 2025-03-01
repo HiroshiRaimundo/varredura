@@ -11,6 +11,7 @@ import Footer from "@/components/layout/Footer";
 import TabContent from "@/components/dashboard/TabContent";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ReleaseManagement from "@/components/admin/ReleaseManagement";
+import ClientDashboardControls from "@/components/admin/ClientDashboardControls";
 
 const Admin: React.FC = () => {
   const navigate = useNavigate();
@@ -52,6 +53,14 @@ const Admin: React.FC = () => {
           </TabsList>
           
           <TabsContent value="dashboard">
+            {/* Novo componente de controle de dashboard para clientes */}
+            <ClientDashboardControls 
+              timeRange={timeRange}
+              setTimeRange={setTimeRange}
+              handleExport={monitoring.handleExport}
+            />
+            
+            {/* Dashboard e monitoramento existentes */}
             <TabContent 
               isAuthenticated={auth.isAuthenticated}
               timeRange={timeRange}
