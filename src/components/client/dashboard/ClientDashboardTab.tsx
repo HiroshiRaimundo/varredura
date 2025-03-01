@@ -84,14 +84,7 @@ const ClientDashboardTab: React.FC<ClientDashboardTabProps> = ({
           responsibleData={mockData.responsibleData}
         />;
       case "journalist":
-        return <JournalistDashboard 
-          trendData={mockData.trendData}
-          categoryData={mockData.categoryData}
-          frequencyData={mockData.frequencyData}
-          radarData={mockData.radarData}
-        />;
       case "press":
-        // For press client type, we'll reuse the JournalistDashboard
         return <JournalistDashboard 
           trendData={mockData.trendData}
           categoryData={mockData.categoryData}

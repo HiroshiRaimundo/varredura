@@ -42,12 +42,12 @@ export const getClientIcon = (clientType: ClientType): string => {
   }
 };
 
-// Function to get client type title - added for ClientHeader.tsx
+// Function to get client type title
 export const getClientTypeTitle = (clientType: ClientType): string => {
   return getClientName(clientType);
 };
 
-// Function to get client description - added for ClientHeader.tsx
+// Function to get client description
 export const getClientDescription = (clientType: ClientType): string => {
   switch (clientType) {
     case "observatory":

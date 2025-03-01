@@ -4,7 +4,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { Info, HelpCircle, FileText, BarChart2, ExternalLink, CheckCircle, Clock } from "lucide-react";
+import { 
+  Info, 
+  HelpCircle, 
+  FileText, 
+  BarChart2, 
+  ExternalLink, 
+  CheckCircle, 
+  Clock, 
+  Newspaper, 
+  Send, 
+  Eye, 
+  Users, 
+  LineChart 
+} from "lucide-react";
 
 const PressReleaseHelp: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -97,107 +110,153 @@ const PressReleaseHelp: React.FC = () => {
               </h2>
               
               <p className="text-muted-foreground mb-6">
-                Siga este guia detalhado para maximizar o potencial da nossa plataforma de assessoria de imprensa.
+                Guia detalhado com todas as etapas do processo de assessoria de imprensa.
               </p>
 
-              <div className="space-y-8">
-                <div className="relative pl-8 pb-8 border-l-2 border-gray-200">
-                  <div className="absolute left-[-9px] top-0 bg-primary text-white rounded-full h-4 w-4 flex items-center justify-center text-xs">
-                    1
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                <!-- Barra de progresso vertical -->
+                <div className="md:col-span-3 space-y-8 hidden md:block">
+                  <div className="bg-gray-100 p-4 rounded-lg border border-gray-200">
+                    <h4 className="font-medium text-sm mb-3">Progresso do Release</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="h-4 w-4 rounded-full bg-primary flex-shrink-0"></div>
+                        <span className="text-xs">Criação</span>
+                      </div>
+                      <div className="w-0.5 h-4 bg-gray-300 ml-2"></div>
+                      <div className="flex items-center gap-2">
+                        <div className="h-4 w-4 rounded-full bg-gray-300 flex-shrink-0"></div>
+                        <span className="text-xs text-gray-500">Revisão</span>
+                      </div>
+                      <div className="w-0.5 h-4 bg-gray-300 ml-2"></div>
+                      <div className="flex items-center gap-2">
+                        <div className="h-4 w-4 rounded-full bg-gray-300 flex-shrink-0"></div>
+                        <span className="text-xs text-gray-500">Aprovação</span>
+                      </div>
+                      <div className="w-0.5 h-4 bg-gray-300 ml-2"></div>
+                      <div className="flex items-center gap-2">
+                        <div className="h-4 w-4 rounded-full bg-gray-300 flex-shrink-0"></div>
+                        <span className="text-xs text-gray-500">Distribuição</span>
+                      </div>
+                      <div className="w-0.5 h-4 bg-gray-300 ml-2"></div>
+                      <div className="flex items-center gap-2">
+                        <div className="h-4 w-4 rounded-full bg-gray-300 flex-shrink-0"></div>
+                        <span className="text-xs text-gray-500">Monitoramento</span>
+                      </div>
+                    </div>
                   </div>
-                  <h3 className="font-semibold text-lg">Acesso ao Sistema</h3>
-                  <p className="text-muted-foreground">
-                    Faça login com suas credenciais exclusivas fornecidas pela nossa equipe.
-                    Cada cliente tem acesso personalizado ao sistema.
-                  </p>
-                  <ul className="list-disc pl-5 mt-2 text-sm text-muted-foreground">
-                    <li>Acesse a página de login específica para clientes</li>
-                    <li>Insira seu email e senha</li>
-                    <li>Selecione o tipo de cliente (Observatório, Pesquisador, etc.)</li>
-                  </ul>
                 </div>
-                
-                <div className="relative pl-8 pb-8 border-l-2 border-gray-200">
-                  <div className="absolute left-[-9px] top-0 bg-primary text-white rounded-full h-4 w-4 flex items-center justify-center text-xs">
-                    2
+
+                <!-- Conteúdo do passo a passo -->
+                <div className="md:col-span-9">
+                  <div className="space-y-8">
+                    <div className="relative pl-8 pb-8 border-l-2 border-gray-200">
+                      <div className="absolute left-[-9px] top-0 bg-primary text-white rounded-full h-4 w-4 flex items-center justify-center text-xs">
+                        1
+                      </div>
+                      <h3 className="font-semibold text-lg flex items-center gap-2">
+                        <FileText className="h-5 w-5 text-primary" />
+                        Criação do Release
+                      </h3>
+                      <p className="text-muted-foreground">
+                        A primeira etapa é criar seu release utilizando nosso editor especializado:
+                      </p>
+                      <ol className="list-decimal pl-5 mt-2 space-y-2 text-sm text-muted-foreground">
+                        <li>Acesse a aba "Assessoria de Imprensa" e depois "Criar Release"</li>
+                        <li>Preencha o título e subtítulo do release - eles devem ser impactantes e diretos</li>
+                        <li>Escreva o conteúdo do release, seguindo as boas práticas jornalísticas (responda: quem, o quê, quando, onde, como e por quê)</li>
+                        <li>Adicione citações relevantes de especialistas ou porta-vozes da organização</li>
+                        <li>Inclua links para materiais complementares (fotos, vídeos, estudos)</li>
+                        <li>Selecione os veículos-alvo para distribuição</li>
+                        <li>Clique em "Enviar para Aprovação" quando finalizar</li>
+                      </ol>
+                    </div>
+                    
+                    <div className="relative pl-8 pb-8 border-l-2 border-gray-200">
+                      <div className="absolute left-[-9px] top-0 bg-gray-300 text-white rounded-full h-4 w-4 flex items-center justify-center text-xs">
+                        2
+                      </div>
+                      <h3 className="font-semibold text-lg flex items-center gap-2">
+                        <Eye className="h-5 w-5 text-gray-500" />
+                        Revisão do Conteúdo
+                      </h3>
+                      <p className="text-muted-foreground">
+                        Depois de enviar, seu release passa por um processo de revisão:
+                      </p>
+                      <ol className="list-decimal pl-5 mt-2 space-y-2 text-sm text-muted-foreground">
+                        <li>Nossa equipe de jornalistas especializados analisa o conteúdo</li>
+                        <li>Verificamos a aderência às boas práticas jornalísticas</li>
+                        <li>Avaliamos a relevância para os veículos selecionados</li>
+                        <li>Sugerimos ajustes quando necessário</li>
+                        <li>Você recebe notificações sobre o status da revisão</li>
+                        <li>Se houver sugestões, você pode editar e reenviar o release</li>
+                      </ol>
+                    </div>
+                    
+                    <div className="relative pl-8 pb-8 border-l-2 border-gray-200">
+                      <div className="absolute left-[-9px] top-0 bg-gray-300 text-white rounded-full h-4 w-4 flex items-center justify-center text-xs">
+                        3
+                      </div>
+                      <h3 className="font-semibold text-lg flex items-center gap-2">
+                        <CheckCircle className="h-5 w-5 text-gray-500" />
+                        Aprovação
+                      </h3>
+                      <p className="text-muted-foreground">
+                        O processo de aprovação é crucial para garantir a qualidade:
+                      </p>
+                      <ol className="list-decimal pl-5 mt-2 space-y-2 text-sm text-muted-foreground">
+                        <li>Releases revisados passam para a fase de aprovação</li>
+                        <li>Nossa equipe editorial avalia a adequação aos veículos-alvo</li>
+                        <li>Verificamos a precisão de todos os dados e informações</li>
+                        <li>Fazemos uma última checagem de formatação e estilo</li>
+                        <li>Você recebe uma notificação de aprovação ou rejeição</li>
+                        <li>Releases aprovados seguem para distribuição</li>
+                      </ol>
+                    </div>
+                    
+                    <div className="relative pl-8 pb-8 border-l-2 border-gray-200">
+                      <div className="absolute left-[-9px] top-0 bg-gray-300 text-white rounded-full h-4 w-4 flex items-center justify-center text-xs">
+                        4
+                      </div>
+                      <h3 className="font-semibold text-lg flex items-center gap-2">
+                        <Send className="h-5 w-5 text-gray-500" />
+                        Distribuição
+                      </h3>
+                      <p className="text-muted-foreground">
+                        A fase de distribuição envia seu release para os veículos selecionados:
+                      </p>
+                      <ol className="list-decimal pl-5 mt-2 space-y-2 text-sm text-muted-foreground">
+                        <li>Releases são enviados para nossa base de contatos jornalísticos</li>
+                        <li>A distribuição é segmentada por área de interesse e veículos</li>
+                        <li>O sistema registra todos os envios realizados</li>
+                        <li>Os jornalistas podem acessar materiais complementares via links</li>
+                        <li>Confirmamos o recebimento sempre que possível</li>
+                        <li>O status muda para "Distribuído" no seu painel</li>
+                      </ol>
+                    </div>
+                    
+                    <div className="relative pl-8">
+                      <div className="absolute left-[-9px] top-0 bg-gray-300 text-white rounded-full h-4 w-4 flex items-center justify-center text-xs">
+                        5
+                      </div>
+                      <h3 className="font-semibold text-lg flex items-center gap-2">
+                        <LineChart className="h-5 w-5 text-gray-500" />
+                        Monitoramento e Relatórios
+                      </h3>
+                      <p className="text-muted-foreground">
+                        Acompanhe o desempenho dos seus releases:
+                      </p>
+                      <ol className="list-decimal pl-5 mt-2 space-y-2 text-sm text-muted-foreground">
+                        <li>Acesse a aba "Acompanhamento" para ver o status de cada release</li>
+                        <li>Veja quais veículos publicaram seu conteúdo</li>
+                        <li>Acesse links diretos para as publicações</li>
+                        <li>Analise estatísticas de desempenho no dashboard</li>
+                        <li>Exporte relatórios detalhados por período</li>
+                        <li>Compare o desempenho entre diferentes releases</li>
+                        <li>Utilize os insights para aprimorar futuras comunicações</li>
+                      </ol>
+                    </div>
                   </div>
-                  <h3 className="font-semibold text-lg">Criação de Release</h3>
-                  <p className="text-muted-foreground">
-                    Utilize o editor para criar seu release com todas as informações necessárias.
-                  </p>
-                  <ul className="list-disc pl-5 mt-2 text-sm text-muted-foreground">
-                    <li>Acesse a aba "Criar Release"</li>
-                    <li>Preencha os campos obrigatórios (título, subtítulo, autor, conteúdo)</li>
-                    <li>Utilize as ferramentas de formatação para destacar informações importantes</li>
-                    <li>Adicione links para arquivos de mídia relevantes</li>
-                    <li>Especifique veículos de mídia alvo, se necessário</li>
-                  </ul>
-                </div>
-                
-                <div className="relative pl-8 pb-8 border-l-2 border-gray-200">
-                  <div className="absolute left-[-9px] top-0 bg-primary text-white rounded-full h-4 w-4 flex items-center justify-center text-xs">
-                    3
-                  </div>
-                  <h3 className="font-semibold text-lg">Processo de Aprovação</h3>
-                  <p className="text-muted-foreground">
-                    Após o envio, seu release passará por um processo de análise e aprovação.
-                  </p>
-                  <ul className="list-disc pl-5 mt-2 text-sm text-muted-foreground">
-                    <li>O status inicial do release será "Pendente"</li>
-                    <li>Nossa equipe de especialistas revisará o conteúdo</li>
-                    <li>Você receberá notificações sobre a aprovação ou rejeição</li>
-                    <li>Em caso de rejeição, você poderá editar e reenviar</li>
-                  </ul>
-                </div>
-                
-                <div className="relative pl-8 pb-8 border-l-2 border-gray-200">
-                  <div className="absolute left-[-9px] top-0 bg-primary text-white rounded-full h-4 w-4 flex items-center justify-center text-xs">
-                    4
-                  </div>
-                  <h3 className="font-semibold text-lg">Distribuição</h3>
-                  <p className="text-muted-foreground">
-                    Releases aprovados são distribuídos para jornalistas e veículos relevantes.
-                  </p>
-                  <ul className="list-disc pl-5 mt-2 text-sm text-muted-foreground">
-                    <li>O status do release mudará para "Aprovado"</li>
-                    <li>Nossa equipe enviará o release para os veículos adequados</li>
-                    <li>A distribuição considera o tipo de cliente e o tema do release</li>
-                    <li>O envio é feito para jornalistas cadastrados em nossa base</li>
-                  </ul>
-                </div>
-                
-                <div className="relative pl-8 pb-8 border-l-2 border-gray-200">
-                  <div className="absolute left-[-9px] top-0 bg-primary text-white rounded-full h-4 w-4 flex items-center justify-center text-xs">
-                    5
-                  </div>
-                  <h3 className="font-semibold text-lg">Monitoramento</h3>
-                  <p className="text-muted-foreground">
-                    Acompanhe o desempenho dos seus releases no dashboard.
-                  </p>
-                  <ul className="list-disc pl-5 mt-2 text-sm text-muted-foreground">
-                    <li>Acesse a aba "Acompanhamento" para ver o status atual</li>
-                    <li>Visualize onde seus releases foram publicados</li>
-                    <li>Acesse links diretos para as publicações</li>
-                    <li>Acompanhe métricas e estatísticas no dashboard</li>
-                    <li>Configure alertas para novas publicações</li>
-                  </ul>
-                </div>
-                
-                <div className="relative pl-8">
-                  <div className="absolute left-[-9px] top-0 bg-primary text-white rounded-full h-4 w-4 flex items-center justify-center text-xs">
-                    6
-                  </div>
-                  <h3 className="font-semibold text-lg">Relatórios e Análises</h3>
-                  <p className="text-muted-foreground">
-                    Utilize os relatórios para medir o impacto da sua assessoria de imprensa.
-                  </p>
-                  <ul className="list-disc pl-5 mt-2 text-sm text-muted-foreground">
-                    <li>Acesse estatísticas detalhadas no dashboard</li>
-                    <li>Visualize tendências de publicação por mês</li>
-                    <li>Identifique os veículos com maior taxa de aproveitamento</li>
-                    <li>Compare o desempenho com períodos anteriores</li>
-                    <li>Exporte relatórios para análise externa</li>
-                  </ul>
                 </div>
               </div>
             </div>
