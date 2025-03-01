@@ -1,14 +1,13 @@
-import React, { useState } from "react";
+
+import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ClientDashboard from "@/components/client/ClientDashboard";
-import MonitoringForm from "@/components/monitoring/MonitoringForm";
-import MonitoringList from "@/components/MonitoringList";
 import { ClientType } from "@/components/monitoring/utils/clientTypeUtils";
-import AlertButton from "./AlertButton";
-import LegislationAlerts from "./LegislationAlerts";
-import AnalysisToolsCard from "./AnalysisToolsCard";
-import PressReleaseTab from "./PressReleaseTab";
 import { LegislationAlert } from "@/hooks/monitoring/types";
+import ClientAlerts from "./alerts/ClientAlerts";
+import AnalysisToolsSection from "./tools/AnalysisToolsSection";
+import ClientDashboardTab from "./dashboard/ClientDashboardTab";
+import MonitoringTab from "./monitoring/MonitoringTab";
+import PressTab from "./press/PressTab";
 
 interface ClientContentProps {
   clientType: ClientType;
@@ -49,31 +48,19 @@ const ClientContent: React.FC<ClientContentProps> = ({
   getUniqueResponsibles,
   isLoading
 }) => {
-  const [showAlerts, setShowAlerts] = useState(false);
-  
-  const showLegislationAlerts = ["politician", "researcher", "observatory"].includes(clientType || "");
-
   return (
     <div className="space-y-6">
-      {showLegislationAlerts && (
-        <AlertButton 
-          unreadCount={unreadAlertCount} 
-          onClick={() => setShowAlerts(!showAlerts)} 
-        />
-      )}
+      <ClientAlerts 
+        clientType={clientType}
+        legislationAlerts={legislationAlerts}
+        markAlertAsRead={markAlertAsRead}
+        unreadAlertCount={unreadAlertCount}
+      />
 
-      {showLegislationAlerts && (
-        <LegislationAlerts 
-          alerts={legislationAlerts} 
-          onMarkAsRead={markAlertAsRead} 
-          showAlerts={showAlerts}
-        />
-      )}
-
-      <AnalysisToolsCard 
-        clientType={clientType} 
-        onDatasetDownload={handleDatasetDownload} 
-        onComparisonView={handleComparisonView} 
+      <AnalysisToolsSection 
+        clientType={clientType}
+        onDatasetDownload={handleDatasetDownload}
+        onComparisonView={handleComparisonView}
       />
 
       <Tabs defaultValue="dashboard" className="w-full">
@@ -84,7 +71,7 @@ const ClientContent: React.FC<ClientContentProps> = ({
         </TabsList>
         
         <TabsContent value="dashboard">
-          <ClientDashboard 
+          <ClientDashboardTab 
             clientType={clientType}
             monitoringItems={monitoringItems}
             timeRange={timeRange}
@@ -95,26 +82,20 @@ const ClientContent: React.FC<ClientContentProps> = ({
         </TabsContent>
         
         <TabsContent value="monitoring">
-          <div className="space-y-6">
-            <MonitoringForm 
-              form={form} 
-              onSubmit={handleAddMonitoring}
-              clientType={clientType}
-            />
-            
-            <MonitoringList 
-              items={monitoringItems} 
-              onDelete={() => {}} // We'll pass this in the main component
-              isLoading={isLoading}
-              uniqueResponsibles={getUniqueResponsibles()}
-              responsibleFilter={responsibleFilter}
-              onFilterChange={setResponsibleFilter}
-            />
-          </div>
+          <MonitoringTab
+            clientType={clientType}
+            monitoringItems={monitoringItems}
+            form={form}
+            handleAddMonitoring={handleAddMonitoring}
+            isLoading={isLoading}
+            responsibleFilter={responsibleFilter}
+            setResponsibleFilter={setResponsibleFilter}
+            getUniqueResponsibles={getUniqueResponsibles}
+          />
         </TabsContent>
         
         <TabsContent value="press">
-          <PressReleaseTab clientType={clientType} />
+          <PressTab clientType={clientType} />
         </TabsContent>
       </Tabs>
     </div>
