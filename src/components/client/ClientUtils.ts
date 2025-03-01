@@ -1,32 +1,43 @@
 
-// Client-specific utility functions and data
+// Type definition for client types
+export type ClientType = "observatory" | "researcher" | "politician" | "institution" | "journalist" | "press";
 
-// Get client type title for display
-export const getClientTypeTitle = (clientType: string): string => {
+// Function to get client name based on client type
+export const getClientName = (clientType: ClientType): string => {
   switch (clientType) {
-    case "observatory": return "Observatório";
-    case "researcher": return "Pesquisador";
-    case "politician": return "Político";
-    case "institution": return "Instituição";
-    case "journalist": return "Jornalista";
-    default: return "Cliente";
+    case "observatory":
+      return "Observatório";
+    case "researcher":
+      return "Pesquisador";
+    case "politician":
+      return "Político";
+    case "institution":
+      return "Instituição";
+    case "journalist":
+      return "Jornalista";
+    case "press":
+      return "Assessoria de Imprensa";
+    default:
+      return "Cliente";
   }
 };
 
-// Client-specific dashboard descriptions
-export const getClientDescription = (clientType: string): string => {
+// Function to get client icon based on client type
+export const getClientIcon = (clientType: ClientType): string => {
   switch (clientType) {
     case "observatory":
-      return "Acesso a indicadores agregados e análises de tendências para monitoramento estratégico de políticas públicas e dados socioeconômicos regionais.";
+      return "search";
     case "researcher":
-      return "Visualização detalhada de dados para análises acadêmicas, com acesso a séries históricas e possibilidade de download para processamento complementar.";
+      return "book";
     case "politician":
-      return "Resumo executivo de indicadores-chave para tomada de decisão estratégica, com foco em tendências e impactos de políticas públicas.";
+      return "landmark";
     case "institution":
-      return "Monitoramento de dados institucionais para gestão de responsabilidades e acompanhamento de projetos por área de atuação.";
+      return "building";
     case "journalist":
-      return "Acesso rápido a dados e tendências para produção de reportagens baseadas em evidências, com foco em visualizações simplificadas e dados atualizados.";
+      return "newspaper";
+    case "press":
+      return "mic";
     default:
-      return "";
+      return "user";
   }
 };
