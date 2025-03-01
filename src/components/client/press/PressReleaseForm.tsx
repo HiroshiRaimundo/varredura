@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -40,8 +39,8 @@ const PressReleaseForm: React.FC<PressReleaseFormProps> = ({ clientType }) => {
     data.mediaLinks = mediaLinks;
     
     toast({
-      title: "Release criado",
-      description: "Seu release foi salvo com sucesso."
+      title: "Release enviado",
+      description: "Seu release foi enviado e aguarda aprovação."
     });
     
     console.log("Release data:", data);
@@ -285,7 +284,7 @@ const PressReleaseForm: React.FC<PressReleaseFormProps> = ({ clientType }) => {
         <div className="flex justify-end">
           <Button type="submit" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
-            Salvar Release
+            Enviar Release
           </Button>
         </div>
       </form>
