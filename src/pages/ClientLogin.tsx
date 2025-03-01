@@ -50,7 +50,8 @@ const ClientLogin: React.FC = () => {
         { email: "researcher@example.com", password: "password123", type: "researcher" },
         { email: "politician@example.com", password: "password123", type: "politician" },
         { email: "institution@example.com", password: "password123", type: "institution" },
-        { email: "journalist@example.com", password: "password123", type: "journalist" }
+        { email: "journalist@example.com", password: "password123", type: "journalist" },
+        { email: "press@example.com", password: "password123", type: "press" }
       ];
       
       const client = validClients.find(
@@ -124,6 +125,7 @@ const ClientLogin: React.FC = () => {
                     <li>politician@example.com</li>
                     <li>institution@example.com</li>
                     <li>journalist@example.com</li>
+                    <li>press@example.com</li>
                   </ul>
                 </AlertDescription>
               </Alert>

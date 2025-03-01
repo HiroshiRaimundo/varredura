@@ -29,6 +29,7 @@ const Header = ({
       case "politician": return "Político";
       case "institution": return "Instituição";
       case "journalist": return "Jornalista";
+      case "press": return "Assessoria de Imprensa";
       default: return type;
     }
   };
@@ -94,25 +95,14 @@ const Header = ({
               <span className="hidden sm:inline">Sair</span>
             </Button>
           ) : (
-            <>
-              <Button
-                variant="outline"
-                className="flex items-center gap-2"
-                onClick={() => navigate("/client-login")}
-              >
-                <User className="h-4 w-4" />
-                <span className="hidden sm:inline">Cliente</span>
-              </Button>
-              
-              <Button
-                variant="default"
-                className="flex items-center gap-2"
-                onClick={onLoginClick}
-              >
-                <LogIn className="h-4 w-4" />
-                <span className="hidden sm:inline">Admin</span>
-              </Button>
-            </>
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+              onClick={() => navigate("/client-login")}
+            >
+              <User className="h-4 w-4" />
+              <span className="hidden sm:inline">Área do Cliente</span>
+            </Button>
           )}
         </div>
       </div>

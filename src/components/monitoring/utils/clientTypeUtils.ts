@@ -1,4 +1,5 @@
-export type ClientType = "observatory" | "researcher" | "politician" | "institution" | "journalist";
+
+export type ClientType = "observatory" | "researcher" | "politician" | "institution" | "journalist" | "press";
 
 export interface ClientTypeInfo {
   description: string;
@@ -28,6 +29,11 @@ export const getClientTypeInfo = (clientType?: ClientType): ClientTypeInfo => {
         description: "Monitore fontes para identificar tendências emergentes e gerar pautas",
         alert: "As fontes monitoradas serão verificadas e classificadas por confiabilidade"
       };
+    case "press":
+      return {
+        description: "Gerencie seus releases e acompanhe a veiculação na mídia",
+        alert: "Seus releases serão analisados e enviados a jornalistas cadastrados em nossa base"
+      };
     default:
       return {
         description: "Gerencie monitoramentos automáticos de fontes de dados",
@@ -51,6 +57,8 @@ export const getDefaultCategories = (clientType?: ClientType): string[] => {
       return [...baseCategories, "relatórios", "auditorias", "compliance", "transparência"];
     case "journalist":
       return [...baseCategories, "pautas", "entrevistas", "fontes", "fact-checking", "tendências", "exclusivo"];
+    case "press":
+      return ["releases", "assessoria", "imprensa", "midia", "comunicação", "porta-voz", "crise"];
     default:
       return baseCategories;
   }
@@ -69,6 +77,8 @@ export const getMonitoringFormTitle = (clientType?: ClientType): string => {
       return "Sistema de Monitoramento Institucional";
     case "journalist":
       return "Sistema de Monitoramento de Fontes e Pautas";
+    case "press":
+      return "Sistema de Assessoria de Imprensa";
     default:
       return "Sistema de Monitoramento";
   }
@@ -87,6 +97,8 @@ export const getMonitoringFormDescription = (clientType?: ClientType): string =>
       return "Monitore dados relevantes para sua instituição";
     case "journalist":
       return "Acompanhe tendências e identifique novas pautas";
+    case "press":
+      return "Gerencie seus releases e acompanhe a veiculação na mídia";
     default:
       return "Gerencie monitoramentos automáticos de fontes de dados";
   }

@@ -1,9 +1,8 @@
 
 import React from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Eye, Users, GraduationCap, Building2, Landmark, Newspaper } from "lucide-react";
+import { Eye, Users, GraduationCap, Building2, Landmark, Newspaper, MessagesSquare } from "lucide-react";
 
 const ClientSelection: React.FC = () => {
   const navigate = useNavigate();
@@ -68,6 +67,18 @@ const ClientSelection: React.FC = () => {
         "Tendências atualizadas para reportagens",
         "Acesso rápido a indicadores-chave"
       ]
+    },
+    {
+      id: "press",
+      title: "Assessoria de Imprensa",
+      description: "Serviços exclusivos de assessoria de imprensa e gestão de releases.",
+      icon: MessagesSquare,
+      color: "bg-indigo-100 text-indigo-700",
+      features: [
+        "Gestão completa de releases",
+        "Monitoramento de veiculação na mídia",
+        "Relacionamento com jornalistas e veículos"
+      ]
     }
   ];
 
@@ -81,16 +92,22 @@ const ClientSelection: React.FC = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
         {clientTypes.map((type) => (
-          <Card key={type.id} className="overflow-hidden transition-all hover:shadow-md border-t-4" style={{ borderTopColor: 
-            type.id === "observatory" ? "#3b82f6" : 
-            type.id === "researcher" ? "#10b981" : 
-            type.id === "politician" ? "#8b5cf6" : 
-            type.id === "institution" ? "#f59e0b" :
-            type.id === "journalist" ? "#ef4444" :
-            "#64748b"
-          }}>
+          <Card 
+            key={type.id} 
+            className="overflow-hidden transition-all hover:shadow-md border-t-4 cursor-pointer"
+            onClick={() => navigate(`/client/${type.id}`)}
+            style={{ borderTopColor: 
+              type.id === "observatory" ? "#3b82f6" : 
+              type.id === "researcher" ? "#10b981" : 
+              type.id === "politician" ? "#8b5cf6" : 
+              type.id === "institution" ? "#f59e0b" :
+              type.id === "journalist" ? "#ef4444" :
+              type.id === "press" ? "#6366f1" :
+              "#64748b"
+            }}
+          >
             <CardHeader className="pb-2">
               <div className={`w-12 h-12 rounded-lg ${type.color} flex items-center justify-center mb-2`}>
                 <type.icon className="h-6 w-6" />
@@ -108,14 +125,6 @@ const ClientSelection: React.FC = () => {
                 ))}
               </ul>
             </CardContent>
-            <CardFooter>
-              <Button 
-                className="w-full" 
-                onClick={() => navigate(`/client/${type.id}`)}
-              >
-                Acessar Dashboard
-              </Button>
-            </CardFooter>
           </Card>
         ))}
       </div>

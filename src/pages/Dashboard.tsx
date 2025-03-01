@@ -45,7 +45,7 @@ const DashboardPage: React.FC = () => {
           handleExport={monitoring.handleExport}
           isAuthenticated={auth.isAuthenticated}
           monitoringItems={monitoring.monitoringItems}
-          showClientButton={true}
+          showClientButton={false}
         />
       </div>
 

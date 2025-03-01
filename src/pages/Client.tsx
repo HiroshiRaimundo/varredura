@@ -18,7 +18,7 @@ const Client: React.FC = () => {
   const auth = useAuth();
   const [timeRange, setTimeRange] = useState("mensal");
 
-  const validClientTypes = ["observatory", "researcher", "politician", "institution", "journalist"];
+  const validClientTypes = ["observatory", "researcher", "politician", "institution", "journalist", "press"];
   const isValidClientType = clientType && validClientTypes.includes(clientType);
 
   useEffect(() => {
