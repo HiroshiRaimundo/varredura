@@ -1,3 +1,4 @@
+
 import { ClientInfo, ClientLoginFormValues } from "./types";
 import { ClientType } from "@/components/monitoring/utils/clientTypeUtils";
 
@@ -26,9 +27,12 @@ export const asClientType = (type: string): ClientType => {
  * @returns The valid client or null if not found
  */
 export const validateClient = (data: ClientLoginFormValues) => {
-  return validClients.find(
+  const client = validClients.find(
     c => c.email === data.email && c.password === data.password
   );
+  
+  console.log("Client login validation:", data.email, client ? "found" : "not found", client?.type);
+  return client;
 };
 
 /**
@@ -53,6 +57,7 @@ export const createClientInfo = (email: string, clientType: string): ClientInfo 
  */
 export const saveClientInfo = (clientInfo: ClientInfo) => {
   localStorage.setItem('clientInfo', JSON.stringify(clientInfo));
+  console.log("Saved client info:", clientInfo);
 };
 
 /**

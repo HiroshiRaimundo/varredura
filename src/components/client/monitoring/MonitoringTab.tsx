@@ -27,11 +27,13 @@ const MonitoringTab: React.FC<MonitoringTabProps> = ({
 }) => {
   return (
     <div className="space-y-6">
-      <MonitoringForm 
-        form={form} 
-        onSubmit={handleAddMonitoring}
-        clientType={clientType}
-      />
+      {clientType && (
+        <MonitoringForm 
+          form={form} 
+          onSubmit={handleAddMonitoring}
+          clientType={clientType}
+        />
+      )}
       <MonitoringList 
         items={monitoringItems} 
         onDelete={() => {}} // Clients can't delete items
