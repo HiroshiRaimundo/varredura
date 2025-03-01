@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
@@ -20,8 +19,16 @@ interface LoginFormValues {
 const ExampleClient: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"dashboard" | "monitoring" | "analysis">("dashboard");
-  const [clientType, setClientType] = useState<ClientType>("observatory");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+  const location = window.location;
+  const params = new URLSearchParams(location.search);
+  const typeParam = params.get('type') as ClientType | null;
+  const [clientType, setClientType] = useState<ClientType>(
+    typeParam && Object.keys(clientTypeDetails).includes(typeParam) 
+      ? typeParam 
+      : "observatory"
+  );
 
   const form = useForm<LoginFormValues>({
     defaultValues: {

@@ -14,6 +14,7 @@ import ReleaseManagement from "@/components/admin/ReleaseManagement";
 import ClientDashboardControls from "@/components/admin/ClientDashboardControls";
 import ClientManagement from "@/components/admin/ClientManagement";
 import PasswordRecoveryAdmin from "@/components/admin/PasswordRecoveryAdmin";
+import ClientAreaPreview from "@/components/admin/ClientAreaPreview";
 
 const Admin: React.FC = () => {
   const navigate = useNavigate();
@@ -59,6 +60,7 @@ const Admin: React.FC = () => {
             <TabsTrigger value="releases">Gerenciar Releases</TabsTrigger>
             <TabsTrigger value="clients">Gerenciar Clientes</TabsTrigger>
             <TabsTrigger value="recovery">Recuperação de Senha</TabsTrigger>
+            <TabsTrigger value="clientareas">Áreas de Clientes</TabsTrigger>
           </TabsList>
           
           <TabsContent value="dashboard">
@@ -100,6 +102,10 @@ const Admin: React.FC = () => {
 
           <TabsContent value="recovery">
             <PasswordRecoveryAdmin />
+          </TabsContent>
+          
+          <TabsContent value="clientareas">
+            <ClientAreaPreview />
           </TabsContent>
         </Tabs>
       </div>
