@@ -1,4 +1,3 @@
-
 export type ClientType = "observatory" | "researcher" | "politician" | "institution" | "journalist";
 
 export interface ClientTypeInfo {
@@ -54,5 +53,41 @@ export const getDefaultCategories = (clientType?: ClientType): string[] => {
       return [...baseCategories, "pautas", "entrevistas", "fontes", "fact-checking", "tendências", "exclusivo"];
     default:
       return baseCategories;
+  }
+};
+
+// Get title for monitoring form based on client type
+export const getMonitoringFormTitle = (clientType?: ClientType): string => {
+  switch (clientType) {
+    case "observatory":
+      return "Sistema de Monitoramento para Observatórios";
+    case "researcher":
+      return "Sistema de Monitoramento para Pesquisadores";
+    case "politician":
+      return "Sistema de Alertas para Gestores Públicos";
+    case "institution":
+      return "Sistema de Monitoramento Institucional";
+    case "journalist":
+      return "Sistema de Monitoramento de Fontes e Pautas";
+    default:
+      return "Sistema de Monitoramento";
+  }
+};
+
+// Get description for monitoring form based on client type
+export const getMonitoringFormDescription = (clientType?: ClientType): string => {
+  switch (clientType) {
+    case "observatory":
+      return "Configure análises comparativas e acesso a datasets completos";
+    case "researcher":
+      return "Identifique correlações e tendências para suas pesquisas";
+    case "politician":
+      return "Acompanhe indicadores de impacto e novas legislações";
+    case "institution":
+      return "Monitore dados relevantes para sua instituição";
+    case "journalist":
+      return "Acompanhe tendências e identifique novas pautas";
+    default:
+      return "Gerencie monitoramentos automáticos de fontes de dados";
   }
 };
