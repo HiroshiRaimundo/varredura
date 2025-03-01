@@ -3,9 +3,9 @@ import React from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Calendar, Trash, Check, X, BookOpen, UserCircle, Building, Newspaper } from "lucide-react";
+import { FileText, Calendar, Trash, Check, X, BookOpen, UserCircle, Building, Newspaper, Bell, BellOff } from "lucide-react";
 import { ReleaseData } from "../types/releaseTypes";
-import { getStatusLabel, getStatusColor, getClientTypeLabel } from "../utils/releaseUtils";
+import { getStatusLabel, getStatusColor, getClientTypeLabel, getClientTypeIcon } from "../utils/releaseUtils";
 
 interface ReleaseListProps {
   filteredReleases: ReleaseData[];
@@ -13,6 +13,7 @@ interface ReleaseListProps {
   handleApprove: (id: string) => void;
   handleReject: (id: string) => void;
   handleDelete: (id: string) => void;
+  handleToggleMonitoring?: (id: string) => void;
 }
 
 const ReleaseList: React.FC<ReleaseListProps> = ({
@@ -20,26 +21,9 @@ const ReleaseList: React.FC<ReleaseListProps> = ({
   handleView,
   handleApprove,
   handleReject,
-  handleDelete
+  handleDelete,
+  handleToggleMonitoring
 }) => {
-
-  const getClientTypeIcon = (type: string) => {
-    switch (type) {
-      case 'observatory':
-        return <BookOpen className="h-4 w-4" />;
-      case 'researcher':
-        return <UserCircle className="h-4 w-4" />;
-      case 'politician':
-        return <Building className="h-4 w-4" />;
-      case 'institution':
-        return <Building className="h-4 w-4" />;
-      case 'journalist':
-        return <Newspaper className="h-4 w-4" />;
-      default:
-        return <UserCircle className="h-4 w-4" />;
-    }
-  };
-
   return (
     <>
       {filteredReleases.length > 0 ? (
@@ -69,11 +53,19 @@ const ReleaseList: React.FC<ReleaseListProps> = ({
                       <FileText className="h-4 w-4 text-muted-foreground" />
                       <span className="truncate max-w-[200px]">{release.title}</span>
                     </div>
+                    {release.monitoringActive && (
+                      <Badge variant="outline" className="mt-1 text-xs bg-blue-50 text-blue-800 border-blue-300">
+                        Monitorado
+                      </Badge>
+                    )}
                   </TableCell>
                   <TableCell>{release.clientName}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className="flex items-center gap-1">
-                      {getClientTypeIcon(release.clientType)}
+                      {getClientTypeIcon(release.clientType) === 'BookOpen' && <BookOpen className="h-4 w-4" />}
+                      {getClientTypeIcon(release.clientType) === 'UserCircle' && <UserCircle className="h-4 w-4" />}
+                      {getClientTypeIcon(release.clientType) === 'Building' && <Building className="h-4 w-4" />}
+                      {getClientTypeIcon(release.clientType) === 'Newspaper' && <Newspaper className="h-4 w-4" />}
                       {getClientTypeLabel(release.clientType)}
                     </Badge>
                   </TableCell>
@@ -129,6 +121,26 @@ const ReleaseList: React.FC<ReleaseListProps> = ({
                             <span className="sr-only">Rejeitar</span>
                           </Button>
                         </>
+                      )}
+                      
+                      {handleToggleMonitoring && (release.status === 'published' || release.status === 'approved') && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleToggleMonitoring(release.id)}
+                          className={`h-8 w-8 p-0 ${release.monitoringActive 
+                            ? 'text-blue-600 hover:text-blue-700 hover:bg-blue-50' 
+                            : 'text-gray-600 hover:text-gray-700 hover:bg-gray-50'}`}
+                        >
+                          {release.monitoringActive ? (
+                            <BellOff className="h-4 w-4" />
+                          ) : (
+                            <Bell className="h-4 w-4" />
+                          )}
+                          <span className="sr-only">
+                            {release.monitoringActive ? 'Desativar Monitoramento' : 'Ativar Monitoramento'}
+                          </span>
+                        </Button>
                       )}
                       
                       <Button 

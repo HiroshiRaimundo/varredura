@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
-import { FileText, Image, Youtube, Link, Bold, Italic, AlignLeft, AlignCenter, AlignRight, List } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FileText, Image, Youtube, Link, Bold, Italic, AlignLeft, AlignCenter, AlignRight, List, Send } from "lucide-react";
 
 interface PressReleaseFormProps {
   clientType: string;
@@ -17,6 +19,7 @@ interface FormValues {
   subtitle: string;
   author: string;
   content: string;
+  targetOutlet: string;
   mediaLinks: string[];
 }
 
@@ -25,12 +28,27 @@ const PressReleaseForm: React.FC<PressReleaseFormProps> = ({ clientType }) => {
   const [newMediaLink, setNewMediaLink] = useState<string>('');
   const [mediaType, setMediaType] = useState<'image' | 'youtube' | 'repository'>('image');
 
+  // Mock list of media outlets for selection
+  const availableOutlets = [
+    { id: "1", name: "Folha de São Paulo", category: "Jornal", region: "Nacional" },
+    { id: "2", name: "G1", category: "Portal", region: "Nacional" },
+    { id: "3", name: "Estadão", category: "Jornal", region: "Nacional" },
+    { id: "4", name: "Valor Econômico", category: "Jornal", region: "Economia" },
+    { id: "5", name: "UOL", category: "Portal", region: "Nacional" },
+    { id: "6", name: "R7", category: "Portal", region: "Nacional" },
+    { id: "7", name: "BBC Brasil", category: "Portal", region: "Internacional" },
+    { id: "8", name: "Veja", category: "Revista", region: "Nacional" },
+    { id: "9", name: "Carta Capital", category: "Revista", region: "Nacional" },
+    { id: "10", name: "Exame", category: "Revista", region: "Economia" }
+  ];
+
   const form = useForm<FormValues>({
     defaultValues: {
       title: "",
       subtitle: "",
       author: "",
       content: "",
+      targetOutlet: "",
       mediaLinks: []
     }
   });
@@ -40,7 +58,7 @@ const PressReleaseForm: React.FC<PressReleaseFormProps> = ({ clientType }) => {
     
     toast({
       title: "Release enviado",
-      description: "Seu release foi enviado e aguarda aprovação."
+      description: "Seu release foi enviado e aguarda aprovação. Você receberá uma notificação quando for analisado."
     });
     
     console.log("Release data:", data);
@@ -193,6 +211,34 @@ const PressReleaseForm: React.FC<PressReleaseFormProps> = ({ clientType }) => {
           />
         </div>
 
+        <FormField
+          control={form.control}
+          name="targetOutlet"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Veículo de Destino</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o veículo para envio" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {availableOutlets.map((outlet) => (
+                    <SelectItem key={outlet.id} value={outlet.name}>
+                      {outlet.name} ({outlet.category})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                O veículo selecionado será automaticamente monitorado após a aprovação do release
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Card>
           <CardContent className="p-4">
             <h3 className="text-sm font-medium mb-2">Mídia</h3>
@@ -283,7 +329,7 @@ const PressReleaseForm: React.FC<PressReleaseFormProps> = ({ clientType }) => {
 
         <div className="flex justify-end">
           <Button type="submit" className="flex items-center gap-2">
-            <FileText className="h-4 w-4" />
+            <Send className="h-4 w-4" />
             Enviar Release
           </Button>
         </div>

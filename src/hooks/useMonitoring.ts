@@ -26,11 +26,23 @@ interface LegislationAlert {
   isRead: boolean;
 }
 
+// New interface for release monitoring results
+interface ReleaseMonitoringItem {
+  id: string;
+  releaseTitle: string;
+  websiteName: string;
+  publishedDate: string;
+  publishedTime: string;
+  url: string;
+  isVerified: boolean;
+}
+
 export const useMonitoring = () => {
   const [monitoringItems, setMonitoringItems] = useState<MonitoringItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [responsibleFilter, setResponsibleFilter] = useState<string>("");
   const [legislationAlerts, setLegislationAlerts] = useState<LegislationAlert[]>([]);
+  const [releaseMonitoring, setReleaseMonitoring] = useState<ReleaseMonitoringItem[]>([]);
   const form = useForm<Omit<MonitoringItem, "id">>();
 
   // Fetch monitoring items
@@ -59,6 +71,8 @@ export const useMonitoring = () => {
       
       // Simulate fetching legislation alerts (would come from a real API in production)
       fetchLegislationAlerts();
+      // Fetch release monitoring results
+      fetchReleaseMonitoring();
     } catch (error) {
       console.error('Erro ao buscar itens de monitoramento:', error);
       toast({
@@ -102,6 +116,43 @@ export const useMonitoring = () => {
     ];
     
     setLegislationAlerts(mockAlerts);
+  };
+
+  // Fetch release monitoring results
+  const fetchReleaseMonitoring = () => {
+    // In a real app, this would come from an API
+    // Mock data for release monitoring
+    const mockReleaseMonitoring: ReleaseMonitoringItem[] = [
+      {
+        id: "1",
+        releaseTitle: "Nova tecnologia ambiental lançada no mercado",
+        websiteName: "Folha de São Paulo",
+        publishedDate: "2023-06-12",
+        publishedTime: "14:30",
+        url: "https://folha.com/tecnologia-ambiental",
+        isVerified: true
+      },
+      {
+        id: "2",
+        releaseTitle: "Resultados do estudo sobre qualidade do ar divulgados",
+        websiteName: "G1",
+        publishedDate: "2023-05-18",
+        publishedTime: "10:15",
+        url: "https://g1.com/qualidade-ar-estudo",
+        isVerified: true
+      },
+      {
+        id: "3",
+        releaseTitle: "Novo programa de monitoramento ambiental",
+        websiteName: "Estadão",
+        publishedDate: "2023-06-22",
+        publishedTime: "09:45",
+        url: "https://estadao.com/programa-monitoramento",
+        isVerified: false
+      }
+    ];
+    
+    setReleaseMonitoring(mockReleaseMonitoring);
   };
 
   // Mark a legislation alert as read
@@ -243,9 +294,10 @@ export const useMonitoring = () => {
     handleDeleteMonitoring,
     handleExport,
     legislationAlerts,
+    releaseMonitoring,
     markAlertAsRead,
     unreadAlertCount: legislationAlerts.filter(alert => !alert.isRead).length
   };
 };
 
-export type { MonitoringItem, LegislationAlert };
+export type { MonitoringItem, LegislationAlert, ReleaseMonitoringItem };

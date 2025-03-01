@@ -70,3 +70,65 @@ export const getClientTypeLabel = (type: string) => {
       return 'Desconhecido';
   }
 };
+
+// New functions for release monitoring
+export const createMonitoringFromRelease = (release: ReleaseData): ReleaseMonitoring => {
+  return {
+    id: crypto.randomUUID(),
+    releaseId: release.id,
+    releaseTitle: release.title,
+    targetWebsites: [release.mediaOutlet],
+    monitoringFrequency: 'daily',
+    lastChecked: new Date().toISOString(),
+    status: 'active',
+    results: []
+  };
+};
+
+export const getRecommendedJournalists = (release: ReleaseData, journalists: JournalistContact[]): JournalistContact[] => {
+  // Simple matching based on media outlet
+  return journalists.filter(journalist => 
+    journalist.mediaOutlet?.toLowerCase() === release.mediaOutlet?.toLowerCase()
+  );
+};
+
+export const getPaginatedItems = <T>(
+  items: T[],
+  currentPage: number,
+  itemsPerPage: number
+): T[] => {
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  return items.slice(startIndex, endIndex);
+};
+
+export const calculateTotalPages = (totalItems: number, itemsPerPage: number): number => {
+  return Math.ceil(totalItems / itemsPerPage);
+};
+
+// Mock function - in a real app, this would be an API call to a monitoring service
+export const checkReleasePublications = async (
+  monitoring: ReleaseMonitoring
+): Promise<ReleaseMonitoringResult[]> => {
+  // Simulate a check with a 10% chance of finding the release
+  const hasFound = Math.random() < 0.1;
+  
+  if (!hasFound) {
+    return [];
+  }
+  
+  const website = monitoring.targetWebsites[Math.floor(Math.random() * monitoring.targetWebsites.length)];
+  
+  const result: ReleaseMonitoringResult = {
+    id: crypto.randomUUID(),
+    monitoringId: monitoring.id,
+    foundUrl: `https://${website}/article-${Math.floor(Math.random() * 1000)}`,
+    foundDate: new Date().toISOString().split('T')[0],
+    foundTime: new Date().toTimeString().split(' ')[0],
+    websiteName: website,
+    excerptFound: `...mencionando "${monitoring.releaseTitle.substring(0, 30)}..."`,
+    verified: true
+  };
+  
+  return [result];
+};
