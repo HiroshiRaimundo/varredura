@@ -28,7 +28,7 @@ export const useClientLogin = () => {
           description: `Bem-vindo ao portal do cliente.`
         });
         
-        // Navigate to the client dashboard for the specific client type
+        // Navigate directly to the client dashboard instead of service contracting
         navigate(`/client/${client.type}`);
       } else {
         toast({

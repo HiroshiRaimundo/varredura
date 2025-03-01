@@ -64,8 +64,8 @@ const HeroSection: React.FC = () => {
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg flex items-center justify-center">
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-blue-600">100%</p>
-                      <p className="text-xs text-gray-600">Amazônia</p>
+                      <p className="text-2xl font-bold text-blue-600">Amazônia</p>
+                      <p className="text-xs text-gray-600">Monitoramento</p>
                     </div>
                   </div>
                 </div>
