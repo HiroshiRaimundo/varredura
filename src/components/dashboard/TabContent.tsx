@@ -1,8 +1,9 @@
+
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Dashboard from "@/components/Dashboard";
 import MonitoringForm from "@/components/monitoring/MonitoringForm";
-import MonitoringList from "@/components/MonitoringList";
+import MonitoringList from "@/components/monitoring-list";
 import ResearchForm from "@/components/ResearchForm";
 import ResearchList from "@/components/ResearchList";
 import MapView from "@/components/MapView";
