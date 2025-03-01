@@ -12,6 +12,8 @@ import TabContent from "@/components/dashboard/TabContent";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ReleaseManagement from "@/components/admin/ReleaseManagement";
 import ClientDashboardControls from "@/components/admin/ClientDashboardControls";
+import ClientManagement from "@/components/admin/ClientManagement";
+import PasswordRecoveryAdmin from "@/components/admin/PasswordRecoveryAdmin";
 
 const Admin: React.FC = () => {
   const navigate = useNavigate();
@@ -55,17 +57,19 @@ const Admin: React.FC = () => {
           <TabsList className="mb-4">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="releases">Gerenciar Releases</TabsTrigger>
+            <TabsTrigger value="clients">Gerenciar Clientes</TabsTrigger>
+            <TabsTrigger value="recovery">Recuperação de Senha</TabsTrigger>
           </TabsList>
           
           <TabsContent value="dashboard">
-            {/* Novo componente de controle de dashboard para clientes */}
+            {/* Controle de dashboard para clientes */}
             <ClientDashboardControls 
               timeRange={timeRange}
               setTimeRange={setTimeRange}
               handleExport={monitoring.handleExport}
             />
             
-            {/* Dashboard e monitoramento existentes */}
+            {/* Dashboard e monitoramento */}
             <TabContent 
               isAuthenticated={auth.isAuthenticated}
               timeRange={timeRange}
@@ -88,6 +92,14 @@ const Admin: React.FC = () => {
           
           <TabsContent value="releases">
             <ReleaseManagement />
+          </TabsContent>
+
+          <TabsContent value="clients">
+            <ClientManagement />
+          </TabsContent>
+
+          <TabsContent value="recovery">
+            <PasswordRecoveryAdmin />
           </TabsContent>
         </Tabs>
       </div>
