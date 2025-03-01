@@ -50,3 +50,13 @@
   ExpiresByType application/pdf "access plus 1 month"
   ExpiresByType application/x-font-woff "access plus 1 year"
 </IfModule>
+
+# Verificar se mod_php está ativado
+<IfModule mod_php7.c>
+  php_flag display_errors on
+  php_value error_reporting E_ALL
+</IfModule>
+<IfModule mod_php.c>
+  php_flag display_errors on
+  php_value error_reporting E_ALL
+</IfModule>
