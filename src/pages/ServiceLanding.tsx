@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Check, Users, BarChart2, Zap } from "lucide-react";
@@ -26,8 +27,8 @@ const ServiceLanding: React.FC = () => {
     navigate("/");
   };
 
-  const handleTryServiceClick = () => {
-    navigate(`/client-login?service=${serviceDetails.id}`);
+  const handleContractServiceClick = () => {
+    navigate(`/client`);
   };
 
   // Get color classes based on service type
@@ -73,11 +74,11 @@ const ServiceLanding: React.FC = () => {
           </p>
           
           <Button 
-            onClick={handleTryServiceClick}
+            onClick={handleContractServiceClick}
             size="lg"
             className={`${colorClasses.bg} hover:opacity-90 shadow-lg`}
           >
-            Solicitar demonstração
+            Contratar agora
           </Button>
         </div>
         
@@ -100,11 +101,11 @@ const ServiceLanding: React.FC = () => {
                 </p>
                 <div className="flex flex-col md:flex-row gap-4">
                   <Button 
-                    onClick={handleTryServiceClick}
+                    onClick={handleContractServiceClick}
                     size="lg"
                     className={`${colorClasses.bg} hover:opacity-90`}
                   >
-                    Começar agora
+                    Contratar serviço
                   </Button>
                   <Button 
                     onClick={() => navigate('/help')}
@@ -193,14 +194,14 @@ const ServiceLanding: React.FC = () => {
           <div className="max-w-6xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-4">Pronto para começar?</h2>
             <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Solicite uma demonstração personalizada e descubra como podemos ajudar sua organização com soluções de dados eficientes.
+              Contrate hoje mesmo e descubra como podemos ajudar sua organização com soluções de dados eficientes.
             </p>
             <Button 
-              onClick={handleTryServiceClick}
+              onClick={handleContractServiceClick}
               size="lg"
               className={`${colorClasses.bg} hover:opacity-90 shadow-lg px-8`}
             >
-              Solicitar demonstração
+              Contratar serviço
             </Button>
           </div>
         </section>

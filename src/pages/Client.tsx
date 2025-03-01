@@ -1,139 +1,67 @@
 
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import ClientSelection from "@/components/client/ClientSelection";
-import { useMonitoring } from "@/hooks/useMonitoring";
 import { useAuth } from "@/hooks/useAuth";
-import { toast } from "@/hooks/use-toast";
-import ClientContent from "@/components/client/ClientContent";
-import { ClientType } from "@/components/monitoring/utils/clientTypeUtils";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { LogIn } from "lucide-react";
+import { Check } from "lucide-react";
+import { ClientType } from "@/components/monitoring/utils/clientTypeUtils";
+import { clientTypeDetails } from "@/components/client/ClientTypes";
 
-const Client: React.FC = () => {
-  const { clientType } = useParams<{ clientType?: string }>();
+const ServicePricing: React.FC = () => {
   const navigate = useNavigate();
-  const monitoring = useMonitoring();
   const auth = useAuth();
-  const [timeRange, setTimeRange] = useState("mensal");
 
-  const validClientTypes = ["observatory", "researcher", "politician", "institution", "journalist", "press"];
-  const isValidClientType = clientType && validClientTypes.includes(clientType);
-
-  useEffect(() => {
-    if (clientType && !isValidClientType) {
-      navigate("/client");
-    }
-  }, [clientType, isValidClientType, navigate]);
-
-  useEffect(() => {
-    monitoring.fetchMonitoringItems();
-  }, []);
-
-  const handleDatasetDownload = () => {
+  const handleServiceContract = (serviceId: ClientType) => {
     if (!auth.isAuthenticated) {
       auth.setIsLoginDialogOpen(true);
       return;
     }
-
-    toast({
-      title: "Conjunto de dados pronto",
-      description: "O dataset completo está sendo baixado."
-    });
     
-    // Simulate download preparation
-    setTimeout(() => {
-      const element = document.createElement("a");
-      if (clientType === "researcher") {
-        element.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURIComponent(
-          convertToCSV(monitoring.allMonitoringItems)
-        ));
-        element.setAttribute("download", "dataset-pesquisa.csv");
-      } else {
-        element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(
-          JSON.stringify(monitoring.allMonitoringItems, null, 2)
-        ));
-        element.setAttribute("download", "dataset-completo.json");
-      }
-      element.style.display = "none";
-      document.body.appendChild(element);
-      element.click();
-      document.body.removeChild(element);
-    }, 800);
+    // Navigate to the client area with the specific service type
+    navigate(`/client/${serviceId}`);
   };
 
-  const handleComparisonView = () => {
-    if (!auth.isAuthenticated) {
-      auth.setIsLoginDialogOpen(true);
-      return;
+  const servicePricing = [
+    {
+      id: "observatory" as ClientType,
+      price: "R$ 3.500",
+      period: "por mês",
+      popular: true
+    },
+    {
+      id: "researcher" as ClientType,
+      price: "R$ 1.200",
+      period: "por mês",
+      popular: false
+    },
+    {
+      id: "politician" as ClientType,
+      price: "R$ 2.800",
+      period: "por mês",
+      popular: false
+    },
+    {
+      id: "institution" as ClientType,
+      price: "R$ 4.200",
+      period: "por mês",
+      popular: false
+    },
+    {
+      id: "journalist" as ClientType,
+      price: "R$ 980",
+      period: "por mês",
+      popular: false
+    },
+    {
+      id: "press" as ClientType,
+      price: "R$ 1.850",
+      period: "por mês",
+      popular: false
     }
-
-    toast({
-      title: "Análise comparativa",
-      description: "A visualização comparativa será disponibilizada em breve."
-    });
-  };
-
-  // Helper function to convert data to CSV
-  const convertToCSV = (items: any[]) => {
-    const headers = Object.keys(items[0] || {}).filter(key => key !== 'id');
-    const rows = items.map(item => headers.map(key => item[key]));
-    return [headers, ...rows]
-      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
-      .join('\n');
-  };
-
-  // Show login card if a client type is selected but not authenticated
-  if (isValidClientType && !auth.isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col">
-        <div className="p-6">
-          <div className="max-w-7xl mx-auto">
-            <Header 
-              isAuthenticated={auth.isAuthenticated} 
-              onLoginClick={() => auth.setIsLoginDialogOpen(true)} 
-              onLogoutClick={auth.handleLogout}
-            />
-
-            <div className="flex items-center justify-center py-12">
-              <Card className="w-full max-w-md">
-                <CardHeader>
-                  <CardTitle className="text-center">Acesso Restrito</CardTitle>
-                  <CardDescription className="text-center">
-                    Para acessar os recursos do perfil {clientType}, por favor faça login
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-center text-muted-foreground">
-                    Esta área é restrita a usuários autenticados. Por favor, faça login para continuar.
-                  </p>
-                  <div className="flex justify-center">
-                    <Button 
-                      className="w-full max-w-xs" 
-                      onClick={() => auth.setIsLoginDialogOpen(true)}
-                    >
-                      <LogIn className="h-4 w-4 mr-2" />
-                      Entrar
-                    </Button>
-                  </div>
-                  <p className="text-center text-sm text-muted-foreground pt-2">
-                    Não tem uma conta? Entre em contato com o administrador.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-auto">
-          <Footer />
-        </div>
-      </div>
-    );
-  }
+  ];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -142,32 +70,90 @@ const Client: React.FC = () => {
           <Header 
             isAuthenticated={auth.isAuthenticated} 
             onLoginClick={() => auth.setIsLoginDialogOpen(true)} 
-            onLogoutClick={auth.handleLogout} 
+            onLogoutClick={auth.handleLogout}
           />
+          
+          <div className="mb-12 text-center">
+            <h1 className="text-4xl font-bold mb-3">Nossos Planos e Serviços</h1>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Escolha o plano ideal para suas necessidades e comece a utilizar nossos serviços especializados de dados.
+            </p>
+          </div>
 
-          {isValidClientType && auth.isAuthenticated ? (
-            <ClientContent 
-              clientType={clientType as ClientType}
-              monitoringItems={monitoring.monitoringItems}
-              timeRange={timeRange}
-              setTimeRange={setTimeRange}
-              handleExport={monitoring.handleExport}
-              isAuthenticated={auth.isAuthenticated}
-              form={monitoring.form}
-              handleAddMonitoring={monitoring.handleAddMonitoring}
-              legislationAlerts={monitoring.legislationAlerts}
-              markAlertAsRead={monitoring.markAlertAsRead}
-              unreadAlertCount={monitoring.unreadAlertCount}
-              handleDatasetDownload={handleDatasetDownload}
-              handleComparisonView={handleComparisonView}
-              responsibleFilter={monitoring.responsibleFilter}
-              setResponsibleFilter={monitoring.setResponsibleFilter}
-              getUniqueResponsibles={monitoring.getUniqueResponsibles}
-              isLoading={monitoring.isLoading}
-            />
-          ) : (
-            <ClientSelection />
-          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {servicePricing.map((service) => {
+              const details = clientTypeDetails[service.id];
+              const colorMap: Record<ClientType, { bg: string, light: string, text: string, border: string }> = {
+                observatory: { bg: "bg-blue-600", light: "bg-blue-50", text: "text-blue-600", border: "border-blue-200" },
+                researcher: { bg: "bg-indigo-600", light: "bg-indigo-50", text: "text-indigo-600", border: "border-indigo-200" },
+                politician: { bg: "bg-green-600", light: "bg-green-50", text: "text-green-600", border: "border-green-200" },
+                institution: { bg: "bg-purple-600", light: "bg-purple-50", text: "text-purple-600", border: "border-purple-200" },
+                journalist: { bg: "bg-red-600", light: "bg-red-50", text: "text-red-600", border: "border-red-200" },
+                press: { bg: "bg-amber-600", light: "bg-amber-50", text: "text-amber-600", border: "border-amber-200" }
+              };
+              
+              const colors = colorMap[service.id];
+              
+              return (
+                <Card 
+                  key={service.id} 
+                  className={`${service.popular ? 'border-primary shadow-lg' : 'border-border'} relative`}
+                >
+                  {service.popular && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-primary text-white text-sm rounded-full">
+                      Mais Popular
+                    </div>
+                  )}
+                  
+                  <CardHeader className={service.popular ? 'pt-8' : ''}>
+                    <CardTitle className="flex items-center gap-2">
+                      <span className={colors.text}>{details.title}</span>
+                    </CardTitle>
+                    <CardDescription>{details.shortDescription}</CardDescription>
+                  </CardHeader>
+                  
+                  <CardContent>
+                    <div className="mb-6">
+                      <p className="text-3xl font-bold">{service.price}</p>
+                      <p className="text-muted-foreground">{service.period}</p>
+                    </div>
+                    
+                    <ul className="space-y-2">
+                      {details.benefits.slice(0, 4).map((benefit, i) => (
+                        <li key={i} className="flex items-start">
+                          <div className={`rounded-full p-1 ${colors.light} mr-3 mt-1`}>
+                            <Check className={`h-4 w-4 ${colors.text}`} />
+                          </div>
+                          <span className="text-sm">{benefit}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                  
+                  <CardFooter>
+                    <Button 
+                      className={`w-full ${colors.bg} hover:opacity-90`}
+                      onClick={() => handleServiceContract(service.id)}
+                    >
+                      Contratar Serviço
+                    </Button>
+                  </CardFooter>
+                </Card>
+              );
+            })}
+          </div>
+          
+          <div className="mt-12 text-center">
+            <p className="text-muted-foreground mb-4">
+              Precisa de um plano personalizado para sua organização?
+            </p>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate("/help")}
+            >
+              Entre em contato
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -178,4 +164,4 @@ const Client: React.FC = () => {
   );
 };
 
-export default Client;
+export default ServicePricing;

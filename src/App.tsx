@@ -28,7 +28,7 @@ const App = () => (
           {/* Páginas de serviços */}
           <Route path="/service/:serviceId" element={<ServiceLanding />} />
           
-          {/* Área do cliente */}
+          {/* Área de serviços */}
           <Route path="/client" element={<Client />} />
           <Route path="/client/:clientType" element={<Client />} />
           <Route path="/client-login" element={<ClientLogin />} />

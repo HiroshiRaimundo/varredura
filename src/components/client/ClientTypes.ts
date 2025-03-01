@@ -1,211 +1,211 @@
 
-// Type definition for client types
 export type ClientType = "observatory" | "researcher" | "politician" | "institution" | "journalist" | "press";
 
-// Function to get client name based on client type
-export const getClientName = (clientType: ClientType): string => {
-  switch (clientType) {
-    case "observatory":
-      return "Observatório";
-    case "researcher":
-      return "Pesquisador";
-    case "politician":
-      return "Político";
-    case "institution":
-      return "Instituição";
-    case "journalist":
-      return "Jornalista";
-    case "press":
-      return "Assessoria de Imprensa";
-    default:
-      return "Cliente";
-  }
-};
+export const clientTypes = [
+  {
+    type: "observatory" as ClientType,
+    label: "Observatório",
+    description: "Acesso a dashboards e ferramentas para observatórios de dados",
+    alert: "Popular"
+  },
+  {
+    type: "researcher" as ClientType,
+    label: "Pesquisador",
+    description: "Ferramentas para análise e processamento de dados científicos",
+    alert: ""
+  },
+  {
+    type: "politician" as ClientType,
+    label: "Político",
+    description: "Monitoramento de legislação e indicadores governamentais",
+    alert: ""
+  },
+  {
+    type: "institution" as ClientType,
+    label: "Instituição",
+    description: "Soluções para gestão de dados institucionais",
+    alert: ""
+  },
+  {
+    type: "journalist" as ClientType,
+    label: "Jornalista",
+    description: "Acesso a dados verificados para produção de conteúdo",
+    alert: ""
+  },
+  {
+    type: "press" as ClientType,
+    label: "Assessoria de Imprensa",
+    description: "Ferramentas para gestão de releases e contatos",
+    alert: "Novo"
+  },
+];
 
-// Function to get client description
-export const getClientDescription = (clientType: ClientType): string => {
-  switch (clientType) {
-    case "observatory":
-      return "Plataforma completa para observatórios de políticas públicas acompanharem indicadores, integrarem dados e gerarem relatórios automatizados com visualizações avançadas.";
-    case "researcher":
-      return "Acesso a datasets completos, APIs para integração com ferramentas estatísticas, histórico de séries temporais e capacidade de compartilhamento de dados com outros pesquisadores.";
-    case "politician":
-      return "Alertas sobre novas legislações, análise de impacto de políticas públicas, resumos executivos de dados governamentais e comparativos de indicadores por região.";
-    case "institution":
-      return "Ferramentas para gestão de dados institucionais, monitoramento de programas, dashboards personalizados e relatórios de acompanhamento para instituições de diversos setores.";
-    case "journalist":
-      return "Acesso a indicadores atualizados, visualizações prontas para publicação, verificação de dados e comparativos históricos para embasar reportagens investigativas e especiais.";
-    case "press":
-      return "Sistema completo para criação, aprovação e monitoramento de releases, acompanhamento de publicações, métricas de desempenho e gestão de contatos com veículos de comunicação.";
-    default:
-      return "Acesso a ferramentas e informações personalizadas.";
-  }
-};
+interface CaseStudy {
+  title: string;
+  description: string;
+}
 
-// Client type details for service landing pages
-export const clientTypeDetails = {
+interface ClientTypeDetail {
+  id: ClientType;
+  title: string;
+  shortDescription: string;
+  description: string;
+  details: string;
+  features: string[];
+  benefits: string[];
+  caseStudy?: CaseStudy;
+}
+
+export const clientTypeDetails: Record<ClientType, ClientTypeDetail> = {
   observatory: {
     id: "observatory",
-    title: "Observatório de Dados",
-    description: "Plataforma completa para observatórios de políticas públicas.",
-    details: "Nossa plataforma oferece ferramentas avançadas para observatórios de políticas públicas acompanharem indicadores, integrarem dados de múltiplas fontes e gerarem relatórios automatizados com visualizações dinâmicas e interativas.",
+    title: "Observatório",
+    shortDescription: "Plataforma completa para observatórios de políticas públicas.",
+    description: "Plataforma completa para observatórios de políticas públicas acompanharem indicadores, integrarem dados e gerarem relatórios automatizados com visualizações avançadas.",
+    details: "Nossa solução para observatórios oferece um conjunto completo de ferramentas para coleta, análise e visualização de dados relacionados a políticas públicas. Com painéis personalizáveis e relatórios automáticos, sua equipe poderá acompanhar indicadores em tempo real, identificar tendências e compartilhar insights com facilidade.",
     features: [
-      "Integração de dados de múltiplas fontes",
-      "Dashboards personalizados e interativos",
-      "Geração automatizada de relatórios",
-      "Monitoramento de indicadores-chave",
-      "Histórico de séries temporais",
-      "Exportação em múltiplos formatos"
+      "Dashboard personalizado com indicadores",
+      "Integração com bases de dados públicas",
+      "Geração automática de relatórios",
+      "Exportação de dados em múltiplos formatos",
+      "Visualizações interativas e gráficos avançados",
+      "Compartilhamento seguro de dados"
     ],
     benefits: [
-      "Tomada de decisão baseada em dados confiáveis",
-      "Economia de tempo na coleta e análise de informações",
-      "Visualização clara e objetiva de tendências",
-      "Compartilhamento simplificado de resultados",
-      "Identificação rápida de padrões e anomalias"
+      "Economize tempo com automação de coleta de dados",
+      "Melhore a qualidade das análises com dados integrados",
+      "Aumente a visibilidade do seu observatório com relatórios profissionais",
+      "Facilite a tomada de decisões baseadas em evidências",
+      "Monitore tendências e padrões em tempo real"
     ],
     caseStudy: {
-      title: "Observatório de Políticas Públicas - Região Norte",
-      description: "Um observatório regional conseguiu aumentar em 60% a eficiência na coleta de dados e reduziu o tempo de geração de relatórios de 2 semanas para apenas 2 dias, melhorando significativamente sua capacidade de resposta a demandas urgentes."
+      title: "Observatório de Políticas Educacionais",
+      description: "Um observatório educacional conseguiu reduzir em 70% o tempo gasto na coleta e processamento de dados, aumentando a frequência de publicação de relatórios de trimestral para mensal."
     }
   },
   researcher: {
     id: "researcher",
-    title: "Plataforma para Pesquisadores",
-    description: "Ferramentas avançadas para pesquisadores e acadêmicos.",
-    details: "Oferecemos acesso a datasets completos, APIs para integração com ferramentas estatísticas avançadas, histórico detalhado de séries temporais e recursos para compartilhamento seguro de dados com colaboradores e outros pesquisadores.",
+    title: "Pesquisador",
+    shortDescription: "Acesso a datasets completos e ferramentas estatísticas avançadas.",
+    description: "Acesso a datasets completos, APIs para integração com ferramentas estatísticas, histórico de séries temporais e capacidade de compartilhamento de dados com outros pesquisadores.",
+    details: "Desenvolvida especialmente para pesquisadores, nossa plataforma oferece acesso privilegiado a conjuntos de dados exclusivos e ferramentas estatísticas avançadas. Consulte séries históricas, exporte dados em formato compatível com softwares estatísticos e colabore com outros pesquisadores em um ambiente seguro.",
     features: [
-      "Acesso a datasets completos e atualizados",
-      "APIs para integração com R, Python e outras ferramentas",
-      "Histórico completo de séries temporais",
-      "Compartilhamento seguro de dados",
-      "Ferramentas de análise estatística",
-      "Visualizações personalizáveis para publicações"
+      "Acesso a datasets exclusivos e atualizados",
+      "Ferramentas de análise estatística integradas",
+      "Exportação para R, Python, SPSS e outros formatos",
+      "Colaboração segura entre pesquisadores",
+      "Documentação completa das metodologias"
     ],
     benefits: [
-      "Economia de tempo na coleta e preparação de dados",
-      "Garantia de confiabilidade e origem das informações",
-      "Facilitação da colaboração entre equipes de pesquisa",
-      "Acesso a dados históricos para análises longitudinais",
-      "Conformidade com requisitos de financiadores sobre gestão de dados"
+      "Acesse dados confiáveis e atualizados para suas pesquisas",
+      "Economize tempo com dados já estruturados e limpos",
+      "Colabore facilmente com colegas em projetos compartilhados",
+      "Obtenha suporte metodológico especializado",
+      "Publique resultados com maior rapidez e qualidade"
     ],
     caseStudy: {
-      title: "Grupo de Pesquisa em Epidemiologia - Universidade Federal",
-      description: "Um grupo de pesquisa universitário conseguiu reduzir em 70% o tempo dedicado à coleta e limpeza de dados, permitindo que os pesquisadores focassem mais na análise e interpretação, resultando em três publicações adicionais em um ano."
+      title: "Grupo de Pesquisa em Políticas Públicas",
+      description: "Um grupo de pesquisa universitário conseguiu publicar 3 artigos científicos em menos de um ano usando os datasets e ferramentas disponíveis na plataforma."
     }
   },
   politician: {
     id: "politician",
-    title: "Inteligência para Mandatos",
-    description: "Dados e análises para decisões políticas fundamentadas.",
-    details: "Sistema completo com alertas sobre novas legislações, análises de impacto de políticas públicas, resumos executivos de dados governamentais e comparativos de indicadores por região para suporte à tomada de decisão.",
+    title: "Político",
+    shortDescription: "Alertas e análises para tomada de decisão em políticas públicas.",
+    description: "Alertas sobre novas legislações, análise de impacto de políticas públicas, resumos executivos de dados governamentais e comparativos de indicadores por região.",
+    details: "Nossa plataforma para políticos e assessores parlamentares oferece informações estratégicas para a tomada de decisões. Receba alertas sobre novas legislações, acompanhe indicadores relevantes para sua base eleitoral e acesse análises de impacto de políticas públicas, tudo em um único ambiente.",
     features: [
-      "Alertas personalizados sobre novas legislações",
-      "Análise de impacto de políticas públicas",
-      "Resumos executivos diários",
-      "Comparativos regionais de indicadores",
-      "Monitoramento de repercussão de temas",
-      "Relatórios de desempenho de políticas"
+      "Alertas personalizados sobre legislação",
+      "Indicadores regionalizados por base eleitoral",
+      "Análises comparativas entre regiões",
+      "Resumos executivos para tomada de decisão",
+      "Monitoramento de métricas de políticas públicas"
     ],
     benefits: [
-      "Tomada de decisão baseada em evidências",
-      "Antecipação de tendências e demandas sociais",
-      "Priorização eficiente de ações e recursos",
-      "Avaliação objetiva do impacto de iniciativas",
-      "Melhor comunicação com eleitores e stakeholders"
+      "Tome decisões mais informadas com dados atualizados",
+      "Acompanhe o impacto de políticas públicas em sua região",
+      "Receba alertas sobre temas relevantes para sua atuação",
+      "Compare indicadores entre diferentes regiões",
+      "Fundamente propostas com dados confiáveis"
     ],
     caseStudy: {
-      title: "Mandato Legislativo Estadual",
-      description: "Um mandato legislativo estadual utilizou nossa plataforma para identificar prioridades regionais baseadas em dados, resultando em proposição de projetos com 40% mais apoio e engajamento da população local."
+      title: "Secretaria Estadual de Planejamento",
+      description: "Uma secretaria estadual utilizou nossa plataforma para identificar áreas prioritárias para investimentos, otimizando a alocação de recursos públicos com base em evidências."
     }
   },
   institution: {
     id: "institution",
-    title: "Gestão Institucional de Dados",
-    description: "Soluções integradas para instituições de todos os setores.",
-    details: "Fornecemos ferramentas completas para gestão de dados institucionais, monitoramento de programas e projetos, dashboards personalizados e relatórios de acompanhamento adaptados às necessidades específicas de cada instituição.",
+    title: "Instituição",
+    shortDescription: "Ferramentas para gestão e análise de dados institucionais.",
+    description: "Ferramentas para gestão de dados institucionais, monitoramento de programas, dashboards personalizados e relatórios de acompanhamento para instituições de diversos setores.",
+    details: "Desenvolvemos uma solução completa para instituições públicas e privadas gerenciarem seus dados e monitorarem programas. Com dashboards personalizados, relatórios automatizados e ferramentas de análise, sua instituição poderá tomar decisões baseadas em evidências e demonstrar resultados com transparência.",
     features: [
-      "Integração de dados de múltiplos departamentos",
-      "Painéis executivos personalizados",
-      "Monitoramento em tempo real de indicadores",
-      "Relatórios automatizados periódicos",
-      "Ferramentas de planejamento estratégico",
-      "Análise de desempenho de programas"
+      "Gestão centralizada de dados institucionais",
+      "Monitoramento de indicadores de programas",
+      "Dashboards personalizados por departamento",
+      "Relatórios de desempenho automáticos",
+      "Comparativos históricos e projeções"
     ],
     benefits: [
-      "Visão unificada do desempenho institucional",
-      "Alinhamento entre equipes e departamentos",
-      "Otimização da alocação de recursos",
-      "Melhoria contínua baseada em dados",
-      "Prestação de contas simplificada"
+      "Centralize informações de diferentes departamentos",
+      "Demonstre resultados com relatórios profissionais",
+      "Melhore a transparência e a prestação de contas",
+      "Otimize processos com base em dados concretos",
+      "Facilite auditorias e avaliações externas"
     ],
     caseStudy: {
-      title: "Secretaria Estadual de Planejamento",
-      description: "Uma secretaria estadual implementou nossa solução e conseguiu reduzir em 30% o tempo de elaboração do orçamento anual, além de melhorar a precisão das projeções orçamentárias em 25%."
+      title: "Rede de Hospitais Regionais",
+      description: "Uma rede de hospitais conseguiu reduzir em 25% o tempo de espera para atendimentos ao identificar gargalos nos processos através dos dashboards de monitoramento."
     }
   },
   journalist: {
     id: "journalist",
-    title: "Centro de Dados para Jornalistas",
-    description: "Informações verificadas para reportagens fundamentadas.",
-    details: "Oferecemos acesso privilegiado a indicadores atualizados, visualizações prontas para publicação, ferramentas de verificação de dados e comparativos históricos para embasar reportagens investigativas e matérias especiais.",
+    title: "Jornalista",
+    shortDescription: "Dados verificados e visualizações para reportagens de qualidade.",
+    description: "Acesso a indicadores atualizados, visualizações prontas para publicação, verificação de dados e comparativos históricos para embasar reportagens investigativas e especiais.",
+    details: "Nossa plataforma para jornalistas fornece acesso a dados verificados e atualizados, além de visualizações prontas para publicação. Com ferramentas de checagem e comparativos históricos, você poderá produzir reportagens investigativas e especiais com embasamento sólido e visualizações de impacto.",
     features: [
-      "Acesso a dados verificados e atualizados",
+      "Dados verificados de fontes confiáveis",
       "Visualizações prontas para publicação",
-      "Ferramentas de fact-checking",
-      "Comparativos históricos de indicadores",
-      "Alertas de novos dados relevantes",
-      "Exportação em formatos compatíveis com editorias"
+      "Ferramentas de checagem de informações",
+      "Séries históricas para comparativos",
+      "Exportação em formatos compatíveis com redações"
     ],
     benefits: [
-      "Credibilidade reforçada das reportagens",
-      "Redução do tempo de apuração e verificação",
-      "Capacidade de identificar tendências e pautas relevantes",
-      "Diferenciação do conteúdo produzido",
-      "Proteção contra desinformação e dados imprecisos"
+      "Produza reportagens baseadas em dados confiáveis",
+      "Economize tempo com visualizações prontas para uso",
+      "Verifique informações com ferramentas especializadas",
+      "Encontre tendências e padrões para pautas exclusivas",
+      "Diferencie seu trabalho com análises aprofundadas"
     ],
     caseStudy: {
-      title: "Equipe de Jornalismo de Dados - Jornal Nacional",
-      description: "Uma equipe de jornalismo de dados utilizou nossa plataforma para produzir uma série especial sobre desigualdade social, conseguindo reduzir o tempo de apuração em 50% e aumentando o engajamento dos leitores em 35%."
+      title: "Reportagem Investigativa Premiada",
+      description: "Uma equipe de jornalismo de dados utilizou nossa plataforma para criar uma série investigativa sobre gastos públicos que foi premiada nacionalmente."
     }
   },
   press: {
     id: "press",
-    title: "Sistema para Assessorias de Imprensa",
-    description: "Gestão completa de releases e relacionamento com a mídia.",
-    details: "Nosso sistema oferece ferramentas para criação, aprovação e monitoramento de releases, acompanhamento de publicações na mídia, métricas de desempenho e gestão integrada de contatos com veículos de comunicação.",
+    title: "Assessoria de Imprensa",
+    shortDescription: "Sistema completo para gestão de releases e contatos.",
+    description: "Sistema completo para criação, aprovação e monitoramento de releases, acompanhamento de publicações, métricas de desempenho e gestão de contatos com veículos de comunicação.",
+    details: "Nossa solução para assessorias de imprensa oferece um fluxo completo para criação, aprovação, distribuição e monitoramento de releases. Com ferramentas para gestão de contatos, acompanhamento de publicações e métricas de desempenho, sua equipe poderá otimizar estratégias e demonstrar resultados com precisão.",
     features: [
-      "Workflow de criação e aprovação de releases",
-      "Monitoramento de publicações na mídia",
-      "Métricas de desempenho de divulgações",
-      "Gestão de relacionamento com veículos",
-      "Agenda integrada de pautas e eventos",
-      "Relatórios de resultados para clientes"
+      "Fluxo de aprovação de releases",
+      "Distribuição segmentada por público",
+      "Monitoramento de publicações",
+      "Métricas de desempenho e ROI",
+      "Gestão avançada de contatos e veículos"
     ],
     benefits: [
-      "Organização e controle do fluxo de informações",
-      "Avaliação objetiva do retorno de divulgações",
-      "Otimização da estratégia de relacionamento com a mídia",
-      "Identificação dos canais mais efetivos",
-      "Demonstração clara de resultados para clientes"
+      "Aumente a taxa de aproveitamento de seus releases",
+      "Segmente envios para maior relevância",
+      "Acompanhe resultados em tempo real",
+      "Demonstre o valor do trabalho com métricas precisas",
+      "Organize contatos e histórico de relacionamento com a imprensa"
     ],
     caseStudy: {
       title: "Assessoria de Imprensa Corporativa",
-      description: "Uma assessoria que atende 12 clientes simultaneamente conseguiu aumentar em 45% o índice de aproveitamento de releases e reduzir em 30% o tempo dedicado à produção de relatórios de resultados."
+      description: "Uma assessoria de imprensa conseguiu aumentar em 40% a taxa de aproveitamento de seus releases após implementar o sistema de segmentação e monitoramento."
     }
   }
 };
-
-// Type assertion helper
-export function assertClientType(value: string): asserts value is ClientType {
-  const validTypes = ["observatory", "researcher", "politician", "institution", "journalist", "press"];
-  if (!validTypes.includes(value)) {
-    throw new Error(`Invalid client type: ${value}`);
-  }
-}
-
-// Safe type casting
-export function asClientType(value: string): ClientType {
-  assertClientType(value);
-  return value;
-}
