@@ -69,7 +69,7 @@ const CTASection: React.FC = () => {
               <Button 
                 size="lg"
                 className="bg-blue-600 hover:bg-blue-700 flex items-center shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all"
-                onClick={() => navigate('/client-login')}
+                onClick={() => navigate('/payment')}
               >
                 Solicitar demonstração
                 <svg

@@ -28,7 +28,8 @@ const ServiceLanding: React.FC = () => {
   };
 
   const handleContractServiceClick = () => {
-    navigate(`/client-login`);
+    // Navigate to payment page instead of client login
+    navigate("/payment");
   };
 
   // Get color classes based on service type
@@ -201,7 +202,7 @@ const ServiceLanding: React.FC = () => {
               size="lg"
               className={`${colorClasses.bg} hover:opacity-90 shadow-lg px-8`}
             >
-              Acessar agora
+              Contratar agora
             </Button>
           </div>
         </section>

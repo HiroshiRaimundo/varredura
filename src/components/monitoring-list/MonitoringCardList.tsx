@@ -9,14 +9,22 @@ interface MonitoringCardListProps {
 }
 
 const MonitoringCardList: React.FC<MonitoringCardListProps> = ({ items, onDelete }) => {
+  console.log("MonitoringCardList received items:", items);
+  
   // Ensure items is always an array
   const safeItems = Array.isArray(items) ? items : [];
   
   return (
     <div className="grid gap-4">
-      {safeItems.map((item) => (
-        <MonitoringCard key={item.id} item={item} onDelete={onDelete} />
-      ))}
+      {safeItems.length > 0 ? (
+        safeItems.map((item) => (
+          <MonitoringCard key={item.id} item={item} onDelete={onDelete} />
+        ))
+      ) : (
+        <div className="text-center p-4 text-gray-500">
+          Nenhum item de monitoramento encontrado.
+        </div>
+      )}
     </div>
   );
 };
