@@ -8,6 +8,7 @@ import { ClientType } from "@/components/monitoring/utils/clientTypeUtils";
 import AlertButton from "./AlertButton";
 import LegislationAlerts from "./LegislationAlerts";
 import AnalysisToolsCard from "./AnalysisToolsCard";
+import PressReleaseTab from "./PressReleaseTab";
 import { LegislationAlert } from "@/hooks/useMonitoring";
 
 interface ClientContentProps {
@@ -81,6 +82,7 @@ const ClientContent: React.FC<ClientContentProps> = ({
         <TabsList className="mb-4">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="monitoring">Monitoramento</TabsTrigger>
+          <TabsTrigger value="press">Assessoria de Imprensa</TabsTrigger>
         </TabsList>
         
         <TabsContent value="dashboard">
@@ -111,6 +113,10 @@ const ClientContent: React.FC<ClientContentProps> = ({
               onFilterChange={setResponsibleFilter}
             />
           </div>
+        </TabsContent>
+        
+        <TabsContent value="press">
+          <PressReleaseTab clientType={clientType} />
         </TabsContent>
       </Tabs>
     </div>
