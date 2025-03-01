@@ -44,6 +44,9 @@ export const useAuth = () => {
         setIsAuthenticated(true);
         setIsLoginDialogOpen(false);
         
+        // Navigate to admin page instead of client page
+        navigate("/admin");
+        
         toast({
           title: "Login realizado com sucesso",
           description: "Bem-vindo ao sistema de monitoramento."

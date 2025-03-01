@@ -1,25 +1,44 @@
 
 import React from "react";
-import { MonitoringItem } from "@/hooks/useMonitoring";
+import MonitoringForm from "@/components/monitoring/MonitoringForm";
 import MonitoringList from "@/components/monitoring-list";
+import { ClientType } from "@/components/monitoring/utils/clientTypeUtils";
 
 interface MonitoringTabProps {
-  items: MonitoringItem[];
-  onDelete: (id: string) => void;
-  isLoading?: boolean;
+  clientType: ClientType;
+  monitoringItems: any[];
+  form: any;
+  handleAddMonitoring: (data: any) => void;
+  isLoading: boolean;
+  responsibleFilter: string;
+  setResponsibleFilter: (filter: string) => void;
+  getUniqueResponsibles: () => string[];
 }
 
-const MonitoringTab: React.FC<MonitoringTabProps> = ({ 
-  items, 
-  onDelete,
-  isLoading = false
+const MonitoringTab: React.FC<MonitoringTabProps> = ({
+  clientType,
+  monitoringItems,
+  form,
+  handleAddMonitoring,
+  isLoading,
+  responsibleFilter,
+  setResponsibleFilter,
+  getUniqueResponsibles
 }) => {
   return (
-    <div className="grid gap-6">
+    <div className="space-y-6">
+      <MonitoringForm 
+        form={form} 
+        onSubmit={handleAddMonitoring}
+        clientType={clientType}
+      />
       <MonitoringList 
-        items={items}
-        onDelete={onDelete}
+        items={monitoringItems} 
+        onDelete={() => {}} // Clients can't delete items
         isLoading={isLoading}
+        uniqueResponsibles={getUniqueResponsibles()}
+        responsibleFilter={responsibleFilter}
+        onFilterChange={setResponsibleFilter}
       />
     </div>
   );
