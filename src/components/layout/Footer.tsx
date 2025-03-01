@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex items-center text-sm text-muted-foreground">
           <span className="flex items-center">
-            Copyright ©️ 2024 | Programa de Pós-graduação em Desenvolvimento da Amazônia Sustentável (PPGDAS)
+            Monitoramento, Amazônia e Sustentabilidade
           </span>
         </div>
         <div className="text-sm text-muted-foreground">

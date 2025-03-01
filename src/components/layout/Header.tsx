@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
-import { LogIn, LogOut, User, Home, ArrowLeft } from "lucide-react";
+import { LogIn, LogOut, User, Home, ArrowLeft, Search, Leaf } from "lucide-react";
 
 interface HeaderProps {
   isAuthenticated: boolean;
@@ -45,9 +45,15 @@ const Header = ({
           onClick={() => navigate("/")} 
           className="cursor-pointer flex items-center"
         >
-          {!isClientPage && (
-            <span className="text-xl font-bold">Serviços Especializados</span>
-          )}
+          <div className="flex items-center gap-2">
+            <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white p-2 rounded-lg flex items-center">
+              <Search className="h-5 w-5 mr-1" />
+              <Leaf className="h-5 w-5" />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+              Varredura
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -86,7 +92,7 @@ const Header = ({
                 variant="ghost"
                 onClick={() => navigate("/")}
               >
-                Dashboard
+                Início
               </Button>
               
               <Button
