@@ -9,54 +9,62 @@ interface LoginCredentials {
 }
 
 export const useAuth = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Initialize isAuthenticated from localStorage to prevent flickering
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem("isAuthenticated") === "true";
+  });
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
-  const form = useForm<LoginCredentials>();
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const form = useForm<LoginCredentials>({
+    defaultValues: {
+      email: "",
+      password: ""
+    }
+  });
 
-  // Check for authentication on component mount
-  useEffect(() => {
-    const checkAuthStatus = () => {
-      // Check for authentication in local storage (for the help page)
-      const storedAuth = localStorage.getItem("isAuthenticated");
-      if (storedAuth === "true") {
+  const handleLogin = async (data: LoginCredentials) => {
+    setIsLoggingIn(true);
+    
+    try {
+      // Add a slight delay to simulate network request
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Verify credentials (using shared login: odr@2025 / Ppgdas@2025)
+      if (data.email === "odr@2025" && data.password === "Ppgdas@2025") {
+        // Set authentication in localStorage
+        localStorage.setItem("isAuthenticated", "true");
+        
+        // Create a session timestamp to track login
+        const sessionId = Date.now().toString();
+        localStorage.setItem("sessionId", sessionId);
+        
+        // Update state after localStorage is set
         setIsAuthenticated(true);
+        setIsLoginDialogOpen(false);
+        
+        toast({
+          title: "Login realizado com sucesso",
+          description: "Bem-vindo ao sistema de monitoramento."
+        });
+      } else {
+        toast({
+          title: "Erro de autenticação",
+          description: "Email ou senha incorretos.",
+          variant: "destructive"
+        });
       }
-    };
-
-    checkAuthStatus();
-  }, []);
-
-  const handleLogin = (data: LoginCredentials) => {
-    // Verify credentials (now using a shared login: odr@2025 / Ppgdas@2025)
-    if (data.email === "odr@2025" && data.password === "Ppgdas@2025") {
-      setIsAuthenticated(true);
-      setIsLoginDialogOpen(false);
-      
-      // Save authentication in localStorage for page navigation
-      localStorage.setItem("isAuthenticated", "true");
-      
-      // Create a session timestamp to track login
-      const sessionId = Date.now().toString();
-      localStorage.setItem("sessionId", sessionId);
-      
-      toast({
-        title: "Login realizado com sucesso",
-        description: "Bem-vindo ao sistema de monitoramento."
-      });
-    } else {
-      toast({
-        title: "Erro de autenticação",
-        description: "Email ou senha incorretos.",
-        variant: "destructive"
-      });
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
   const handleLogout = () => {
-    setIsAuthenticated(false);
     // Remove authentication from localStorage
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("sessionId");
+    
+    // Update state
+    setIsAuthenticated(false);
     
     toast({
       title: "Logout realizado",
@@ -68,6 +76,7 @@ export const useAuth = () => {
     isAuthenticated,
     isLoginDialogOpen,
     setIsLoginDialogOpen,
+    isLoggingIn,
     form,
     handleLogin,
     handleLogout
