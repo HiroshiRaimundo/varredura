@@ -22,12 +22,48 @@ interface MonitoringFormProps {
 }
 
 const MonitoringForm: React.FC<MonitoringFormProps> = ({ form, onSubmit, clientType }) => {
+  // Get title based on client type
+  const getTitle = () => {
+    switch (clientType) {
+      case "observatory":
+        return "Sistema de Monitoramento para Observatórios";
+      case "researcher":
+        return "Sistema de Monitoramento para Pesquisadores";
+      case "politician":
+        return "Sistema de Alertas para Gestores Públicos";
+      case "institution":
+        return "Sistema de Monitoramento Institucional";
+      case "journalist":
+        return "Sistema de Monitoramento de Fontes e Pautas";
+      default:
+        return "Sistema de Monitoramento";
+    }
+  };
+  
+  // Get description based on client type
+  const getDescription = () => {
+    switch (clientType) {
+      case "observatory":
+        return "Configure análises comparativas e acesso a datasets completos";
+      case "researcher":
+        return "Identifique correlações e tendências para suas pesquisas";
+      case "politician":
+        return "Acompanhe indicadores de impacto e novas legislações";
+      case "institution":
+        return "Monitore dados relevantes para sua instituição";
+      case "journalist":
+        return "Acompanhe tendências e identifique novas pautas";
+      default:
+        return "Gerencie monitoramentos automáticos de fontes de dados";
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Sistema de Monitoramento</CardTitle>
+        <CardTitle>{getTitle()}</CardTitle>
         <CardDescription>
-          Gerencie monitoramentos automáticos de fontes de dados
+          {getDescription()}
         </CardDescription>
       </CardHeader>
       <CardContent>

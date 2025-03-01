@@ -5,7 +5,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription } fr
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface MonitoringItem {
   name: string;
@@ -34,15 +35,15 @@ const MonitoringFormInputs: React.FC<MonitoringFormInputsProps> = ({ form, onSub
     
     switch (clientType) {
       case "observatory":
-        return [...baseCategories, "ambiental", "social"];
+        return [...baseCategories, "ambiental", "social", "climático", "conservação", "biodiversidade"];
       case "researcher":
-        return [...baseCategories, "acadêmico", "publicações"];
+        return [...baseCategories, "acadêmico", "publicações", "peer-review", "conferências", "datasets"];
       case "politician":
-        return [...baseCategories, "votações", "projetos", "orçamento"];
+        return [...baseCategories, "votações", "projetos", "orçamento", "impacto-social", "políticas-públicas"];
       case "institution":
-        return [...baseCategories, "relatórios", "auditorias"];
+        return [...baseCategories, "relatórios", "auditorias", "compliance", "transparência"];
       case "journalist":
-        return [...baseCategories, "pautas", "entrevistas", "fontes"];
+        return [...baseCategories, "pautas", "entrevistas", "fontes", "fact-checking", "tendências", "exclusivo"];
       default:
         return baseCategories;
     }
@@ -56,10 +57,52 @@ const MonitoringFormInputs: React.FC<MonitoringFormInputsProps> = ({ form, onSub
       setNewCategory("");
     }
   };
+
+  // Get client-specific descriptions and alerts
+  const getClientTypeInfo = () => {
+    switch (clientType) {
+      case "observatory":
+        return {
+          description: "Configure monitoramentos com foco em análises comparativas e datasets completos",
+          alert: "Novos monitoramentos serão incluídos nas análises regionais e comparativas"
+        };
+      case "researcher":
+        return {
+          description: "Defina monitoramentos para identificar correlações e tendências em seus estudos",
+          alert: "Seus monitoramentos estarão disponíveis para exportação em formatos compatíveis com ferramentas de análise"
+        };
+      case "politician":
+        return {
+          description: "Configure alertas sobre legislações e indicadores relevantes para políticas públicas",
+          alert: "Você receberá notificações sobre alterações em indicadores-chave relacionados"
+        };
+      case "journalist":
+        return {
+          description: "Monitore fontes para identificar tendências emergentes e gerar pautas",
+          alert: "As fontes monitoradas serão verificadas e classificadas por confiabilidade"
+        };
+      default:
+        return {
+          description: "Gerencie monitoramentos automáticos de fontes de dados",
+          alert: null
+        };
+    }
+  };
+  
+  const clientInfo = getClientTypeInfo();
   
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {clientInfo.alert && (
+          <Alert className="mb-4 bg-blue-50">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {clientInfo.alert}
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <FormField
           control={form.control}
           name="name"
@@ -69,6 +112,9 @@ const MonitoringFormInputs: React.FC<MonitoringFormInputsProps> = ({ form, onSub
               <FormControl>
                 <Input placeholder="Ex: Índice de Desmatamento - Amazônia Legal" {...field} />
               </FormControl>
+              <FormDescription>
+                {clientInfo.description}
+              </FormDescription>
             </FormItem>
           )}
         />

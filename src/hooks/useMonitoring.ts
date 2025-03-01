@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,12 +17,23 @@ interface MonitoringItem {
   notes?: string;
 }
 
+interface LegislationAlert {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  url: string;
+  isRead: boolean;
+}
+
 export const useMonitoring = () => {
   const [monitoringItems, setMonitoringItems] = useState<MonitoringItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [responsibleFilter, setResponsibleFilter] = useState<string>("");
+  const [legislationAlerts, setLegislationAlerts] = useState<LegislationAlert[]>([]);
   const form = useForm<Omit<MonitoringItem, "id">>();
 
+  // Fetch monitoring items
   const fetchMonitoringItems = async () => {
     try {
       const { data, error } = await supabase
@@ -45,6 +56,9 @@ export const useMonitoring = () => {
       }));
       
       setMonitoringItems(formattedItems);
+      
+      // Simulate fetching legislation alerts (would come from a real API in production)
+      fetchLegislationAlerts();
     } catch (error) {
       console.error('Erro ao buscar itens de monitoramento:', error);
       toast({
@@ -55,6 +69,53 @@ export const useMonitoring = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Simulate fetching legislation alerts
+  const fetchLegislationAlerts = () => {
+    // In a real app, this would come from an API
+    const mockAlerts: LegislationAlert[] = [
+      {
+        id: "1",
+        title: "Nova Lei de Proteção Ambiental",
+        description: "Lei Nº 14.522/2023 sobre medidas de proteção a áreas ambientais",
+        date: "2023-06-10",
+        url: "https://www.gov.br/exemplo",
+        isRead: false
+      },
+      {
+        id: "2",
+        title: "Atualização do Código Florestal",
+        description: "Alteração nos artigos 23 e 24 relacionados a reservas legais",
+        date: "2023-05-15",
+        url: "https://www.gov.br/exemplo2",
+        isRead: true
+      },
+      {
+        id: "3",
+        title: "Resolução sobre Qualidade do Ar",
+        description: "Novas métricas para monitoramento da qualidade do ar em centros urbanos",
+        date: "2023-04-22",
+        url: "https://www.gov.br/exemplo3",
+        isRead: false
+      }
+    ];
+    
+    setLegislationAlerts(mockAlerts);
+  };
+
+  // Mark a legislation alert as read
+  const markAlertAsRead = (id: string) => {
+    setLegislationAlerts(prev => 
+      prev.map(alert => 
+        alert.id === id ? { ...alert, isRead: true } : alert
+      )
+    );
+    
+    toast({
+      title: "Alerta marcado como lido",
+      description: "O alerta foi marcado como lido e não aparecerá nas notificações."
+    });
   };
 
   const handleAddMonitoring = async (data: Omit<MonitoringItem, "id">) => {
@@ -180,8 +241,11 @@ export const useMonitoring = () => {
     fetchMonitoringItems,
     handleAddMonitoring,
     handleDeleteMonitoring,
-    handleExport
+    handleExport,
+    legislationAlerts,
+    markAlertAsRead,
+    unreadAlertCount: legislationAlerts.filter(alert => !alert.isRead).length
   };
 };
 
-export type { MonitoringItem };
+export type { MonitoringItem, LegislationAlert };
