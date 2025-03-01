@@ -1,10 +1,10 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronLeft } from "lucide-react";
 import { getClientTypeTitle, getClientDescription } from "./ClientUtils";
+import { ClientType } from "@/components/monitoring/utils/clientTypeUtils";
 
 interface ClientHeaderProps {
   clientType: string;
