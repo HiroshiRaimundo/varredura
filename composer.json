@@ -4,5 +4,13 @@
   "description": "Aplicativo JavaScript/React para monitoramento",
   "type": "project",
   "license": "MIT",
-  "require": {}
+  "require": {},
+  "require-dev": {},
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "sort-packages": true
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
 }

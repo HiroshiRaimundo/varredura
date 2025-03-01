@@ -1,20 +1,52 @@
 
+# Ativar o motor de reescrita
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
-  RewriteRule ^index\.php$ - [L]
+  
+  # Não aplicar regras a arquivos existentes ou diretórios
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
+  
+  # Se a requisição for para index.php, não fazer nada
+  RewriteRule ^index\.php$ - [L]
+  
+  # Para PHP-based hosts, reescreva para index.php
+  RewriteRule ^(api|admin)($|/) index.php [L]
+  
+  # Para todas as outras requisições, reescreva para index.html (SPA React)
   RewriteRule . /index.html [L]
 </IfModule>
 
-# Serve files with correct MIME types
+# Configurar MIME types corretamente
 <IfModule mod_mime.c>
   AddType application/javascript .js
+  AddType application/json .json
   AddType text/css .css
+  AddType image/svg+xml .svg
+  AddType font/ttf .ttf
+  AddType font/otf .otf
+  AddType font/woff .woff
+  AddType font/woff2 .woff2
 </IfModule>
 
-# Enable CORS
+# Habilitar CORS
 <IfModule mod_headers.c>
   Header set Access-Control-Allow-Origin "*"
+  Header set Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT, DELETE"
+  Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+</IfModule>
+
+# Configurações de cache para arquivos estáticos
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpg "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/gif "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType application/pdf "access plus 1 month"
+  ExpiresByType application/x-font-woff "access plus 1 year"
 </IfModule>
