@@ -3,9 +3,11 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { UseFormReturn } from "react-hook-form";
 import MonitoringFormInputs from "./MonitoringFormInputs";
-import { ClientType, getMonitoringFormTitle, getMonitoringFormDescription } from "./utils/clientTypeUtils";
+import { ClientType } from "@/types/clientTypes";
+import { getMonitoringFormTitle, getMonitoringFormDescription } from "./utils/clientTypeUtils";
 
 interface MonitoringItem {
+  id?: string;
   name: string;
   url: string;
   api_url?: string;
@@ -13,6 +15,7 @@ interface MonitoringItem {
   category: string;
   keywords?: string;
   responsible?: string;
+  institution?: string;
   notes?: string;
 }
 
@@ -41,17 +44,7 @@ const MonitoringForm: React.FC<MonitoringFormProps> = ({ form, onSubmit, clientT
   }
   
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{getMonitoringFormTitle(clientType)}</CardTitle>
-        <CardDescription>
-          {getMonitoringFormDescription(clientType)}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <MonitoringFormInputs form={form} onSubmit={onSubmit} clientType={clientType} />
-      </CardContent>
-    </Card>
+    <MonitoringFormInputs form={form} onSubmit={onSubmit} clientType={clientType} />
   );
 };
 
