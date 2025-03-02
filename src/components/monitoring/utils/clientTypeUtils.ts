@@ -1,3 +1,4 @@
+
 export type ClientType = 'observatory' | 'institution' | 'researcher' | 'journalist' | 'politician' | 'press';
 
 interface ClientTypeInfo {

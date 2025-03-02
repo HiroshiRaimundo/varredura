@@ -3,6 +3,8 @@ import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { ClientType } from "@/components/client/ClientTypes";
 import { getColorClasses } from "@/components/service/utils/colorUtils";
 
@@ -26,28 +28,32 @@ const ReleasesSection: React.FC<ReleasesSectionProps> = ({ clientType }) => {
           <form className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Título do Release</label>
-                <Input placeholder="Digite o título do release" />
+                <Label htmlFor="release-title">Título do Release</Label>
+                <Input id="release-title" placeholder="Digite o título do release" />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Cliente</label>
-                <Input defaultValue="Observatório Nacional" readOnly />
+                <Label htmlFor="client-name">Cliente</Label>
+                <Input id="client-name" defaultValue="Observatório Nacional" readOnly />
               </div>
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium">Conteúdo</label>
-              <textarea className="w-full min-h-[200px] p-2 border rounded-md" placeholder="Digite o conteúdo do release"></textarea>
+              <Label htmlFor="content">Conteúdo</Label>
+              <Textarea 
+                id="content"
+                className="min-h-[200px]" 
+                placeholder="Digite o conteúdo do release"
+              />
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Veículo Alvo</label>
-                <Input placeholder="Ex: G1, Folha de SP" />
+                <Label htmlFor="target-media">Veículo Alvo</Label>
+                <Input id="target-media" placeholder="Ex: G1, Folha de SP" />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Data de Publicação</label>
-                <Input type="date" />
+                <Label htmlFor="pub-date">Data de Publicação</Label>
+                <Input id="pub-date" type="date" />
               </div>
             </div>
             

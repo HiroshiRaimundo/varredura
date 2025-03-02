@@ -1,5 +1,4 @@
-
-export type ClientType = "observatory" | "researcher" | "politician" | "institution" | "journalist" | "press";
+export type ClientType = 'observatory' | 'institution' | 'researcher' | 'journalist' | 'politician' | 'press';
 
 export const clientTypes = [
   {
