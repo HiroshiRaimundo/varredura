@@ -3,6 +3,30 @@ import React from "react";
 import { ClientType } from "../ClientTypes";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PressDashboard from "./PressDashboard";
+import ReleaseMonitoringDashboard from "./ReleaseMonitoringDashboard";
+import { ReleaseMonitoringItem } from "@/hooks/monitoring/types";
+
+// Sample data for demonstration
+const sampleMonitoringResults: ReleaseMonitoringItem[] = [
+  {
+    id: "1",
+    releaseTitle: "Novo Estudo Ambiental",
+    websiteName: "Portal Ambiental",
+    publishedDate: "2023-05-15",
+    publishedTime: "14:30",
+    url: "https://example.com/release1",
+    isVerified: true
+  },
+  {
+    id: "2",
+    releaseTitle: "Relatório de Sustentabilidade",
+    websiteName: "Jornal Verde",
+    publishedDate: "2023-05-10",
+    publishedTime: "09:15",
+    url: "https://example.com/release2",
+    isVerified: false
+  }
+];
 
 interface PressTabProps {
   clientType: ClientType;
@@ -22,11 +46,7 @@ const PressTab: React.FC<PressTabProps> = ({ clientType }) => {
         </TabsContent>
         
         <TabsContent value="media">
-          <div className="p-6 text-center bg-muted rounded-lg">
-            <p className="text-muted-foreground">
-              Serviço de monitoramento de mídia em desenvolvimento.
-            </p>
-          </div>
+          <ReleaseMonitoringDashboard monitoringResults={sampleMonitoringResults} />
         </TabsContent>
       </Tabs>
     </div>

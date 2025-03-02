@@ -2,11 +2,11 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ReleaseMonitoringItem } from "@/hooks/useMonitoring";
+import { ReleaseMonitoringItem } from "@/hooks/monitoring/types";
 import { Check, X, ExternalLink, BarChart2, TrendingUp, Activity } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-interface ReleaseMonitoringDashboardProps {
+export interface ReleaseMonitoringDashboardProps {
   monitoringResults: ReleaseMonitoringItem[];
 }
 

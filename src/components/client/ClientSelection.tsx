@@ -5,7 +5,7 @@ import { AlertCircle, BarChart2, Building, Database, Globe, Landmark, Newspaper,
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { ClientType, clientTypes } from "@/components/monitoring/utils/clientTypeUtils";
+import { ClientType, clientTypes } from "@/components/client/ClientTypes";
 
 const ClientSelection: React.FC = () => {
   const navigate = useNavigate();
