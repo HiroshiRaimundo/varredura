@@ -1,154 +1,66 @@
 
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Check, ArrowRightCircle, Users, BarChart2, Leaf, FileText, PenTool,
-  Bell, BarChart, PieChart
-} from "lucide-react";
-import { ClientType, clientTypeDetails } from "@/components/client/ClientTypes";
-import { getColorClasses } from "@/components/service/utils/colorUtils";
-import LoginForm, { LoginFormValues } from "@/components/example-client/LoginForm";
-import ClientTabs from "@/components/example-client/ClientTabs";
+import { Card, CardContent } from "@/components/ui/card";
 import ClientHeader from "@/components/example-client/ClientHeader";
+import ClientTabs from "@/components/example-client/ClientTabs";
 import ClientInfo from "@/components/example-client/ClientInfo";
 import DefaultContent from "@/components/example-client/DefaultContent";
+import { ClientType } from "@/components/client/ClientTypes";
+import { Landmark, Database, BookOpen, Building, FileText, Mail } from "lucide-react";
 import PressContent from "@/components/example-client/press/PressContent";
 import generateMockData from "@/components/example-client/utils/mockDataGenerator";
-import { toast } from "@/hooks/use-toast";
 
 const ExampleClient: React.FC = () => {
-  const navigate = useNavigate();
+  const [clientType, setClientType] = useState<ClientType>("press");
   const [activeTab, setActiveTab] = useState<"dashboard" | "monitoring" | "analysis" | "releases">("dashboard");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
-  const location = window.location;
-  const params = new URLSearchParams(location.search);
-  const typeParam = params.get('type') as ClientType | null;
-  const [clientType, setClientType] = useState<ClientType>(
-    typeParam && Object.keys(clientTypeDetails).includes(typeParam) 
-      ? typeParam 
-      : "observatory"
-  );
-
-  const handleLoginSubmit = (data: LoginFormValues) => {
-    // For demonstration, any login works
-    console.log("Login attempt with:", data);
-    
-    toast({
-      title: "Login bem-sucedido",
-      description: `Bem-vindo à área do cliente de exemplo (${clientTypeDetails[clientType].title})`,
-    });
-    
-    setIsLoggedIn(true);
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    toast({
-      title: "Logout realizado",
-      description: "Você saiu da área do cliente de exemplo."
-    });
-  };
+  const mockData = generateMockData();
 
   const getClientIcon = (type: ClientType) => {
-    switch(type) {
-      case "observatory": return <BarChart2 className="h-5 w-5" />;
-      case "researcher": return <PenTool className="h-5 w-5" />;
-      case "politician": return <FileText className="h-5 w-5" />;
-      case "institution": return <Users className="h-5 w-5" />;
-      case "journalist": return <FileText className="h-5 w-5" />;
-      case "press": return <PenTool className="h-5 w-5" />;
-      default: return <BarChart2 className="h-5 w-5" />;
+    switch (type) {
+      case "observatory":
+        return <Database className="h-6 w-6 text-sky-600" />;
+      case "researcher":
+        return <BookOpen className="h-6 w-6 text-emerald-600" />;
+      case "politician":
+        return <Landmark className="h-6 w-6 text-violet-600" />;
+      case "institution":
+        return <Building className="h-6 w-6 text-amber-600" />;
+      case "journalist":
+        return <FileText className="h-6 w-6 text-rose-600" />;
+      case "press":
+        return <Mail className="h-6 w-6 text-indigo-600" />;
     }
   };
 
-  // Generate mock data for charts
-  const mockData = generateMockData();
-
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Header 
-        isAuthenticated={isLoggedIn}
-        onLoginClick={() => {}}
-        onLogoutClick={handleLogout}
-      />
-
-      <div className="flex-1 p-6">
-        <div className="max-w-7xl mx-auto">
-          {!isLoggedIn ? (
-            <div className="flex justify-center my-12">
-              <Card className="w-full max-w-md">
-                <CardHeader>
-                  <CardTitle>Acesso à Área do Cliente (Exemplo)</CardTitle>
-                  <CardDescription>
-                    Este é um modelo de acesso para demonstração.
-                  </CardDescription>
-                </CardHeader>
-                
-                <CardContent>
-                  <LoginForm 
+    <div className="container py-6 max-w-7xl">
+      <ClientHeader clientType={clientType} getClientIcon={getClientIcon} />
+      
+      <div className="grid md:grid-cols-4 gap-6 mt-6">
+        <div className="md:col-span-1">
+          <ClientInfo clientType={clientType} />
+        </div>
+        
+        <div className="md:col-span-3">
+          <Card>
+            <CardContent className="p-0">
+              <ClientTabs activeTab={activeTab} setActiveTab={setActiveTab} clientType={clientType} />
+              
+              <div className="p-6">
+                {clientType === "press" ? (
+                  <PressContent 
+                    activeTab={activeTab} 
                     clientType={clientType}
-                    onSubmit={handleLoginSubmit}
-                    onClientTypeChange={setClientType}
-                    getClientIcon={getClientIcon}
+                    mockData={mockData}
                   />
-                </CardContent>
-                
-                <CardFooter className="flex flex-col">
-                  <div className="text-sm text-center w-full text-muted-foreground">
-                    <a href="#" className="text-primary hover:underline">
-                      Esqueceu sua senha?
-                    </a>
-                  </div>
-                </CardFooter>
-              </Card>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <ClientHeader 
-                clientType={clientType} 
-                getClientIcon={getClientIcon} 
-              />
-              
-              {/* Tabs */}
-              <ClientTabs 
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
-                clientType={clientType}
-              />
-              
-              {/* Tab Content */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="col-span-2">
-                  {clientType === "press" ? (
-                    // Render press office content
-                    <PressContent 
-                      activeTab={activeTab} 
-                      clientType={clientType} 
-                      mockData={mockData} 
-                    />
-                  ) : (
-                    // Render default content for other client types
-                    <DefaultContent 
-                      activeTab={activeTab} 
-                      clientType={clientType} 
-                    />
-                  )}
-                </div>
-                
-                <div>
-                  <ClientInfo clientType={clientType} />
-                </div>
+                ) : (
+                  <DefaultContent activeTab={activeTab} clientType={clientType} />
+                )}
               </div>
-            </div>
-          )}
+            </CardContent>
+          </Card>
         </div>
       </div>
-
-      <Footer />
     </div>
   );
 };
