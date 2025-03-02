@@ -9,25 +9,39 @@ import { getColorClasses } from "@/components/service/utils/colorUtils";
 import MonitoringForm from "@/components/monitoring/MonitoringForm";
 import { useForm } from "react-hook-form";
 
+// Define the MonitoringItem interface to match what the component expects
+interface MonitoringItem {
+  name: string;
+  url: string;
+  api_url?: string;
+  frequency: string;
+  category: string;
+  keywords?: string;
+  responsible?: string;
+  notes?: string;
+}
+
 const PoliticianClient: React.FC = () => {
   const auth = useAuth();
   const clientType = "politician";
   const colorClasses = getColorClasses(clientType);
   const details = clientTypeDetails[clientType];
   
-  const form = useForm({
+  // Updated form to match the MonitoringItem interface
+  const form = useForm<MonitoringItem>({
     defaultValues: {
       name: "",
       url: "",
+      api_url: "",
       frequency: "diario",
       category: "",
-      responsible: "",
       keywords: "",
+      responsible: "",
       notes: ""
     }
   });
 
-  const handleAddMonitoring = (data: any) => {
+  const handleAddMonitoring = (data: MonitoringItem) => {
     console.log("Adding monitoring item:", data);
     // Here would be the logic to save the monitoring data
     form.reset();

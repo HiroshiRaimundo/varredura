@@ -86,7 +86,8 @@ const clientTypeInfoMap: Record<ClientType, ClientTypeInfo> = {
   }
 };
 
-export { ClientType }; // Re-export the ClientType to fix import errors
+// Fix: Use export type for re-exporting types when isolatedModules is enabled
+export type { ClientType }; 
 
 export const getClientTypeInfo = (clientType: ClientType): ClientTypeInfo => {
   return clientTypeInfoMap[clientType] || clientTypeInfoMap.observatory;
