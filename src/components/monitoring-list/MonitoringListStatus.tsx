@@ -1,6 +1,6 @@
 
 import React from "react";
-import { AlertTriangle } from "lucide-react";
+import { CircleSlash, Search, Loader2 } from "lucide-react";
 
 interface MonitoringListStatusProps {
   isLoading: boolean;
@@ -8,41 +8,36 @@ interface MonitoringListStatusProps {
   responsibleFilter: string;
 }
 
-const MonitoringListStatus: React.FC<MonitoringListStatusProps> = ({
-  isLoading,
-  isEmpty,
-  responsibleFilter
+const MonitoringListStatus: React.FC<MonitoringListStatusProps> = ({ 
+  isLoading, 
+  isEmpty, 
+  responsibleFilter 
 }) => {
   if (isLoading) {
     return (
-      <div className="text-center py-8">
-        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
-          <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Carregando...</span>
-        </div>
-        <p className="mt-2 text-muted-foreground">Carregando monitoramentos...</p>
+      <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
+        <Loader2 className="h-10 w-10 animate-spin mb-4" />
+        <p>Carregando monitoramentos...</p>
+      </div>
+    );
+  }
+
+  if (isEmpty && responsibleFilter) {
+    return (
+      <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
+        <Search className="h-10 w-10 mb-4" />
+        <p>Nenhum monitoramento encontrado para o filtro selecionado.</p>
+        <p className="text-sm mt-1">Tente selecionar outro responsável ou limpar o filtro.</p>
       </div>
     );
   }
 
   if (isEmpty) {
     return (
-      <div className="text-center py-10 border border-dashed rounded-lg">
-        <AlertTriangle size={36} className="mx-auto text-yellow-500 mb-2" />
-        <p className="text-muted-foreground">
-          {responsibleFilter 
-            ? "Não foram encontrados monitoramentos para este responsável." 
-            : "Nenhum item sendo monitorado ainda."}
-        </p>
-        {responsibleFilter && (
-          <p className="text-sm text-muted-foreground mt-2">
-            Tente selecionar outro responsável ou volte para "Todos".
-          </p>
-        )}
-        {!responsibleFilter && (
-          <p className="text-sm text-muted-foreground mt-2">
-            Utilize o formulário acima para adicionar seu primeiro monitoramento.
-          </p>
-        )}
+      <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
+        <CircleSlash className="h-10 w-10 mb-4" />
+        <p>Nenhum monitoramento cadastrado.</p>
+        <p className="text-sm mt-1">Adicione um novo monitoramento utilizando o formulário acima.</p>
       </div>
     );
   }

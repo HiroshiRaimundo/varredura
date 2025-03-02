@@ -8,6 +8,7 @@ import { clientTypeDetails } from "@/components/client/ClientTypes";
 import { getColorClasses } from "@/components/service/utils/colorUtils";
 import MonitoringForm from "@/components/monitoring/MonitoringForm";
 import { useForm } from "react-hook-form";
+import { useToast } from "@/hooks/use-toast";
 
 // Define the MonitoringItem interface to match what the component expects
 interface MonitoringItem {
@@ -18,10 +19,12 @@ interface MonitoringItem {
   category: string;
   keywords?: string;
   responsible?: string;
+  institution?: string;
   notes?: string;
 }
 
 const PoliticianClient: React.FC = () => {
+  const { toast } = useToast();
   const auth = useAuth();
   const clientType = "politician";
   const colorClasses = getColorClasses(clientType);
@@ -37,6 +40,7 @@ const PoliticianClient: React.FC = () => {
       category: "",
       keywords: "",
       responsible: "",
+      institution: "",
       notes: ""
     }
   });
@@ -44,6 +48,10 @@ const PoliticianClient: React.FC = () => {
   const handleAddMonitoring = (data: MonitoringItem) => {
     console.log("Adding monitoring item:", data);
     // Here would be the logic to save the monitoring data
+    toast({
+      title: "Monitoramento adicionado",
+      description: `O monitoramento "${data.name}" foi adicionado com sucesso.`
+    });
     form.reset();
   };
 

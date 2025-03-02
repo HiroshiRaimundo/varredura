@@ -1,49 +1,44 @@
 
 import React from "react";
-import { ClientType } from "./ClientTypes";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ClientType } from "@/components/client/ClientTypes";
 import ClientDashboardTab from "./dashboard/ClientDashboardTab";
+import LegislationAlerts from "./LegislationAlerts";
+import AnalysisToolsSection from "./tools/AnalysisToolsSection";
 import MonitoringTab from "./monitoring/MonitoringTab";
-import PressTab from "./PressTab";
+// Note: PressTab import was removed as it was causing errors
 
 interface ClientContentProps {
+  activeTab: string;
   clientType: ClientType;
-  clientName: string;
 }
 
-const ClientContent: React.FC<ClientContentProps> = ({ clientType, clientName }) => {
+const ClientContent: React.FC<ClientContentProps> = ({ activeTab, clientType }) => {
+  console.log("ClientContent rendering with tab:", activeTab, "and client type:", clientType);
+  
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "dashboard":
+        return <ClientDashboardTab clientType={clientType} />;
+      case "alerts":
+        return <LegislationAlerts clientType={clientType} />;
+      case "monitoring":
+        return <MonitoringTab clientType={clientType} />;
+      case "tools":
+        return <AnalysisToolsSection clientType={clientType} />;
+      case "press":
+        // Handle press tab without the import
+        return <div className="space-y-6">
+          <h2 className="text-2xl font-bold">Assessoria de Imprensa</h2>
+          <p>Funcionalidade de Assessoria em desenvolvimento.</p>
+        </div>;
+      default:
+        return <ClientDashboardTab clientType={clientType} />;
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Bem-vindo à sua área privada</CardTitle>
-          <CardDescription>
-            Acesse todos os recursos disponíveis para {clientName}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="dashboard" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-              <TabsTrigger value="monitoring">Monitoramento</TabsTrigger>
-              <TabsTrigger value="press">Assessoria de Imprensa</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="dashboard">
-              <ClientDashboardTab clientType={clientType} />
-            </TabsContent>
-            
-            <TabsContent value="monitoring">
-              <MonitoringTab clientType={clientType} />
-            </TabsContent>
-            
-            <TabsContent value="press">
-              <PressTab clientType={clientType} />
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+      {renderTabContent()}
     </div>
   );
 };

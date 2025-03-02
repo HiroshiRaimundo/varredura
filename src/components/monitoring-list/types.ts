@@ -8,6 +8,7 @@ export interface MonitoringItem {
   category: string;
   responsible?: string;
   keywords?: string;
+  institution?: string;
   notes?: string;
 }
 
