@@ -1,7 +1,5 @@
 
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -9,15 +7,45 @@ import { useAuth } from "@/hooks/useAuth";
 import { clientTypeDetails } from "@/components/client/ClientTypes";
 import { getColorClasses } from "@/components/service/utils/colorUtils";
 import { ClientType } from "@/types/clientTypes";
+import ClientTabs from "@/components/example-client/ClientTabs";
+import DefaultContent from "@/components/example-client/DefaultContent";
+import { useForm } from "react-hook-form";
+import MonitoringForm, { MonitoringItem } from "@/components/monitoring/MonitoringForm";
+import { useToast } from "@/hooks/use-toast";
 
 // Include this press client type in the ClientType type definition
 const clientType = "press" as ClientType;
 
 const PressClient: React.FC = () => {
-  const navigate = useNavigate();
   const auth = useAuth();
   const colorClasses = getColorClasses(clientType);
   const details = clientTypeDetails[clientType];
+  const { toast } = useToast();
+  
+  // Estado para controlar a aba ativa
+  const [activeTab, setActiveTab] = useState<"dashboard" | "monitoring" | "analysis" | "releases">("dashboard");
+  
+  // Form para monitoramento
+  const monitoringForm = useForm<MonitoringItem>({
+    defaultValues: {
+      name: "",
+      url: "",
+      frequency: "",
+      category: "",
+    }
+  });
+  
+  // Função para lidar com a submissão do formulário de monitoramento
+  const handleMonitoringSubmit = (data: MonitoringItem) => {
+    console.log("Dados de monitoramento submetidos:", data);
+    toast({
+      title: "Monitoramento adicionado",
+      description: `O monitoramento "${data.name}" foi adicionado com sucesso.`,
+    });
+    
+    // Resetar o formulário após submissão
+    monitoringForm.reset();
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -31,26 +59,12 @@ const PressClient: React.FC = () => {
             clientType={clientType}
           />
           
-          <div className="mb-6 flex items-center justify-between">
+          <div className="mb-6">
             <div>
-              <h1 className="text-3xl font-bold">{details.title} - Área Administrativa</h1>
+              <h1 className="text-3xl font-bold">{details.title} - Área do Cliente</h1>
               <p className="text-muted-foreground">
-                Gerencie os dados e configurações específicas para clientes do tipo Assessoria de Imprensa
+                Gerencie seus releases, contatos e monitore a cobertura de mídia
               </p>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={() => navigate("/admin")}
-              >
-                Voltar para Admin
-              </Button>
-              <Button
-                className={colorClasses.bg}
-                onClick={() => navigate("/admin/client/press/new")}
-              >
-                Novo Cliente
-              </Button>
             </div>
           </div>
           
@@ -58,20 +72,8 @@ const PressClient: React.FC = () => {
             <Card>
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
-                  <span>Assessorias Ativas</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>24</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <p>Total de assessorias com contratos ativos</p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
-                <CardTitle className="flex justify-between items-center">
                   <span>Releases Publicados</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>136</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>28</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
@@ -90,56 +92,55 @@ const PressClient: React.FC = () => {
                 <p>Média de aproveitamento dos releases</p>
               </CardContent>
             </Card>
-          </div>
-          
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Exemplo da Área do Cliente - Assessoria de Imprensa</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="border p-4 rounded-lg text-center">
-                <p className="text-lg font-medium mb-2">Dashboard do Cliente</p>
-                <p className="text-muted-foreground">Visualização simplificada do dashboard para cliente do tipo {details.title}</p>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Funcionalidades Específicas</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="list-disc pl-5 space-y-2">
-                  {details.features.map((feature, index) => (
-                    <li key={index}>{feature}</li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
             
             <Card>
-              <CardHeader>
-                <CardTitle>Customização</CardTitle>
+              <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
+                <CardTitle className="flex justify-between items-center">
+                  <span>Visualizações</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>8.4k</span>
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="mb-4">Nesta área você pode personalizar os recursos disponíveis para clientes do tipo Assessoria de Imprensa.</p>
-                <div className="space-y-2">
-                  <Button variant="outline" className="w-full justify-start">
-                    Modelos de Releases
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    Gerenciar Contatos
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    Configurar Notificações
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    Relatórios de Desempenho
-                  </Button>
-                </div>
+              <CardContent className="pt-4">
+                <p>Visualizações totais dos seus conteúdos</p>
               </CardContent>
             </Card>
+          </div>
+          
+          <ClientTabs 
+            activeTab={activeTab} 
+            setActiveTab={setActiveTab} 
+            clientType={clientType} 
+          />
+          
+          <div className="mt-6">
+            {activeTab === "dashboard" && (
+              <DefaultContent activeTab="dashboard" clientType={clientType} />
+            )}
+            
+            {activeTab === "monitoring" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className={colorClasses.text}>Monitoramento de Publicações</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="mb-6">Configure o monitoramento de publicações relacionadas aos seus releases ou à sua organização.</p>
+                  
+                  <MonitoringForm 
+                    form={monitoringForm} 
+                    onSubmit={handleMonitoringSubmit} 
+                    clientType={clientType}
+                  />
+                </CardContent>
+              </Card>
+            )}
+            
+            {activeTab === "analysis" && (
+              <DefaultContent activeTab="analysis" clientType={clientType} />
+            )}
+            
+            {activeTab === "releases" && (
+              <DefaultContent activeTab="releases" clientType={clientType} />
+            )}
           </div>
         </div>
       </div>
