@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -23,7 +22,7 @@ const ClientAreaPreview: React.FC = () => {
 
   // Navigate to the actual client area
   const handleAccessClientArea = (clientType: ClientType) => {
-    navigate(`/client?type=${clientType}`);
+    navigate(`/client/${clientType}`);
   };
 
   // Simulated edit function - in a real app this would open an editor
@@ -89,7 +88,6 @@ const ClientAreaPreview: React.FC = () => {
   );
 };
 
-// Component to display preview and actions for a specific client type
 interface ClientTypePreviewProps {
   clientType: ClientType;
   onPreview: (clientType: ClientType) => void;
