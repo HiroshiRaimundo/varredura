@@ -1,73 +1,49 @@
 
-import React, { useState } from "react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ClientType, clientTypeDetails } from "./ClientTypes";
+import React from "react";
+import { ClientType } from "./ClientTypes";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ClientDashboardTab from "./dashboard/ClientDashboardTab";
 import MonitoringTab from "./monitoring/MonitoringTab";
-import PressReleaseTab from "./PressReleaseTab";
-import PressTab from "./press/PressTab";
-import { getColorClasses } from "@/components/service/utils/colorUtils";
+import PressTab from "./PressTab";
 
 interface ClientContentProps {
   clientType: ClientType;
+  clientName: string;
 }
 
-const ClientContent: React.FC<ClientContentProps> = ({ clientType }) => {
-  const [activeTab, setActiveTab] = useState<string>("dashboard");
-  const colorClasses = getColorClasses(clientType);
-  const details = clientTypeDetails[clientType];
-
-  // Determine which tabs to show based on client type
-  const showPressTab = clientType === "press";
-  const showReleaseTab = ["politician", "researcher", "institution", "observatory"].includes(clientType);
-
+const ClientContent: React.FC<ClientContentProps> = ({ clientType, clientName }) => {
   return (
     <div className="space-y-6">
-      <Tabs
-        defaultValue="dashboard"
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="w-full"
-      >
-        <TabsList className="mb-4 flex w-full flex-wrap">
-          <TabsTrigger key="dashboard" value="dashboard" className="flex-grow">
-            Dashboard
-          </TabsTrigger>
-          <TabsTrigger key="monitoring" value="monitoring" className="flex-grow">
-            Monitoramento
-          </TabsTrigger>
-          {showReleaseTab && (
-            <TabsTrigger key="releases" value="releases" className="flex-grow">
-              Releases
-            </TabsTrigger>
-          )}
-          {showPressTab && (
-            <TabsTrigger key="press" value="press" className="flex-grow">
-              Assessoria de Imprensa
-            </TabsTrigger>
-          )}
-        </TabsList>
-
-        <TabsContent value="dashboard">
-          <ClientDashboardTab clientType={clientType} />
-        </TabsContent>
-
-        <TabsContent value="monitoring">
-          <MonitoringTab clientType={clientType} />
-        </TabsContent>
-
-        {showReleaseTab && (
-          <TabsContent value="releases">
-            <PressReleaseTab clientType={clientType} />
-          </TabsContent>
-        )}
-
-        {showPressTab && (
-          <TabsContent value="press">
-            <PressTab />
-          </TabsContent>
-        )}
-      </Tabs>
+      <Card>
+        <CardHeader>
+          <CardTitle>Bem-vindo à sua área privada</CardTitle>
+          <CardDescription>
+            Acesse todos os recursos disponíveis para {clientName}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="dashboard" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+              <TabsTrigger value="monitoring">Monitoramento</TabsTrigger>
+              <TabsTrigger value="press">Assessoria de Imprensa</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="dashboard">
+              <ClientDashboardTab clientType={clientType} />
+            </TabsContent>
+            
+            <TabsContent value="monitoring">
+              <MonitoringTab clientType={clientType} />
+            </TabsContent>
+            
+            <TabsContent value="press">
+              <PressTab clientType={clientType} />
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
 };

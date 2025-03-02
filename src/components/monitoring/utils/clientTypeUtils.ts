@@ -1,123 +1,60 @@
 
-export type ClientType = "observatory" | "researcher" | "politician" | "institution" | "journalist" | "press";
+export type ClientType = 'observatory' | 'institution' | 'researcher' | 'journalist' | 'politician';
 
-export interface ClientTypeInfo {
-  type: ClientType;
-  label: string;
+interface ClientTypeInfo {
+  title: string;
   description: string;
-  icon: string;
-  color: string;
-  alert?: string;
+  alert: string | null;
+  categories: string[];
 }
 
-export const clientTypes: ClientTypeInfo[] = [
-  {
-    type: "observatory",
-    label: "Observatório",
-    description: "Acesso a dados e visualizações para observatórios de políticas públicas",
-    icon: "database",
-    color: "bg-blue-500"
+const clientTypeInfoMap: Record<ClientType, ClientTypeInfo> = {
+  observatory: {
+    title: "Monitoramento do Observatório",
+    description: "Identifique claramente o que está sendo monitorado para facilitar a organização dos dados.",
+    alert: null,
+    categories: ["ambiente", "legislação", "economia", "sociedade", "governo", "tecnologia"]
   },
-  {
-    type: "researcher",
-    label: "Pesquisador",
-    description: "Recursos para pesquisadores acadêmicos e científicos",
-    icon: "microscope",
-    color: "bg-purple-500"
+  institution: {
+    title: "Monitoramento Institucional",
+    description: "Insira o título do monitoramento relacionado às atividades da sua instituição.",
+    alert: "Como instituição, você possui acesso a ferramentas de análise avançadas.",
+    categories: ["economia", "política", "desenvolvimento", "recursos", "projetos", "orçamento"]
   },
-  {
-    type: "politician",
-    label: "Político",
-    description: "Ferramentas para acompanhamento de políticas e legislação",
-    icon: "landmark",
-    color: "bg-green-500"
+  researcher: {
+    title: "Monitoramento de Pesquisa",
+    description: "Defina o título da sua pesquisa ou do conjunto de dados a ser monitorado.",
+    alert: "As fontes de pesquisa são verificadas automaticamente quanto à disponibilidade.",
+    categories: ["pesquisa", "dados científicos", "estatísticas", "artigos", "repositórios", "bases de dados"]
   },
-  {
-    type: "institution",
-    label: "Instituição",
-    description: "Recursos para instituições governamentais e não-governamentais",
-    icon: "building",
-    color: "bg-amber-500"
+  journalist: {
+    title: "Monitoramento de Mídia",
+    description: "Especifique o tópico de mídia ou fluxo de notícias para monitoramento.",
+    alert: "Você receberá alertas em tempo real para novos conteúdos publicados.",
+    categories: ["notícias", "reportagens", "publicações", "redes sociais", "eventos", "comunicados"]
   },
-  {
-    type: "journalist",
-    label: "Jornalista",
-    description: "Fontes de dados e indicadores para reportagens",
-    icon: "newspaper",
-    color: "bg-rose-500"
-  },
-  {
-    type: "press",
-    label: "Assessoria de Imprensa",
-    description: "Ferramentas para criação e distribuição de releases",
-    icon: "megaphone",
-    color: "bg-indigo-500",
-    alert: "Novo"
+  politician: {
+    title: "Monitoramento Político",
+    description: "Monitore políticas públicas, legislação ou temas de interesse político.",
+    alert: "Os dados de monitoramento político são atualizados diariamente.",
+    categories: ["legislação", "políticas públicas", "orçamento", "debates", "propostas", "audiências"]
   }
-];
-
-export const getClientTypeInfo = (type: ClientType): ClientTypeInfo => {
-  const info = clientTypes.find(ct => ct.type === type);
-  if (!info) {
-    throw new Error(`Client type "${type}" not found`);
-  }
-  return info;
 };
 
-// Added missing functions
-export const getDefaultCategories = (clientType?: ClientType): string[] => {
-  switch (clientType) {
-    case "observatory":
-      return ["indicadores", "estatísticas", "relatórios", "dados abertos"];
-    case "researcher":
-      return ["pesquisa", "artigos", "dados brutos", "datasets"];
-    case "politician":
-      return ["legislação", "políticas", "orçamento", "transparência"];
-    case "institution":
-      return ["relatórios", "programas", "dados institucionais"];
-    case "journalist":
-      return ["notícias", "pautas", "estatísticas", "dados públicos"];
-    case "press":
-      return ["releases", "mídia", "cobertura", "publicações"];
-    default:
-      return ["geral", "dados", "relatórios", "estatísticas"];
-  }
+export const getClientTypeInfo = (clientType: ClientType): ClientTypeInfo => {
+  return clientTypeInfoMap[clientType] || clientTypeInfoMap.observatory;
 };
 
 export const getMonitoringFormTitle = (clientType?: ClientType): string => {
-  switch (clientType) {
-    case "observatory":
-      return "Adicionar Fonte de Dados para Monitoramento";
-    case "researcher":
-      return "Adicionar Dataset de Pesquisa";
-    case "politician":
-      return "Adicionar Legislação ou Política para Acompanhamento";
-    case "institution":
-      return "Adicionar Fonte de Monitoramento Institucional";
-    case "journalist":
-      return "Adicionar Fonte de Dados para Reportagens";
-    case "press":
-      return "Adicionar Veículo para Monitoramento de Publicações";
-    default:
-      return "Adicionar Novo Monitoramento";
-  }
+  if (!clientType) return "Adicionar Novo Monitoramento";
+  return clientTypeInfoMap[clientType]?.title || "Adicionar Novo Monitoramento";
 };
 
 export const getMonitoringFormDescription = (clientType?: ClientType): string => {
-  switch (clientType) {
-    case "observatory":
-      return "Cadastre fontes de dados para monitoramento contínuo de indicadores";
-    case "researcher":
-      return "Adicione datasets e APIs para análise científica e pesquisa";
-    case "politician":
-      return "Monitore atualizações em legislações e políticas públicas";
-    case "institution":
-      return "Acompanhe indicadores e relatórios institucionais";
-    case "journalist":
-      return "Cadastre fontes de dados para embasar suas reportagens";
-    case "press":
-      return "Monitore a publicação de releases em veículos de comunicação";
-    default:
-      return "Preencha os dados para adicionar uma nova fonte de monitoramento";
-  }
+  if (!clientType) return "Configure uma nova fonte de dados para monitoramento contínuo";
+  return clientTypeInfoMap[clientType]?.description || "Configure uma nova fonte de dados para monitoramento contínuo";
+};
+
+export const getDefaultCategories = (clientType: ClientType): string[] => {
+  return clientTypeInfoMap[clientType]?.categories || clientTypeInfoMap.observatory.categories;
 };

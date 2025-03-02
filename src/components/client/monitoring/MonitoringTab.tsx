@@ -1,61 +1,53 @@
 
-import React, { useState } from "react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import ClientMonitoringForm from "./ClientMonitoringForm";
-import { Button } from "@/components/ui/button";
-import { Plus, List } from "lucide-react";
-import { ClientType } from "@/components/client/ClientTypes";
-import { getColorClasses } from "@/components/service/utils/colorUtils";
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useMonitoring } from "@/hooks/useMonitoring";
+import { ClientType } from "../ClientTypes";
+import MonitoringForm from "@/components/monitoring/MonitoringForm";
+import MonitoringList from "@/components/monitoring-list";
 
 interface MonitoringTabProps {
   clientType: ClientType;
 }
 
 const MonitoringTab: React.FC<MonitoringTabProps> = ({ clientType }) => {
-  const [activeTab, setActiveTab] = useState<"list" | "add">("list");
-  const colorClasses = getColorClasses(clientType);
+  const {
+    monitoringItems,
+    isLoading,
+    form,
+    handleAddMonitoring,
+    handleDeleteMonitoring,
+    responsibleFilter,
+    setResponsibleFilter,
+    getUniqueResponsibles
+  } = useMonitoring();
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Monitoramento de Dados</h2>
-        <div className="flex space-x-2">
-          <Button
-            variant={activeTab === "list" ? "default" : "outline"}
-            className={activeTab === "list" ? colorClasses.bg : ""}
-            onClick={() => setActiveTab("list")}
-          >
-            <List className="mr-2 h-4 w-4" />
-            Lista de Monitoramentos
-          </Button>
-          <Button
-            variant={activeTab === "add" ? "default" : "outline"}
-            className={activeTab === "add" ? colorClasses.bg : ""}
-            onClick={() => setActiveTab("add")}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Adicionar Novo
-          </Button>
-        </div>
-      </div>
-
-      {activeTab === "list" ? (
-        <div className="bg-muted p-6 rounded-lg border text-center">
-          <h3 className="text-lg font-medium mb-2">Seus Monitoramentos</h3>
-          <p className="text-muted-foreground">
-            Esta página mostrará todos os seus monitoramentos ativos. No momento, não há nenhum monitoramento configurado.
-          </p>
-          <Button
-            className={`mt-4 ${colorClasses.bg}`}
-            onClick={() => setActiveTab("add")}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Adicionar Seu Primeiro Monitoramento
-          </Button>
-        </div>
-      ) : (
-        <ClientMonitoringForm />
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle>Gerenciamento de Monitoramento</CardTitle>
+          <CardDescription>
+            Adicione e gerencie seus itens de monitoramento personalizados
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <MonitoringForm 
+            form={form} 
+            onSubmit={handleAddMonitoring} 
+            clientType={clientType}
+          />
+          
+          <MonitoringList 
+            items={monitoringItems} 
+            onDelete={handleDeleteMonitoring}
+            isLoading={isLoading}
+            uniqueResponsibles={getUniqueResponsibles()}
+            responsibleFilter={responsibleFilter}
+            onFilterChange={setResponsibleFilter}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 };
