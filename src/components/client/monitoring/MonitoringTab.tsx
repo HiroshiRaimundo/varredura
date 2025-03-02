@@ -1,25 +1,12 @@
 
-import React, { useState, useEffect } from "react";
-import { ClientType } from "@/components/client/ClientTypes";
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import MonitoringForm from "@/components/monitoring/MonitoringForm";
-import MonitoringList from "@/components/monitoring-list/MonitoringList";
-import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
-
-// Define the MonitoringItem interface
-interface MonitoringItem {
-  id: string;
-  name: string;
-  url: string;
-  api_url?: string;
-  frequency: string;
-  category: string;
-  keywords?: string;
-  responsible?: string;
-  institution?: string;
-  notes?: string;
-}
+import { useToast } from "@/hooks/use-toast";
+import { ClientType } from "@/components/client/ClientTypes";
+import { getColorClasses } from "@/components/service/utils/colorUtils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import MonitoringForm, { MonitoringItem } from "@/components/monitoring/MonitoringForm";
 
 interface MonitoringTabProps {
   clientType: ClientType;
@@ -27,10 +14,13 @@ interface MonitoringTabProps {
 
 const MonitoringTab: React.FC<MonitoringTabProps> = ({ clientType }) => {
   const { toast } = useToast();
-  const [monitoringItems, setMonitoringItems] = useState<MonitoringItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [responsibleFilter, setResponsibleFilter] = useState("");
+  const colorClasses = getColorClasses(clientType);
   
+  // State for monitoring items
+  const [monitoringItems, setMonitoringItems] = useState<MonitoringItem[]>([]);
+  const [activeTab, setActiveTab] = useState("list");
+  
+  // Create the form with correct typing
   const form = useForm<MonitoringItem>({
     defaultValues: {
       name: "",
@@ -45,168 +35,160 @@ const MonitoringTab: React.FC<MonitoringTabProps> = ({ clientType }) => {
     }
   });
 
-  // Mock data for demonstration
-  const mockItems: MonitoringItem[] = [
-    {
-      id: "1",
-      name: "Monitoramento de Leis Ambientais",
-      url: "https://www.gov.br/ambiente/legislacao",
-      frequency: "diario",
-      category: "legislação",
-      responsible: "Maria Silva",
-      institution: "Ministério do Meio Ambiente",
-      keywords: "meio ambiente, proteção, recursos naturais"
-    },
-    {
-      id: "2",
-      name: "Transparência Governamental",
-      url: "https://transparencia.gov.br/",
-      frequency: "semanal",
-      category: "transparência",
-      responsible: "João Pereira",
-      institution: "CGU",
-      keywords: "gastos públicos, licitações"
-    }
-  ];
-
-  // Simulate fetch operation
-  const fetchMonitoringItems = async () => {
-    setIsLoading(true);
-    try {
-      // Here would be the Supabase query
-      // const { data, error } = await supabase.from('monitoring_items').select('*');
-      
-      // Using mock data for now
-      setTimeout(() => {
-        setMonitoringItems(mockItems);
-        setIsLoading(false);
-      }, 800);
-    } catch (error) {
-      console.error("Error fetching monitoring items:", error);
-      setIsLoading(false);
-      toast({
-        title: "Erro ao carregar dados",
-        description: "Não foi possível carregar os monitoramentos. Tente novamente mais tarde.",
-        variant: "destructive"
-      });
-    }
+  const handleAddMonitoring = (data: MonitoringItem) => {
+    console.log("Adding monitoring item:", data);
+    // Add an ID (in a real app this would come from the backend)
+    const newItem = { ...data, id: Date.now().toString() };
+    // Add to the list of monitoring items
+    setMonitoringItems([...monitoringItems, newItem]);
+    // Show success message
+    toast({
+      title: "Monitoramento adicionado",
+      description: `O monitoramento "${data.name}" foi adicionado com sucesso.`
+    });
+    form.reset();
+    // Switch to list tab after adding
+    setActiveTab("list");
   };
 
-  useEffect(() => {
-    fetchMonitoringItems();
-  }, []);
-
-  const handleAddMonitoring = async (data: Omit<MonitoringItem, "id">) => {
-    try {
-      // Here would be the Supabase insert
-      /*
-      const { data: newItem, error } = await supabase
-        .from('monitoring_items')
-        .insert({
-          name: data.name,
-          url: data.url,
-          api_url: data.api_url || null,
-          frequency: data.frequency,
-          category: data.category,
-          keywords: data.keywords || null,
-          responsible: data.responsible || null,
-          institution: data.institution || null,
-          notes: data.notes || null
-        })
-        .select()
-        .single();
-      
-      if (error) throw error;
-      */
-      
-      // Mock response
-      const newItem = {
-        id: Date.now().toString(),
-        ...data
-      };
-      
-      setMonitoringItems([newItem, ...monitoringItems]);
-      form.reset();
-      
-      toast({
-        title: "Monitoramento adicionado",
-        description: `O monitoramento "${data.name}" foi adicionado com sucesso.`
-      });
-    } catch (error) {
-      console.error("Error adding monitoring:", error);
-      toast({
-        title: "Erro ao adicionar monitoramento",
-        description: "Ocorreu um erro ao adicionar o monitoramento. Tente novamente.",
-        variant: "destructive"
-      });
-    }
+  const handleDeleteMonitoring = (id: string) => {
+    console.log("Deleting monitoring item:", id);
+    // Filter out the item to delete
+    const updatedItems = monitoringItems.filter(item => item.id !== id);
+    setMonitoringItems(updatedItems);
+    // Show success message
+    toast({
+      title: "Monitoramento removido",
+      description: "O monitoramento foi removido com sucesso."
+    });
   };
-
-  const handleDeleteMonitoring = async (id: string) => {
-    try {
-      // Here would be the Supabase delete
-      /*
-      const { error } = await supabase
-        .from('monitoring_items')
-        .delete()
-        .eq('id', id);
-        
-      if (error) throw error;
-      */
-      
-      setMonitoringItems(monitoringItems.filter(item => item.id !== id));
-      
-      toast({
-        title: "Monitoramento excluído",
-        description: "O monitoramento foi excluído com sucesso."
-      });
-    } catch (error) {
-      console.error("Error deleting monitoring:", error);
-      toast({
-        title: "Erro ao excluir monitoramento",
-        description: "Ocorreu um erro ao excluir o monitoramento. Tente novamente.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Get unique responsibles for filter
-  const uniqueResponsibles = Array.from(
-    new Set(monitoringItems.map(item => item.responsible).filter(Boolean))
-  ) as string[];
-
-  // Filter items based on responsible
-  const filteredItems = responsibleFilter
-    ? monitoringItems.filter(item => item.responsible === responsibleFilter)
-    : monitoringItems;
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Monitoramento de Dados</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="mb-4 text-muted-foreground">
-            Configure novos monitoramentos de dados ou gerencie os existentes para seu painel personalizado.
-          </p>
-          
-          <MonitoringForm 
-            form={form} 
-            onSubmit={handleAddMonitoring} 
-            clientType={clientType} 
-          />
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
+            <CardTitle className="flex justify-between items-center">
+              <span>Monitoramentos Ativos</span>
+              <span className={`${colorClasses.text} font-bold text-2xl`}>{monitoringItems.length}</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <p>Total de monitoramentos ativos</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
+            <CardTitle className="flex justify-between items-center">
+              <span>Atualizações</span>
+              <span className={`${colorClasses.text} font-bold text-2xl`}>24</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <p>Atualizações nas últimas 24 horas</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
+            <CardTitle className="flex justify-between items-center">
+              <span>Status</span>
+              <span className={`${colorClasses.text} font-bold text-2xl`}>100%</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <p>Fontes disponíveis atualmente</p>
+          </CardContent>
+        </Card>
+      </div>
       
-      <MonitoringList 
-        items={filteredItems}
-        onDelete={handleDeleteMonitoring}
-        isLoading={isLoading}
-        uniqueResponsibles={uniqueResponsibles}
-        responsibleFilter={responsibleFilter}
-        onFilterChange={setResponsibleFilter}
-      />
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="mb-4">
+          <TabsTrigger value="list">Lista de Monitoramentos</TabsTrigger>
+          <TabsTrigger value="add">Adicionar Novo</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="list">
+          <Card>
+            <CardHeader>
+              <CardTitle>Monitoramentos Configurados</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {monitoringItems.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground mb-4">Nenhum monitoramento configurado ainda.</p>
+                  <button 
+                    onClick={() => setActiveTab("add")}
+                    className={`px-4 py-2 rounded-md text-white ${colorClasses.bg}`}>
+                    Adicionar Primeiro Monitoramento
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {monitoringItems.map(item => (
+                    <div key={item.id} className="border rounded-md p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="text-lg font-medium">{item.name}</h3>
+                        <button 
+                          onClick={() => handleDeleteMonitoring(item.id || "")}
+                          className="text-red-500 hover:text-red-700">
+                          Excluir
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm text-muted-foreground">URL:</p>
+                          <p className="text-sm">{item.url}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">Categoria:</p>
+                          <p className="text-sm">{item.category}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">Frequência:</p>
+                          <p className="text-sm">{item.frequency}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">Responsável:</p>
+                          <p className="text-sm">{item.responsible || "Não definido"}</p>
+                        </div>
+                        {item.keywords && (
+                          <div className="col-span-2">
+                            <p className="text-sm text-muted-foreground">Palavras-chave:</p>
+                            <p className="text-sm">{item.keywords}</p>
+                          </div>
+                        )}
+                        {item.notes && (
+                          <div className="col-span-2">
+                            <p className="text-sm text-muted-foreground">Anotações:</p>
+                            <p className="text-sm">{item.notes}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="add">
+          <Card>
+            <CardHeader>
+              <CardTitle>Adicionar Novo Monitoramento</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MonitoringForm 
+                form={form} 
+                onSubmit={handleAddMonitoring} 
+                clientType={clientType} 
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

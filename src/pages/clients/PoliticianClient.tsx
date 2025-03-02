@@ -6,24 +6,10 @@ import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/hooks/useAuth";
 import { clientTypeDetails } from "@/components/client/ClientTypes";
 import { getColorClasses } from "@/components/service/utils/colorUtils";
-import MonitoringForm from "@/components/monitoring/MonitoringForm";
+import MonitoringForm, { MonitoringItem } from "@/components/monitoring/MonitoringForm";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-// Define the MonitoringItem interface
-interface MonitoringItem {
-  id?: string;
-  name: string;
-  url: string;
-  api_url?: string;
-  frequency: string;
-  category: string;
-  keywords?: string;
-  responsible?: string;
-  institution?: string;
-  notes?: string;
-}
 
 const PoliticianClient: React.FC = () => {
   const { toast } = useToast();
@@ -265,35 +251,6 @@ const PoliticianClient: React.FC = () => {
               </Card>
             </TabsContent>
           </Tabs>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Funcionalidades Disponíveis</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="list-disc pl-5 space-y-2">
-                  {details.features.map((feature, index) => (
-                    <li key={index}>{feature}</li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Benefícios</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="mb-4">{details.description}</p>
-                <ul className="list-disc pl-5 space-y-2">
-                  {details.benefits.map((benefit, index) => (
-                    <li key={index}>{benefit}</li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </div>
       

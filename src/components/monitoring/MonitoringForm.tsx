@@ -6,7 +6,7 @@ import MonitoringFormInputs from "./MonitoringFormInputs";
 import { ClientType } from "@/types/clientTypes";
 import { getMonitoringFormTitle, getMonitoringFormDescription } from "./utils/clientTypeUtils";
 
-interface MonitoringItem {
+export interface MonitoringItem {
   id?: string;
   name: string;
   url: string;
