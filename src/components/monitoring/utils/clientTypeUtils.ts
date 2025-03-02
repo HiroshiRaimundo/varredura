@@ -1,5 +1,4 @@
-
-export type ClientType = 'observatory' | 'institution' | 'researcher' | 'journalist' | 'politician' | 'press';
+import { ClientType } from "@/types/clientTypes";
 
 interface ClientTypeInfo {
   title: string;

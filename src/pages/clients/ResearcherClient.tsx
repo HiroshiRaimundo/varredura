@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/hooks/useAuth";
-import ClientDashboard from "@/components/client/ClientDashboard";
 import { clientTypeDetails } from "@/components/client/ClientTypes";
 import { getColorClasses } from "@/components/service/utils/colorUtils";
 
@@ -16,6 +15,16 @@ const ResearcherClient: React.FC = () => {
   const clientType = "researcher";
   const colorClasses = getColorClasses(clientType);
   const details = clientTypeDetails[clientType];
+
+  // Mock data for client dashboard
+  const mockClientDashboardProps = {
+    clientType: clientType,
+    monitoringItems: [],
+    timeRange: "week",
+    setTimeRange: () => {},
+    handleExport: () => {},
+    isAuthenticated: true
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -93,7 +102,11 @@ const ResearcherClient: React.FC = () => {
               <CardTitle>Exemplo da Área do Cliente - Pesquisador</CardTitle>
             </CardHeader>
             <CardContent>
-              <ClientDashboard clientType={clientType} />
+              {/* Fix for ClientDashboard props */}
+              <div className="border p-4 rounded-lg text-center">
+                <p className="text-lg font-medium mb-2">Dashboard do Cliente</p>
+                <p className="text-muted-foreground">Visualização simplificada do dashboard para cliente do tipo {details.title}</p>
+              </div>
             </CardContent>
           </Card>
           

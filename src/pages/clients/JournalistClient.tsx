@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/hooks/useAuth";
-import ClientDashboard from "@/components/client/ClientDashboard";
 import { clientTypeDetails } from "@/components/client/ClientTypes";
 import { getColorClasses } from "@/components/service/utils/colorUtils";
 
@@ -54,36 +53,36 @@ const JournalistClient: React.FC = () => {
             <Card>
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
-                  <span>Clientes Ativos</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>33</span>
+                  <span>Jornalistas Ativos</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>53</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
-                <p>Total de jornalistas com contratos ativos</p>
+                <p>Total de jornalistas com acesso ativo</p>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
-                  <span>Reportagens Produzidas</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>128</span>
+                  <span>Pautas Geradas</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>124</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
-                <p>Reportagens produzidas com nossos dados</p>
+                <p>Pautas geradas a partir dos dados este mês</p>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
-                  <span>Ticket Médio</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>R$ 980</span>
+                  <span>Visualizações</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>8.4k</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
-                <p>Valor médio dos contratos com jornalistas</p>
+                <p>Visualizações de dados nos últimos 30 dias</p>
               </CardContent>
             </Card>
           </div>
@@ -93,7 +92,10 @@ const JournalistClient: React.FC = () => {
               <CardTitle>Exemplo da Área do Cliente - Jornalista</CardTitle>
             </CardHeader>
             <CardContent>
-              <ClientDashboard clientType={clientType} />
+              <div className="border p-4 rounded-lg text-center">
+                <p className="text-lg font-medium mb-2">Dashboard do Cliente</p>
+                <p className="text-muted-foreground">Visualização simplificada do dashboard para cliente do tipo {details.title}</p>
+              </div>
             </CardContent>
           </Card>
           
@@ -119,16 +121,16 @@ const JournalistClient: React.FC = () => {
                 <p className="mb-4">Nesta área você pode personalizar os recursos disponíveis para clientes do tipo Jornalista.</p>
                 <div className="space-y-2">
                   <Button variant="outline" className="w-full justify-start">
-                    Fontes de Dados Verificadas
+                    Fontes de Dados
                   </Button>
                   <Button variant="outline" className="w-full justify-start">
-                    Visualizações para Publicação
+                    Modelos de Visualização
                   </Button>
                   <Button variant="outline" className="w-full justify-start">
                     Ferramentas de Checagem
                   </Button>
                   <Button variant="outline" className="w-full justify-start">
-                    Exportação para Redações
+                    Formatos de Exportação
                   </Button>
                 </div>
               </CardContent>

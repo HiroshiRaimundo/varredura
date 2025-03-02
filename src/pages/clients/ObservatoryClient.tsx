@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/hooks/useAuth";
-import ClientDashboard from "@/components/client/ClientDashboard";
 import { clientTypeDetails } from "@/components/client/ClientTypes";
 import { getColorClasses } from "@/components/service/utils/colorUtils";
 
@@ -54,36 +53,36 @@ const ObservatoryClient: React.FC = () => {
             <Card>
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
-                  <span>Clientes Ativos</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>12</span>
+                  <span>Observatórios Ativos</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>42</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
-                <p>Total de clientes do tipo observatório com contratos ativos</p>
+                <p>Total de observatórios com contratos ativos</p>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
-                  <span>Monitoramentos</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>47</span>
+                  <span>Dashboards</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>87</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
-                <p>Total de monitoramentos configurados por observatórios</p>
+                <p>Total de dashboards personalizados</p>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
-                  <span>Ticket Médio</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>R$ 3.500</span>
+                  <span>Integrações</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>15</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
-                <p>Valor médio dos contratos com observatórios</p>
+                <p>Fontes de dados integradas</p>
               </CardContent>
             </Card>
           </div>
@@ -93,7 +92,10 @@ const ObservatoryClient: React.FC = () => {
               <CardTitle>Exemplo da Área do Cliente - Observatório</CardTitle>
             </CardHeader>
             <CardContent>
-              <ClientDashboard clientType={clientType} />
+              <div className="border p-4 rounded-lg text-center">
+                <p className="text-lg font-medium mb-2">Dashboard do Cliente</p>
+                <p className="text-muted-foreground">Visualização simplificada do dashboard para cliente do tipo {details.title}</p>
+              </div>
             </CardContent>
           </Card>
           
@@ -119,16 +121,16 @@ const ObservatoryClient: React.FC = () => {
                 <p className="mb-4">Nesta área você pode personalizar os recursos disponíveis para clientes do tipo Observatório.</p>
                 <div className="space-y-2">
                   <Button variant="outline" className="w-full justify-start">
-                    Personalizar Dashboard
+                    Configurar Fontes de Dados
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start">
+                    Personalizar Dashboards
                   </Button>
                   <Button variant="outline" className="w-full justify-start">
                     Configurar Alertas
                   </Button>
                   <Button variant="outline" className="w-full justify-start">
-                    Gerenciar Relatórios
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    Fontes de Dados
+                    Gerenciar Usuários
                   </Button>
                 </div>
               </CardContent>

@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/hooks/useAuth";
-import ClientDashboard from "@/components/client/ClientDashboard";
 import { clientTypeDetails } from "@/components/client/ClientTypes";
 import { getColorClasses } from "@/components/service/utils/colorUtils";
 
@@ -54,8 +53,8 @@ const PoliticianClient: React.FC = () => {
             <Card>
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
-                  <span>Clientes Ativos</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>14</span>
+                  <span>Políticos Ativos</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>32</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
@@ -66,24 +65,24 @@ const PoliticianClient: React.FC = () => {
             <Card>
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
-                  <span>Monitoramentos de Legislação</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>32</span>
+                  <span>Alertas</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>48</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
-                <p>Total de monitoramentos de legislação ativos</p>
+                <p>Alertas de legislação este mês</p>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
-                  <span>Ticket Médio</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>R$ 2.800</span>
+                  <span>Regiões</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>17</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
-                <p>Valor médio dos contratos com políticos</p>
+                <p>Regiões monitoradas ativamente</p>
               </CardContent>
             </Card>
           </div>
@@ -93,7 +92,10 @@ const PoliticianClient: React.FC = () => {
               <CardTitle>Exemplo da Área do Cliente - Político</CardTitle>
             </CardHeader>
             <CardContent>
-              <ClientDashboard clientType={clientType} />
+              <div className="border p-4 rounded-lg text-center">
+                <p className="text-lg font-medium mb-2">Dashboard do Cliente</p>
+                <p className="text-muted-foreground">Visualização simplificada do dashboard para cliente do tipo {details.title}</p>
+              </div>
             </CardContent>
           </Card>
           
@@ -119,16 +121,16 @@ const PoliticianClient: React.FC = () => {
                 <p className="mb-4">Nesta área você pode personalizar os recursos disponíveis para clientes do tipo Político.</p>
                 <div className="space-y-2">
                   <Button variant="outline" className="w-full justify-start">
-                    Alertas de Legislação
+                    Configurar Alertas
                   </Button>
                   <Button variant="outline" className="w-full justify-start">
-                    Indicadores Regionais
+                    Definir Regiões
                   </Button>
                   <Button variant="outline" className="w-full justify-start">
-                    Análises Comparativas
+                    Personalizar Resumos
                   </Button>
                   <Button variant="outline" className="w-full justify-start">
-                    Monitoramento de Métricas
+                    Indicadores de Desempenho
                   </Button>
                 </div>
               </CardContent>

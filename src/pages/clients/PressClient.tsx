@@ -6,16 +6,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/hooks/useAuth";
-import ClientDashboard from "@/components/client/ClientDashboard";
-import { clientTypeDetails } from "@/components/client/ClientTypes";
+import { ClientType, clientTypeDetails } from "@/components/client/ClientTypes";
 import { getColorClasses } from "@/components/service/utils/colorUtils";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ReleasesSection from "@/components/example-client/press/ReleasesSection";
+
+// Include this press client type in the ClientType type definition
+const clientType = "press" as ClientType;
 
 const PressClient: React.FC = () => {
   const navigate = useNavigate();
   const auth = useAuth();
-  const clientType = "press";
   const colorClasses = getColorClasses(clientType);
   const details = clientTypeDetails[clientType];
 
@@ -56,8 +55,8 @@ const PressClient: React.FC = () => {
             <Card>
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
-                  <span>Clientes Ativos</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>19</span>
+                  <span>Assessorias Ativas</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>24</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
@@ -68,72 +67,39 @@ const PressClient: React.FC = () => {
             <Card>
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
-                  <span>Releases Enviados</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>243</span>
+                  <span>Releases Publicados</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>136</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
-                <p>Total de releases enviados por assessorias</p>
+                <p>Total de releases publicados este mês</p>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
-                  <span>Ticket Médio</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>R$ 1.850</span>
+                  <span>Taxa de Conversão</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>42%</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
-                <p>Valor médio dos contratos com assessorias</p>
+                <p>Média de aproveitamento dos releases</p>
               </CardContent>
             </Card>
           </div>
           
-          <Tabs defaultValue="dashboard" className="w-full mb-6">
-            <TabsList className="mb-4">
-              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-              <TabsTrigger value="releases">Gestão de Releases</TabsTrigger>
-              <TabsTrigger value="contacts">Contatos</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="dashboard">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Exemplo da Área do Cliente - Assessoria de Imprensa</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ClientDashboard clientType={clientType} />
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="releases">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Gerenciamento de Releases</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ReleasesSection clientType={clientType} />
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="contacts">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Gerenciamento de Contatos</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="p-4 border rounded bg-muted/30">
-                    <p className="text-center py-10">
-                      Sistema de gerenciamento de contatos para assessoria de imprensa
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Exemplo da Área do Cliente - Assessoria de Imprensa</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="border p-4 rounded-lg text-center">
+                <p className="text-lg font-medium mb-2">Dashboard do Cliente</p>
+                <p className="text-muted-foreground">Visualização simplificada do dashboard para cliente do tipo {details.title}</p>
+              </div>
+            </CardContent>
+          </Card>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
@@ -157,16 +123,16 @@ const PressClient: React.FC = () => {
                 <p className="mb-4">Nesta área você pode personalizar os recursos disponíveis para clientes do tipo Assessoria de Imprensa.</p>
                 <div className="space-y-2">
                   <Button variant="outline" className="w-full justify-start">
-                    Fluxo de Aprovação
+                    Modelos de Releases
                   </Button>
                   <Button variant="outline" className="w-full justify-start">
-                    Distribuição Segmentada
+                    Gerenciar Contatos
                   </Button>
                   <Button variant="outline" className="w-full justify-start">
-                    Monitoramento de Publicações
+                    Configurar Notificações
                   </Button>
                   <Button variant="outline" className="w-full justify-start">
-                    Gestão de Contatos
+                    Relatórios de Desempenho
                   </Button>
                 </div>
               </CardContent>

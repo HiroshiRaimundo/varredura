@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/hooks/useAuth";
-import ClientDashboard from "@/components/client/ClientDashboard";
 import { clientTypeDetails } from "@/components/client/ClientTypes";
 import { getColorClasses } from "@/components/service/utils/colorUtils";
 
@@ -54,8 +53,8 @@ const InstitutionClient: React.FC = () => {
             <Card>
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
-                  <span>Clientes Ativos</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>8</span>
+                  <span>Instituições Ativas</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>36</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
@@ -66,24 +65,24 @@ const InstitutionClient: React.FC = () => {
             <Card>
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
-                  <span>Programas Monitorados</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>21</span>
+                  <span>Programas</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>84</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
-                <p>Total de programas sob monitoramento</p>
+                <p>Total de programas monitorados</p>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
-                  <span>Ticket Médio</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>R$ 4.200</span>
+                  <span>Relatórios</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>112</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
-                <p>Valor médio dos contratos com instituições</p>
+                <p>Relatórios gerados este mês</p>
               </CardContent>
             </Card>
           </div>
@@ -93,7 +92,10 @@ const InstitutionClient: React.FC = () => {
               <CardTitle>Exemplo da Área do Cliente - Instituição</CardTitle>
             </CardHeader>
             <CardContent>
-              <ClientDashboard clientType={clientType} />
+              <div className="border p-4 rounded-lg text-center">
+                <p className="text-lg font-medium mb-2">Dashboard do Cliente</p>
+                <p className="text-muted-foreground">Visualização simplificada do dashboard para cliente do tipo {details.title}</p>
+              </div>
             </CardContent>
           </Card>
           
@@ -119,16 +121,16 @@ const InstitutionClient: React.FC = () => {
                 <p className="mb-4">Nesta área você pode personalizar os recursos disponíveis para clientes do tipo Instituição.</p>
                 <div className="space-y-2">
                   <Button variant="outline" className="w-full justify-start">
-                    Gestão de Dados Institucionais
+                    Configurar Departamentos
                   </Button>
                   <Button variant="outline" className="w-full justify-start">
-                    Dashboards por Departamento
+                    Gerenciar Programas
                   </Button>
                   <Button variant="outline" className="w-full justify-start">
-                    Relatórios de Desempenho
+                    Personalizar Relatórios
                   </Button>
                   <Button variant="outline" className="w-full justify-start">
-                    Comparativos Históricos
+                    Definir Métricas
                   </Button>
                 </div>
               </CardContent>
