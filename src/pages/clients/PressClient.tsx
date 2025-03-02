@@ -12,6 +12,8 @@ import DefaultContent from "@/components/example-client/DefaultContent";
 import { useForm } from "react-hook-form";
 import MonitoringForm, { MonitoringItem } from "@/components/monitoring/MonitoringForm";
 import { useToast } from "@/hooks/use-toast";
+import PressContent from "@/components/example-client/press/PressContent";
+import generateMockData from "@/components/example-client/utils/mockDataGenerator";
 
 // Include this press client type in the ClientType type definition
 const clientType = "press" as ClientType;
@@ -21,6 +23,7 @@ const PressClient: React.FC = () => {
   const colorClasses = getColorClasses(clientType);
   const details = clientTypeDetails[clientType];
   const { toast } = useToast();
+  const mockData = generateMockData();
   
   // Estado para controlar a aba ativa
   const [activeTab, setActiveTab] = useState<"dashboard" | "monitoring" | "analysis" | "releases">("dashboard");
@@ -73,7 +76,7 @@ const PressClient: React.FC = () => {
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
                   <span>Releases Publicados</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>28</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>{mockData.releaseStats.published}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
@@ -114,7 +117,7 @@ const PressClient: React.FC = () => {
           
           <div className="mt-6">
             {activeTab === "dashboard" && (
-              <DefaultContent activeTab="dashboard" clientType={clientType} />
+              <PressContent activeTab="dashboard" clientType={clientType} mockData={mockData} />
             )}
             
             {activeTab === "monitoring" && (
@@ -139,7 +142,7 @@ const PressClient: React.FC = () => {
             )}
             
             {activeTab === "releases" && (
-              <DefaultContent activeTab="releases" clientType={clientType} />
+              <PressContent activeTab="releases" clientType={clientType} mockData={mockData} />
             )}
           </div>
         </div>

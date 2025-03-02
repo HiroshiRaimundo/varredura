@@ -3,6 +3,7 @@ import React from "react";
 import { ClientType } from "@/components/client/ClientTypes";
 import DashboardSection from "./DashboardSection";
 import ReleasesSection from "./ReleasesSection";
+import PublishedReleasesSection from "./PublishedReleasesSection";
 
 interface PressContentProps {
   activeTab: string;
@@ -22,7 +23,12 @@ const PressContent: React.FC<PressContentProps> = ({
       )}
 
       {activeTab === "releases" && (
-        <ReleasesSection clientType={clientType} />
+        <>
+          <ReleasesSection clientType={clientType} />
+          <div className="mt-8">
+            <PublishedReleasesSection clientType={clientType} mockData={mockData} />
+          </div>
+        </>
       )}
     </div>
   );

@@ -1,16 +1,17 @@
 
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/hooks/useAuth";
 import { clientTypeDetails } from "@/components/client/ClientTypes";
 import { getColorClasses } from "@/components/service/utils/colorUtils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FileText, Users, Activity } from "lucide-react";
+import ReleaseModerationSection from "@/components/example-client/press/ReleaseModerationSection";
+import JournalistContactsSection from "@/components/example-client/press/JournalistContactsSection";
 
 const JournalistClient: React.FC = () => {
-  const navigate = useNavigate();
   const auth = useAuth();
   const clientType = "journalist";
   const colorClasses = getColorClasses(clientType);
@@ -24,28 +25,15 @@ const JournalistClient: React.FC = () => {
             isAuthenticated={auth.isAuthenticated} 
             onLoginClick={() => auth.setIsLoginDialogOpen(true)} 
             onLogoutClick={auth.handleLogout}
+            clientName="Admin"
           />
           
-          <div className="mb-6 flex items-center justify-between">
+          <div className="mb-6">
             <div>
               <h1 className="text-3xl font-bold">{details.title} - Área Administrativa</h1>
               <p className="text-muted-foreground">
                 Gerencie os dados e configurações específicas para clientes do tipo Jornalista
               </p>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={() => navigate("/admin")}
-              >
-                Voltar para Admin
-              </Button>
-              <Button
-                className={colorClasses.bg}
-                onClick={() => navigate("/admin/client/journalist/new")}
-              >
-                Novo Cliente
-              </Button>
             </div>
           </div>
           
@@ -88,54 +76,39 @@ const JournalistClient: React.FC = () => {
           </div>
           
           <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Exemplo da Área do Cliente - Jornalista</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="border p-4 rounded-lg text-center">
-                <p className="text-lg font-medium mb-2">Dashboard do Cliente</p>
-                <p className="text-muted-foreground">Visualização simplificada do dashboard para cliente do tipo {details.title}</p>
-              </div>
+            <CardContent className="p-0">
+              <Tabs defaultValue="moderation" className="w-full">
+                <TabsList className="w-full border-b rounded-none p-0 h-auto">
+                  <TabsTrigger 
+                    value="moderation" 
+                    className="flex-1 rounded-none border-r py-3 data-[state=active]:border-b-0"
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      <span>Moderação de Releases</span>
+                    </div>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="contacts" 
+                    className="flex-1 rounded-none py-3 data-[state=active]:border-b-0"
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <Users className="h-4 w-4" />
+                      <span>Contatos de Imprensa</span>
+                    </div>
+                  </TabsTrigger>
+                </TabsList>
+                <div className="p-6">
+                  <TabsContent value="moderation" className="mt-0">
+                    <ReleaseModerationSection />
+                  </TabsContent>
+                  <TabsContent value="contacts" className="mt-0">
+                    <JournalistContactsSection />
+                  </TabsContent>
+                </div>
+              </Tabs>
             </CardContent>
           </Card>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Funcionalidades Específicas</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="list-disc pl-5 space-y-2">
-                  {details.features.map((feature, index) => (
-                    <li key={index}>{feature}</li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Customização</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="mb-4">Nesta área você pode personalizar os recursos disponíveis para clientes do tipo Jornalista.</p>
-                <div className="space-y-2">
-                  <Button variant="outline" className="w-full justify-start">
-                    Fontes de Dados
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    Modelos de Visualização
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    Ferramentas de Checagem
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    Formatos de Exportação
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </div>
       
