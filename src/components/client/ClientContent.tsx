@@ -7,16 +7,11 @@ import AnalysisToolsSection from "./tools/AnalysisToolsSection";
 import MonitoringTab from "./monitoring/MonitoringTab";
 import PressTab from "./PressTab";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { LegislationAlert } from "@/hooks/monitoring/types";
 
 interface ClientContentProps {
   activeTab: string;
   clientType: ClientType;
-}
-
-interface LegislationAlertsProps {
-  alerts: any[];
-  onMarkAsRead: (id: string) => void;
-  showAlerts: boolean;
 }
 
 const ClientContent: React.FC<ClientContentProps> = ({ activeTab, clientType }) => {
@@ -28,10 +23,24 @@ const ClientContent: React.FC<ClientContentProps> = ({ activeTab, clientType }) 
     console.log("View comparison");
   };
 
-  // Dummy alerts data
-  const alerts = [
-    { id: "1", title: "Nova legislação", description: "Detalhes da legislação", date: "2024-05-01", read: false },
-    { id: "2", title: "Atualização legal", description: "Detalhes da atualização", date: "2024-05-02", read: true },
+  // Dummy alerts data that matches the LegislationAlert type
+  const alerts: LegislationAlert[] = [
+    { 
+      id: "1", 
+      title: "Nova legislação", 
+      description: "Detalhes da legislação", 
+      date: "2024-05-01", 
+      isRead: false,
+      url: "https://example.com/legislation/1"
+    },
+    { 
+      id: "2", 
+      title: "Atualização legal", 
+      description: "Detalhes da atualização", 
+      date: "2024-05-02", 
+      isRead: true,
+      url: "https://example.com/legislation/2"
+    },
   ];
 
   const handleMarkAsRead = (id: string) => {

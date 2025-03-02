@@ -86,8 +86,7 @@ const clientTypeInfoMap: Record<ClientType, ClientTypeInfo> = {
   }
 };
 
-// Export both the type and the object
-export { ClientType };
+// Use the 'export type' syntax for re-exporting types with isolatedModules enabled
 export type { ClientTypeInfo }; 
 
 export const getClientTypeInfo = (clientType: ClientType): ClientTypeInfo => {
