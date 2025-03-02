@@ -16,6 +16,16 @@ const ResearcherClient: React.FC = () => {
   const colorClasses = getColorClasses(clientType);
   const details = clientTypeDetails[clientType];
 
+  // Mock data for client dashboard
+  const mockClientDashboardProps = {
+    clientType: clientType,
+    monitoringItems: [],
+    timeRange: "week",
+    setTimeRange: () => {},
+    handleExport: () => {},
+    isAuthenticated: true
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <div className="p-6 flex-grow">
@@ -32,6 +42,20 @@ const ResearcherClient: React.FC = () => {
               <p className="text-muted-foreground">
                 Gerencie os dados e configurações específicas para clientes do tipo Pesquisador
               </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => navigate("/admin")}
+              >
+                Voltar para Admin
+              </Button>
+              <Button
+                className={colorClasses.bg}
+                onClick={() => navigate("/admin/client/researcher/new")}
+              >
+                Novo Cliente
+              </Button>
             </div>
           </div>
           
@@ -78,6 +102,7 @@ const ResearcherClient: React.FC = () => {
               <CardTitle>Exemplo da Área do Cliente - Pesquisador</CardTitle>
             </CardHeader>
             <CardContent>
+              {/* Fix for ClientDashboard props */}
               <div className="border p-4 rounded-lg text-center">
                 <p className="text-lg font-medium mb-2">Dashboard do Cliente</p>
                 <p className="text-muted-foreground">Visualização simplificada do dashboard para cliente do tipo {details.title}</p>

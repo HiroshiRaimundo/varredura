@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/hooks/useAuth";
-import { ClientType, clientTypeDetails } from "@/components/client/ClientTypes";
+import { clientTypeDetails } from "@/components/client/ClientTypes";
 import { getColorClasses } from "@/components/service/utils/colorUtils";
+import { ClientType } from "@/types/clientTypes";
 
 // Include this press client type in the ClientType type definition
 const clientType = "press" as ClientType;
@@ -36,6 +37,20 @@ const PressClient: React.FC = () => {
               <p className="text-muted-foreground">
                 Gerencie os dados e configurações específicas para clientes do tipo Assessoria de Imprensa
               </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => navigate("/admin")}
+              >
+                Voltar para Admin
+              </Button>
+              <Button
+                className={colorClasses.bg}
+                onClick={() => navigate("/admin/client/press/new")}
+              >
+                Novo Cliente
+              </Button>
             </div>
           </div>
           

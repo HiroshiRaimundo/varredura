@@ -33,6 +33,20 @@ const JournalistClient: React.FC = () => {
                 Gerencie os dados e configurações específicas para clientes do tipo Jornalista
               </p>
             </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => navigate("/admin")}
+              >
+                Voltar para Admin
+              </Button>
+              <Button
+                className={colorClasses.bg}
+                onClick={() => navigate("/admin/client/journalist/new")}
+              >
+                Novo Cliente
+              </Button>
+            </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
