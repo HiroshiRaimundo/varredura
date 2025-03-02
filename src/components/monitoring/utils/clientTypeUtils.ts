@@ -1,3 +1,4 @@
+
 import { ClientType } from "@/types/clientTypes";
 
 interface ClientTypeInfo {
@@ -84,6 +85,8 @@ const clientTypeInfoMap: Record<ClientType, ClientTypeInfo> = {
     categories: ["releases", "cobertura", "mídia", "publicações", "menções", "veículos"]
   }
 };
+
+export { ClientType }; // Re-export the ClientType to fix import errors
 
 export const getClientTypeInfo = (clientType: ClientType): ClientTypeInfo => {
   return clientTypeInfoMap[clientType] || clientTypeInfoMap.observatory;

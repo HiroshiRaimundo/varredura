@@ -5,7 +5,7 @@ import ClientHeader from "@/components/example-client/ClientHeader";
 import ClientTabs from "@/components/example-client/ClientTabs";
 import ClientInfo from "@/components/example-client/ClientInfo";
 import DefaultContent from "@/components/example-client/DefaultContent";
-import { ClientType } from "@/components/client/ClientTypes";
+import { ClientType } from "@/types/clientTypes";
 import { Landmark, Database, BookOpen, Building, FileText, Mail } from "lucide-react";
 import PressContent from "@/components/example-client/press/PressContent";
 import generateMockData from "@/components/example-client/utils/mockDataGenerator";
