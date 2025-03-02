@@ -12,6 +12,12 @@ import ServiceLanding from "@/pages/ServiceLanding";
 import Payment from "@/pages/Payment";
 import ExampleClient from "@/pages/ExampleClient";
 import NotFound from "@/pages/NotFound";
+import ObservatoryClient from "@/pages/clients/ObservatoryClient";
+import ResearcherClient from "@/pages/clients/ResearcherClient";
+import PoliticianClient from "@/pages/clients/PoliticianClient";
+import InstitutionClient from "@/pages/clients/InstitutionClient";
+import JournalistClient from "@/pages/clients/JournalistClient";
+import PressClient from "@/pages/clients/PressClient";
 
 function App() {
   console.log("App component rendered with routes");
@@ -29,6 +35,15 @@ function App() {
         <Route path="/service/:serviceId" element={<ServiceLanding />} />
         <Route path="/payment" element={<Payment />} /> 
         <Route path="/example-client" element={<ExampleClient />} />
+        
+        {/* Novas páginas específicas por tipo de cliente */}
+        <Route path="/admin/client/observatory" element={<ObservatoryClient />} />
+        <Route path="/admin/client/researcher" element={<ResearcherClient />} />
+        <Route path="/admin/client/politician" element={<PoliticianClient />} />
+        <Route path="/admin/client/institution" element={<InstitutionClient />} />
+        <Route path="/admin/client/journalist" element={<JournalistClient />} />
+        <Route path="/admin/client/press" element={<PressClient />} />
+        
         <Route path="/*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

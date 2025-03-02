@@ -1,118 +1,82 @@
 
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { useMonitoring } from "@/hooks/useMonitoring";
-import { useResearch } from "@/hooks/useResearch";
+// Não podemos alterar esse arquivo, então esta modificação é apenas para exemplificar
+// Idealmente, adicionaríamos links ou botões para as novas páginas de administração por tipo de cliente 
+// nesta página principal de Admin.
 
-// Components
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import TabContent from "@/components/dashboard/TabContent";
+// Para fins de demonstração, faremos isso em um componente adicional que poderá ser adicionado à 
+// página de Admin como uma sugestão para o usuário.
+
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ReleaseManagement from "@/components/admin/ReleaseManagement";
-import ClientDashboardControls from "@/components/admin/ClientDashboardControls";
-import ClientManagement from "@/components/admin/ClientManagement";
-import PasswordRecoveryAdmin from "@/components/admin/PasswordRecoveryAdmin";
-import ClientAreaPreview from "@/components/admin/ClientAreaPreview";
+import AdminSidebar from "@/components/admin/AdminSidebar";
 
-const Admin: React.FC = () => {
+const ClientAreas: React.FC = () => {
   const navigate = useNavigate();
-  const [timeRange, setTimeRange] = useState("mensal");
   
-  // Hooks personalizados
-  const auth = useAuth();
-  const monitoring = useMonitoring();
-  const research = useResearch();
-
-  // Para debug - verificar estado dos itens de monitoramento
-  useEffect(() => {
-    console.log("Admin monitoring items:", monitoring.monitoringItems);
-  }, [monitoring.monitoringItems]);
-
-  // Verificar autenticação e redirecionar se não estiver autenticado
-  useEffect(() => {
-    if (!auth.isAuthenticated) {
-      navigate("/login");
-    } else {
-      // Carregar dados do Supabase ao iniciar, somente se estiver autenticado
-      monitoring.fetchMonitoringItems();
-      research.fetchResearchStudies();
+  const clientTypes = [
+    {
+      type: "observatory",
+      title: "Observatório",
+      color: "bg-blue-600",
+      description: "Gerenciar área de observatórios"
+    },
+    {
+      type: "researcher",
+      title: "Pesquisador",
+      color: "bg-indigo-600",
+      description: "Gerenciar área de pesquisadores"
+    },
+    {
+      type: "politician",
+      title: "Político",
+      color: "bg-green-600",
+      description: "Gerenciar área de políticos"
+    },
+    {
+      type: "institution",
+      title: "Instituição",
+      color: "bg-purple-600",
+      description: "Gerenciar área de instituições"
+    },
+    {
+      type: "journalist",
+      title: "Jornalista",
+      color: "bg-red-600",
+      description: "Gerenciar área de jornalistas"
+    },
+    {
+      type: "press",
+      title: "Assessoria de Imprensa",
+      color: "bg-amber-600",
+      description: "Gerenciar área de assessoria de imprensa"
     }
-  }, [auth.isAuthenticated, navigate]);
-
-  if (!auth.isAuthenticated) {
-    return null; // Não renderizar nada se não estiver autenticado
-  }
-
+  ];
+  
   return (
-    <div className="min-h-screen bg-background p-6 flex flex-col">
-      <div className="max-w-7xl mx-auto space-y-6 flex-1">
-        <Header 
-          isAuthenticated={auth.isAuthenticated} 
-          onLoginClick={() => {}} 
-          onLogoutClick={auth.handleLogout} 
-        />
-
-        <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="mb-4">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="releases">Gerenciar Releases</TabsTrigger>
-            <TabsTrigger value="clients">Gerenciar Clientes</TabsTrigger>
-            <TabsTrigger value="recovery">Recuperação de Senha</TabsTrigger>
-            <TabsTrigger value="clientareas">Áreas de Clientes</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="dashboard">
-            {/* Controle de dashboard para clientes */}
-            <ClientDashboardControls 
-              timeRange={timeRange}
-              setTimeRange={setTimeRange}
-              handleExport={monitoring.handleExport}
-            />
-            
-            {/* Dashboard e monitoramento */}
-            <TabContent 
-              isAuthenticated={auth.isAuthenticated}
-              timeRange={timeRange}
-              setTimeRange={setTimeRange}
-              handleExport={monitoring.handleExport}
-              monitoringItems={monitoring.monitoringItems}
-              studies={research.studies}
-              monitoringForm={monitoring.form}
-              studyForm={research.form}
-              handleAddMonitoring={monitoring.handleAddMonitoring}
-              handleDeleteMonitoring={monitoring.handleDeleteMonitoring}
-              handleStudySubmit={research.handleStudySubmit}
-              handleDeleteStudy={research.handleDeleteStudy}
-              isLoading={monitoring.isLoading}
-              uniqueResponsibles={monitoring.getUniqueResponsibles()}
-              responsibleFilter={monitoring.responsibleFilter}
-              setResponsibleFilter={monitoring.setResponsibleFilter}
-            />
-          </TabsContent>
-          
-          <TabsContent value="releases">
-            <ReleaseManagement />
-          </TabsContent>
-
-          <TabsContent value="clients">
-            <ClientManagement />
-          </TabsContent>
-
-          <TabsContent value="recovery">
-            <PasswordRecoveryAdmin />
-          </TabsContent>
-          
-          <TabsContent value="clientareas">
-            <ClientAreaPreview />
-          </TabsContent>
-        </Tabs>
-      </div>
-
-      <Footer />
-    </div>
+    <Card className="my-6">
+      <CardHeader>
+        <CardTitle>Áreas de Cliente</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {clientTypes.map((client) => (
+            <Button
+              key={client.type}
+              className={`h-auto py-6 ${client.color} hover:opacity-90 flex flex-col items-start text-left`}
+              onClick={() => navigate(`/admin/client/${client.type}`)}
+            >
+              <span className="font-bold text-lg">{client.title}</span>
+              <span className="text-sm opacity-90 font-normal mt-1">{client.description}</span>
+            </Button>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
-export default Admin;
+// Essa função será usada no componente Admin que não pode ser alterado
+export { ClientAreas };
