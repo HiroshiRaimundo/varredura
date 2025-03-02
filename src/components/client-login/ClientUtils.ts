@@ -1,6 +1,6 @@
 
 import { ClientInfo, ClientLoginFormValues } from "./types";
-import { ClientType } from "@/components/monitoring/utils/clientTypeUtils";
+import { ClientType } from "@/types/clientTypes";
 
 // Mock client credentials - in a real app this would be fetched from an API
 export const validClients = [
