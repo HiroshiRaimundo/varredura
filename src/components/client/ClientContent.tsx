@@ -13,6 +13,12 @@ interface ClientContentProps {
   clientType: ClientType;
 }
 
+interface LegislationAlertsProps {
+  alerts: any[];
+  onMarkAsRead: (id: string) => void;
+  showAlerts: boolean;
+}
+
 const ClientContent: React.FC<ClientContentProps> = ({ activeTab, clientType }) => {
   const handleDatasetDownload = () => {
     console.log("Download dataset");
@@ -22,6 +28,16 @@ const ClientContent: React.FC<ClientContentProps> = ({ activeTab, clientType }) 
     console.log("View comparison");
   };
 
+  // Dummy alerts data
+  const alerts = [
+    { id: "1", title: "Nova legislação", description: "Detalhes da legislação", date: "2024-05-01", read: false },
+    { id: "2", title: "Atualização legal", description: "Detalhes da atualização", date: "2024-05-02", read: true },
+  ];
+
+  const handleMarkAsRead = (id: string) => {
+    console.log("Mark as read:", id);
+  };
+
   return (
     <Tabs defaultValue={activeTab} className="w-full">
       <TabsContent value="dashboard">
@@ -29,8 +45,11 @@ const ClientContent: React.FC<ClientContentProps> = ({ activeTab, clientType }) 
       </TabsContent>
       
       <TabsContent value="alerts">
-        {/* Passing empty props since LegislationAlerts doesn't use clientType */}
-        <LegislationAlerts />
+        <LegislationAlerts 
+          alerts={alerts}
+          onMarkAsRead={handleMarkAsRead}
+          showAlerts={true}
+        />
       </TabsContent>
       
       <TabsContent value="analysis">
@@ -47,7 +66,7 @@ const ClientContent: React.FC<ClientContentProps> = ({ activeTab, clientType }) 
       
       {clientType === "press" && (
         <TabsContent value="press">
-          <PressTab />
+          <PressTab clientType={clientType} />
         </TabsContent>
       )}
     </Tabs>

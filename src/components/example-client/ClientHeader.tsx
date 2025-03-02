@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ClientType, clientTypeDetails } from "@/components/client/ClientTypes";
 import { getColorClasses } from "@/components/service/utils/colorUtils";
-import { LucideIcon } from "lucide-react";
 
 interface ClientHeaderProps {
   clientType: ClientType;

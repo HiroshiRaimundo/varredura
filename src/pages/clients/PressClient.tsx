@@ -26,6 +26,8 @@ const PressClient: React.FC = () => {
             isAuthenticated={auth.isAuthenticated} 
             onLoginClick={() => auth.setIsLoginDialogOpen(true)} 
             onLogoutClick={auth.handleLogout}
+            clientName="Assessoria Exemplo"
+            clientType={clientType}
           />
           
           <div className="mb-6 flex items-center justify-between">
@@ -34,20 +36,6 @@ const PressClient: React.FC = () => {
               <p className="text-muted-foreground">
                 Gerencie os dados e configurações específicas para clientes do tipo Assessoria de Imprensa
               </p>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={() => navigate("/admin")}
-              >
-                Voltar para Admin
-              </Button>
-              <Button
-                className={colorClasses.bg}
-                onClick={() => navigate("/admin/client/press/new")}
-              >
-                Novo Cliente
-              </Button>
             </div>
           </div>
           
