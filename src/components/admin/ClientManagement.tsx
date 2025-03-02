@@ -3,15 +3,16 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Search, Eye, Edit, UserPlus } from "lucide-react";
+import { Search, Eye, UserPlus } from "lucide-react";
 import { validClients } from "@/components/client-login/ClientUtils";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 // Extended client type with additional fields for admin view
 interface ExtendedClient {
@@ -38,10 +39,10 @@ const extendedClients: ExtendedClient[] = validClients.map(client => ({
 }));
 
 const ClientManagement: React.FC = () => {
+  const navigate = useNavigate();
   const [clients, setClients] = useState<ExtendedClient[]>(extendedClients);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedClient, setSelectedClient] = useState<ExtendedClient | null>(null);
-  const [viewMode, setViewMode] = useState<'table' | 'details'>('table');
 
   // Form for client details edit
   const form = useForm<ExtendedClient>({
@@ -67,6 +68,11 @@ const ClientManagement: React.FC = () => {
   const handleViewClient = (client: ExtendedClient) => {
     setSelectedClient(client);
     form.reset(client);
+  };
+
+  // View example client area
+  const handleViewExampleClient = (client: ExtendedClient) => {
+    navigate(`/example-client?type=${client.type}`);
   };
 
   // Save client details
@@ -114,28 +120,32 @@ const ClientManagement: React.FC = () => {
             <TabsContent value="all">
               <ClientTable 
                 clients={filteredClients} 
-                onViewClient={handleViewClient} 
+                onViewClient={handleViewClient}
+                onViewExampleClient={handleViewExampleClient}
               />
             </TabsContent>
             
             <TabsContent value="paid">
               <ClientTable 
                 clients={filteredClients.filter(c => c.paymentStatus === 'paid')} 
-                onViewClient={handleViewClient} 
+                onViewClient={handleViewClient}
+                onViewExampleClient={handleViewExampleClient}
               />
             </TabsContent>
             
             <TabsContent value="pending">
               <ClientTable 
                 clients={filteredClients.filter(c => c.paymentStatus === 'pending')} 
-                onViewClient={handleViewClient} 
+                onViewClient={handleViewClient}
+                onViewExampleClient={handleViewExampleClient}
               />
             </TabsContent>
             
             <TabsContent value="overdue">
               <ClientTable 
                 clients={filteredClients.filter(c => c.paymentStatus === 'overdue')} 
-                onViewClient={handleViewClient} 
+                onViewClient={handleViewClient}
+                onViewExampleClient={handleViewExampleClient}
               />
             </TabsContent>
           </Tabs>
@@ -278,7 +288,8 @@ const ClientManagement: React.FC = () => {
 const ClientTable: React.FC<{ 
   clients: ExtendedClient[]; 
   onViewClient: (client: ExtendedClient) => void;
-}> = ({ clients, onViewClient }) => {
+  onViewExampleClient: (client: ExtendedClient) => void;
+}> = ({ clients, onViewClient, onViewExampleClient }) => {
   return (
     <div className="border rounded-md">
       <Table>
@@ -314,14 +325,25 @@ const ClientTable: React.FC<{
                 </TableCell>
                 <TableCell>{client.lastLogin}</TableCell>
                 <TableCell>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => onViewClient(client)}
-                    className="h-8 w-8"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => onViewClient(client)}
+                      className="h-8 w-8"
+                      title="Editar detalhes"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => onViewExampleClient(client)}
+                      className="text-xs"
+                    >
+                      Ver exemplo
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))

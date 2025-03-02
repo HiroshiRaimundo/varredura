@@ -1,5 +1,5 @@
 
-export type ClientType = 'observatory' | 'institution' | 'researcher' | 'journalist' | 'politician';
+export type ClientType = 'observatory' | 'institution' | 'researcher' | 'journalist' | 'politician' | 'press';
 
 interface ClientTypeInfo {
   title: string;
@@ -38,6 +38,12 @@ const clientTypeInfoMap: Record<ClientType, ClientTypeInfo> = {
     description: "Monitore políticas públicas, legislação ou temas de interesse político.",
     alert: "Os dados de monitoramento político são atualizados diariamente.",
     categories: ["legislação", "políticas públicas", "orçamento", "debates", "propostas", "audiências"]
+  },
+  press: {
+    title: "Monitoramento de Imprensa",
+    description: "Monitore a cobertura de mídia e publicações relacionadas aos seus releases.",
+    alert: "Os releases publicados são monitorados automaticamente.",
+    categories: ["releases", "cobertura", "mídia", "publicações", "menções", "veículos"]
   }
 };
 
