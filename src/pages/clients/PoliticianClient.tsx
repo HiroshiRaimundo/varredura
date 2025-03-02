@@ -10,6 +10,7 @@ import MonitoringForm, { MonitoringItem } from "@/components/monitoring/Monitori
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BarChart3, FilePieChart, LineChart, PieChart } from "lucide-react";
 
 const PoliticianClient: React.FC = () => {
   const { toast } = useToast();
@@ -21,6 +22,7 @@ const PoliticianClient: React.FC = () => {
   // State for monitoring items
   const [monitoringItems, setMonitoringItems] = useState<MonitoringItem[]>([]);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [selectedChart, setSelectedChart] = useState<string>("category");
   
   // Create the form with correct typing
   const form = useForm<MonitoringItem>({
@@ -36,6 +38,23 @@ const PoliticianClient: React.FC = () => {
       notes: ""
     }
   });
+
+  // Mock alerts data
+  const [alerts, setAlerts] = useState([
+    { id: "1", title: "Nova alteração na legislação", description: "Alteração na lei 123/2023 publicada hoje", date: new Date().toISOString(), read: false },
+    { id: "2", title: "Votação agendada", description: "Projeto de lei 456/2023 entrará em votação amanhã", date: new Date().toISOString(), read: false },
+    { id: "3", title: "Audiência pública", description: "Audiência sobre reforma tributária agendada para próxima semana", date: new Date().toISOString(), read: true },
+  ]);
+
+  const handleMarkAsRead = (id: string) => {
+    setAlerts(alerts.map(alert => 
+      alert.id === id ? { ...alert, read: true } : alert
+    ));
+    toast({
+      title: "Alerta marcado como lido",
+      description: "O alerta foi marcado como lido com sucesso."
+    });
+  };
 
   const handleAddMonitoring = (data: MonitoringItem) => {
     console.log("Adding monitoring item:", data);
@@ -99,11 +118,11 @@ const PoliticianClient: React.FC = () => {
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
                   <span>Alertas</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>8</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>{alerts.filter(a => !a.read).length}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
-                <p>Alertas de legislação este mês</p>
+                <p>Alertas de legislação não lidos</p>
               </CardContent>
             </Card>
             
@@ -111,7 +130,7 @@ const PoliticianClient: React.FC = () => {
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
                   <span>Regiões</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>5</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>{5}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
@@ -124,13 +143,40 @@ const PoliticianClient: React.FC = () => {
             <TabsList className="mb-4">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="monitoring">Monitoramentos</TabsTrigger>
-              <TabsTrigger value="add">Adicionar Monitoramento</TabsTrigger>
+              <TabsTrigger value="add">Novo Monitoramento</TabsTrigger>
+              <TabsTrigger value="alerts">Alertas ({alerts.filter(a => !a.read).length})</TabsTrigger>
             </TabsList>
             
             <TabsContent value="dashboard">
               <Card>
                 <CardHeader>
                   <CardTitle>Dashboard de Monitoramentos</CardTitle>
+                  <div className="flex gap-2 mt-2">
+                    <button 
+                      onClick={() => setSelectedChart("category")}
+                      className={`p-2 rounded-md ${selectedChart === "category" ? colorClasses.bg + " text-white" : "bg-gray-100"}`}
+                    >
+                      <PieChart className="h-5 w-5" />
+                    </button>
+                    <button 
+                      onClick={() => setSelectedChart("frequency")}
+                      className={`p-2 rounded-md ${selectedChart === "frequency" ? colorClasses.bg + " text-white" : "bg-gray-100"}`}
+                    >
+                      <BarChart3 className="h-5 w-5" />
+                    </button>
+                    <button 
+                      onClick={() => setSelectedChart("timeline")}
+                      className={`p-2 rounded-md ${selectedChart === "timeline" ? colorClasses.bg + " text-white" : "bg-gray-100"}`}
+                    >
+                      <LineChart className="h-5 w-5" />
+                    </button>
+                    <button 
+                      onClick={() => setSelectedChart("distribution")}
+                      className={`p-2 rounded-md ${selectedChart === "distribution" ? colorClasses.bg + " text-white" : "bg-gray-100"}`}
+                    >
+                      <FilePieChart className="h-5 w-5" />
+                    </button>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {monitoringItems.length === 0 ? (
@@ -139,12 +185,57 @@ const PoliticianClient: React.FC = () => {
                       <button 
                         onClick={() => setActiveTab("add")}
                         className={`px-4 py-2 rounded-md text-white ${colorClasses.bg}`}>
-                        Adicionar Primeiro Monitoramento
+                        Novo Monitoramento
                       </button>
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      <h3 className="text-lg font-medium">Resumo de Monitoramentos</h3>
+                      <h3 className="text-lg font-medium">
+                        {selectedChart === "category" && "Distribuição por Categoria"}
+                        {selectedChart === "frequency" && "Frequência de Atualização"}
+                        {selectedChart === "timeline" && "Linha do Tempo de Monitoramentos"}
+                        {selectedChart === "distribution" && "Distribuição por Responsável"}
+                      </h3>
+                      
+                      <div className="border rounded-md p-4 min-h-[300px] flex items-center justify-center">
+                        {selectedChart === "category" && (
+                          <div className="text-center w-full">
+                            <p className="text-muted-foreground mb-2">Visualização de gráfico em pizza das categorias</p>
+                            <div className="h-64 w-full bg-muted/20 rounded-md flex items-center justify-center">
+                              <PieChart className="h-16 w-16 text-muted" />
+                            </div>
+                          </div>
+                        )}
+                        
+                        {selectedChart === "frequency" && (
+                          <div className="text-center w-full">
+                            <p className="text-muted-foreground mb-2">Visualização de gráfico de barras das frequências</p>
+                            <div className="h-64 w-full bg-muted/20 rounded-md flex items-center justify-center">
+                              <BarChart3 className="h-16 w-16 text-muted" />
+                            </div>
+                          </div>
+                        )}
+                        
+                        {selectedChart === "timeline" && (
+                          <div className="text-center w-full">
+                            <p className="text-muted-foreground mb-2">Visualização de linha do tempo</p>
+                            <div className="h-64 w-full bg-muted/20 rounded-md flex items-center justify-center">
+                              <LineChart className="h-16 w-16 text-muted" />
+                            </div>
+                          </div>
+                        )}
+                        
+                        {selectedChart === "distribution" && (
+                          <div className="text-center w-full">
+                            <p className="text-muted-foreground mb-2">Visualização de gráfico de distribuição</p>
+                            <div className="h-64 w-full bg-muted/20 rounded-md flex items-center justify-center">
+                              <FilePieChart className="h-16 w-16 text-muted" />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <h3 className="text-lg font-medium mt-6">Resumo de Monitoramentos</h3>
                       <div className="border rounded-md p-4">
                         <table className="w-full">
                           <thead className="border-b">
@@ -183,7 +274,7 @@ const PoliticianClient: React.FC = () => {
                       <button 
                         onClick={() => setActiveTab("add")}
                         className={`px-4 py-2 rounded-md text-white ${colorClasses.bg}`}>
-                        Adicionar Primeiro Monitoramento
+                        Novo Monitoramento
                       </button>
                     </div>
                   ) : (
@@ -239,7 +330,7 @@ const PoliticianClient: React.FC = () => {
             <TabsContent value="add">
               <Card>
                 <CardHeader>
-                  <CardTitle>Adicionar Novo Monitoramento</CardTitle>
+                  <CardTitle>Novo Monitoramento</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <MonitoringForm 
@@ -247,6 +338,48 @@ const PoliticianClient: React.FC = () => {
                     onSubmit={handleAddMonitoring} 
                     clientType={clientType} 
                   />
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="alerts">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Alertas de Monitoramento</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {alerts.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground">Nenhum alerta disponível no momento.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {alerts.map(alert => (
+                        <div key={alert.id} className={`border rounded-md p-4 ${!alert.read ? 'border-l-4 border-l-amber-500' : ''}`}>
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className="text-lg font-medium">{alert.title}</h3>
+                            {!alert.read && (
+                              <button 
+                                onClick={() => handleMarkAsRead(alert.id)}
+                                className={`px-2 py-1 rounded-md text-xs text-white ${colorClasses.bg}`}>
+                                Marcar como lido
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-sm mb-2">{alert.description}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(alert.date).toLocaleDateString('pt-BR', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

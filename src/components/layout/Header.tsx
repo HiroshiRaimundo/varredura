@@ -21,8 +21,9 @@ const Header = ({
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Check if we're on the client page
-  const isClientPage = location.pathname.startsWith('/client');
+  // Check if we're on a client page
+  const isClientPage = location.pathname.includes('/client') || 
+                      location.pathname.includes('/admin/client');
 
   const getClientTypeLabel = (type?: string) => {
     if (!type) return "";
@@ -69,14 +70,6 @@ const Header = ({
 
           {isClientPage ? (
             <>
-              <Button
-                variant="outline"
-                className="flex items-center gap-2"
-                onClick={() => navigate(-1)}
-              >
-                <ArrowLeft className="h-4 w-4" />
-                <span className="hidden sm:inline">Voltar</span>
-              </Button>
               <Button
                 variant="ghost"
                 className="flex items-center gap-2"
