@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Search, BarChart2, Leaf } from "lucide-react";
@@ -22,9 +21,14 @@ const HeroSection: React.FC = () => {
               </h1>
             </div>
             
-            <p className="text-xl text-gray-700 mb-8 leading-relaxed">
-              Monitoramento inteligente para a Amazônia. Transformando dados em soluções sustentáveis para pesquisadores, instituições e gestores públicos.
-            </p>
+            <div className="md:w-1/2 space-y-4">
+              <h1 className="text-4xl font-bold tracking-tight">
+                Análise Inteligente de Dados
+              </h1>
+              <p className="text-xl text-muted-foreground">
+                Transformando dados em soluções sustentáveis para pesquisadores, instituições e gestores públicos.
+              </p>
+            </div>
             
             <div className="flex flex-col sm:flex-row gap-4">
               <Button 
@@ -49,7 +53,7 @@ const HeroSection: React.FC = () => {
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <Search className="h-6 w-6 text-blue-600 mb-2" />
-                    <h3 className="font-semibold text-gray-800">Monitoramento</h3>
+                    <h3 className="font-semibold text-gray-800">Análise de Dados</h3>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <Leaf className="h-6 w-6 text-green-600 mb-2" />
@@ -57,8 +61,8 @@ const HeroSection: React.FC = () => {
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg flex items-center justify-center">
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-blue-600">Amazônia</p>
-                      <p className="text-xs text-gray-600">Monitoramento</p>
+                      <p className="text-2xl font-bold text-blue-600">Análise</p>
+                      <p className="text-xs text-gray-600">Dados</p>
                     </div>
                   </div>
                 </div>

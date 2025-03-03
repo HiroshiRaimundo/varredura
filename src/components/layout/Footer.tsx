@@ -1,4 +1,3 @@
-
 import React from "react";
 
 const Footer: React.FC = () => {
@@ -7,7 +6,7 @@ const Footer: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex items-center text-sm text-muted-foreground">
           <span className="flex items-center">
-            Monitoramento, Amazônia e Sustentabilidade
+            Sustentabilidade
           </span>
         </div>
         <div className="text-sm text-muted-foreground">
