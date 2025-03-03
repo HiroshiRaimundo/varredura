@@ -21,16 +21,35 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+const validateSession = () => {
+  const auth = localStorage.getItem("isAuthenticated");
+  const session = localStorage.getItem("sessionId");
+  const lastActivity = localStorage.getItem("lastActivity");
+  
+  if (!auth || !session || !lastActivity) {
+    return false;
+  }
+
+  // Verifica se a última atividade foi há menos de 24 horas
+  const lastActivityTime = parseInt(lastActivity, 10);
+  const now = Date.now();
+  const hoursSinceLastActivity = (now - lastActivityTime) / (1000 * 60 * 60);
+  
+  if (hoursSinceLastActivity > 24) {
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("sessionId");
+    localStorage.removeItem("lastActivity");
+    return false;
+  }
+
+  return true;
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    const auth = localStorage.getItem("isAuthenticated");
-    const session = localStorage.getItem("sessionId");
-    return auth === "true" && !!session;
-  });
-
+  const [isAuthenticated, setIsAuthenticated] = useState(validateSession);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   
@@ -41,19 +60,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   });
 
+  // Atualiza a última atividade quando há interação
+  useEffect(() => {
+    if (isAuthenticated) {
+      localStorage.setItem("lastActivity", Date.now().toString());
+    }
+  }, [location.pathname, isAuthenticated]);
+
+  // Verifica autenticação periodicamente
   useEffect(() => {
     const checkAuth = () => {
-      const auth = localStorage.getItem("isAuthenticated");
-      const session = localStorage.getItem("sessionId");
-      const isAuth = auth === "true" && !!session;
-      
-      if (!isAuth && location.pathname.startsWith("/admin")) {
-        navigate("/login", { replace: true });
+      const isValid = validateSession();
+      if (!isValid && isAuthenticated) {
+        setIsAuthenticated(false);
+        if (location.pathname.startsWith("/admin")) {
+          navigate("/login", { replace: true });
+        }
       }
     };
     
-    checkAuth();
-  }, [location, navigate]);
+    const interval = setInterval(checkAuth, 1000 * 60); // Verifica a cada minuto
+    return () => clearInterval(interval);
+  }, [location, navigate, isAuthenticated]);
 
   const handleLogin = async (data: LoginCredentials) => {
     setIsLoggingIn(true);
@@ -65,6 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const sessionId = Date.now().toString();
         localStorage.setItem("isAuthenticated", "true");
         localStorage.setItem("sessionId", sessionId);
+        localStorage.setItem("lastActivity", Date.now().toString());
         setIsAuthenticated(true);
         setIsLoginDialogOpen(false);
         
@@ -97,6 +126,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const handleLogout = () => {
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("sessionId");
+    localStorage.removeItem("lastActivity");
     setIsAuthenticated(false);
     navigate("/", { replace: true });
     

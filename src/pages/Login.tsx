@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -18,19 +17,13 @@ const Login: React.FC = () => {
   const [rememberPassword, setRememberPassword] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
 
-  // Check authentication status once on initial load
+  // Apenas inicializa o componente
   useEffect(() => {
-    const checkAuth = () => {
-      if (auth.isAuthenticated) {
-        navigate("/admin");
-      }
+    const timer = setTimeout(() => {
       setIsInitializing(false);
-    };
-    
-    // Add a small delay to ensure consistent behavior
-    const timer = setTimeout(checkAuth, 100);
+    }, 100);
     return () => clearTimeout(timer);
-  }, [auth.isAuthenticated, navigate]);
+  }, []);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
