@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { 
@@ -9,13 +8,19 @@ import {
   FileText, 
   UserCircle, 
   Newspaper, 
-  ChevronRight 
+  ChevronRight,
+  Home,
+  Settings,
+  LogOut,
+  UserPlus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 const AdminSidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { handleLogout } = useAuth();
   
   const clientPages = [
     { 
@@ -52,36 +57,63 @@ const AdminSidebar: React.FC = () => {
   
   const isActive = (path: string) => location.pathname === path;
   
+  const menuItems = [
+    {
+      title: "Dashboard",
+      icon: <Home className="h-5 w-5" />,
+      path: "/admin"
+    },
+    {
+      title: "Gerenciar Clientes",
+      icon: <UserPlus className="h-4 w-4" />,
+      path: "/admin/clients"
+    },
+    {
+      title: "Contatos de Mídia",
+      icon: <Users className="h-4 w-4" />,
+      path: "/admin/contacts"
+    },
+    {
+      title: "Releases e Reportagens",
+      icon: <FileText className="h-4 w-4" />,
+      path: "/admin/content"
+    },
+    {
+      title: "Configurações",
+      icon: <Settings className="h-4 w-4" />,
+      path: "/admin/settings"
+    }
+  ];
+  
   return (
-    <div className="w-64 border-r h-screen px-4 py-6">
-      <div className="mb-6">
-        <h2 className="font-bold text-xl mb-2">Área Administrativa</h2>
-        <Button 
-          variant="outline" 
-          className="w-full justify-start mb-4"
-          onClick={() => navigate("/admin")}
-        >
-          <Users className="h-4 w-4 mr-2" />
-          Dashboard Principal
-        </Button>
+    <div className="w-64 bg-card border-r h-screen p-4 flex flex-col">
+      <div className="flex items-center justify-center p-4 border-b">
+        <h2 className="text-xl font-bold">Admin</h2>
       </div>
-      
-      <div>
-        <h3 className="font-semibold text-sm text-muted-foreground mb-2 uppercase">Áreas de Cliente</h3>
-        <div className="space-y-1">
-          {clientPages.map((page) => (
-            <Button
-              key={page.path}
-              variant={isActive(page.path) ? "default" : "ghost"}
-              className="w-full justify-start"
-              onClick={() => navigate(page.path)}
-            >
-              {page.icon}
-              <span className="ml-2">{page.title}</span>
-              {isActive(page.path) && <ChevronRight className="ml-auto h-4 w-4" />}
-            </Button>
-          ))}
-        </div>
+
+      <nav className="flex-1 py-4 space-y-2">
+        {menuItems.map((item) => (
+          <Button
+            key={item.path}
+            variant={location.pathname === item.path ? "secondary" : "ghost"}
+            className="w-full justify-start"
+            onClick={() => navigate(item.path)}
+          >
+            {item.icon}
+            <span className="ml-2">{item.title}</span>
+          </Button>
+        ))}
+      </nav>
+
+      <div className="border-t pt-4">
+        <Button
+          variant="ghost"
+          className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
+          onClick={handleLogout}
+        >
+          <LogOut className="h-5 w-5" />
+          <span className="ml-2">Sair</span>
+        </Button>
       </div>
     </div>
   );
