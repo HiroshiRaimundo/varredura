@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
@@ -8,24 +9,14 @@ interface LoginCredentials {
   password: string;
 }
 
-interface User {
-  email: string;
-  role: 'admin' | 'user';
-  name: string;
-}
-
 export const useAuth = () => {
   const navigate = useNavigate();
+  // Initialize isAuthenticated from localStorage to prevent flickering
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return localStorage.getItem("isAuthenticated") === "true";
   });
-  const [user, setUser] = useState<User | null>(() => {
-    const userData = localStorage.getItem("user");
-    return userData ? JSON.parse(userData) : null;
-  });
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  
   const form = useForm<LoginCredentials>({
     defaultValues: {
       email: "",
@@ -37,59 +28,48 @@ export const useAuth = () => {
     setIsLoggingIn(true);
     
     try {
-      // Verify credentials
+      // Add a slight delay to simulate network request
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Verify credentials (using shared login: odr@2025 / Ppgdas@2025)
       if (data.email === "odr@2025" && data.password === "Ppgdas@2025") {
-        const userData: User = {
-          email: data.email,
-          role: 'admin',
-          name: 'Administrador'
-        };
-
         // Set authentication in localStorage
         localStorage.setItem("isAuthenticated", "true");
-        localStorage.setItem("user", JSON.stringify(userData));
-        localStorage.setItem("sessionId", Date.now().toString());
         
-        // Update state
+        // Create a session timestamp to track login
+        const sessionId = Date.now().toString();
+        localStorage.setItem("sessionId", sessionId);
+        
+        // Update state after localStorage is set
         setIsAuthenticated(true);
-        setUser(userData);
         setIsLoginDialogOpen(false);
         
-        // Navigate to admin page
-        window.location.href = '/admin';
+        // Navigate to admin page instead of client page
+        navigate("/admin");
         
         toast({
           title: "Login realizado com sucesso",
           description: "Bem-vindo ao sistema de monitoramento."
         });
-        
-        return { success: true };
+      } else {
+        toast({
+          title: "Erro de autenticação",
+          description: "Email ou senha incorretos.",
+          variant: "destructive"
+        });
       }
-      
-      return { 
-        success: false, 
-        error: 'Credenciais inválidas' 
-      };
-    } catch (error) {
-      console.error('Erro no login:', error);
-      return { 
-        success: false, 
-        error: 'Erro ao realizar login' 
-      };
     } finally {
       setIsLoggingIn(false);
     }
   };
 
   const handleLogout = () => {
+    // Remove authentication from localStorage
     localStorage.removeItem("isAuthenticated");
-    localStorage.removeItem("user");
     localStorage.removeItem("sessionId");
     
+    // Update state
     setIsAuthenticated(false);
-    setUser(null);
-    
-    window.location.href = '/login';
     
     toast({
       title: "Logout realizado",
@@ -99,12 +79,12 @@ export const useAuth = () => {
 
   return {
     isAuthenticated,
-    user,
     isLoginDialogOpen,
     setIsLoginDialogOpen,
     isLoggingIn,
     form,
-    login: handleLogin,
-    logout: handleLogout
+    handleLogin,
+    handleLogout,
+    navigate // Add the navigate function to the return object
   };
 };
