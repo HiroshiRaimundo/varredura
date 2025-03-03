@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProfileType {
+  POLITICO
+  ASSESSOR_IMPRENSA
+  JORNALISTA
+  OBSERVATORIO
+  INSTITUICAO
+}
+
+enum PlanStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+  CANCELLED
+}
+
+model Client {
+  id            String      @id @default(cuid())
+  email         String      @unique
+  name          String
+  passwordHash  String
+  profileType   ProfileType
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  lastLogin     DateTime?
+  plan          Plan?       @relation(fields: [planId], references: [id])
+  planId        String?
+  clientArea    ClientArea?
+  sessions      Session[]
+}
+
+model Plan {
+  id          String      @id @default(cuid())
+  name        String
+  status      PlanStatus  @default(ACTIVE)
+  startDate   DateTime
+  endDate     DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  clients     Client[]
+}
+
+model ClientArea {
+  id          String    @id @default(cuid())
+  clientId    String    @unique
+  client      Client    @relation(fields: [clientId], references: [id])
+  settings    Json?     // Configurações específicas da área do cliente
+  dashboards  Json[]    // Dashboards personalizados
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  clientId     String
+  client       Client   @relation(fields: [clientId], references: [id])
+  token        String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  lastActivity DateTime @updatedAt
+} 

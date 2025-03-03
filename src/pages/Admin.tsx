@@ -1,12 +1,69 @@
-
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import { useAuth } from "@/hooks/useAuth";
 
 const Admin: React.FC = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // Limpa o cache de autenticação
+        const clearCache = () => {
+          localStorage.removeItem("isAuthenticated");
+          localStorage.removeItem("user");
+          localStorage.removeItem("admin_token");
+          document.cookie = "admin_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        };
+
+        const isAuth = localStorage.getItem("isAuthenticated") === "true";
+        const userData = localStorage.getItem("user");
+        const userObj = userData ? JSON.parse(userData) : null;
+        const adminToken = localStorage.getItem("admin_token");
+
+        if (!isAuth || !userObj || userObj.role !== 'admin' || !adminToken) {
+          clearCache();
+          window.location.href = '/admin/login';
+          return;
+        }
+
+        // Verifica a validade do token no servidor
+        const response = await fetch('/api/admin/verify-token', {
+          headers: {
+            'Authorization': `Bearer ${adminToken}`
+          }
+        });
+
+        if (!response.ok) {
+          clearCache();
+          window.location.href = '/admin/login';
+          return;
+        }
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Erro na verificação de autenticação:', error);
+        window.location.href = '/admin/login';
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  // Mostra loading enquanto verifica autenticação
+  if (isLoading) {
+    return <div className="flex items-center justify-center h-screen">Carregando...</div>;
+  }
+
+  // Renderiza nada se não estiver autenticado
+  if (!isAuthenticated || !user || user.role !== 'admin') {
+    return null;
+  }
 
   const clientTypes = [
     {
@@ -48,52 +105,29 @@ const Admin: React.FC = () => {
   ];
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen bg-gray-100">
       <AdminSidebar />
-      
-      <div className="flex-1 p-6 overflow-auto">
-        <h1 className="text-3xl font-bold mb-6">Painel Administrativo</h1>
-        
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Áreas de Cliente</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {clientTypes.map((client) => (
+      <main className="flex-1 p-6 overflow-auto">
+        <h1 className="text-2xl font-bold mb-6">Painel Administrativo</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {clientTypes.map((client) => (
+            <Card key={client.type} className="hover:shadow-lg transition-shadow">
+              <CardHeader className={`${client.color} text-white rounded-t-lg`}>
+                <CardTitle>{client.title}</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <p className="text-gray-600 mb-4">{client.description}</p>
                 <Button
-                  key={client.type}
-                  className={`h-auto py-6 ${client.color} hover:opacity-90 flex flex-col items-start text-left`}
                   onClick={() => navigate(`/admin/client/${client.type}`)}
+                  className="w-full"
                 >
-                  <span className="font-bold text-lg">{client.title}</span>
-                  <span className="text-sm opacity-90 font-normal mt-1">{client.description}</span>
+                  Acessar
                 </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Estatísticas Gerais</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Painel de estatísticas gerais do sistema.</p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Atividades Recentes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Lista de atividades recentes no sistema.</p>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-      </div>
+      </main>
     </div>
   );
 };

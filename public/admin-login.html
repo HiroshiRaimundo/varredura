@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOGA Monitoramento - Login Administrativo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .loading {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center px-4">
+        <div class="w-full max-w-md bg-white rounded-lg shadow-md p-8">
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold text-gray-900">KOGA Monitoramento</h1>
+                <p class="text-gray-600 mt-2">Acesso Administrativo</p>
+            </div>
+
+            <div id="error-message" class="hidden bg-red-50 text-red-600 p-4 rounded-md text-sm mb-4"></div>
+
+            <form id="login-form" class="space-y-6">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Digite seu email administrativo"
+                    />
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Digite sua senha"
+                    />
+                </div>
+
+                <button
+                    type="submit"
+                    id="submit-button"
+                    class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                >
+                    Entrar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Função para mostrar mensagem de erro
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+        }
+
+        // Função para limpar mensagem de erro
+        function clearError() {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.classList.add('hidden');
+        }
+
+        // Função para atualizar estado do botão
+        function updateButtonState(loading) {
+            const button = document.getElementById('submit-button');
+            if (loading) {
+                button.disabled = true;
+                button.innerHTML = '<span class="loading inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span>Entrando...';
+            } else {
+                button.disabled = false;
+                button.textContent = 'Entrar';
+            }
+        }
+
+        // Função para validar email
+        function validateEmail(email) {
+            return email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+        }
+
+        // Função para validar senha
+        function validatePassword(password) {
+            return password.length >= 8;
+        }
+
+        // Handler do formulário
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            clearError();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            // Validações básicas
+            if (!validateEmail(email)) {
+                showError('Por favor, insira um email válido');
+                return;
+            }
+
+            if (!validatePassword(password)) {
+                showError('A senha deve ter pelo menos 8 caracteres');
+                return;
+            }
+
+            updateButtonState(true);
+
+            try {
+                // Verifica as credenciais
+                if (email === 'odr@2025' && password === 'Ppgdas@2025') {
+                    // Limpa dados antigos
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    
+                    // Salva os dados de autenticação
+                    localStorage.setItem('adminAuth', JSON.stringify({
+                        token: 'admin-token',
+                        user: {
+                            email,
+                            role: 'admin',
+                            name: 'Administrador'
+                        },
+                        timestamp: Date.now()
+                    }));
+
+                    // Redireciona para o painel
+                    window.location.href = '/admin';
+                } else {
+                    showError('Credenciais inválidas');
+                    updateButtonState(false);
+                }
+            } catch (error) {
+                showError('Erro ao realizar login. Tente novamente.');
+                updateButtonState(false);
+                console.error('Erro no login:', error);
+            }
+        });
+
+        // Verifica autenticação existente ao carregar a página
+        window.addEventListener('load', function() {
+            try {
+                const authData = localStorage.getItem('adminAuth');
+                if (authData) {
+                    const data = JSON.parse(authData);
+                    const now = Date.now();
+                    const authAge = now - data.timestamp;
+                    
+                    // Se a autenticação tem menos de 8 horas
+                    if (authAge < 8 * 3600 * 1000) {
+                        window.location.href = '/admin';
+                    } else {
+                        // Limpa autenticação expirada
+                        localStorage.clear();
+                        sessionStorage.clear();
+                    }
+                }
+            } catch (error) {
+                localStorage.clear();
+                sessionStorage.clear();
+            }
+        });
+    </script>
+</body>
+</html> 
