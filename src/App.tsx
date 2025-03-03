@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/hooks/useAuth";
 import Index from "@/pages/Index";
 import Dashboard from "@/pages/Dashboard";
 import Login from "@/pages/Login";
@@ -24,28 +25,30 @@ function App() {
   
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/help" element={<Help />} />
-        <Route path="/client/:clientType" element={<Client />} />
-        <Route path="/client-login" element={<ClientLogin />} />
-        <Route path="/service/:serviceId" element={<ServiceLanding />} />
-        <Route path="/payment" element={<Payment />} /> 
-        <Route path="/example-client" element={<ExampleClient />} />
-        
-        {/* Rotas protegidas - área administrativa */}
-        <Route path="/admin" element={<PrivateRoute><Admin /></PrivateRoute>} />
-        <Route path="/admin/client/observatory" element={<PrivateRoute><ObservatoryClient /></PrivateRoute>} />
-        <Route path="/admin/client/researcher" element={<PrivateRoute><ResearcherClient /></PrivateRoute>} />
-        <Route path="/admin/client/politician" element={<PrivateRoute><PoliticianClient /></PrivateRoute>} />
-        <Route path="/admin/client/institution" element={<PrivateRoute><InstitutionClient /></PrivateRoute>} />
-        <Route path="/admin/client/journalist" element={<PrivateRoute><JournalistClient /></PrivateRoute>} />
-        <Route path="/admin/client/press" element={<PrivateRoute><PressClient /></PrivateRoute>} />
-        
-        <Route path="/*" element={<NotFound />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/help" element={<Help />} />
+          <Route path="/client/:clientType" element={<Client />} />
+          <Route path="/client-login" element={<ClientLogin />} />
+          <Route path="/service/:serviceId" element={<ServiceLanding />} />
+          <Route path="/payment" element={<Payment />} /> 
+          <Route path="/example-client" element={<ExampleClient />} />
+          
+          {/* Rotas protegidas - área administrativa */}
+          <Route path="/admin" element={<PrivateRoute><Admin /></PrivateRoute>} />
+          <Route path="/admin/client/observatory" element={<PrivateRoute><ObservatoryClient /></PrivateRoute>} />
+          <Route path="/admin/client/researcher" element={<PrivateRoute><ResearcherClient /></PrivateRoute>} />
+          <Route path="/admin/client/politician" element={<PrivateRoute><PoliticianClient /></PrivateRoute>} />
+          <Route path="/admin/client/institution" element={<PrivateRoute><InstitutionClient /></PrivateRoute>} />
+          <Route path="/admin/client/journalist" element={<PrivateRoute><JournalistClient /></PrivateRoute>} />
+          <Route path="/admin/client/press" element={<PrivateRoute><PressClient /></PrivateRoute>} />
+          
+          <Route path="/*" element={<NotFound />} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

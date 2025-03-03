@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -8,13 +8,29 @@ interface LoginCredentials {
   password: string;
 }
 
-export const useAuth = () => {
+interface AuthContextType {
+  isAuthenticated: boolean;
+  isLoginDialogOpen: boolean;
+  setIsLoginDialogOpen: (value: boolean) => void;
+  isLoggingIn: boolean;
+  form: any;
+  handleLogin: (data: LoginCredentials) => Promise<void>;
+  handleLogout: () => void;
+  navigate: (to: string) => void;
+}
+
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem("isAuthenticated") === "true";
+    const auth = localStorage.getItem("isAuthenticated");
+    const session = localStorage.getItem("sessionId");
+    return auth === "true" && !!session;
   });
+
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   
@@ -25,12 +41,14 @@ export const useAuth = () => {
     }
   });
 
-  // Verificar autenticação e redirecionar se necessário
   useEffect(() => {
     const checkAuth = () => {
-      const isAuth = localStorage.getItem("isAuthenticated") === "true";
+      const auth = localStorage.getItem("isAuthenticated");
+      const session = localStorage.getItem("sessionId");
+      const isAuth = auth === "true" && !!session;
+      
       if (!isAuth && location.pathname.startsWith("/admin")) {
-        navigate("/login");
+        navigate("/login", { replace: true });
       }
     };
     
@@ -44,13 +62,14 @@ export const useAuth = () => {
       await new Promise(resolve => setTimeout(resolve, 300));
       
       if (data.email === "Rosemary@Hiroshi2025" && data.password === "koga@2025") {
+        const sessionId = Date.now().toString();
         localStorage.setItem("isAuthenticated", "true");
-        localStorage.setItem("sessionId", Date.now().toString());
+        localStorage.setItem("sessionId", sessionId);
         setIsAuthenticated(true);
         setIsLoginDialogOpen(false);
         
-        // Redireciona para /admin após login bem-sucedido
-        navigate("/admin");
+        const redirectTo = location.state?.from || "/admin";
+        navigate(redirectTo, { replace: true });
         
         toast({
           title: "Login realizado com sucesso",
@@ -63,6 +82,13 @@ export const useAuth = () => {
           variant: "destructive"
         });
       }
+    } catch (error) {
+      console.error("Erro durante o login:", error);
+      toast({
+        title: "Erro no sistema",
+        description: "Ocorreu um erro durante o login. Tente novamente.",
+        variant: "destructive"
+      });
     } finally {
       setIsLoggingIn(false);
     }
@@ -72,9 +98,7 @@ export const useAuth = () => {
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("sessionId");
     setIsAuthenticated(false);
-    
-    // Redireciona para a página inicial após logout
-    navigate("/");
+    navigate("/", { replace: true });
     
     toast({
       title: "Logout realizado",
@@ -82,7 +106,7 @@ export const useAuth = () => {
     });
   };
 
-  return {
+  const value = {
     isAuthenticated,
     isLoginDialogOpen,
     setIsLoginDialogOpen,
@@ -92,4 +116,14 @@ export const useAuth = () => {
     handleLogout,
     navigate
   };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth deve ser usado dentro de um AuthProvider");
+  }
+  return context;
 };
