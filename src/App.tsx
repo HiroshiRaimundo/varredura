@@ -1,4 +1,3 @@
-
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "@/pages/Index";
@@ -18,6 +17,7 @@ import PoliticianClient from "@/pages/clients/PoliticianClient";
 import InstitutionClient from "@/pages/clients/InstitutionClient";
 import JournalistClient from "@/pages/clients/JournalistClient";
 import PressClient from "@/pages/clients/PressClient";
+import PrivateRoute from "@/components/PrivateRoute";
 
 function App() {
   console.log("App component rendered with routes");
@@ -28,7 +28,6 @@ function App() {
         <Route path="/" element={<Index />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/admin" element={<Admin />} />
         <Route path="/help" element={<Help />} />
         <Route path="/client/:clientType" element={<Client />} />
         <Route path="/client-login" element={<ClientLogin />} />
@@ -36,13 +35,14 @@ function App() {
         <Route path="/payment" element={<Payment />} /> 
         <Route path="/example-client" element={<ExampleClient />} />
         
-        {/* Novas páginas específicas por tipo de cliente */}
-        <Route path="/admin/client/observatory" element={<ObservatoryClient />} />
-        <Route path="/admin/client/researcher" element={<ResearcherClient />} />
-        <Route path="/admin/client/politician" element={<PoliticianClient />} />
-        <Route path="/admin/client/institution" element={<InstitutionClient />} />
-        <Route path="/admin/client/journalist" element={<JournalistClient />} />
-        <Route path="/admin/client/press" element={<PressClient />} />
+        {/* Rotas protegidas - área administrativa */}
+        <Route path="/admin" element={<PrivateRoute><Admin /></PrivateRoute>} />
+        <Route path="/admin/client/observatory" element={<PrivateRoute><ObservatoryClient /></PrivateRoute>} />
+        <Route path="/admin/client/researcher" element={<PrivateRoute><ResearcherClient /></PrivateRoute>} />
+        <Route path="/admin/client/politician" element={<PrivateRoute><PoliticianClient /></PrivateRoute>} />
+        <Route path="/admin/client/institution" element={<PrivateRoute><InstitutionClient /></PrivateRoute>} />
+        <Route path="/admin/client/journalist" element={<PrivateRoute><JournalistClient /></PrivateRoute>} />
+        <Route path="/admin/client/press" element={<PrivateRoute><PressClient /></PrivateRoute>} />
         
         <Route path="/*" element={<NotFound />} />
       </Routes>

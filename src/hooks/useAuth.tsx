@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface LoginCredentials {
   email: string;
@@ -11,12 +10,14 @@ interface LoginCredentials {
 
 export const useAuth = () => {
   const navigate = useNavigate();
-  // Initialize isAuthenticated from localStorage to prevent flickering
+  const location = useLocation();
+  
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return localStorage.getItem("isAuthenticated") === "true";
   });
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  
   const form = useForm<LoginCredentials>({
     defaultValues: {
       email: "",
@@ -24,32 +25,36 @@ export const useAuth = () => {
     }
   });
 
+  // Verificar autenticação e redirecionar se necessário
+  useEffect(() => {
+    const checkAuth = () => {
+      const isAuth = localStorage.getItem("isAuthenticated") === "true";
+      if (!isAuth && location.pathname.startsWith("/admin")) {
+        navigate("/login");
+      }
+    };
+    
+    checkAuth();
+  }, [location, navigate]);
+
   const handleLogin = async (data: LoginCredentials) => {
     setIsLoggingIn(true);
     
     try {
-      // Add a slight delay to simulate network request
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Verify credentials (using shared login: odr@2025 / Ppgdas@2025)
-      if (data.email === "odr@2025" && data.password === "Ppgdas@2025") {
-        // Set authentication in localStorage
+      if (data.email === "Rosemary@Hiroshi2025" && data.password === "koga@2025") {
         localStorage.setItem("isAuthenticated", "true");
-        
-        // Create a session timestamp to track login
-        const sessionId = Date.now().toString();
-        localStorage.setItem("sessionId", sessionId);
-        
-        // Update state after localStorage is set
+        localStorage.setItem("sessionId", Date.now().toString());
         setIsAuthenticated(true);
         setIsLoginDialogOpen(false);
         
-        // Navigate to admin page instead of client page
+        // Redireciona para /admin após login bem-sucedido
         navigate("/admin");
         
         toast({
           title: "Login realizado com sucesso",
-          description: "Bem-vindo ao sistema de monitoramento."
+          description: "Bem-vindo ao painel administrativo."
         });
       } else {
         toast({
@@ -64,12 +69,12 @@ export const useAuth = () => {
   };
 
   const handleLogout = () => {
-    // Remove authentication from localStorage
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("sessionId");
-    
-    // Update state
     setIsAuthenticated(false);
+    
+    // Redireciona para a página inicial após logout
+    navigate("/");
     
     toast({
       title: "Logout realizado",
@@ -85,6 +90,6 @@ export const useAuth = () => {
     form,
     handleLogin,
     handleLogout,
-    navigate // Add the navigate function to the return object
+    navigate
   };
 };
