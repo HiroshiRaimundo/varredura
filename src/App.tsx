@@ -17,7 +17,9 @@ import JournalistDashboard from '@/pages/dashboard/JournalistDashboard';
 import PressDashboard from '@/pages/dashboard/PressDashboard';
 
 // Other pages
+import Index from '@/pages/Index';
 import LoginPage from '@/pages/Login';
+import ClientLoginPage from '@/pages/ClientLogin';
 import Unauthorized from '@/pages/Unauthorized';
 
 function App() {
@@ -25,8 +27,12 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* Rota pública de login */}
+          {/* Página inicial pública */}
+          <Route path="/" element={<Index />} />
+
+          {/* Rotas de login */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/client-login" element={<ClientLoginPage />} />
           
           {/* Rota de erro de autorização */}
           <Route path="/unauthorized" element={<Unauthorized />} />
@@ -122,12 +128,9 @@ function App() {
               </ProtectedRoute>
             }
           />
-
-          {/* Redirecionar raiz para login */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
           
           {/* Rota 404 */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </AuthProvider>
