@@ -1,10 +1,8 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ClientLoginForm from "./ClientLoginForm";
-import LoginDemoAlert from "./LoginDemoAlert";
 import { ClientLoginFormValues } from "./types";
 
 interface LoginCardProps {
@@ -25,7 +23,6 @@ const LoginCard: React.FC<LoginCardProps> = ({ onLogin, isLoggingIn }) => {
       </CardHeader>
       
       <CardContent>
-        <LoginDemoAlert />
         <ClientLoginForm onSubmit={onLogin} isLoggingIn={isLoggingIn} />
       </CardContent>
       
