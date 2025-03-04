@@ -9,7 +9,7 @@ import { clientService, Client } from "@/services/clientService";
 
 // Componentes refatorados
 import ClientTable from "@/components/admin/clients/ClientTable";
-import AddClientDialog from "@/components/admin/clients/AddClientDialog";
+import AddClientDialog, { NewClientData } from "@/components/admin/clients/AddClientDialog";
 import DeleteClientDialog from "@/components/admin/clients/DeleteClientDialog";
 import PasswordDialog from "@/components/admin/clients/PasswordDialog";
 import ClientStatusBadges from "@/components/admin/clients/ClientStatusBadges";
@@ -33,11 +33,11 @@ const ClientManagement: React.FC = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [newClient, setNewClient] = useState({
+  const [newClient, setNewClient] = useState<NewClientData>({
     name: "",
     email: "",
     serviceType: ServiceType.OBSERVATORY,
-    status: "active" as const
+    status: "active"
   });
   const [generatedPassword, setGeneratedPassword] = useState("");
 

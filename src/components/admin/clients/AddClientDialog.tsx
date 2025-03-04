@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { PlusCircle } from "lucide-react";
 import { ServiceType } from "@/hooks/useClientAuth";
 
-interface NewClientData {
+// Fix the type definition to match what's used in ClientManagement
+export interface NewClientData {
   name: string;
   email: string;
   serviceType: ServiceType;

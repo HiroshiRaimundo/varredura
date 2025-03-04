@@ -1,3 +1,4 @@
+
 import { ServiceType } from "@/hooks/useClientAuth";
 
 export interface Client {
@@ -10,8 +11,39 @@ export interface Client {
   expiresAt?: Date;
 }
 
-// Simulação de banco de dados (substituir por integração real posteriormente)
-let clients: Client[] = [];
+// Local storage implementation
+const STORAGE_KEY = 'app_clients_data';
+
+// Helper function to load clients from localStorage
+const loadClientsFromStorage = (): Client[] => {
+  try {
+    const storedData = localStorage.getItem(STORAGE_KEY);
+    if (storedData) {
+      const parsedData = JSON.parse(storedData);
+      // Convert string dates back to Date objects
+      return parsedData.map((client: any) => ({
+        ...client,
+        createdAt: new Date(client.createdAt),
+        expiresAt: client.expiresAt ? new Date(client.expiresAt) : undefined
+      }));
+    }
+  } catch (error) {
+    console.error("Error loading clients from storage:", error);
+  }
+  return [];
+};
+
+// Helper function to save clients to localStorage
+const saveClientsToStorage = (clients: Client[]): void => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
+  } catch (error) {
+    console.error("Error saving clients to storage:", error);
+  }
+};
+
+// Initialize clients from localStorage
+let clients: Client[] = loadClientsFromStorage();
 
 export const clientService = {
   // Buscar todos os clientes
@@ -26,7 +58,7 @@ export const clientService = {
 
   // Buscar cliente por email
   getByEmail: async (email: string): Promise<Client | null> => {
-    return clients.find(client => client.email === email) || null;
+    return clients.find(client => client.email.toLowerCase() === email.toLowerCase()) || null;
   },
 
   // Criar novo cliente
@@ -37,12 +69,13 @@ export const clientService = {
     }
 
     const newClient: Client = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(), // More reliable ID generation
       ...data,
       createdAt: new Date()
     };
 
     clients.push(newClient);
+    saveClientsToStorage(clients);
     return newClient;
   },
 
@@ -53,7 +86,7 @@ export const clientService = {
       throw new Error("Cliente não encontrado");
     }
 
-    if (data.email && data.email !== clients[index].email) {
+    if (data.email && data.email.toLowerCase() !== clients[index].email.toLowerCase()) {
       const existingClient = await clientService.getByEmail(data.email);
       if (existingClient) {
         throw new Error("Email já cadastrado");
@@ -62,9 +95,13 @@ export const clientService = {
 
     clients[index] = {
       ...clients[index],
-      ...data
+      ...data,
+      // Ensure dates are Date objects
+      createdAt: clients[index].createdAt,
+      expiresAt: data.expiresAt ? new Date(data.expiresAt) : clients[index].expiresAt
     };
 
+    saveClientsToStorage(clients);
     return clients[index];
   },
 
@@ -76,6 +113,7 @@ export const clientService = {
     }
 
     clients.splice(index, 1);
+    saveClientsToStorage(clients);
   },
 
   // Atualizar status do cliente
@@ -97,8 +135,15 @@ export const clientService = {
       throw new Error("Cliente não encontrado");
     }
 
-    // Implementar geração e atualização de senha quando houver integração com banco real
-    const newPassword = "nova-senha-gerada";
+    // Generate a secure random password
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+    let newPassword = "";
+    for (let i = 0; i < 12; i++) {
+      newPassword += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    
+    // In a real implementation, we would hash this password and store it in the database
+    
     return newPassword;
   }
-}; 
+};
