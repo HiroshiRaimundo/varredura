@@ -13,6 +13,7 @@ import AddClientDialog from "@/components/admin/clients/AddClientDialog";
 import DeleteClientDialog from "@/components/admin/clients/DeleteClientDialog";
 import PasswordDialog from "@/components/admin/clients/PasswordDialog";
 import ClientStatusBadges from "@/components/admin/clients/ClientStatusBadges";
+import EditClientDialog from "@/components/admin/clients/EditClientDialog";
 
 const generatePassword = () => {
   const length = 12;
@@ -29,7 +30,9 @@ const ClientManagement: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [newClient, setNewClient] = useState({
     name: "",
     email: "",
@@ -186,11 +189,61 @@ const ClientManagement: React.FC = () => {
   };
   
   const handleEditClient = (clientId: string) => {
-    // Funcionalidade a ser implementada
-    toast({
-      title: "Edição de cliente",
-      description: "Esta funcionalidade será implementada em breve."
+    const client = clients.find(c => c.id === clientId);
+    if (client) {
+      setSelectedClient(client);
+      setSelectedClientId(clientId);
+      setIsEditDialogOpen(true);
+    }
+  };
+
+  const handleClientFieldChange = (field: string, value: string) => {
+    if (!selectedClient) return;
+    
+    setSelectedClient(prev => {
+      if (!prev) return null;
+      
+      if (field === "expiresAt") {
+        // Convert string date to Date object
+        return {
+          ...prev,
+          [field]: value ? new Date(value) : undefined
+        };
+      }
+      
+      return {
+        ...prev,
+        [field]: value
+      };
     });
+  };
+
+  const handleSaveClientChanges = async () => {
+    if (!selectedClient || !selectedClientId) return;
+    
+    try {
+      const updatedClient = await clientService.update(selectedClientId, selectedClient);
+      
+      // Update client list
+      setClients(clients.map(client => 
+        client.id === selectedClientId ? updatedClient : client
+      ));
+      
+      setIsEditDialogOpen(false);
+      setSelectedClient(null);
+      setSelectedClientId(null);
+      
+      toast({
+        title: "Cliente atualizado",
+        description: "As informações do cliente foram atualizadas com sucesso."
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao atualizar cliente",
+        description: error instanceof Error ? error.message : "Ocorreu um erro ao atualizar o cliente.",
+        variant: "destructive"
+      });
+    }
   };
 
   if (isLoading) {
@@ -239,6 +292,15 @@ const ClientManagement: React.FC = () => {
         isOpen={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirmDelete={handleDeleteClient}
+      />
+
+      {/* Diálogo de edição */}
+      <EditClientDialog
+        isOpen={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        client={selectedClient}
+        onClientChange={handleClientFieldChange}
+        onSave={handleSaveClientChanges}
       />
 
       {/* Diálogo de senha gerada */}
