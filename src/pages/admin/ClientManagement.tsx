@@ -1,17 +1,18 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { ServiceType } from "@/hooks/useClientAuth";
-import { PlusCircle, Edit, Trash2, Key, CheckCircle, XCircle, Copy, AlertTriangle, Loader2 } from "lucide-react";
 import BackToAdminButton from "@/components/admin/BackToAdminButton";
-import { Badge } from "@/components/ui/badge";
 import { clientService, Client } from "@/services/clientService";
+
+// Componentes refatorados
+import ClientTable from "@/components/admin/clients/ClientTable";
+import AddClientDialog from "@/components/admin/clients/AddClientDialog";
+import DeleteClientDialog from "@/components/admin/clients/DeleteClientDialog";
+import PasswordDialog from "@/components/admin/clients/PasswordDialog";
+import ClientStatusBadges from "@/components/admin/clients/ClientStatusBadges";
 
 const generatePassword = () => {
   const length = 12;
@@ -183,17 +184,13 @@ const ClientManagement: React.FC = () => {
       });
     }
   };
-
-  const getServiceTypeLabel = (type: ServiceType) => {
-    const labels = {
-      [ServiceType.OBSERVATORY]: "Observatório",
-      [ServiceType.PRESS]: "Assessoria de Imprensa",
-      [ServiceType.RESEARCHER]: "Pesquisador",
-      [ServiceType.POLITICIAN]: "Político",
-      [ServiceType.INSTITUTION]: "Instituição",
-      [ServiceType.JOURNALIST]: "Jornalista"
-    };
-    return labels[type];
+  
+  const handleEditClient = (clientId: string) => {
+    // Funcionalidade a ser implementada
+    toast({
+      title: "Edição de cliente",
+      description: "Esta funcionalidade será implementada em breve."
+    });
   };
 
   if (isLoading) {
@@ -216,222 +213,45 @@ const ClientManagement: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center space-x-2">
-              <Badge variant="outline" className="text-green-500">
-                <CheckCircle className="h-4 w-4 mr-1" />
-                {clients.filter(c => c.status === "active").length} Ativos
-              </Badge>
-              <Badge variant="outline" className="text-red-500">
-                <XCircle className="h-4 w-4 mr-1" />
-                {clients.filter(c => c.status === "inactive").length} Inativos
-              </Badge>
-            </div>
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Adicionar Cliente
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Adicionar Novo Cliente</DialogTitle>
-                  <DialogDescription>
-                    Preencha os dados do cliente para criar seu acesso.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <Label>Nome *</Label>
-                    <Input
-                      value={newClient.name}
-                      onChange={(e) => setNewClient({ ...newClient, name: e.target.value })}
-                      placeholder="Nome completo do cliente"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Email *</Label>
-                    <Input
-                      type="email"
-                      value={newClient.email}
-                      onChange={(e) => setNewClient({ ...newClient, email: e.target.value })}
-                      placeholder="email@exemplo.com"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Tipo de Serviço *</Label>
-                    <Select
-                      value={newClient.serviceType}
-                      onValueChange={(value) => setNewClient({ ...newClient, serviceType: value as ServiceType })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o serviço" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={ServiceType.OBSERVATORY}>Observatório</SelectItem>
-                        <SelectItem value={ServiceType.PRESS}>Assessoria de Imprensa</SelectItem>
-                        <SelectItem value={ServiceType.RESEARCHER}>Pesquisador</SelectItem>
-                        <SelectItem value={ServiceType.POLITICIAN}>Político</SelectItem>
-                        <SelectItem value={ServiceType.INSTITUTION}>Instituição</SelectItem>
-                        <SelectItem value={ServiceType.JOURNALIST}>Jornalista</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                    Cancelar
-                  </Button>
-                  <Button onClick={handleAddClient}>
-                    Adicionar Cliente
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <ClientStatusBadges clients={clients} />
+            
+            <AddClientDialog
+              isOpen={isAddDialogOpen}
+              onOpenChange={setIsAddDialogOpen}
+              newClient={newClient}
+              onNewClientChange={setNewClient}
+              onAddClient={handleAddClient}
+            />
           </div>
 
-          <div className="border rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Serviço</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Data de Criação</TableHead>
-                  <TableHead>Expira em</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {clients.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                      Nenhum cliente cadastrado ainda.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  clients.map((client) => (
-                    <TableRow key={client.id}>
-                      <TableCell>{client.name}</TableCell>
-                      <TableCell>{client.email}</TableCell>
-                      <TableCell>{getServiceTypeLabel(client.serviceType)}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={client.status === "active" ? "default" : "destructive"}
-                          className="cursor-pointer"
-                          onClick={() => handleStatusToggle(client.id)}
-                        >
-                          {client.status === "active" ? (
-                            <>
-                              <CheckCircle className="h-3 w-3 mr-1" />
-                              Ativo
-                            </>
-                          ) : (
-                            <>
-                              <XCircle className="h-3 w-3 mr-1" />
-                              Inativo
-                            </>
-                          )}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{new Date(client.createdAt).toLocaleDateString()}</TableCell>
-                      <TableCell>
-                        {client.expiresAt ? new Date(client.expiresAt).toLocaleDateString() : "N/A"}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end space-x-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleResetPassword(client.id)}
-                            title="Redefinir senha"
-                          >
-                            <Key className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            title="Editar cliente"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteConfirmation(client.id)}
-                            title="Remover cliente"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+          <ClientTable
+            clients={clients}
+            onStatusToggle={handleStatusToggle}
+            onResetPassword={handleResetPassword}
+            onEditClient={handleEditClient}
+            onDeleteClient={handleDeleteConfirmation}
+          />
         </CardContent>
       </Card>
 
       {/* Diálogo de confirmação de exclusão */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center">
-              <AlertTriangle className="h-5 w-5 text-destructive mr-2" />
-              Confirmar Exclusão
-            </DialogTitle>
-            <DialogDescription>
-              Tem certeza que deseja remover este cliente? Esta ação não pode ser desfeita.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
-              Cancelar
-            </Button>
-            <Button variant="destructive" onClick={handleDeleteClient}>
-              Remover Cliente
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteClientDialog
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirmDelete={handleDeleteClient}
+      />
 
       {/* Diálogo de senha gerada */}
       {generatedPassword && (
-        <Dialog open={true} onOpenChange={() => setGeneratedPassword("")}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Senha Gerada</DialogTitle>
-              <DialogDescription>
-                Guarde esta senha em um local seguro. Ela será necessária para o primeiro acesso do cliente.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="p-4 bg-secondary rounded-lg flex items-center justify-between">
-                <code className="text-lg font-mono">{generatedPassword}</code>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => copyToClipboard(generatedPassword)}
-                  title="Copiar senha"
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Recomende ao cliente que altere esta senha no primeiro acesso.
-              </p>
-            </div>
-            <DialogFooter>
-              <Button onClick={() => setGeneratedPassword("")}>Fechar</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <PasswordDialog
+          password={generatedPassword}
+          isOpen={!!generatedPassword}
+          onOpenChange={(open) => !open && setGeneratedPassword("")}
+          onCopyPassword={copyToClipboard}
+        />
       )}
     </div>
   );
 };
 
-export default ClientManagement; 
+export default ClientManagement;
