@@ -1,7 +1,7 @@
-import { useContext } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '@/contexts/AuthContext';
+import { useAuth as useAuthContext } from '@/contexts/AuthContext';
 
 interface LoginFormData {
   email: string;
@@ -10,14 +10,8 @@ interface LoginFormData {
 
 export function useAuth() {
   const navigate = useNavigate();
-  const context = useContext(AuthContext);
+  const auth = useAuthContext();
   const form = useForm<LoginFormData>();
-
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-
-  const { isAuthenticated, user, login, logout } = context;
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const handleLogin = async (data: LoginFormData) => {
@@ -28,7 +22,7 @@ export function useAuth() {
 
       // Mock de autenticação - substituir por chamada real à API
       if (data.email === 'admin@koga.com' && data.password === 'admin123') {
-        login({
+        auth.login({
           id: '1',
           name: 'Administrador',
           email: data.email,
@@ -47,13 +41,13 @@ export function useAuth() {
   };
 
   const handleLogout = () => {
-    logout();
+    auth.logout();
     navigate('/login');
   };
 
   return {
-    isAuthenticated,
-    user,
+    isAuthenticated: auth.isAuthenticated,
+    user: auth.user,
     form,
     isLoggingIn,
     handleLogin,
