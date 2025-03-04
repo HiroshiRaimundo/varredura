@@ -14,6 +14,7 @@ import MonitoringForm, { MonitoringItem } from "@/components/monitoring/Monitori
 import { useToast } from "@/hooks/use-toast";
 import PressContent from "@/components/example-client/press/PressContent";
 import generateMockData from "@/components/example-client/utils/mockDataGenerator";
+import BackToAdminButton from "@/components/admin/BackToAdminButton";
 
 // Include this press client type in the ClientType type definition
 const clientType = "press" as ClientType;
@@ -54,6 +55,7 @@ const PressClient: React.FC = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <div className="p-6 flex-grow">
         <div className="max-w-7xl mx-auto">
+          <BackToAdminButton />
           <Header 
             isAuthenticated={auth.isAuthenticated} 
             onLoginClick={() => auth.setIsLoginDialogOpen(true)} 

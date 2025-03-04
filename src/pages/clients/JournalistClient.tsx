@@ -8,6 +8,7 @@ import { clientTypeDetails } from "@/components/client/ClientTypes";
 import { getColorClasses } from "@/components/service/utils/colorUtils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, Users, Activity } from "lucide-react";
+import BackToAdminButton from "@/components/admin/BackToAdminButton";
 import ReleaseModerationSection from "@/components/example-client/press/ReleaseModerationSection";
 import JournalistContactsSection from "@/components/example-client/press/JournalistContactsSection";
 
@@ -21,6 +22,7 @@ const JournalistClient: React.FC = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <div className="p-6 flex-grow">
         <div className="max-w-7xl mx-auto">
+          <BackToAdminButton />
           <Header 
             isAuthenticated={auth.isAuthenticated} 
             onLoginClick={() => auth.setIsLoginDialogOpen(true)} 

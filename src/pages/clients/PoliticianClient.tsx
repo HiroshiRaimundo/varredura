@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart3, FilePieChart, LineChart, PieChart } from "lucide-react";
+import BackToAdminButton from "@/components/admin/BackToAdminButton";
 
 const PoliticianClient: React.FC = () => {
   const { toast } = useToast();
@@ -86,6 +87,7 @@ const PoliticianClient: React.FC = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <div className="p-6 flex-grow">
         <div className="max-w-7xl mx-auto">
+          <BackToAdminButton />
           <Header 
             isAuthenticated={auth.isAuthenticated} 
             onLoginClick={() => auth.setIsLoginDialogOpen(true)} 

@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import MonitoringForm, { MonitoringItem } from "@/components/monitoring/MonitoringForm";
 import { BarChart3, FilePieChart, LineChart, PieChart } from "lucide-react";
+import BackToAdminButton from "@/components/admin/BackToAdminButton";
 
 const InstitutionClient: React.FC = () => {
   const { toast } = useToast();
@@ -86,6 +87,7 @@ const InstitutionClient: React.FC = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <div className="p-6 flex-grow">
         <div className="max-w-7xl mx-auto">
+          <BackToAdminButton />
           <Header 
             isAuthenticated={auth.isAuthenticated} 
             onLoginClick={() => auth.setIsLoginDialogOpen(true)} 
