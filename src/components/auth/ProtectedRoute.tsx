@@ -1,29 +1,20 @@
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { ClientType } from '@/types/clientTypes';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedTypes?: ClientType[];
+  allowedTypes: string[];
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
-  allowedTypes 
-}) => {
-  const { client, isLoading } = useAuth();
-  const location = useLocation();
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedTypes }) => {
+  const { isAuthenticated, user } = useAuth();
 
-  if (isLoading) {
-    return <div>Carregando...</div>;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
   }
 
-  if (!client) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-
-  if (allowedTypes && !allowedTypes.includes(client.type)) {
+  if (user && !allowedTypes.includes(user.type)) {
     return <Navigate to="/unauthorized" replace />;
   }
 
