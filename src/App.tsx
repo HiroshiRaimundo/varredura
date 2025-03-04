@@ -8,6 +8,14 @@ import ClientManagement from '@/pages/admin/ClientManagement';
 import ContentManagement from '@/pages/admin/ContentManagement';
 import MediaContactsManagement from '@/pages/admin/MediaContactsManagement';
 
+// Client pages
+import ObservatoryClient from '@/pages/clients/ObservatoryClient';
+import ResearcherClient from '@/pages/clients/ResearcherClient';
+import PoliticianClient from '@/pages/clients/PoliticianClient';
+import InstitutionClient from '@/pages/clients/InstitutionClient';
+import JournalistClient from '@/pages/clients/JournalistClient';
+import PressClient from '@/pages/clients/PressClient';
+
 // Dashboards
 import ObservatoryDashboard from '@/pages/dashboard/ObservatoryDashboard';
 import ResearcherDashboard from '@/pages/dashboard/ResearcherDashboard';
@@ -52,7 +60,7 @@ function App() {
           />
           
           <Route
-            path="/admin/client-management"
+            path="/admin/clients"
             element={
               <ProtectedRoute allowedTypes={['admin']}>
                 <ClientManagement />
@@ -61,7 +69,7 @@ function App() {
           />
           
           <Route
-            path="/admin/content-management"
+            path="/admin/content"
             element={
               <ProtectedRoute allowedTypes={['admin']}>
                 <ContentManagement />
@@ -70,13 +78,31 @@ function App() {
           />
           
           <Route
-            path="/admin/media-contacts"
+            path="/admin/contacts"
             element={
               <ProtectedRoute allowedTypes={['admin']}>
                 <MediaContactsManagement />
               </ProtectedRoute>
             }
           />
+
+          {/* Rotas específicas de cada tipo de cliente na área admin */}
+          <Route
+            path="/admin/client/:clientType"
+            element={
+              <ProtectedRoute allowedTypes={['admin']}>
+                <ClientManagement />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Rotas de clientes */}
+          <Route path="/clients/observatory" element={<ObservatoryClient />} />
+          <Route path="/clients/researcher" element={<ResearcherClient />} />
+          <Route path="/clients/politician" element={<PoliticianClient />} />
+          <Route path="/clients/institution" element={<InstitutionClient />} />
+          <Route path="/clients/journalist" element={<JournalistClient />} />
+          <Route path="/clients/press" element={<PressClient />} />
 
           {/* Rotas protegidas dos dashboards */}
           <Route

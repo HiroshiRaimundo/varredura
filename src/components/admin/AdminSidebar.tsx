@@ -91,16 +91,33 @@ const AdminSidebar: React.FC = () => {
         <h2 className="text-xl font-bold">Admin</h2>
       </div>
 
-      <nav className="flex-1 py-4 space-y-2">
+      <nav className="flex-1 py-4">
         {menuItems.map((item) => (
           <Button
             key={item.path}
             variant={location.pathname === item.path ? "secondary" : "ghost"}
-            className="w-full justify-start"
+            className="w-full justify-start mb-2"
             onClick={() => navigate(item.path)}
           >
             {item.icon}
             <span className="ml-2">{item.title}</span>
+          </Button>
+        ))}
+
+        <div className="mt-4 mb-2">
+          <h3 className="px-4 text-sm font-semibold text-gray-500">Áreas de Cliente</h3>
+        </div>
+
+        {clientPages.map((item) => (
+          <Button
+            key={item.path}
+            variant={location.pathname === item.path ? "secondary" : "ghost"}
+            className="w-full justify-start mb-2"
+            onClick={() => navigate(item.path)}
+          >
+            {item.icon}
+            <span className="ml-2">{item.title}</span>
+            <ChevronRight className="h-4 w-4 ml-auto" />
           </Button>
         ))}
       </nav>

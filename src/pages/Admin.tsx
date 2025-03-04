@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -47,6 +46,24 @@ const Admin: React.FC = () => {
     }
   ];
 
+  const quickActions = [
+    {
+      title: "Gerenciar Clientes",
+      description: "Adicionar, editar e remover clientes do sistema",
+      path: "/admin/clients"
+    },
+    {
+      title: "Contatos de Mídia",
+      description: "Gerenciar contatos e relacionamentos com veículos de mídia",
+      path: "/admin/contacts"
+    },
+    {
+      title: "Releases e Reportagens",
+      description: "Gerenciar conteúdo e publicações",
+      path: "/admin/content"
+    }
+  ];
+
   return (
     <div className="flex h-screen">
       <AdminSidebar />
@@ -54,6 +71,25 @@ const Admin: React.FC = () => {
       <div className="flex-1 p-6 overflow-auto">
         <h1 className="text-3xl font-bold mb-6">Painel Administrativo</h1>
         
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          {quickActions.map((action) => (
+            <Card key={action.path} className="hover:shadow-lg transition-shadow">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">{action.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600 mb-4">{action.description}</p>
+                <Button 
+                  className="w-full"
+                  onClick={() => navigate(action.path)}
+                >
+                  Acessar
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
         <Card className="mb-6">
           <CardHeader>
             <CardTitle>Áreas de Cliente</CardTitle>
