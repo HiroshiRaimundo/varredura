@@ -2,6 +2,12 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
+// Admin pages
+import Admin from '@/pages/Admin';
+import ClientManagement from '@/pages/admin/ClientManagement';
+import ContentManagement from '@/pages/admin/ContentManagement';
+import MediaContactsManagement from '@/pages/admin/MediaContactsManagement';
+
 // Dashboards
 import ObservatoryDashboard from '@/pages/dashboard/ObservatoryDashboard';
 import ResearcherDashboard from '@/pages/dashboard/ResearcherDashboard';
@@ -24,6 +30,43 @@ function App() {
           
           {/* Rota de erro de autorização */}
           <Route path="/unauthorized" element={<Unauthorized />} />
+
+          {/* Rotas administrativas */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute allowedTypes={['admin']}>
+                <Admin />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/client-management"
+            element={
+              <ProtectedRoute allowedTypes={['admin']}>
+                <ClientManagement />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/content-management"
+            element={
+              <ProtectedRoute allowedTypes={['admin']}>
+                <ContentManagement />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/media-contacts"
+            element={
+              <ProtectedRoute allowedTypes={['admin']}>
+                <MediaContactsManagement />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Rotas protegidas dos dashboards */}
           <Route
