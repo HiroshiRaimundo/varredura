@@ -28,6 +28,30 @@ import { useForm } from "react-hook-form";
 import { PlusCircle, Trash2, User, Mail, Phone, AtSign, Building, Edit } from "lucide-react";
 
 // Tipos
+interface JournalistContact {
+  id: string;
+  name: string;
+  type: "journalist";
+  email: string;
+  phone: string;
+  socialMedia: string;
+  company: string;
+  position: string;
+  notes: string;
+}
+
+interface CompanyContact {
+  id: string;
+  name: string;
+  type: "company";
+  email: string;
+  phone: string;
+  socialMedia: string;
+  notes: string;
+}
+
+type Contact = JournalistContact | CompanyContact;
+
 interface ContactFormValues {
   name: string;
   type: "journalist" | "company";
@@ -40,7 +64,7 @@ interface ContactFormValues {
 }
 
 // Dados mockados
-const mockJournalists = [
+const mockJournalists: JournalistContact[] = [
   {
     id: "1",
     name: "Maria Silva",
@@ -65,7 +89,7 @@ const mockJournalists = [
   }
 ];
 
-const mockCompanies = [
+const mockCompanies: CompanyContact[] = [
   {
     id: "3",
     name: "Grupo Folha",
@@ -92,7 +116,7 @@ const JournalistContactsSection: React.FC = () => {
     companies: mockCompanies
   });
   const [isOpen, setIsOpen] = useState(false);
-  const [editingContact, setEditingContact] = useState<any>(null);
+  const [editingContact, setEditingContact] = useState<Contact | null>(null);
   const { toast } = useToast();
   
   const form = useForm<ContactFormValues>({
@@ -123,15 +147,15 @@ const JournalistContactsSection: React.FC = () => {
     setIsOpen(true);
   };
 
-  const openEditContactForm = (contact: any) => {
+  const openEditContactForm = (contact: Contact) => {
     form.reset({
       name: contact.name,
       type: contact.type,
       email: contact.email,
       phone: contact.phone,
       socialMedia: contact.socialMedia,
-      company: contact.company || "",
-      position: contact.position || "",
+      company: contact.type === "journalist" ? contact.company : "",
+      position: contact.type === "journalist" ? contact.position : "",
       notes: contact.notes
     });
     setEditingContact(contact);
@@ -142,17 +166,39 @@ const JournalistContactsSection: React.FC = () => {
     if (editingContact) {
       // Editar contato existente
       if (data.type === "journalist") {
+        const updatedContact: JournalistContact = {
+          id: editingContact.id,
+          name: data.name,
+          type: "journalist",
+          email: data.email,
+          phone: data.phone,
+          socialMedia: data.socialMedia,
+          company: data.company || "Não informado",
+          position: data.position || "Não informado",
+          notes: data.notes
+        };
+
         setContacts({
           ...contacts,
           journalists: contacts.journalists.map(j => 
-            j.id === editingContact.id ? { ...data, id: editingContact.id } : j
+            j.id === editingContact.id ? updatedContact : j
           )
         });
       } else {
+        const updatedContact: CompanyContact = {
+          id: editingContact.id,
+          name: data.name,
+          type: "company",
+          email: data.email,
+          phone: data.phone,
+          socialMedia: data.socialMedia,
+          notes: data.notes
+        };
+
         setContacts({
           ...contacts,
           companies: contacts.companies.map(c => 
-            c.id === editingContact.id ? { ...data, id: editingContact.id } : c
+            c.id === editingContact.id ? updatedContact : c
           )
         });
       }
@@ -164,15 +210,38 @@ const JournalistContactsSection: React.FC = () => {
     } else {
       // Adicionar novo contato
       const newId = Date.now().toString();
+      
       if (data.type === "journalist") {
+        const newContact: JournalistContact = {
+          id: newId,
+          name: data.name,
+          type: "journalist",
+          email: data.email,
+          phone: data.phone,
+          socialMedia: data.socialMedia,
+          company: data.company || "Não informado",
+          position: data.position || "Não informado",
+          notes: data.notes
+        };
+
         setContacts({
           ...contacts,
-          journalists: [...contacts.journalists, { ...data, id: newId }]
+          journalists: [...contacts.journalists, newContact]
         });
       } else {
+        const newContact: CompanyContact = {
+          id: newId,
+          name: data.name,
+          type: "company",
+          email: data.email,
+          phone: data.phone,
+          socialMedia: data.socialMedia,
+          notes: data.notes
+        };
+
         setContacts({
           ...contacts,
-          companies: [...contacts.companies, { ...data, id: newId }]
+          companies: [...contacts.companies, newContact]
         });
       }
       
