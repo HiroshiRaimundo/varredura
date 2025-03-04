@@ -1,175 +1,63 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
-import { ServiceType } from "@/hooks/useClientAuth";
 import BackToAdminButton from "@/components/admin/BackToAdminButton";
-import { clientService, Client } from "@/services/clientService";
-
-// Componentes refatorados
 import ClientTable from "@/components/admin/clients/ClientTable";
-import AddClientDialog, { NewClientData } from "@/components/admin/clients/AddClientDialog";
+import AddClientDialog from "@/components/admin/clients/AddClientDialog";
 import DeleteClientDialog from "@/components/admin/clients/DeleteClientDialog";
 import PasswordDialog from "@/components/admin/clients/PasswordDialog";
 import ClientStatusBadges from "@/components/admin/clients/ClientStatusBadges";
 import EditClientDialog from "@/components/admin/clients/EditClientDialog";
-
-const generatePassword = () => {
-  const length = 12;
-  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
-  let password = "";
-  for (let i = 0; i < length; i++) {
-    password += charset.charAt(Math.floor(Math.random() * charset.length));
-  }
-  return password;
-};
+import { useClientManagement } from "@/components/admin/clients/hooks/useClientManagement";
 
 const ClientManagement: React.FC = () => {
-  const [clients, setClients] = useState<Client[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [newClient, setNewClient] = useState<NewClientData>({
-    name: "",
-    email: "",
-    serviceType: ServiceType.OBSERVATORY,
-    status: "active"
-  });
-  const [generatedPassword, setGeneratedPassword] = useState("");
+  const {
+    clients,
+    isLoading,
+    isAddDialogOpen,
+    setIsAddDialogOpen,
+    isDeleteDialogOpen,
+    setIsDeleteDialogOpen,
+    isEditDialogOpen,
+    setIsEditDialogOpen,
+    selectedClientId,
+    setSelectedClientId,
+    selectedClient,
+    setSelectedClient,
+    generatedPassword,
+    setGeneratedPassword,
+    newClient,
+    setNewClient,
+    loadClients,
+    handleAddClient,
+    handleStatusToggle,
+    handleDeleteClient,
+    handleResetPassword
+  } = useClientManagement();
 
-  // Carregar clientes ao montar o componente
   useEffect(() => {
     loadClients();
-  }, []);
+  }, [loadClients]);
 
-  const loadClients = async () => {
-    try {
-      setIsLoading(true);
-      const data = await clientService.getAll();
-      setClients(data);
-    } catch (error) {
-      toast({
-        title: "Erro ao carregar clientes",
-        description: "Não foi possível carregar a lista de clientes.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAddClient = async () => {
-    if (!newClient.name || !newClient.email) {
-      toast({
-        title: "Campos obrigatórios",
-        description: "Por favor, preencha todos os campos obrigatórios.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      const password = generatePassword();
-      setGeneratedPassword(password);
-      
-      const client = await clientService.create({
-        ...newClient,
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-      });
-
-      setClients([...clients, client]);
-      setIsAddDialogOpen(false);
-      setNewClient({
-        name: "",
-        email: "",
-        serviceType: ServiceType.OBSERVATORY,
-        status: "active"
-      });
-      
-      toast({
-        title: "Cliente adicionado com sucesso",
-        description: "As credenciais foram geradas e serão exibidas em seguida."
-      });
-    } catch (error) {
-      toast({
-        title: "Erro ao adicionar cliente",
-        description: error instanceof Error ? error.message : "Ocorreu um erro ao adicionar o cliente.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleStatusToggle = async (clientId: string) => {
-    try {
-      const client = clients.find(c => c.id === clientId);
-      if (!client) return;
-
-      const newStatus = client.status === "active" ? "inactive" : "active";
-      const updatedClient = await clientService.updateStatus(clientId, newStatus);
-      
-      setClients(clients.map(c => c.id === clientId ? updatedClient : c));
-
-      toast({
-        title: "Status atualizado",
-        description: `O cliente foi marcado como ${newStatus === "active" ? "ativo" : "inativo"}.`
-      });
-    } catch (error) {
-      toast({
-        title: "Erro ao atualizar status",
-        description: "Não foi possível atualizar o status do cliente.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleDeleteConfirmation = (clientId: string) => {
-    setSelectedClientId(clientId);
-    setIsDeleteDialogOpen(true);
-  };
-
-  const handleDeleteClient = async () => {
-    if (!selectedClientId) return;
-
-    try {
-      await clientService.delete(selectedClientId);
-      setClients(clients.filter(client => client.id !== selectedClientId));
-      setIsDeleteDialogOpen(false);
-      setSelectedClientId(null);
-
-      toast({
-        title: "Cliente removido",
-        description: "O cliente foi removido com sucesso."
-      });
-    } catch (error) {
-      toast({
-        title: "Erro ao remover cliente",
-        description: "Não foi possível remover o cliente.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleResetPassword = async (clientId: string) => {
-    try {
-      const newPassword = await clientService.resetPassword(clientId);
+  const handleEditClient = (clientId: string) => {
+    const client = clients.find(c => c.id === clientId);
+    if (client) {
+      setSelectedClient(client);
       setSelectedClientId(clientId);
-      setGeneratedPassword(newPassword);
-
-      toast({
-        title: "Senha redefinida",
-        description: "A nova senha será exibida em seguida."
-      });
-    } catch (error) {
-      toast({
-        title: "Erro ao redefinir senha",
-        description: "Não foi possível redefinir a senha do cliente.",
-        variant: "destructive"
-      });
+      setIsEditDialogOpen(true);
     }
+  };
+
+  const handleClientFieldChange = (field: string, value: string) => {
+    if (!selectedClient) return;
+    setSelectedClient(prev => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        [field]: value
+      };
+    });
   };
 
   const copyToClipboard = async (text: string) => {
@@ -183,64 +71,6 @@ const ClientManagement: React.FC = () => {
       toast({
         title: "Erro ao copiar",
         description: "Não foi possível copiar a senha automaticamente.",
-        variant: "destructive"
-      });
-    }
-  };
-  
-  const handleEditClient = (clientId: string) => {
-    const client = clients.find(c => c.id === clientId);
-    if (client) {
-      setSelectedClient(client);
-      setSelectedClientId(clientId);
-      setIsEditDialogOpen(true);
-    }
-  };
-
-  const handleClientFieldChange = (field: string, value: string) => {
-    if (!selectedClient) return;
-    
-    setSelectedClient(prev => {
-      if (!prev) return null;
-      
-      if (field === "expiresAt") {
-        // Convert string date to Date object
-        return {
-          ...prev,
-          [field]: value ? new Date(value) : undefined
-        };
-      }
-      
-      return {
-        ...prev,
-        [field]: value
-      };
-    });
-  };
-
-  const handleSaveClientChanges = async () => {
-    if (!selectedClient || !selectedClientId) return;
-    
-    try {
-      const updatedClient = await clientService.update(selectedClientId, selectedClient);
-      
-      // Update client list
-      setClients(clients.map(client => 
-        client.id === selectedClientId ? updatedClient : client
-      ));
-      
-      setIsEditDialogOpen(false);
-      setSelectedClient(null);
-      setSelectedClientId(null);
-      
-      toast({
-        title: "Cliente atualizado",
-        description: "As informações do cliente foram atualizadas com sucesso."
-      });
-    } catch (error) {
-      toast({
-        title: "Erro ao atualizar cliente",
-        description: error instanceof Error ? error.message : "Ocorreu um erro ao atualizar o cliente.",
         variant: "destructive"
       });
     }
@@ -282,19 +112,20 @@ const ClientManagement: React.FC = () => {
             onStatusToggle={handleStatusToggle}
             onResetPassword={handleResetPassword}
             onEditClient={handleEditClient}
-            onDeleteClient={handleDeleteConfirmation}
+            onDeleteClient={(clientId) => {
+              setSelectedClientId(clientId);
+              setIsDeleteDialogOpen(true);
+            }}
           />
         </CardContent>
       </Card>
 
-      {/* Diálogo de confirmação de exclusão */}
       <DeleteClientDialog
         isOpen={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirmDelete={handleDeleteClient}
       />
 
-      {/* Diálogo de edição */}
       <EditClientDialog
         isOpen={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
@@ -303,15 +134,12 @@ const ClientManagement: React.FC = () => {
         onSave={handleSaveClientChanges}
       />
 
-      {/* Diálogo de senha gerada */}
-      {generatedPassword && (
-        <PasswordDialog
-          password={generatedPassword}
-          isOpen={!!generatedPassword}
-          onOpenChange={(open) => !open && setGeneratedPassword("")}
-          onCopyPassword={copyToClipboard}
-        />
-      )}
+      <PasswordDialog
+        password={generatedPassword}
+        isOpen={!!generatedPassword}
+        onOpenChange={(open) => !open && setGeneratedPassword("")}
+        onCopyPassword={copyToClipboard}
+      />
     </div>
   );
 };

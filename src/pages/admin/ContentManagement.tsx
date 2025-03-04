@@ -4,22 +4,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import BackToAdminButton from "@/components/admin/BackToAdminButton";
-// Remove next/dynamic import if it exists and replace with React.lazy
-
-// Use React.lazy for dynamic imports instead of next/dynamic
-const RichTextEditor = React.lazy(() => import("@/components/editor/RichTextEditor"));
+import RichTextEditor from "@/components/editor/RichTextEditor";
 
 const ContentManagement = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [content, setContent] = useState("");
 
-  // Fetch content when component mounts
   useEffect(() => {
     const fetchContent = async () => {
       try {
         setIsLoading(true);
-        // Here you would fetch content from your API or database
-        // For now, we'll just simulate a delay
         await new Promise(resolve => setTimeout(resolve, 1000));
         setContent("<p>Conteúdo de exemplo para edição.</p>");
       } catch (error) {
@@ -35,7 +29,6 @@ const ContentManagement = () => {
   const handleSaveContent = async () => {
     try {
       setIsLoading(true);
-      // Here you would save the content to your API or database
       console.log("Saving content:", content);
       await new Promise(resolve => setTimeout(resolve, 1000));
       alert("Conteúdo salvo com sucesso!");
@@ -73,7 +66,10 @@ const ContentManagement = () => {
                 <React.Suspense fallback={<div className="flex justify-center py-8">
                   <Loader2 className="h-8 w-8 animate-spin" />
                 </div>}>
-                  <RichTextEditor content={content} onChange={setContent} />
+                  <RichTextEditor
+                    initialContent={content}
+                    onContentChange={setContent}
+                  />
                 </React.Suspense>
               )}
               <div className="flex justify-end mt-4">
