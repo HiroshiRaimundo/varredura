@@ -20,6 +20,7 @@ import PressDashboard from '@/pages/dashboard/PressDashboard';
 import Index from '@/pages/Index';
 import LoginPage from '@/pages/Login';
 import ClientLoginPage from '@/pages/ClientLogin';
+import ServiceLanding from '@/pages/ServiceLanding';
 import Unauthorized from '@/pages/Unauthorized';
 
 function App() {
@@ -33,6 +34,9 @@ function App() {
           {/* Rotas de login */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/client-login" element={<ClientLoginPage />} />
+          
+          {/* Rotas de serviço */}
+          <Route path="/service/:serviceId" element={<ServiceLanding />} />
           
           {/* Rota de erro de autorização */}
           <Route path="/unauthorized" element={<Unauthorized />} />
