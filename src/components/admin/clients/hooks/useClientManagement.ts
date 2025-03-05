@@ -3,6 +3,7 @@ import { ClientAccount } from '@/types/adminTypes';
 
 // Mock data - substituir por dados reais da API
 const mockClients: ClientAccount[] = [
+  // Clientes do Observatório
   {
     id: '1',
     name: 'Observatório Nacional',
@@ -14,6 +15,17 @@ const mockClients: ClientAccount[] = [
     organization: 'Observatório Nacional'
   },
   {
+    id: '7',
+    name: 'Observatório Regional',
+    email: 'contato@observatorio-regional.com.br',
+    type: 'observatory',
+    status: 'active',
+    plan: 'basic',
+    createdAt: new Date().toISOString(),
+    organization: 'Observatório Regional'
+  },
+  // Pesquisadores
+  {
     id: '2',
     name: 'João Silva',
     email: 'joao.silva@pesquisa.org',
@@ -22,6 +34,16 @@ const mockClients: ClientAccount[] = [
     plan: 'basic',
     createdAt: new Date().toISOString()
   },
+  {
+    id: '8',
+    name: 'Ana Pesquisadora',
+    email: 'ana@pesquisa.org',
+    type: 'researcher',
+    status: 'active',
+    plan: 'premium',
+    createdAt: new Date().toISOString()
+  },
+  // Políticos
   {
     id: '3',
     name: 'Maria Santos',
@@ -33,6 +55,17 @@ const mockClients: ClientAccount[] = [
     organization: 'Câmara dos Deputados'
   },
   {
+    id: '9',
+    name: 'José Político',
+    email: 'jose@politica.gov.br',
+    type: 'politician',
+    status: 'active',
+    plan: 'basic',
+    createdAt: new Date().toISOString(),
+    organization: 'Assembleia Legislativa'
+  },
+  // Instituições
+  {
     id: '4',
     name: 'Universidade Federal',
     email: 'reitoria@univ.edu.br',
@@ -42,6 +75,17 @@ const mockClients: ClientAccount[] = [
     createdAt: new Date().toISOString(),
     organization: 'Universidade Federal'
   },
+  {
+    id: '10',
+    name: 'Instituto de Pesquisa',
+    email: 'contato@instituto.org.br',
+    type: 'institution',
+    status: 'active',
+    plan: 'basic',
+    createdAt: new Date().toISOString(),
+    organization: 'Instituto de Pesquisa'
+  },
+  // Jornalistas
   {
     id: '5',
     name: 'Pedro Costa',
@@ -53,6 +97,17 @@ const mockClients: ClientAccount[] = [
     organization: 'Jornal da Cidade'
   },
   {
+    id: '11',
+    name: 'Carla Jornalista',
+    email: 'carla@jornal.com.br',
+    type: 'journalist',
+    status: 'trial',
+    plan: 'basic',
+    createdAt: new Date().toISOString(),
+    organization: 'Revista Semanal'
+  },
+  // Assessorias de Imprensa
+  {
     id: '6',
     name: 'Agência de Notícias',
     email: 'redacao@agencia.com.br',
@@ -61,10 +116,20 @@ const mockClients: ClientAccount[] = [
     plan: 'premium',
     createdAt: new Date().toISOString(),
     organization: 'Agência de Notícias'
+  },
+  {
+    id: '12',
+    name: 'Assessoria Comunicação',
+    email: 'contato@assessoria.com.br',
+    type: 'press',
+    status: 'active',
+    plan: 'basic',
+    createdAt: new Date().toISOString(),
+    organization: 'Assessoria Comunicação'
   }
 ];
 
-export const useClientManagement = () => {
+export const useClientManagement = (clientType?: string) => {
   const [clients, setClients] = useState<ClientAccount[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -72,13 +137,19 @@ export const useClientManagement = () => {
     try {
       // Simular chamada à API
       await new Promise(resolve => setTimeout(resolve, 1000));
-      setClients(mockClients);
+      
+      // Se um tipo de cliente foi especificado, filtrar apenas os clientes daquele tipo
+      const filteredClients = clientType 
+        ? mockClients.filter(client => client.type === clientType)
+        : mockClients;
+        
+      setClients(filteredClients);
     } catch (error) {
       console.error('Erro ao carregar clientes:', error);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [clientType]);
 
   const handleStatusToggle = useCallback(async (clientId: string) => {
     try {

@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -12,6 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import MonitoringForm, { MonitoringItem } from "@/components/monitoring/MonitoringForm";
 import { BarChart3, FilePieChart, LineChart, PieChart } from "lucide-react";
 import BackToAdminButton from "@/components/admin/BackToAdminButton";
+import ClientList from "@/components/admin/clients/ClientList";
+import { useClientManagement } from "@/components/admin/clients/hooks/useClientManagement";
 
 const ObservatoryClient: React.FC = () => {
   const { toast } = useToast();
@@ -19,12 +20,17 @@ const ObservatoryClient: React.FC = () => {
   const clientType = "observatory";
   const colorClasses = getColorClasses(clientType);
   const details = clientTypeDetails[clientType];
+  const { clients, isLoading, loadClients } = useClientManagement(clientType);
   
   // State for monitoring items
   const [monitoringItems, setMonitoringItems] = useState<MonitoringItem[]>([]);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [selectedChart, setSelectedChart] = useState<string>("category");
   
+  useEffect(() => {
+    loadClients();
+  }, [loadClients]);
+
   // Create the form with correct typing
   const form = useForm<MonitoringItem>({
     defaultValues: {
@@ -59,11 +65,8 @@ const ObservatoryClient: React.FC = () => {
 
   const handleAddMonitoring = (data: MonitoringItem) => {
     console.log("Adding monitoring item:", data);
-    // Add an ID (in a real app this would come from the backend)
     const newItem = { ...data, id: Date.now().toString() };
-    // Add to the list of monitoring items
     setMonitoringItems([...monitoringItems, newItem]);
-    // Show success message
     toast({
       title: "Monitoramento adicionado",
       description: `O monitoramento "${data.name}" foi adicionado com sucesso.`
@@ -73,14 +76,24 @@ const ObservatoryClient: React.FC = () => {
 
   const handleDeleteMonitoring = (id: string) => {
     console.log("Deleting monitoring item:", id);
-    // Filter out the item to delete
     const updatedItems = monitoringItems.filter(item => item.id !== id);
     setMonitoringItems(updatedItems);
-    // Show success message
     toast({
       title: "Monitoramento removido",
       description: "O monitoramento foi removido com sucesso."
     });
+  };
+
+  const handleAddClient = () => {
+    // Implementar lógica de adicionar cliente
+  };
+
+  const handleEditClient = (client: any) => {
+    // Implementar lógica de editar cliente
+  };
+
+  const handleDeleteClient = (clientId: string) => {
+    // Implementar lógica de deletar cliente
   };
 
   return (
@@ -107,12 +120,14 @@ const ObservatoryClient: React.FC = () => {
             <Card>
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
-                  <span>Monitoramentos Ativos</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>{monitoringItems.length}</span>
+                  <span>Clientes Ativos</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>
+                    {clients.filter(c => c.status === 'active').length}
+                  </span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
-                <p>Total de monitoramentos ativos</p>
+                <p>Total de clientes ativos</p>
               </CardContent>
             </Card>
             
@@ -144,6 +159,7 @@ const ObservatoryClient: React.FC = () => {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
             <TabsList className="mb-4">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+              <TabsTrigger value="clients">Clientes</TabsTrigger>
               <TabsTrigger value="monitoring">Monitoramentos</TabsTrigger>
               <TabsTrigger value="add">Novo Monitoramento</TabsTrigger>
               <TabsTrigger value="alerts">Alertas ({alerts.filter(a => !a.read).length})</TabsTrigger>
@@ -198,68 +214,25 @@ const ObservatoryClient: React.FC = () => {
                         {selectedChart === "timeline" && "Linha do Tempo de Monitoramentos"}
                         {selectedChart === "distribution" && "Distribuição por Responsável"}
                       </h3>
-                      
-                      <div className="border rounded-md p-4 min-h-[300px] flex items-center justify-center">
-                        {selectedChart === "category" && (
-                          <div className="text-center w-full">
-                            <p className="text-muted-foreground mb-2">Visualização de gráfico em pizza das categorias</p>
-                            <div className="h-64 w-full bg-muted/20 rounded-md flex items-center justify-center">
-                              <PieChart className="h-16 w-16 text-muted" />
-                            </div>
-                          </div>
-                        )}
-                        
-                        {selectedChart === "frequency" && (
-                          <div className="text-center w-full">
-                            <p className="text-muted-foreground mb-2">Visualização de gráfico de barras das frequências</p>
-                            <div className="h-64 w-full bg-muted/20 rounded-md flex items-center justify-center">
-                              <BarChart3 className="h-16 w-16 text-muted" />
-                            </div>
-                          </div>
-                        )}
-                        
-                        {selectedChart === "timeline" && (
-                          <div className="text-center w-full">
-                            <p className="text-muted-foreground mb-2">Visualização de linha do tempo</p>
-                            <div className="h-64 w-full bg-muted/20 rounded-md flex items-center justify-center">
-                              <LineChart className="h-16 w-16 text-muted" />
-                            </div>
-                          </div>
-                        )}
-                        
-                        {selectedChart === "distribution" && (
-                          <div className="text-center w-full">
-                            <p className="text-muted-foreground mb-2">Visualização de gráfico de distribuição</p>
-                            <div className="h-64 w-full bg-muted/20 rounded-md flex items-center justify-center">
-                              <FilePieChart className="h-16 w-16 text-muted" />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      
-                      <h3 className="text-lg font-medium mt-6">Resumo de Monitoramentos</h3>
-                      <div className="border rounded-md p-4">
-                        <table className="w-full">
-                          <thead className="border-b">
-                            <tr>
-                              <th className="text-left pb-2">Nome</th>
-                              <th className="text-left pb-2">Categoria</th>
-                              <th className="text-left pb-2">Frequência</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {monitoringItems.map(item => (
-                              <tr key={item.id} className="border-b last:border-0">
-                                <td className="py-2">{item.name}</td>
-                                <td className="py-2">{item.category}</td>
-                                <td className="py-2">{item.frequency}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
                     </div>
                   )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="clients">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Clientes do Observatório</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ClientList
+                    clients={clients}
+                    onAddClient={handleAddClient}
+                    onEditClient={handleEditClient}
+                    onDeleteClient={handleDeleteClient}
+                    currentClientType={clientType}
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -388,7 +361,6 @@ const ObservatoryClient: React.FC = () => {
           </Tabs>
         </div>
       </div>
-      
       <Footer />
     </div>
   );

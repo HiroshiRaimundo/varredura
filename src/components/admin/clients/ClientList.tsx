@@ -21,6 +21,7 @@ interface ClientListProps {
   onAddClient: () => void;
   onEditClient: (client: ClientAccount) => void;
   onDeleteClient: (clientId: string) => void;
+  currentClientType?: string; 
 }
 
 const ClientList: React.FC<ClientListProps> = ({
@@ -28,15 +29,18 @@ const ClientList: React.FC<ClientListProps> = ({
   onAddClient,
   onEditClient,
   onDeleteClient,
+  currentClientType
 }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredClients = clients.filter(client =>
-    client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredClients = clients
+    .filter(client => !currentClientType || client.type === currentClientType)
+    .filter(client =>
+      client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -67,7 +71,6 @@ const ClientList: React.FC<ClientListProps> = ({
   };
 
   const handleViewClient = (clientType: string) => {
-    // Navegar para a página específica do tipo de cliente
     const clientPages: Record<string, string> = {
       'observatory': '/clients/observatory',
       'researcher': '/clients/researcher',
@@ -77,11 +80,14 @@ const ClientList: React.FC<ClientListProps> = ({
       'press': '/clients/press'
     };
 
-    // Verificar se a página existe para o tipo de cliente
+    if (currentClientType) {
+      navigate(clientPages[currentClientType]);
+      return;
+    }
+
     if (clientPages[clientType]) {
       navigate(clientPages[clientType]);
     } else {
-      // Se não existir, mostrar um toast de erro
       toast({
         title: "Página não encontrada",
         description: "A página deste tipo de cliente ainda não está disponível.",
@@ -114,7 +120,7 @@ const ClientList: React.FC<ClientListProps> = ({
             <TableRow>
               <TableHead>Nome</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>Tipo</TableHead>
+              {!currentClientType && <TableHead>Tipo</TableHead>}
               <TableHead>Status</TableHead>
               <TableHead>Plano</TableHead>
               <TableHead>Criado em</TableHead>
@@ -126,7 +132,7 @@ const ClientList: React.FC<ClientListProps> = ({
               <TableRow key={client.id}>
                 <TableCell>{client.name}</TableCell>
                 <TableCell>{client.email}</TableCell>
-                <TableCell>{client.type}</TableCell>
+                {!currentClientType && <TableCell>{client.type}</TableCell>}
                 <TableCell>
                   <Badge className={getStatusColor(client.status)}>
                     {client.status}
@@ -144,7 +150,7 @@ const ClientList: React.FC<ClientListProps> = ({
                       variant="ghost"
                       size="sm"
                       onClick={() => handleViewClient(client.type)}
-                      title="Visualizar área do cliente"
+                      title={`Visualizar área do ${currentClientType || client.type}`}
                     >
                       <Eye className="w-4 h-4" />
                     </Button>

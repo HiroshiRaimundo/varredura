@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -7,11 +6,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { clientTypeDetails } from "@/components/client/ClientTypes";
 import { getColorClasses } from "@/components/service/utils/colorUtils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import BackToAdminButton from "@/components/admin/BackToAdminButton";
+import ClientList from "@/components/admin/clients/ClientList";
+import { useClientManagement } from "@/components/admin/clients/hooks/useClientManagement";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import MonitoringForm, { MonitoringItem } from "@/components/monitoring/MonitoringForm";
 import { BarChart3, FilePieChart, LineChart, PieChart } from "lucide-react";
-import BackToAdminButton from "@/components/admin/BackToAdminButton";
 
 const InstitutionClient: React.FC = () => {
   const { toast } = useToast();
@@ -19,10 +20,9 @@ const InstitutionClient: React.FC = () => {
   const clientType = "institution";
   const colorClasses = getColorClasses(clientType);
   const details = clientTypeDetails[clientType];
-
-  // State for monitoring items
-  const [monitoringItems, setMonitoringItems] = useState<MonitoringItem[]>([]);
+  const { clients, isLoading, loadClients } = useClientManagement(clientType);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [monitoringItems, setMonitoringItems] = useState<MonitoringItem[]>([]);
   const [selectedChart, setSelectedChart] = useState<string>("category");
   
   // Create the form with correct typing
@@ -46,6 +46,22 @@ const InstitutionClient: React.FC = () => {
     { id: "2", title: "Prazo de relatório", description: "Prazo para relatório trimestral se aproximando", date: new Date().toISOString(), read: false },
     { id: "3", title: "Novo programa disponível", description: "Programa de desenvolvimento social adicionado", date: new Date().toISOString(), read: true },
   ]);
+
+  useEffect(() => {
+    loadClients();
+  }, [loadClients]);
+
+  const handleAddClient = () => {
+    // Implementar lógica de adicionar cliente
+  };
+
+  const handleEditClient = (client: any) => {
+    // Implementar lógica de editar cliente
+  };
+
+  const handleDeleteClient = (clientId: string) => {
+    // Implementar lógica de deletar cliente
+  };
 
   const handleMarkAsRead = (id: string) => {
     setAlerts(alerts.map(alert => 
@@ -107,6 +123,48 @@ const InstitutionClient: React.FC = () => {
             <Card>
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
+                  <span>Clientes Ativos</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>
+                    {clients.filter(c => c.status === 'active').length}
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <p>Total de instituições ativas</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
+                <CardTitle className="flex justify-between items-center">
+                  <span>Departamentos</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>
+                    {clients.length * 4} {/* Mock: cada cliente tem em média 4 departamentos */}
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <p>Total de departamentos monitorados</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
+                <CardTitle className="flex justify-between items-center">
+                  <span>Premium</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>
+                    {clients.filter(c => c.plan === 'premium').length}
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <p>Clientes com plano premium</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
+                <CardTitle className="flex justify-between items-center">
                   <span>Programas Ativos</span>
                   <span className={`${colorClasses.text} font-bold text-2xl`}>{monitoringItems.length}</span>
                 </CardTitle>
@@ -144,6 +202,7 @@ const InstitutionClient: React.FC = () => {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
             <TabsList className="mb-4">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+              <TabsTrigger value="clients">Clientes</TabsTrigger>
               <TabsTrigger value="monitoring">Monitoramentos</TabsTrigger>
               <TabsTrigger value="add">Novo Monitoramento</TabsTrigger>
               <TabsTrigger value="alerts">Alertas ({alerts.filter(a => !a.read).length})</TabsTrigger>
@@ -152,114 +211,30 @@ const InstitutionClient: React.FC = () => {
             <TabsContent value="dashboard">
               <Card>
                 <CardHeader>
-                  <CardTitle>Dashboard de Monitoramentos</CardTitle>
-                  <div className="flex gap-2 mt-2">
-                    <button 
-                      onClick={() => setSelectedChart("category")}
-                      className={`p-2 rounded-md ${selectedChart === "category" ? colorClasses.bg + " text-white" : "bg-gray-100"}`}
-                    >
-                      <PieChart className="h-5 w-5" />
-                    </button>
-                    <button 
-                      onClick={() => setSelectedChart("frequency")}
-                      className={`p-2 rounded-md ${selectedChart === "frequency" ? colorClasses.bg + " text-white" : "bg-gray-100"}`}
-                    >
-                      <BarChart3 className="h-5 w-5" />
-                    </button>
-                    <button 
-                      onClick={() => setSelectedChart("timeline")}
-                      className={`p-2 rounded-md ${selectedChart === "timeline" ? colorClasses.bg + " text-white" : "bg-gray-100"}`}
-                    >
-                      <LineChart className="h-5 w-5" />
-                    </button>
-                    <button 
-                      onClick={() => setSelectedChart("distribution")}
-                      className={`p-2 rounded-md ${selectedChart === "distribution" ? colorClasses.bg + " text-white" : "bg-gray-100"}`}
-                    >
-                      <FilePieChart className="h-5 w-5" />
-                    </button>
-                  </div>
+                  <CardTitle>Visão Geral</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {monitoringItems.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-muted-foreground mb-4">Nenhum monitoramento configurado ainda.</p>
-                      <button 
-                        onClick={() => setActiveTab("add")}
-                        className={`px-4 py-2 rounded-md text-white ${colorClasses.bg}`}>
-                        Novo Monitoramento
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-medium">
-                        {selectedChart === "category" && "Distribuição por Categoria"}
-                        {selectedChart === "frequency" && "Frequência de Atualização"}
-                        {selectedChart === "timeline" && "Linha do Tempo de Monitoramentos"}
-                        {selectedChart === "distribution" && "Distribuição por Responsável"}
-                      </h3>
-                      
-                      <div className="border rounded-md p-4 min-h-[300px] flex items-center justify-center">
-                        {selectedChart === "category" && (
-                          <div className="text-center w-full">
-                            <p className="text-muted-foreground mb-2">Visualização de gráfico em pizza das categorias</p>
-                            <div className="h-64 w-full bg-muted/20 rounded-md flex items-center justify-center">
-                              <PieChart className="h-16 w-16 text-muted" />
-                            </div>
-                          </div>
-                        )}
-                        
-                        {selectedChart === "frequency" && (
-                          <div className="text-center w-full">
-                            <p className="text-muted-foreground mb-2">Visualização de gráfico de barras das frequências</p>
-                            <div className="h-64 w-full bg-muted/20 rounded-md flex items-center justify-center">
-                              <BarChart3 className="h-16 w-16 text-muted" />
-                            </div>
-                          </div>
-                        )}
-                        
-                        {selectedChart === "timeline" && (
-                          <div className="text-center w-full">
-                            <p className="text-muted-foreground mb-2">Visualização de linha do tempo</p>
-                            <div className="h-64 w-full bg-muted/20 rounded-md flex items-center justify-center">
-                              <LineChart className="h-16 w-16 text-muted" />
-                            </div>
-                          </div>
-                        )}
-                        
-                        {selectedChart === "distribution" && (
-                          <div className="text-center w-full">
-                            <p className="text-muted-foreground mb-2">Visualização de gráfico de distribuição</p>
-                            <div className="h-64 w-full bg-muted/20 rounded-md flex items-center justify-center">
-                              <FilePieChart className="h-16 w-16 text-muted" />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      
-                      <h3 className="text-lg font-medium mt-6">Resumo de Monitoramentos</h3>
-                      <div className="border rounded-md p-4">
-                        <table className="w-full">
-                          <thead className="border-b">
-                            <tr>
-                              <th className="text-left pb-2">Nome</th>
-                              <th className="text-left pb-2">Categoria</th>
-                              <th className="text-left pb-2">Frequência</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {monitoringItems.map(item => (
-                              <tr key={item.id} className="border-b last:border-0">
-                                <td className="py-2">{item.name}</td>
-                                <td className="py-2">{item.category}</td>
-                                <td className="py-2">{item.frequency}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  )}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Resumo de Atividades</h3>
+                    <p>Visualize as principais métricas e atividades das instituições.</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="clients">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Clientes Institucionais</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ClientList
+                    clients={clients}
+                    onAddClient={handleAddClient}
+                    onEditClient={handleEditClient}
+                    onDeleteClient={handleDeleteClient}
+                    currentClientType={clientType}
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -385,10 +360,124 @@ const InstitutionClient: React.FC = () => {
                 </CardContent>
               </Card>
             </TabsContent>
+            
+            <TabsContent value="dashboard">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Dashboard de Monitoramentos</CardTitle>
+                  <div className="flex gap-2 mt-2">
+                    <button 
+                      onClick={() => setSelectedChart("category")}
+                      className={`p-2 rounded-md ${selectedChart === "category" ? colorClasses.bg + " text-white" : "bg-gray-100"}`}
+                    >
+                      <PieChart className="h-5 w-5" />
+                    </button>
+                    <button 
+                      onClick={() => setSelectedChart("frequency")}
+                      className={`p-2 rounded-md ${selectedChart === "frequency" ? colorClasses.bg + " text-white" : "bg-gray-100"}`}
+                    >
+                      <BarChart3 className="h-5 w-5" />
+                    </button>
+                    <button 
+                      onClick={() => setSelectedChart("timeline")}
+                      className={`p-2 rounded-md ${selectedChart === "timeline" ? colorClasses.bg + " text-white" : "bg-gray-100"}`}
+                    >
+                      <LineChart className="h-5 w-5" />
+                    </button>
+                    <button 
+                      onClick={() => setSelectedChart("distribution")}
+                      className={`p-2 rounded-md ${selectedChart === "distribution" ? colorClasses.bg + " text-white" : "bg-gray-100"}`}
+                    >
+                      <FilePieChart className="h-5 w-5" />
+                    </button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {monitoringItems.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground mb-4">Nenhum monitoramento configurado ainda.</p>
+                      <button 
+                        onClick={() => setActiveTab("add")}
+                        className={`px-4 py-2 rounded-md text-white ${colorClasses.bg}`}>
+                        Novo Monitoramento
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-medium">
+                        {selectedChart === "category" && "Distribuição por Categoria"}
+                        {selectedChart === "frequency" && "Frequência de Atualização"}
+                        {selectedChart === "timeline" && "Linha do Tempo de Monitoramentos"}
+                        {selectedChart === "distribution" && "Distribuição por Responsável"}
+                      </h3>
+                      
+                      <div className="border rounded-md p-4 min-h-[300px] flex items-center justify-center">
+                        {selectedChart === "category" && (
+                          <div className="text-center w-full">
+                            <p className="text-muted-foreground mb-2">Visualização de gráfico em pizza das categorias</p>
+                            <div className="h-64 w-full bg-muted/20 rounded-md flex items-center justify-center">
+                              <PieChart className="h-16 w-16 text-muted" />
+                            </div>
+                          </div>
+                        )}
+                        
+                        {selectedChart === "frequency" && (
+                          <div className="text-center w-full">
+                            <p className="text-muted-foreground mb-2">Visualização de gráfico de barras das frequências</p>
+                            <div className="h-64 w-full bg-muted/20 rounded-md flex items-center justify-center">
+                              <BarChart3 className="h-16 w-16 text-muted" />
+                            </div>
+                          </div>
+                        )}
+                        
+                        {selectedChart === "timeline" && (
+                          <div className="text-center w-full">
+                            <p className="text-muted-foreground mb-2">Visualização de linha do tempo</p>
+                            <div className="h-64 w-full bg-muted/20 rounded-md flex items-center justify-center">
+                              <LineChart className="h-16 w-16 text-muted" />
+                            </div>
+                          </div>
+                        )}
+                        
+                        {selectedChart === "distribution" && (
+                          <div className="text-center w-full">
+                            <p className="text-muted-foreground mb-2">Visualização de gráfico de distribuição</p>
+                            <div className="h-64 w-full bg-muted/20 rounded-md flex items-center justify-center">
+                              <FilePieChart className="h-16 w-16 text-muted" />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <h3 className="text-lg font-medium mt-6">Resumo de Monitoramentos</h3>
+                      <div className="border rounded-md p-4">
+                        <table className="w-full">
+                          <thead className="border-b">
+                            <tr>
+                              <th className="text-left pb-2">Nome</th>
+                              <th className="text-left pb-2">Categoria</th>
+                              <th className="text-left pb-2">Frequência</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {monitoringItems.map(item => (
+                              <tr key={item.id} className="border-b last:border-0">
+                                <td className="py-2">{item.name}</td>
+                                <td className="py-2">{item.category}</td>
+                                <td className="py-2">{item.frequency}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
           </Tabs>
         </div>
       </div>
-      
       <Footer />
     </div>
   );
