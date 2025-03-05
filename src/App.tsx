@@ -30,6 +30,7 @@ import LoginPage from '@/pages/Login';
 import ClientLoginPage from '@/pages/ClientLogin';
 import ServiceLanding from '@/pages/ServiceLanding';
 import ExampleClient from '@/pages/ExampleClient';
+import ServiceLd from '@/pages/ServiceLd';
 import Unauthorized from '@/pages/Unauthorized';
 
 function App() {
@@ -46,6 +47,7 @@ function App() {
           
           {/* Rotas de serviço */}
           <Route path="/service/:serviceId" element={<ServiceLanding />} />
+          <Route path="/serviceld" element={<ServiceLd />} />
           <Route path="/example-client" element={<ExampleClient />} />
           
           {/* Rota de erro de autorização */}
