@@ -1,158 +1,302 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, FileText, Database, BookOpen } from "lucide-react";
+import { FileText, Database, BookOpen, Play, Pause, RefreshCw, Trash2, Filter as FilterIcon } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { toast } from "@/components/ui/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
-interface MonitoredSource {
+interface Monitoring {
   id: string;
-  type: 'governo' | 'indicadores' | 'legislacao';
   name: string;
   url: string;
-  frequency: string;
-  lastUpdate: string;
+  apiUrl?: string;
+  keywords: string[];
+  category: 'governo' | 'indicadores' | 'legislacao';
+  frequency: 'hourly' | 'daily' | 'weekly' | 'monthly';
+  responsible: string;
   status: 'active' | 'paused';
-  dataPoints: number;
+  lastUpdate: string;
+  createdAt: string;
 }
 
 const MonitoringContent: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'governo' | 'indicadores' | 'legislacao'>('governo');
-  
-  // Dados simulados - serão substituídos pela integração real
-  const monitoredSources: MonitoredSource[] = [
-    {
-      id: '1',
-      type: 'governo',
-      name: 'Portal da Transparência',
-      url: 'http://portaltransparencia.gov.br',
-      frequency: 'Diária',
-      lastUpdate: '2025-03-05T10:00:00',
-      status: 'active',
-      dataPoints: 1250
-    },
-    {
-      id: '2',
-      type: 'indicadores',
-      name: 'IBGE - Indicadores Socioeconômicos',
-      url: 'http://ibge.gov.br',
-      frequency: 'Mensal',
-      lastUpdate: '2025-03-01T08:30:00',
-      status: 'active',
-      dataPoints: 450
-    },
-    {
-      id: '3',
-      type: 'legislacao',
-      name: 'Diário Oficial da União',
-      url: 'http://in.gov.br',
-      frequency: 'Diária',
-      lastUpdate: '2025-03-05T09:15:00',
-      status: 'active',
-      dataPoints: 890
-    }
-  ];
+  const [activeTab, setActiveTab] = useState<'add' | 'manage'>('add');
+  const [monitorings, setMonitorings] = useState<Monitoring[]>([]);
+  const [filter, setFilter] = useState('');
+  const [newMonitoring, setNewMonitoring] = useState<Partial<Monitoring>>({
+    category: 'governo',
+    frequency: 'daily',
+    status: 'active'
+  });
 
-  const getSourceIcon = (type: 'governo' | 'indicadores' | 'legislacao') => {
-    switch (type) {
-      case 'governo':
-        return <FileText className="h-5 w-5 text-blue-500" />;
-      case 'indicadores':
-        return <Database className="h-5 w-5 text-green-500" />;
-      case 'legislacao':
-        return <BookOpen className="h-5 w-5 text-purple-500" />;
+  const handleAddMonitoring = () => {
+    if (!newMonitoring.name || !newMonitoring.url || !newMonitoring.responsible) {
+      toast({
+        title: "Erro",
+        description: "Por favor, preencha todos os campos obrigatórios.",
+        variant: "destructive"
+      });
+      return;
     }
+
+    const monitoring: Monitoring = {
+      id: Date.now().toString(),
+      name: newMonitoring.name!,
+      url: newMonitoring.url!,
+      apiUrl: newMonitoring.apiUrl,
+      keywords: newMonitoring.keywords?.split(',').map(k => k.trim()) || [],
+      category: newMonitoring.category!,
+      frequency: newMonitoring.frequency!,
+      responsible: newMonitoring.responsible!,
+      status: 'active',
+      lastUpdate: new Date().toISOString(),
+      createdAt: new Date().toISOString()
+    };
+
+    setMonitorings(prev => [...prev, monitoring]);
+    setNewMonitoring({
+      category: 'governo',
+      frequency: 'daily',
+      status: 'active'
+    });
+
+    toast({
+      title: "Sucesso",
+      description: "Monitoramento adicionado com sucesso!"
+    });
   };
 
-  const filteredSources = monitoredSources.filter(source => source.type === activeTab);
+  const handleDeleteMonitoring = (id: string) => {
+    setMonitorings(prev => prev.filter(m => m.id !== id));
+    toast({
+      title: "Monitoramento Removido",
+      description: "O monitoramento foi removido com sucesso."
+    });
+  };
+
+  const filteredMonitorings = monitorings.filter(m => 
+    filter ? m.responsible.toLowerCase().includes(filter.toLowerCase()) : true
+  );
 
   return (
     <div className="p-6">
       <div className="mb-6">
         <h2 className="text-2xl font-bold mb-2">Sistema de Monitoramento</h2>
         <p className="text-muted-foreground">
-          Coleta automatizada e estruturada de dados de diversas fontes.
+          Configure e gerencie seus monitoramentos
         </p>
       </div>
 
       <Tabs value={activeTab} onValueChange={(value: any) => setActiveTab(value)} className="space-y-4">
         <TabsList>
-          <TabsTrigger value="governo" className="flex items-center gap-2">
+          <TabsTrigger value="add" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
-            Sites Governamentais
+            Adicionar Monitoramento
           </TabsTrigger>
-          <TabsTrigger value="indicadores" className="flex items-center gap-2">
+          <TabsTrigger value="manage" className="flex items-center gap-2">
             <Database className="h-4 w-4" />
-            Indicadores Socioeconômicos
-          </TabsTrigger>
-          <TabsTrigger value="legislacao" className="flex items-center gap-2">
-            <BookOpen className="h-4 w-4" />
-            Legislação
+            Gerenciar Monitoramentos
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value={activeTab}>
-          <div className="grid gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Fontes Monitoradas</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[400px] pr-4">
-                  <div className="space-y-4">
-                    {filteredSources.map((source) => (
-                      <div 
-                        key={source.id}
-                        className="flex items-start justify-between p-4 border rounded-lg hover:bg-accent transition-colors"
-                      >
-                        <div className="flex items-start gap-4">
-                          {getSourceIcon(source.type)}
+        <TabsContent value="add">
+          <Card>
+            <CardHeader>
+              <CardTitle>Novo Monitoramento</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Nome do Monitoramento *</Label>
+                  <Input
+                    id="name"
+                    placeholder="Ex: Portal da Transparência - Licitações"
+                    value={newMonitoring.name || ''}
+                    onChange={e => setNewMonitoring(prev => ({ ...prev, name: e.target.value }))}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="url">URL da Fonte *</Label>
+                  <Input
+                    id="url"
+                    placeholder="https://..."
+                    value={newMonitoring.url || ''}
+                    onChange={e => setNewMonitoring(prev => ({ ...prev, url: e.target.value }))}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="apiUrl">URL da API (opcional)</Label>
+                  <Input
+                    id="apiUrl"
+                    placeholder="https://api..."
+                    value={newMonitoring.apiUrl || ''}
+                    onChange={e => setNewMonitoring(prev => ({ ...prev, apiUrl: e.target.value }))}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="keywords">Palavras-chave (separadas por vírgula)</Label>
+                  <Textarea
+                    id="keywords"
+                    placeholder="licitação, contrato, edital..."
+                    value={newMonitoring.keywords || ''}
+                    onChange={e => setNewMonitoring(prev => ({ ...prev, keywords: e.target.value }))}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="category">Categoria *</Label>
+                    <Select
+                      value={newMonitoring.category}
+                      onValueChange={value => setNewMonitoring(prev => ({ ...prev, category: value as any }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione uma categoria" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="governo">Governo</SelectItem>
+                        <SelectItem value="indicadores">Indicadores</SelectItem>
+                        <SelectItem value="legislacao">Legislação</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="frequency">Frequência *</Label>
+                    <Select
+                      value={newMonitoring.frequency}
+                      onValueChange={value => setNewMonitoring(prev => ({ ...prev, frequency: value as any }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione a frequência" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="hourly">A cada hora</SelectItem>
+                        <SelectItem value="daily">Diário</SelectItem>
+                        <SelectItem value="weekly">Semanal</SelectItem>
+                        <SelectItem value="monthly">Mensal</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="responsible">Responsável *</Label>
+                  <Input
+                    id="responsible"
+                    placeholder="Nome do responsável"
+                    value={newMonitoring.responsible || ''}
+                    onChange={e => setNewMonitoring(prev => ({ ...prev, responsible: e.target.value }))}
+                  />
+                </div>
+
+                <Button className="w-full" onClick={handleAddMonitoring}>
+                  Adicionar Monitoramento
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="manage">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Monitoramentos Ativos</CardTitle>
+                <div className="flex items-center gap-2">
+                  <FilterIcon className="h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Filtrar por responsável..."
+                    value={filter}
+                    onChange={e => setFilter(e.target.value)}
+                    className="w-[200px]"
+                  />
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[500px] pr-4">
+                <div className="space-y-4">
+                  {filteredMonitorings.map(monitoring => (
+                    <div
+                      key={monitoring.id}
+                      className="flex items-start justify-between p-4 border rounded-lg hover:bg-accent transition-colors"
+                    >
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-medium">{monitoring.name}</h4>
+                          <Badge variant={monitoring.status === 'active' ? 'default' : 'secondary'}>
+                            {monitoring.status === 'active' ? 'Ativo' : 'Pausado'}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {monitoring.url}
+                        </p>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {monitoring.keywords.map(keyword => (
+                            <Badge key={keyword} variant="outline">
+                              {keyword}
+                            </Badge>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 mt-2 text-sm text-muted-foreground">
                           <div>
-                            <h4 className="font-medium">{source.name}</h4>
-                            <p className="text-sm text-muted-foreground mb-2">
-                              {source.url}
-                            </p>
-                            <div className="flex gap-2">
-                              <Badge variant="outline">
-                                Frequência: {source.frequency}
-                              </Badge>
-                              <Badge variant="outline">
-                                Dados coletados: {source.dataPoints}
-                              </Badge>
-                            </div>
+                            <strong>Categoria:</strong> {monitoring.category}
+                          </div>
+                          <div>
+                            <strong>Frequência:</strong> {monitoring.frequency}
+                          </div>
+                          <div>
+                            <strong>Responsável:</strong> {monitoring.responsible}
+                          </div>
+                          <div>
+                            <strong>Última atualização:</strong> {new Date(monitoring.lastUpdate).toLocaleString()}
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm text-muted-foreground">
-                            Última atualização
-                          </p>
-                          <p className="font-medium">
-                            {new Date(source.lastUpdate).toLocaleString()}
-                          </p>
-                        </div>
                       </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Histórico de Coletas</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-sm text-muted-foreground">
-                  <p>• Dados são coletados automaticamente conforme a frequência configurada</p>
-                  <p>• Transformação de dados não estruturados (HTML) em formatos estruturados (JSON, CSV)</p>
-                  <p>• Limpeza e padronização automática dos dados coletados</p>
-                  <p>• Versionamento para acompanhamento da evolução temporal</p>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setMonitorings(prev =>
+                              prev.map(m =>
+                                m.id === monitoring.id
+                                  ? { ...m, status: m.status === 'active' ? 'paused' : 'active' }
+                                  : m
+                              )
+                            );
+                          }}
+                        >
+                          {monitoring.status === 'active' ? (
+                            <><Pause className="h-4 w-4 mr-2" /> Pausar</>
+                          ) : (
+                            <><Play className="h-4 w-4 mr-2" /> Ativar</>
+                          )}
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeleteMonitoring(monitoring.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
