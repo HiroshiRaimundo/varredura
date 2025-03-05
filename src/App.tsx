@@ -30,6 +30,7 @@ import LoginPage from '@/pages/Login';
 import ClientLoginPage from '@/pages/ClientLogin';
 import ServiceLanding from '@/pages/ServiceLanding';
 import ExampleClient from '@/pages/ExampleClient';
+import Client from '@/pages/Client';
 import Payment from '@/pages/Payment';
 import Unauthorized from '@/pages/Unauthorized';
 
@@ -47,6 +48,7 @@ function App() {
           
           {/* Rotas de serviço */}
           <Route path="/service/:serviceId" element={<ServiceLanding />} />
+          <Route path="/client" element={<Client />} />
           <Route path="/payment" element={<Payment />} />
           <Route path="/example-client" element={<ExampleClient />} />
           

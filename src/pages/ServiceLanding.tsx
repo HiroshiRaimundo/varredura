@@ -31,8 +31,8 @@ const ServiceLanding: React.FC = () => {
   };
 
   const handleContractServiceClick = () => {
-    // Navigate to payment page
-    navigate(`/payment`);
+    // Navigate to client page that shows all services
+    navigate(`/client`);
   };
 
   const handleExampleClientClick = () => {
