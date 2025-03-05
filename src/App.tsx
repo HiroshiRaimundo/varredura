@@ -29,6 +29,7 @@ import Index from '@/pages/Index';
 import LoginPage from '@/pages/Login';
 import ClientLoginPage from '@/pages/ClientLogin';
 import ServiceLanding from '@/pages/ServiceLanding';
+import ExampleClient from '@/pages/ExampleClient';
 import Unauthorized from '@/pages/Unauthorized';
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
           
           {/* Rotas de serviço */}
           <Route path="/service/:serviceId" element={<ServiceLanding />} />
+          <Route path="/example-client" element={<ExampleClient />} />
           
           {/* Rota de erro de autorização */}
           <Route path="/unauthorized" element={<Unauthorized />} />
@@ -95,14 +97,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
-          {/* Rotas de clientes */}
-          <Route path="/clients/observatory" element={<ObservatoryClient />} />
-          <Route path="/clients/researcher" element={<ResearcherClient />} />
-          <Route path="/clients/politician" element={<PoliticianClient />} />
-          <Route path="/clients/institution" element={<InstitutionClient />} />
-          <Route path="/clients/journalist" element={<JournalistClient />} />
-          <Route path="/clients/press" element={<PressClient />} />
 
           {/* Rotas protegidas dos dashboards */}
           <Route

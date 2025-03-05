@@ -120,7 +120,7 @@ const ServicesSection: React.FC = () => {
   const navigate = useNavigate();
 
   const handleServiceClick = (serviceId: ClientType) => {
-    // Redirecionar para a página de serviço
+    // Redirecionar para a página de detalhes do serviço
     navigate(`/service/${serviceId}`);
   };
 
