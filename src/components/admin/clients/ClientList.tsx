@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Table,
   TableBody,
@@ -11,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ClientAccount } from '@/types/adminTypes';
-import { PlusCircle, Search, Edit, Trash } from 'lucide-react';
+import { PlusCircle, Search, Edit, Trash, Eye } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 
 interface ClientListProps {
@@ -27,6 +28,7 @@ const ClientList: React.FC<ClientListProps> = ({
   onEditClient,
   onDeleteClient,
 }) => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredClients = clients.filter(client =>
@@ -60,6 +62,10 @@ const ClientList: React.FC<ClientListProps> = ({
       default:
         return 'bg-gray-500';
     }
+  };
+
+  const handleViewClient = (clientType: string) => {
+    navigate(`/client/${clientType}`);
   };
 
   return (
@@ -115,7 +121,16 @@ const ClientList: React.FC<ClientListProps> = ({
                     <Button
                       variant="ghost"
                       size="sm"
+                      onClick={() => handleViewClient(client.type)}
+                      title="Visualizar área do cliente"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => onEditClient(client)}
+                      title="Editar cliente"
                     >
                       <Edit className="w-4 h-4" />
                     </Button>
@@ -123,6 +138,7 @@ const ClientList: React.FC<ClientListProps> = ({
                       variant="ghost"
                       size="sm"
                       onClick={() => onDeleteClient(client.id)}
+                      title="Excluir cliente"
                     >
                       <Trash className="w-4 h-4" />
                     </Button>
