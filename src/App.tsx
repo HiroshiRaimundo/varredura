@@ -102,6 +102,61 @@ function App() {
             }
           />
 
+          {/* Rotas dos clientes */}
+          <Route
+            path="/clients/observatory"
+            element={
+              <ProtectedRoute allowedTypes={['admin', 'observatory']}>
+                <ObservatoryClient />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/clients/researcher"
+            element={
+              <ProtectedRoute allowedTypes={['admin', 'researcher']}>
+                <ResearcherClient />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/clients/politician"
+            element={
+              <ProtectedRoute allowedTypes={['admin', 'politician']}>
+                <PoliticianClient />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/clients/institution"
+            element={
+              <ProtectedRoute allowedTypes={['admin', 'institution']}>
+                <InstitutionClient />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/clients/journalist"
+            element={
+              <ProtectedRoute allowedTypes={['admin', 'journalist']}>
+                <JournalistClient />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/clients/press"
+            element={
+              <ProtectedRoute allowedTypes={['admin', 'press']}>
+                <PressClient />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Rotas protegidas dos dashboards - permitir acesso do admin */}
           <Route
             path="/dashboard/observatory"

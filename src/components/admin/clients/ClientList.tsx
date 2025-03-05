@@ -65,8 +65,16 @@ const ClientList: React.FC<ClientListProps> = ({
   };
 
   const handleViewClient = (clientType: string) => {
-    // Navegar para o dashboard específico do tipo de cliente
-    navigate(`/dashboard/${clientType}`);
+    // Navegar para a página específica do tipo de cliente
+    const clientPages: Record<string, string> = {
+      'observatory': '/clients/observatory',
+      'researcher': '/clients/researcher',
+      'politician': '/clients/politician',
+      'institution': '/clients/institution',
+      'journalist': '/clients/journalist',
+      'press': '/clients/press'
+    };
+    navigate(clientPages[clientType]);
   };
 
   return (
