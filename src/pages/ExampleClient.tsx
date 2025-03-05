@@ -8,7 +8,7 @@ import ClientInfo from "@/components/example-client/ClientInfo";
 import DefaultContent from "@/components/example-client/DefaultContent";
 import { ClientType } from "@/types/clientTypes";
 import { Landmark, Database, BookOpen, Building, FileText, Mail } from "lucide-react";
-import PressContent from "@/components/example-client/press/PressContent";
+import PressContent from "@/components/press/PressContent";
 import generateMockData from "@/components/example-client/utils/mockDataGenerator";
 
 const ExampleClient: React.FC = () => {
@@ -51,7 +51,7 @@ const ExampleClient: React.FC = () => {
                   <TabsTrigger value="services">Serviços</TabsTrigger>
                   <TabsTrigger value="monitoring">Monitoramento</TabsTrigger>
                   <TabsTrigger value="analysis">Análise</TabsTrigger>
-                  <TabsTrigger value="releases">Releases</TabsTrigger>
+                  <TabsTrigger value="releases">Assessoria de Imprensa</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="dashboard">
@@ -130,11 +130,7 @@ const ExampleClient: React.FC = () => {
 
                 <TabsContent value="monitoring">
                   {clientType === "press" ? (
-                    <PressContent 
-                      activeTab={activeTab} 
-                      clientType={clientType}
-                      mockData={mockData}
-                    />
+                    <PressContent clientType={clientType} />
                   ) : (
                     <DefaultContent activeTab={activeTab} clientType={clientType} />
                   )}
@@ -142,11 +138,7 @@ const ExampleClient: React.FC = () => {
 
                 <TabsContent value="analysis">
                   {clientType === "press" ? (
-                    <PressContent 
-                      activeTab={activeTab} 
-                      clientType={clientType}
-                      mockData={mockData}
-                    />
+                    <PressContent clientType={clientType} />
                   ) : (
                     <DefaultContent activeTab={activeTab} clientType={clientType} />
                   )}
@@ -154,11 +146,7 @@ const ExampleClient: React.FC = () => {
 
                 <TabsContent value="releases">
                   {clientType === "press" ? (
-                    <PressContent 
-                      activeTab={activeTab} 
-                      clientType={clientType}
-                      mockData={mockData}
-                    />
+                    <PressContent clientType={clientType} />
                   ) : (
                     <DefaultContent activeTab={activeTab} clientType={clientType} />
                   )}
