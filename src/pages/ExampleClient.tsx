@@ -7,7 +7,7 @@ import ClientTabs from "@/components/example-client/ClientTabs";
 import ClientInfo from "@/components/example-client/ClientInfo";
 import DefaultContent from "@/components/example-client/DefaultContent";
 import { ClientType } from "@/types/clientTypes";
-import { Landmark, Database, BookOpen, Building, FileText, Mail } from "lucide-react";
+import { Landmark, Database, BookOpen, Building, FileText, Mail, Eye } from "lucide-react";
 import PressContent from "@/components/press/PressContent";
 import generateMockData from "@/components/example-client/utils/mockDataGenerator";
 
@@ -35,6 +35,19 @@ const ExampleClient: React.FC = () => {
 
   return (
     <div className="container py-6 max-w-7xl">
+      <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+        <div className="flex">
+          <div className="flex-shrink-0">
+            <Eye className="h-5 w-5 text-yellow-400" aria-hidden="true" />
+          </div>
+          <div className="ml-3">
+            <p className="text-sm text-yellow-700">
+              Você está visualizando a interface do cliente como administrador. Isso permite que você veja exatamente o que o cliente vê para fornecer suporte adequado.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <ClientHeader clientType={clientType} getClientIcon={getClientIcon} />
       
       <div className="grid md:grid-cols-4 gap-6 mt-6">
@@ -45,7 +58,7 @@ const ExampleClient: React.FC = () => {
         <div className="md:col-span-3">
           <Card>
             <CardContent className="p-0">
-              <Tabs defaultValue="dashboard" className="w-full">
+              <Tabs defaultValue="releases" className="w-full">
                 <TabsList>
                   <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                   <TabsTrigger value="services">Serviços</TabsTrigger>
