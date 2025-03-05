@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Header from "@/components/layout/Header";
@@ -20,13 +19,23 @@ interface PaymentFormValues {
   cvv: string;
 }
 
+const servicePricing: Record<ClientType, { price: string, period: string }> = {
+  observatory: { price: "R$ 3.500", period: "por mês" },
+  researcher: { price: "R$ 1.200", period: "por mês" },
+  politician: { price: "R$ 2.800", period: "por mês" },
+  institution: { price: "R$ 4.200", period: "por mês" },
+  journalist: { price: "R$ 980", period: "por mês" },
+  press: { price: "R$ 1.850", period: "por mês" }
+};
+
 const Payment: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const auth = useAuth();
   
   // Get the client type from the URL or use default
-  const clientType: ClientType = (location.state?.clientType as ClientType) || "observatory";
+  const clientType = (location.state?.clientType as ClientType) || "observatory";
+  const pricing = servicePricing[clientType];
   
   console.log("Payment page for client type:", clientType);
   
@@ -197,17 +206,17 @@ const Payment: React.FC = () => {
             <CardFooter className="flex justify-between border-t pt-6">
               <div className="text-sm text-gray-500">
                 <span>Total: </span>
-                <span className="font-bold text-lg text-gray-900">R$ 499,90</span>
-              </div>
-              <div className="text-sm text-gray-500">
-                Pagamento único
+                <span className="font-bold text-lg text-gray-900">{pricing.price}</span>
+                <span className="text-sm text-gray-500 ml-1">{pricing.period}</span>
               </div>
             </CardFooter>
           </Card>
         </div>
       </div>
-      
-      <Footer />
+
+      <div className="mt-auto">
+        <Footer />
+      </div>
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
@@ -20,7 +19,8 @@ const ServicePricing: React.FC = () => {
       return;
     }
     
-    navigate("/payment");
+    // Navigate to payment with service type
+    navigate("/payment", { state: { clientType: serviceId } });
   };
 
   const handleExampleClientClick = () => {
