@@ -1,6 +1,7 @@
-
 import React, { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ClientFlowDashboard from "@/components/dashboard/ClientFlowDashboard";
 import ClientHeader from "@/components/example-client/ClientHeader";
 import ClientTabs from "@/components/example-client/ClientTabs";
 import ClientInfo from "@/components/example-client/ClientInfo";
@@ -44,19 +45,125 @@ const ExampleClient: React.FC = () => {
         <div className="md:col-span-3">
           <Card>
             <CardContent className="p-0">
-              <ClientTabs activeTab={activeTab} setActiveTab={setActiveTab} clientType={clientType} />
-              
-              <div className="p-6">
-                {clientType === "press" ? (
-                  <PressContent 
-                    activeTab={activeTab} 
-                    clientType={clientType}
-                    mockData={mockData}
-                  />
-                ) : (
-                  <DefaultContent activeTab={activeTab} clientType={clientType} />
-                )}
-              </div>
+              <Tabs defaultValue="dashboard" className="w-full">
+                <TabsList>
+                  <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+                  <TabsTrigger value="services">Serviços</TabsTrigger>
+                  <TabsTrigger value="monitoring">Monitoramento</TabsTrigger>
+                  <TabsTrigger value="analysis">Análise</TabsTrigger>
+                  <TabsTrigger value="releases">Releases</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="dashboard">
+                  <ClientFlowDashboard />
+                </TabsContent>
+
+                <TabsContent value="services">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Observatório</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground">
+                          Monitore e analise dados e indicadores relevantes para sua área de interesse.
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Pesquisador</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground">
+                          Acesse ferramentas e recursos para pesquisa acadêmica e científica.
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Político</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground">
+                          Acompanhe tendências e monitore a opinião pública sobre temas políticos.
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Instituição</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground">
+                          Gerencie a presença e reputação da sua instituição na mídia.
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Jornalista</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground">
+                          Acesse fontes, dados e informações para suas matérias jornalísticas.
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Assessoria de Imprensa</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground">
+                          Gerencie releases, contatos com a mídia e monitoramento de notícias.
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="monitoring">
+                  {clientType === "press" ? (
+                    <PressContent 
+                      activeTab={activeTab} 
+                      clientType={clientType}
+                      mockData={mockData}
+                    />
+                  ) : (
+                    <DefaultContent activeTab={activeTab} clientType={clientType} />
+                  )}
+                </TabsContent>
+
+                <TabsContent value="analysis">
+                  {clientType === "press" ? (
+                    <PressContent 
+                      activeTab={activeTab} 
+                      clientType={clientType}
+                      mockData={mockData}
+                    />
+                  ) : (
+                    <DefaultContent activeTab={activeTab} clientType={clientType} />
+                  )}
+                </TabsContent>
+
+                <TabsContent value="releases">
+                  {clientType === "press" ? (
+                    <PressContent 
+                      activeTab={activeTab} 
+                      clientType={clientType}
+                      mockData={mockData}
+                    />
+                  ) : (
+                    <DefaultContent activeTab={activeTab} clientType={clientType} />
+                  )}
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
         </div>
