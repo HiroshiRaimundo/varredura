@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,28 +6,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import ContentModerator from "@/components/admin/ContentModerator";
 
+interface Content {
+  id: string;
+  type: 'release' | 'reportagem';
+  title: string;
+  subtitle: string;
+  category: string;
+  content: string;
+  status: 'pending' | 'approved' | 'distributed' | 'published' | 'rejected';
+  tags: string[];
+}
+
 const Admin: React.FC = () => {
   const navigate = useNavigate();
-
-  const quickActions = [
-    {
-      title: "Gerenciar Clientes",
-      description: "Adicionar, editar e remover clientes do sistema",
-      path: "/admin/clients"
-    },
-    {
-      title: "Contatos de Mídia",
-      description: "Gerenciar contatos e relacionamentos com veículos de mídia",
-      path: "/admin/contacts"
-    },
-    {
-      title: "Releases e Reportagens",
-      description: "Gerenciar conteúdo e publicações",
-      path: "/admin/content"
-    }
-  ];
-
-  const mockContents = [
+  const [contents, setContents] = useState<Content[]>([
     {
       id: '1',
       type: 'release',
@@ -48,11 +40,34 @@ const Admin: React.FC = () => {
       status: 'pending',
       tags: ['tecnologia', 'ia', 'mercado de trabalho']
     }
+  ]);
+
+  const quickActions = [
+    {
+      title: "Gerenciar Clientes",
+      description: "Adicionar, editar e remover clientes do sistema",
+      path: "/admin/clients"
+    },
+    {
+      title: "Contatos de Mídia",
+      description: "Gerenciar contatos e relacionamentos com veículos de mídia",
+      path: "/admin/contacts"
+    },
+    {
+      title: "Releases e Reportagens",
+      description: "Gerenciar conteúdo e publicações",
+      path: "/admin/content"
+    }
   ];
 
   const handleUpdateStatus = (id: string, status: 'approved' | 'rejected', feedback?: string) => {
-    console.log('Atualizando status:', { id, status, feedback });
-    // Aqui você implementaria a lógica para atualizar o status no backend
+    setContents(prevContents => 
+      prevContents.map(content => 
+        content.id === id 
+          ? { ...content, status } 
+          : content
+      )
+    );
   };
 
   return (
@@ -154,7 +169,7 @@ const Admin: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <ContentModerator
-                  contents={mockContents}
+                  contents={contents}
                   onUpdateStatus={handleUpdateStatus}
                 />
               </CardContent>

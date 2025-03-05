@@ -1,17 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Send, Clock, CheckCircle, XCircle } from 'lucide-react';
 import ContentCreator, { ContentData } from './ContentCreator';
+import { pressMonitoringService } from '@/services/pressMonitoring';
+
+interface Content {
+  id: string;
+  type: 'release' | 'reportagem';
+  title: string;
+  subtitle: string;
+  category: string;
+  status: string;
+  date: string;
+  tags: string[];
+  monitoringStatus?: {
+    lastCheck: string;
+    publications: number;
+  };
+}
 
 interface PressContentProps {
   clientType: string;
 }
 
 const PressContent: React.FC<PressContentProps> = ({ clientType }) => {
-  const mockContents = [
+  const [contents, setContents] = useState<Content[]>([
     {
       id: '1',
       type: 'release',
@@ -20,7 +36,11 @@ const PressContent: React.FC<PressContentProps> = ({ clientType }) => {
       category: 'sustentabilidade',
       status: 'approved',
       date: '2025-03-01',
-      tags: ['sustentabilidade', 'meio ambiente', 'ESG']
+      tags: ['sustentabilidade', 'meio ambiente', 'ESG'],
+      monitoringStatus: {
+        lastCheck: '2025-03-05T12:00:00',
+        publications: 3
+      }
     },
     {
       id: '2',
@@ -42,11 +62,31 @@ const PressContent: React.FC<PressContentProps> = ({ clientType }) => {
       date: '2025-03-05',
       tags: ['resultados', 'financeiro', 'mercado']
     }
-  ];
+  ]);
 
   const handleContentSubmit = (content: ContentData) => {
-    console.log('Novo conteúdo:', content);
-    // Aqui você implementaria a lógica para enviar o conteúdo para o backend
+    const newContent: Content = {
+      id: Date.now().toString(),
+      type: content.type,
+      title: content.title,
+      subtitle: content.subtitle,
+      category: content.category,
+      status: 'pending',
+      date: new Date().toISOString().split('T')[0],
+      tags: content.tags
+    };
+
+    setContents(prev => [newContent, ...prev]);
+  };
+
+  const handleSendContent = (id: string) => {
+    setContents(prev => 
+      prev.map(content => 
+        content.id === id 
+          ? { ...content, status: 'pending' } 
+          : content
+      )
+    );
   };
 
   const getStatusIcon = (status: string) => {
@@ -67,7 +107,9 @@ const PressContent: React.FC<PressContentProps> = ({ clientType }) => {
       approved: 'Aprovado',
       pending: 'Em análise',
       rejected: 'Rejeitado',
-      draft: 'Rascunho'
+      draft: 'Rascunho',
+      distributed: 'Distribuído',
+      published: 'Publicado'
     };
     return statusMap[status] || status;
   };
@@ -94,7 +136,7 @@ const PressContent: React.FC<PressContentProps> = ({ clientType }) => {
 
         <TabsContent value="my" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {mockContents.map((content) => (
+            {contents.map((content) => (
               <Card key={content.id}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
@@ -127,14 +169,25 @@ const PressContent: React.FC<PressContentProps> = ({ clientType }) => {
                         </Badge>
                       ))}
                     </div>
+                    {content.monitoringStatus && (
+                      <div className="text-sm text-muted-foreground">
+                        <p>Última verificação: {new Date(content.monitoringStatus.lastCheck).toLocaleString()}</p>
+                        <p>Publicações encontradas: {content.monitoringStatus.publications}</p>
+                      </div>
+                    )}
                     <div className="flex justify-end gap-2">
                       <Button variant="outline" size="sm">
                         Editar
                       </Button>
                       {content.status === 'draft' && (
-                        <Button size="sm">
+                        <Button size="sm" onClick={() => handleSendContent(content.id)}>
                           <Send className="h-4 w-4 mr-2" />
                           Enviar
+                        </Button>
+                      )}
+                      {(content.status === 'distributed' || content.status === 'published') && (
+                        <Button variant="outline" size="sm">
+                          Ver publicações
                         </Button>
                       )}
                     </div>
@@ -147,8 +200,8 @@ const PressContent: React.FC<PressContentProps> = ({ clientType }) => {
 
         <TabsContent value="published" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {mockContents
-              .filter(content => content.status === 'approved')
+            {contents
+              .filter(content => content.status === 'published' || content.status === 'distributed')
               .map((content) => (
                 <Card key={content.id}>
                   <CardHeader className="pb-3">
@@ -173,9 +226,15 @@ const PressContent: React.FC<PressContentProps> = ({ clientType }) => {
                           </Badge>
                         ))}
                       </div>
+                      {content.monitoringStatus && (
+                        <div className="text-sm text-muted-foreground">
+                          <p>Última verificação: {new Date(content.monitoringStatus.lastCheck).toLocaleString()}</p>
+                          <p>Publicações encontradas: {content.monitoringStatus.publications}</p>
+                        </div>
+                      )}
                       <div className="flex justify-end">
                         <Button variant="outline" size="sm">
-                          Ver métricas
+                          Ver publicações
                         </Button>
                       </div>
                     </div>
