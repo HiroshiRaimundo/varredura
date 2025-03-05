@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { ClientAccount } from '@/types/adminTypes';
 import { PlusCircle, Search, Edit, Trash, Eye } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
-import { toast } from '@/lib/toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface ClientListProps {
   clients: ClientAccount[];
@@ -30,6 +30,7 @@ const ClientList: React.FC<ClientListProps> = ({
   onDeleteClient,
 }) => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredClients = clients.filter(client =>
@@ -143,7 +144,7 @@ const ClientList: React.FC<ClientListProps> = ({
                       variant="ghost"
                       size="sm"
                       onClick={() => handleViewClient(client.type)}
-                      title="Visualizar dashboard do cliente"
+                      title="Visualizar área do cliente"
                     >
                       <Eye className="w-4 h-4" />
                     </Button>
