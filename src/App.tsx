@@ -102,11 +102,11 @@ function App() {
             }
           />
 
-          {/* Rotas protegidas dos dashboards */}
+          {/* Rotas protegidas dos dashboards - permitir acesso do admin */}
           <Route
             path="/dashboard/observatory"
             element={
-              <ProtectedRoute allowedTypes={['observatory']}>
+              <ProtectedRoute allowedTypes={['admin', 'observatory']}>
                 <ObservatoryDashboard />
               </ProtectedRoute>
             }
@@ -115,7 +115,7 @@ function App() {
           <Route
             path="/dashboard/researcher"
             element={
-              <ProtectedRoute allowedTypes={['researcher']}>
+              <ProtectedRoute allowedTypes={['admin', 'researcher']}>
                 <ResearcherDashboard />
               </ProtectedRoute>
             }
@@ -124,7 +124,7 @@ function App() {
           <Route
             path="/dashboard/politician"
             element={
-              <ProtectedRoute allowedTypes={['politician']}>
+              <ProtectedRoute allowedTypes={['admin', 'politician']}>
                 <PoliticianDashboard />
               </ProtectedRoute>
             }
@@ -133,7 +133,7 @@ function App() {
           <Route
             path="/dashboard/institution"
             element={
-              <ProtectedRoute allowedTypes={['institution']}>
+              <ProtectedRoute allowedTypes={['admin', 'institution']}>
                 <InstitutionDashboard />
               </ProtectedRoute>
             }
@@ -142,7 +142,7 @@ function App() {
           <Route
             path="/dashboard/journalist"
             element={
-              <ProtectedRoute allowedTypes={['journalist']}>
+              <ProtectedRoute allowedTypes={['admin', 'journalist']}>
                 <JournalistDashboard />
               </ProtectedRoute>
             }
@@ -151,7 +151,7 @@ function App() {
           <Route
             path="/dashboard/press"
             element={
-              <ProtectedRoute allowedTypes={['press']}>
+              <ProtectedRoute allowedTypes={['admin', 'press']}>
                 <PressDashboard />
               </ProtectedRoute>
             }
