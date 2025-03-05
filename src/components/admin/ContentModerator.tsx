@@ -201,3 +201,5 @@ const ContentModerator: React.FC<ContentModeratorProps> = ({
     </div>
   );
 };
+
+export default ContentModerator;
