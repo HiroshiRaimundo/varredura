@@ -7,45 +7,6 @@ import AdminSidebar from "@/components/admin/AdminSidebar";
 const Admin: React.FC = () => {
   const navigate = useNavigate();
 
-  const clientTypes = [
-    {
-      type: "observatory",
-      title: "Observatório",
-      color: "bg-blue-600",
-      description: "Gerenciar área de observatórios"
-    },
-    {
-      type: "researcher",
-      title: "Pesquisador",
-      color: "bg-indigo-600",
-      description: "Gerenciar área de pesquisadores"
-    },
-    {
-      type: "politician",
-      title: "Político",
-      color: "bg-green-600",
-      description: "Gerenciar área de políticos"
-    },
-    {
-      type: "institution",
-      title: "Instituição",
-      color: "bg-purple-600",
-      description: "Gerenciar área de instituições"
-    },
-    {
-      type: "journalist",
-      title: "Jornalista",
-      color: "bg-red-600",
-      description: "Gerenciar área de jornalistas"
-    },
-    {
-      type: "press",
-      title: "Assessoria de Imprensa",
-      color: "bg-amber-600",
-      description: "Gerenciar área de assessoria de imprensa"
-    }
-  ];
-
   const quickActions = [
     {
       title: "Gerenciar Clientes",
@@ -89,26 +50,6 @@ const Admin: React.FC = () => {
             </Card>
           ))}
         </div>
-
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Áreas de Cliente</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {clientTypes.map((client) => (
-                <Button
-                  key={client.type}
-                  className={`h-auto py-6 ${client.color} hover:opacity-90 flex flex-col items-start text-left`}
-                  onClick={() => navigate(`/admin/client/${client.type}`)}
-                >
-                  <span className="font-bold text-lg">{client.title}</span>
-                  <span className="text-sm opacity-90 font-normal mt-1">{client.description}</span>
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
@@ -116,7 +57,23 @@ const Admin: React.FC = () => {
               <CardTitle>Estatísticas Gerais</CardTitle>
             </CardHeader>
             <CardContent>
-              <p>Painel de estatísticas gerais do sistema.</p>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-medium">Clientes</h3>
+                  <p className="text-2xl font-bold">248</p>
+                  <p className="text-sm text-muted-foreground">Total de clientes ativos</p>
+                </div>
+                <div>
+                  <h3 className="font-medium">Monitoramentos</h3>
+                  <p className="text-2xl font-bold">1,842</p>
+                  <p className="text-sm text-muted-foreground">Monitoramentos ativos</p>
+                </div>
+                <div>
+                  <h3 className="font-medium">Releases</h3>
+                  <p className="text-2xl font-bold">324</p>
+                  <p className="text-sm text-muted-foreground">Releases publicados este mês</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
           
@@ -125,7 +82,29 @@ const Admin: React.FC = () => {
               <CardTitle>Atividades Recentes</CardTitle>
             </CardHeader>
             <CardContent>
-              <p>Lista de atividades recentes no sistema.</p>
+              <div className="space-y-4">
+                <div className="flex items-center gap-4 border-b pb-4">
+                  <div className="flex-1">
+                    <p className="font-medium">Novo Cliente Adicionado</p>
+                    <p className="text-sm text-muted-foreground">Observatório de Políticas Públicas</p>
+                  </div>
+                  <p className="text-sm text-muted-foreground">Há 2 horas</p>
+                </div>
+                <div className="flex items-center gap-4 border-b pb-4">
+                  <div className="flex-1">
+                    <p className="font-medium">Release Publicado</p>
+                    <p className="text-sm text-muted-foreground">Análise do Cenário Político 2025</p>
+                  </div>
+                  <p className="text-sm text-muted-foreground">Há 4 horas</p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex-1">
+                    <p className="font-medium">Monitoramento Atualizado</p>
+                    <p className="text-sm text-muted-foreground">Cobertura de Mídia - Setor Educacional</p>
+                  </div>
+                  <p className="text-sm text-muted-foreground">Há 6 horas</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>

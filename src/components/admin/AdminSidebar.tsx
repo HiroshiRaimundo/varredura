@@ -1,18 +1,13 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { 
-  BookOpen, 
   Users, 
-  Building, 
-  User, 
-  FileText, 
-  UserCircle, 
-  Newspaper, 
-  ChevronRight,
+  FileText,
   Home,
   Settings,
   LogOut,
-  UserPlus
+  UserPlus,
+  BarChart2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,41 +16,6 @@ const AdminSidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { handleLogout } = useAuth();
-  
-  const clientPages = [
-    { 
-      path: "/admin/client/observatory", 
-      title: "Observatório",
-      icon: <BookOpen className="h-4 w-4" />
-    },
-    { 
-      path: "/admin/client/researcher", 
-      title: "Pesquisador",
-      icon: <UserCircle className="h-4 w-4" />
-    },
-    { 
-      path: "/admin/client/politician", 
-      title: "Político",
-      icon: <User className="h-4 w-4" />
-    },
-    { 
-      path: "/admin/client/institution", 
-      title: "Instituição",
-      icon: <Building className="h-4 w-4" />
-    },
-    { 
-      path: "/admin/client/journalist", 
-      title: "Jornalista",
-      icon: <FileText className="h-4 w-4" />
-    },
-    { 
-      path: "/admin/client/press", 
-      title: "Assessoria de Imprensa",
-      icon: <Newspaper className="h-4 w-4" />
-    },
-  ];
-  
-  const isActive = (path: string) => location.pathname === path;
   
   const menuItems = [
     {
@@ -77,6 +37,11 @@ const AdminSidebar: React.FC = () => {
       title: "Releases e Reportagens",
       icon: <FileText className="h-4 w-4" />,
       path: "/admin/content"
+    },
+    {
+      title: "Análise e Relatórios",
+      icon: <BarChart2 className="h-4 w-4" />,
+      path: "/admin/analytics"
     },
     {
       title: "Configurações",
@@ -101,23 +66,6 @@ const AdminSidebar: React.FC = () => {
           >
             {item.icon}
             <span className="ml-2">{item.title}</span>
-          </Button>
-        ))}
-
-        <div className="mt-4 mb-2">
-          <h3 className="px-4 text-sm font-semibold text-gray-500">Áreas de Cliente</h3>
-        </div>
-
-        {clientPages.map((item) => (
-          <Button
-            key={item.path}
-            variant={location.pathname === item.path ? "secondary" : "ghost"}
-            className="w-full justify-start mb-2"
-            onClick={() => navigate(item.path)}
-          >
-            {item.icon}
-            <span className="ml-2">{item.title}</span>
-            <ChevronRight className="h-4 w-4 ml-auto" />
           </Button>
         ))}
       </nav>
