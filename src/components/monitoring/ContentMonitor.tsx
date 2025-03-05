@@ -1,307 +1,222 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, RefreshCw, AlertCircle, Search } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
-import { Input } from '@/components/ui/input';
+import { ExternalLink, Filter } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 interface Publication {
   id: string;
-  url: string;
-  website: string;
   title: string;
-  publishedAt: string;
-  relevance: number; // 0-100 baseado na similaridade do título
-  status: 'new' | 'viewed' | 'archived';
-  excerpt: string;
+  source: string;
+  url: string;
+  category: string;
+  date: string;
+  keywords: string[];
+  content: string;
+  status: 'new' | 'read' | 'archived';
 }
 
-interface ContentMonitorProps {
-  contentId: string;
-  contentTitle: string;
-  distributedAt: string;
-  distributedTo: string[];
-}
+// Dados de exemplo para publicações
+const mockPublications: Publication[] = [
+  {
+    id: '1',
+    title: 'Abertura de Licitação: Aquisição de Equipamentos de TI',
+    source: 'Portal da Transparência',
+    url: 'https://www.portaltransparencia.gov.br/licitacoes/123456',
+    category: 'Licitações',
+    date: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 horas atrás
+    keywords: ['licitação', 'TI', 'equipamentos'],
+    content: 'Processo licitatório para aquisição de computadores, notebooks e periféricos para modernização do parque tecnológico...',
+    status: 'new'
+  },
+  {
+    id: '2',
+    title: 'Nomeação de Novos Servidores',
+    source: 'Diário Oficial',
+    url: 'https://www.in.gov.br/123456',
+    category: 'Diário Oficial',
+    date: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 horas atrás
+    keywords: ['nomeação', 'servidor', 'cargo'],
+    content: 'Ato de nomeação dos candidatos aprovados no concurso público para os cargos de Analista e Técnico...',
+    status: 'read'
+  },
+  {
+    id: '3',
+    title: 'Atualização do IPCA - Fevereiro 2025',
+    source: 'IBGE',
+    url: 'https://www.ibge.gov.br/indicadores/ipca/2025-02',
+    category: 'Indicadores',
+    date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 dia atrás
+    keywords: ['IPCA', 'inflação', 'índice'],
+    content: 'O Índice Nacional de Preços ao Consumidor Amplo (IPCA) do mês de fevereiro de 2025 apresentou variação de...',
+    status: 'read'
+  },
+  {
+    id: '4',
+    title: 'Novo Decreto Regulamenta Lei de Licitações',
+    source: 'Planalto',
+    url: 'https://www.planalto.gov.br/decretos/2025/123456',
+    category: 'Legislação',
+    date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 dias atrás
+    keywords: ['decreto', 'licitações', 'regulamentação'],
+    content: 'Publicado decreto que regulamenta aspectos da nova Lei de Licitações, estabelecendo procedimentos para...',
+    status: 'archived'
+  },
+  {
+    id: '5',
+    title: 'Contrato de Prestação de Serviços de Manutenção',
+    source: 'Portal da Transparência',
+    url: 'https://www.portaltransparencia.gov.br/contratos/789012',
+    category: 'Contratos',
+    date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(), // 4 dias atrás
+    keywords: ['contrato', 'manutenção', 'serviços'],
+    content: 'Assinatura de contrato para prestação de serviços de manutenção preventiva e corretiva das instalações...',
+    status: 'archived'
+  }
+];
 
-const ContentMonitor: React.FC<ContentMonitorProps> = ({
-  contentId,
-  contentTitle,
-  distributedAt,
-  distributedTo
-}) => {
-  const [publications, setPublications] = useState<Publication[]>([]);
-  const [isMonitoring, setIsMonitoring] = useState(true);
+const ContentMonitor: React.FC = () => {
+  const [publications, setPublications] = useState<Publication[]>(mockPublications);
+  const [filter, setFilter] = useState('');
   const [lastCheck, setLastCheck] = useState(new Date());
-  const [searchTerm, setSearchTerm] = useState('');
-  const [customMonitoringTerms, setCustomMonitoringTerms] = useState<string[]>([]);
-
-  // Mock data - substituir por chamada real à API de monitoramento
-  const mockPublications: Publication[] = [
-    {
-      id: '1',
-      url: 'https://g1.globo.com/exemplo',
-      website: 'G1',
-      title: contentTitle,
-      publishedAt: '2025-03-05T10:30:00',
-      relevance: 95,
-      status: 'new',
-      excerpt: 'O artigo aborda...'
-    },
-    {
-      id: '2',
-      url: 'https://folha.com/exemplo',
-      website: 'Folha de São Paulo',
-      title: 'Título similar com algumas palavras diferentes',
-      publishedAt: '2025-03-05T11:15:00',
-      relevance: 87,
-      status: 'viewed',
-      excerpt: 'A matéria discute...'
-    }
-  ];
 
   useEffect(() => {
-    // Simula o monitoramento contínuo
     const interval = setInterval(() => {
-      if (isMonitoring) {
-        checkForNewPublications();
-      }
-    }, 5000);
+      checkForNewPublications();
+    }, 5000); // Verifica a cada 5 segundos (apenas para demonstração)
 
     return () => clearInterval(interval);
-  }, [isMonitoring, contentTitle, customMonitoringTerms]);
+  }, [publications]);
 
   const checkForNewPublications = () => {
-    // Aqui você implementaria a lógica real de busca por publicações
-    // usando o título original e os termos de monitoramento personalizados
-    
-    // Simula a busca por novas publicações
-    const newPubs = mockPublications.filter(
-      pub => !publications.find(p => p.id === pub.id)
-    );
+    // Simula a chegada de novas publicações
+    const randomNew = Math.random() > 0.7;
+    if (randomNew) {
+      const newPub: Publication = {
+        id: Date.now().toString(),
+        title: 'Nova Licitação Publicada',
+        source: 'Portal da Transparência',
+        url: 'https://www.portaltransparencia.gov.br/licitacoes/new',
+        category: 'Licitações',
+        date: new Date().toISOString(),
+        keywords: ['licitação', 'novo', 'serviços'],
+        content: 'Nova licitação publicada para contratação de serviços...',
+        status: 'new'
+      };
 
-    if (newPubs.length > 0) {
-      setPublications(prev => [...prev, ...newPubs]);
+      setPublications(prev => [newPub, ...prev]);
       toast({
-        title: "Novas publicações encontradas!",
-        description: `Encontramos ${newPubs.length} novas publicações relacionadas ao seu conteúdo.`,
+        title: "Nova Publicação",
+        description: "Uma nova publicação foi encontrada e adicionada à lista."
       });
     }
-
     setLastCheck(new Date());
   };
 
-  const addMonitoringTerm = (term: string) => {
-    if (term && !customMonitoringTerms.includes(term)) {
-      setCustomMonitoringTerms(prev => [...prev, term]);
-      toast({
-        title: "Termo adicionado",
-        description: `"${term}" foi adicionado aos termos de monitoramento.`,
-      });
-    }
-  };
-
-  const removeMonitoringTerm = (term: string) => {
-    setCustomMonitoringTerms(prev => prev.filter(t => t !== term));
-  };
-
-  const markAsViewed = (pubId: string) => {
+  const markAsRead = (id: string) => {
     setPublications(prev =>
       prev.map(pub =>
-        pub.id === pubId
-          ? { ...pub, status: 'viewed' }
-          : pub
+        pub.id === id ? { ...pub, status: 'read' as const } : pub
       )
     );
   };
 
-  const getRelevanceBadge = (relevance: number) => {
-    if (relevance >= 90) return <Badge className="bg-green-500">Alta Similaridade</Badge>;
-    if (relevance >= 70) return <Badge className="bg-yellow-500">Média Similaridade</Badge>;
-    return <Badge className="bg-red-500">Baixa Similaridade</Badge>;
+  const archivePublication = (id: string) => {
+    setPublications(prev =>
+      prev.map(pub =>
+        pub.id === id ? { ...pub, status: 'archived' as const } : pub
+      )
+    );
   };
 
   const filteredPublications = publications.filter(pub =>
-    searchTerm
-      ? pub.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        pub.website.toLowerCase().includes(searchTerm.toLowerCase())
-      : true
+    pub.title.toLowerCase().includes(filter.toLowerCase()) ||
+    pub.content.toLowerCase().includes(filter.toLowerCase()) ||
+    pub.keywords.some(k => k.toLowerCase().includes(filter.toLowerCase()))
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-medium">Monitoramento de Publicações</h3>
-          <p className="text-sm text-muted-foreground">
-            Título monitorado: {contentTitle}
+    <div className="p-6">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold mb-2">Publicações Monitoradas</h2>
+        <div className="flex items-center justify-between">
+          <p className="text-muted-foreground">
+            Última verificação: {lastCheck.toLocaleString()}
           </p>
-        </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={checkForNewPublications}
-          className="flex items-center gap-2"
-        >
-          <RefreshCw className="h-4 w-4" />
-          Atualizar agora
-        </Button>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm font-medium">Termos de Monitoramento</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex gap-2">
-              <Input
-                placeholder="Adicionar termo para monitoramento..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter' && searchTerm) {
-                    addMonitoringTerm(searchTerm);
-                    setSearchTerm('');
-                  }
-                }}
-              />
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  if (searchTerm) {
-                    addMonitoringTerm(searchTerm);
-                    setSearchTerm('');
-                  }
-                }}
-              >
-                Adicionar
-              </Button>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="secondary" className="px-3 py-1">
-                {contentTitle}
-                <span className="ml-2 text-xs">(principal)</span>
-              </Badge>
-              {customMonitoringTerms.map(term => (
-                <Badge
-                  key={term}
-                  variant="outline"
-                  className="px-3 py-1 cursor-pointer"
-                  onClick={() => removeMonitoringTerm(term)}
-                >
-                  {term}
-                  <span className="ml-2 text-xs">(×)</span>
-                </Badge>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm font-medium">Status do Monitoramento</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-4 gap-4 text-center">
-            <div>
-              <p className="text-2xl font-bold">{publications.length}</p>
-              <p className="text-sm text-muted-foreground">Publicações encontradas</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{distributedTo.length}</p>
-              <p className="text-sm text-muted-foreground">Canais monitorados</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-green-500">
-                {publications.filter(p => p.relevance >= 90).length}
-              </p>
-              <p className="text-sm text-muted-foreground">Alta similaridade</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-yellow-500">
-                {publications.filter(p => p.relevance >= 70 && p.relevance < 90).length}
-              </p>
-              <p className="text-sm text-muted-foreground">Média similaridade</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-sm font-medium">Publicações Encontradas</CardTitle>
-          <div className="relative w-64">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <div className="flex items-center gap-2">
+            <Filter className="h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Filtrar publicações..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8"
+              value={filter}
+              onChange={e => setFilter(e.target.value)}
+              className="w-[300px]"
             />
           </div>
-        </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[400px]">
-            <div className="space-y-4">
-              {filteredPublications.map((pub) => (
-                <div
-                  key={pub.id}
-                  className={`p-4 border rounded-lg ${
-                    pub.status === 'new' ? 'bg-muted/50' : ''
-                  }`}
-                >
+        </div>
+      </div>
+
+      <ScrollArea className="h-[600px]">
+        <div className="space-y-4">
+          {filteredPublications.map(publication => (
+            <Card key={publication.id} className={publication.status === 'new' ? 'border-primary' : ''}>
+              <CardContent className="pt-6">
+                <div className="flex items-start justify-between">
                   <div className="space-y-2">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-medium">{pub.website}</h4>
-                          {pub.status === 'new' && (
-                            <Badge variant="outline" className="text-green-500">
-                              Novo
-                            </Badge>
-                          )}
-                          {getRelevanceBadge(pub.relevance)}
-                        </div>
-                        <p className="font-medium">{pub.title}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {pub.excerpt}
-                        </p>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="flex items-center gap-2"
-                        onClick={() => {
-                          window.open(pub.url, '_blank');
-                          markAsViewed(pub.id);
-                        }}
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                        Ver publicação
-                      </Button>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-medium">{publication.title}</h3>
+                      {publication.status === 'new' && (
+                        <Badge>Novo</Badge>
+                      )}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Publicado em: {new Date(pub.publishedAt).toLocaleString()}
+                      {publication.source} • {new Date(publication.date).toLocaleString()}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {publication.keywords.map(keyword => (
+                        <Badge key={keyword} variant="outline">
+                          {keyword}
+                        </Badge>
+                      ))}
+                    </div>
+                    <p className="text-sm mt-2">
+                      {publication.content}
                     </p>
                   </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" asChild>
+                      <a href={publication.url} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        Abrir
+                      </a>
+                    </Button>
+                    {publication.status === 'new' && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => markAsRead(publication.id)}
+                      >
+                        Marcar como Lido
+                      </Button>
+                    )}
+                    {publication.status === 'read' && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => archivePublication(publication.id)}
+                      >
+                        Arquivar
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              ))}
-
-              {filteredPublications.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-8 text-center text-muted-foreground">
-                  <AlertCircle className="h-8 w-8 mb-2" />
-                  <p>Ainda não encontramos publicações do seu conteúdo.</p>
-                  <p className="text-sm">Continuamos monitorando...</p>
-                </div>
-              )}
-            </div>
-          </ScrollArea>
-        </CardContent>
-      </Card>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </ScrollArea>
     </div>
   );
 };

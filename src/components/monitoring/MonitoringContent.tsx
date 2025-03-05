@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FileText, Database, BookOpen, Play, Pause, RefreshCw, Trash2, Filter as FilterIcon } from "lucide-react";
+import { FileText, Database, Plus, Play, Pause, RefreshCw, Trash2, Filter as FilterIcon } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -10,6 +10,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface Monitoring {
   id: string;
@@ -17,7 +18,7 @@ interface Monitoring {
   url: string;
   apiUrl?: string;
   keywords: string[];
-  category: 'governo' | 'indicadores' | 'legislacao';
+  category: string;
   frequency: 'hourly' | 'daily' | 'weekly' | 'monthly';
   responsible: string;
   status: 'active' | 'paused';
@@ -25,18 +26,70 @@ interface Monitoring {
   createdAt: string;
 }
 
+// Dados de exemplo para monitoramentos
+const exampleMonitorings: Monitoring[] = [
+  {
+    id: '1',
+    name: 'Portal da Transparência - Licitações',
+    url: 'https://www.portaltransparencia.gov.br/licitacoes',
+    keywords: ['licitação', 'pregão', 'contrato'],
+    category: 'Licitações',
+    frequency: 'daily',
+    responsible: 'João Silva',
+    status: 'active',
+    lastUpdate: new Date().toISOString(),
+    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: '2',
+    name: 'Diário Oficial - Nomeações',
+    url: 'https://www.in.gov.br',
+    keywords: ['nomeação', 'exoneração', 'cargo'],
+    category: 'Diário Oficial',
+    frequency: 'daily',
+    responsible: 'Maria Santos',
+    status: 'active',
+    lastUpdate: new Date().toISOString(),
+    createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: '3',
+    name: 'IBGE - Indicadores Econômicos',
+    url: 'https://www.ibge.gov.br/indicadores',
+    keywords: ['inflação', 'PIB', 'desemprego'],
+    category: 'Indicadores',
+    frequency: 'monthly',
+    responsible: 'Pedro Costa',
+    status: 'paused',
+    lastUpdate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+  }
+];
+
 const MonitoringContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'add' | 'manage'>('add');
-  const [monitorings, setMonitorings] = useState<Monitoring[]>([]);
+  const [monitorings, setMonitorings] = useState<Monitoring[]>(exampleMonitorings);
   const [filter, setFilter] = useState('');
+  const [categories, setCategories] = useState<string[]>(['Licitações', 'Diário Oficial', 'Indicadores', 'Legislação']);
+  const [newCategory, setNewCategory] = useState('');
   const [newMonitoring, setNewMonitoring] = useState<Partial<Monitoring>>({
-    category: 'governo',
     frequency: 'daily',
     status: 'active'
   });
 
+  const handleAddCategory = () => {
+    if (newCategory.trim() && !categories.includes(newCategory.trim())) {
+      setCategories(prev => [...prev, newCategory.trim()]);
+      setNewCategory('');
+      toast({
+        title: "Categoria Adicionada",
+        description: `A categoria "${newCategory}" foi adicionada com sucesso.`
+      });
+    }
+  };
+
   const handleAddMonitoring = () => {
-    if (!newMonitoring.name || !newMonitoring.url || !newMonitoring.responsible) {
+    if (!newMonitoring.name || !newMonitoring.url || !newMonitoring.responsible || !newMonitoring.category) {
       toast({
         title: "Erro",
         description: "Por favor, preencha todos os campos obrigatórios.",
@@ -61,7 +114,6 @@ const MonitoringContent: React.FC = () => {
 
     setMonitorings(prev => [...prev, monitoring]);
     setNewMonitoring({
-      category: 'governo',
       frequency: 'daily',
       status: 'active'
     });
@@ -154,18 +206,51 @@ const MonitoringContent: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="category">Categoria *</Label>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="category">Categoria *</Label>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            <Plus className="h-4 w-4 mr-2" />
+                            Nova Categoria
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Adicionar Nova Categoria</DialogTitle>
+                          </DialogHeader>
+                          <div className="grid gap-4 py-4">
+                            <div className="grid gap-2">
+                              <Label htmlFor="newCategory">Nome da Categoria</Label>
+                              <div className="flex gap-2">
+                                <Input
+                                  id="newCategory"
+                                  value={newCategory}
+                                  onChange={e => setNewCategory(e.target.value)}
+                                  placeholder="Ex: Contratos"
+                                />
+                                <Button onClick={handleAddCategory}>
+                                  Adicionar
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
                     <Select
                       value={newMonitoring.category}
-                      onValueChange={value => setNewMonitoring(prev => ({ ...prev, category: value as any }))}
+                      onValueChange={value => setNewMonitoring(prev => ({ ...prev, category: value }))}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione uma categoria" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="governo">Governo</SelectItem>
-                        <SelectItem value="indicadores">Indicadores</SelectItem>
-                        <SelectItem value="legislacao">Legislação</SelectItem>
+                        {categories.map(category => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
