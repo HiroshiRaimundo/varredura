@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { ClientAccount } from '@/types/adminTypes';
 import { PlusCircle, Search, Edit, Trash, Eye } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import { toast } from '@/lib/toast';
 
 interface ClientListProps {
   clients: ClientAccount[];
@@ -74,7 +75,18 @@ const ClientList: React.FC<ClientListProps> = ({
       'journalist': '/clients/journalist',
       'press': '/clients/press'
     };
-    navigate(clientPages[clientType]);
+
+    // Verificar se a página existe para o tipo de cliente
+    if (clientPages[clientType]) {
+      navigate(clientPages[clientType]);
+    } else {
+      // Se não existir, mostrar um toast de erro
+      toast({
+        title: "Página não encontrada",
+        description: "A página deste tipo de cliente ainda não está disponível.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (

@@ -157,61 +157,6 @@ function App() {
             }
           />
 
-          {/* Rotas protegidas dos dashboards - permitir acesso do admin */}
-          <Route
-            path="/dashboard/observatory"
-            element={
-              <ProtectedRoute allowedTypes={['admin', 'observatory']}>
-                <ObservatoryDashboard />
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route
-            path="/dashboard/researcher"
-            element={
-              <ProtectedRoute allowedTypes={['admin', 'researcher']}>
-                <ResearcherDashboard />
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route
-            path="/dashboard/politician"
-            element={
-              <ProtectedRoute allowedTypes={['admin', 'politician']}>
-                <PoliticianDashboard />
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route
-            path="/dashboard/institution"
-            element={
-              <ProtectedRoute allowedTypes={['admin', 'institution']}>
-                <InstitutionDashboard />
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route
-            path="/dashboard/journalist"
-            element={
-              <ProtectedRoute allowedTypes={['admin', 'journalist']}>
-                <JournalistDashboard />
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route
-            path="/dashboard/press"
-            element={
-              <ProtectedRoute allowedTypes={['admin', 'press']}>
-                <PressDashboard />
-              </ProtectedRoute>
-            }
-          />
-          
           {/* Rota 404 */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
