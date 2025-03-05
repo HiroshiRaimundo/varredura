@@ -65,7 +65,8 @@ const ClientList: React.FC<ClientListProps> = ({
   };
 
   const handleViewClient = (clientType: string) => {
-    navigate(`/client/${clientType}`);
+    // Navegar para o dashboard específico do tipo de cliente
+    navigate(`/dashboard/${clientType}`);
   };
 
   return (
@@ -122,7 +123,7 @@ const ClientList: React.FC<ClientListProps> = ({
                       variant="ghost"
                       size="sm"
                       onClick={() => handleViewClient(client.type)}
-                      title="Visualizar área do cliente"
+                      title="Visualizar dashboard do cliente"
                     >
                       <Eye className="w-4 h-4" />
                     </Button>
