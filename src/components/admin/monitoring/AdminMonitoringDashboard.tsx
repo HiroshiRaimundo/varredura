@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useLocation, useNavigate } from "react-router-dom";
 import { MonitoringList } from "./MonitoringList";
 import { MonitoringForm } from "./MonitoringForm";
 import { MonitoringStats } from "./MonitoringStats";
@@ -8,7 +9,15 @@ import { MonitoringSettings } from "./MonitoringSettings";
 import { MonitoringAnalytics } from "./MonitoringAnalytics";
 
 export const AdminMonitoringDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("overview");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const path = location.pathname.split("/").pop() || "overview";
+  const [activeTab, setActiveTab] = useState(path);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    navigate(`/admin/monitoring/${value === "overview" ? "" : value}`);
+  };
 
   return (
     <div className="p-6">
@@ -21,7 +30,7 @@ export const AdminMonitoringDashboard: React.FC = () => {
 
       <MonitoringStats />
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-6">
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="add">Novo Monitoramento</TabsTrigger>

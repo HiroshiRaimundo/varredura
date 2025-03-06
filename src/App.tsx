@@ -66,8 +66,9 @@ function App() {
             }
           />
           
+          {/* Rota única para monitoramento */}
           <Route
-            path="/admin/monitoring"
+            path="/admin/monitoring/*"
             element={
               <ProtectedRoute allowedTypes={['admin']}>
                 <AdminMonitoringDashboard />
