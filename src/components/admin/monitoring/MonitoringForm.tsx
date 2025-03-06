@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 interface MonitoringFormData {
   name: string;
@@ -28,6 +28,7 @@ const initialFormData: MonitoringFormData = {
 
 export const MonitoringForm: React.FC = () => {
   const [formData, setFormData] = useState<MonitoringFormData>(initialFormData);
+  const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -6,7 +6,7 @@ import { MonitoringForm } from "./MonitoringForm";
 import { MonitoringStats } from "./MonitoringStats";
 import { MonitoringSettings } from "./MonitoringSettings";
 
-export const AdminMonitoringDashboard: React.FC = () => {
+const AdminMonitoringDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
 
   return (
@@ -76,3 +76,5 @@ export const AdminMonitoringDashboard: React.FC = () => {
     </div>
   );
 };
+
+export { AdminMonitoringDashboard };
