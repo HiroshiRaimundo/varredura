@@ -21,7 +21,7 @@ export const AdminMonitoringDashboard: React.FC = () => {
 
       <MonitoringStats />
 
-      <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="mt-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="add">Novo Monitoramento</TabsTrigger>
