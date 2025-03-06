@@ -7,6 +7,84 @@ import { MonitoringForm } from "./MonitoringForm";
 import { MonitoringStats } from "./MonitoringStats";
 import { MonitoringSettings } from "./MonitoringSettings";
 import { MonitoringAnalytics } from "./MonitoringAnalytics";
+import { MonitoringReports } from "./MonitoringReports";
+
+// Dados mockados para exemplo
+const mockReportData = {
+  network: {
+    centrality: {
+      "http://example.com/page1": 0.8,
+      "http://example.com/page2": 0.6,
+      "http://example.com/page3": 0.4,
+    },
+    pageRank: {
+      "http://example.com/page1": 0.5,
+      "http://example.com/page2": 0.3,
+      "http://example.com/page3": 0.2,
+    },
+    hubScore: {
+      "http://example.com/page1": 0.7,
+      "http://example.com/page2": 0.2,
+      "http://example.com/page3": 0.1,
+    }
+  },
+  content: {
+    sentiment: {
+      polarity: 0.2,
+      subjectivity: 0.5
+    },
+    keyPhrases: [
+      "Importante atualização do sistema",
+      "Novas funcionalidades implementadas",
+      "Melhorias de desempenho",
+      "Correções de bugs",
+      "Atualizações de segurança"
+    ],
+    wordFrequency: {
+      "sistema": 10,
+      "atualização": 8,
+      "segurança": 6,
+      "melhorias": 5,
+      "desempenho": 4
+    }
+  },
+  anomalies: {
+    totalAnomalies: 5,
+    anomalyPercentage: 12.5,
+    timeAnomalies: [false, true, false, false, true, false, false, false],
+    contentAnomalies: [false, false, true, false, false, true, false, false]
+  },
+  report: {
+    summary: {
+      totalInsights: 8,
+      timestamp: new Date().toISOString()
+    },
+    insights: [
+      {
+        type: "network",
+        title: "Alta Centralidade",
+        description: "Páginas com maior conectividade",
+        data: { value: 0.8 }
+      },
+      {
+        type: "content",
+        title: "Sentimento Positivo",
+        description: "Conteúdo com tendência positiva",
+        data: { value: 0.2 }
+      }
+    ],
+    recommendations: [
+      {
+        category: "Rede",
+        action: "Monitorar páginas centrais para mudanças"
+      },
+      {
+        category: "Conteúdo",
+        action: "Manter análise de sentimento do conteúdo"
+      }
+    ]
+  }
+};
 
 export const AdminMonitoringDashboard: React.FC = () => {
   const location = useLocation();
@@ -77,15 +155,7 @@ export const AdminMonitoringDashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="reports">
-          <Card>
-            <CardHeader>
-              <CardTitle>Relatórios e Análises</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {/* Componente de relatórios será implementado posteriormente */}
-              <p>Em desenvolvimento...</p>
-            </CardContent>
-          </Card>
+          <MonitoringReports data={mockReportData} />
         </TabsContent>
       </Tabs>
     </div>
