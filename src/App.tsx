@@ -67,41 +67,19 @@ function App() {
           />
           
           <Route
-            path="/admin/monitoring"
+            path="/admin/monitoring/*"
             element={
               <ProtectedRoute allowedTypes={['admin']}>
-                <AdminMonitoringDashboard defaultTab="overview" />
+                <Routes>
+                  <Route path="/" element={<AdminMonitoringDashboard defaultTab="overview" />} />
+                  <Route path="/add" element={<AdminMonitoringDashboard defaultTab="add" />} />
+                  <Route path="/settings" element={<AdminMonitoringDashboard defaultTab="settings" />} />
+                  <Route path="/reports" element={<AdminMonitoringDashboard defaultTab="reports" />} />
+                </Routes>
               </ProtectedRoute>
             }
           />
 
-          <Route
-            path="/admin/monitoring/add"
-            element={
-              <ProtectedRoute allowedTypes={['admin']}>
-                <AdminMonitoringDashboard defaultTab="add" />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/admin/monitoring/settings"
-            element={
-              <ProtectedRoute allowedTypes={['admin']}>
-                <AdminMonitoringDashboard defaultTab="settings" />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/admin/monitoring/reports"
-            element={
-              <ProtectedRoute allowedTypes={['admin']}>
-                <AdminMonitoringDashboard defaultTab="reports" />
-              </ProtectedRoute>
-            }
-          />
-          
           <Route
             path="/admin/clients"
             element={
