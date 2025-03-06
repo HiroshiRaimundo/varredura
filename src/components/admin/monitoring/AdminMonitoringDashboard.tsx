@@ -5,6 +5,7 @@ import { MonitoringList } from "./MonitoringList";
 import { MonitoringForm } from "./MonitoringForm";
 import { MonitoringStats } from "./MonitoringStats";
 import { MonitoringSettings } from "./MonitoringSettings";
+import { MonitoringAnalytics } from "./MonitoringAnalytics";
 
 export const AdminMonitoringDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -21,9 +22,10 @@ export const AdminMonitoringDashboard: React.FC = () => {
       <MonitoringStats />
 
       <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="mt-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="add">Novo Monitoramento</TabsTrigger>
+          <TabsTrigger value="analytics">Análises</TabsTrigger>
           <TabsTrigger value="settings">Configurações</TabsTrigger>
           <TabsTrigger value="reports">Relatórios</TabsTrigger>
         </TabsList>
@@ -48,6 +50,10 @@ export const AdminMonitoringDashboard: React.FC = () => {
               <MonitoringForm />
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="analytics">
+          <MonitoringAnalytics />
         </TabsContent>
 
         <TabsContent value="settings">
