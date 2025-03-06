@@ -67,15 +67,10 @@ function App() {
           />
           
           <Route
-            path="/admin/monitoring/*"
+            path="/admin/monitoring"
             element={
               <ProtectedRoute allowedTypes={['admin']}>
-                <Routes>
-                  <Route path="/" element={<AdminMonitoringDashboard defaultTab="overview" />} />
-                  <Route path="/add" element={<AdminMonitoringDashboard defaultTab="add" />} />
-                  <Route path="/settings" element={<AdminMonitoringDashboard defaultTab="settings" />} />
-                  <Route path="/reports" element={<AdminMonitoringDashboard defaultTab="reports" />} />
-                </Routes>
+                <AdminMonitoringDashboard />
               </ProtectedRoute>
             }
           />

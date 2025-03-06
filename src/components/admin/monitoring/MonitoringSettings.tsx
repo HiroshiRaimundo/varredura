@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Settings {
   maxConcurrentMonitoring: number;
@@ -30,6 +30,7 @@ const defaultSettings: Settings = {
 
 export const MonitoringSettings: React.FC = () => {
   const [settings, setSettings] = useState<Settings>(defaultSettings);
+  const { toast } = useToast();
 
   const handleSave = () => {
     // Aqui você implementaria a lógica para salvar as configurações
