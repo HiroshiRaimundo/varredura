@@ -44,6 +44,11 @@ const Admin: React.FC = () => {
 
   const quickActions = [
     {
+      title: "Central de Monitoramento",
+      description: "Gerencie todos os monitoramentos do sistema",
+      path: "/admin/monitoring"
+    },
+    {
       title: "Gerenciar Clientes",
       description: "Adicionar, editar e remover clientes do sistema",
       path: "/admin/clients"

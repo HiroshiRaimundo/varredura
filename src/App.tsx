@@ -7,6 +7,7 @@ import Admin from '@/pages/Admin';
 import ClientManagement from '@/pages/admin/ClientManagement';
 import ContentManagement from '@/pages/admin/ContentManagement';
 import MediaContactsManagement from '@/pages/admin/MediaContactsManagement';
+import { AdminMonitoringDashboard } from '@/components/admin/monitoring/AdminMonitoringDashboard';
 
 // Client pages
 import ObservatoryClient from '@/pages/clients/ObservatoryClient';
@@ -61,6 +62,15 @@ function App() {
             element={
               <ProtectedRoute allowedTypes={['admin']}>
                 <Admin />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/monitoring"
+            element={
+              <ProtectedRoute allowedTypes={['admin']}>
+                <AdminMonitoringDashboard />
               </ProtectedRoute>
             }
           />

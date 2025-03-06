@@ -8,7 +8,8 @@ import {
   LogOut,
   UserPlus,
   BarChart2,
-  Eye
+  Eye,
+  Activity
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,6 +24,12 @@ const AdminSidebar: React.FC = () => {
       title: "Dashboard",
       icon: <Home className="h-5 w-5" />,
       path: "/admin"
+    },
+    {
+      title: "Monitoramento",
+      icon: <Activity className="h-4 w-4" />,
+      path: "/admin/monitoring",
+      description: "Central de monitoramento do sistema"
     },
     {
       title: "Gerenciar Clientes",
