@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { LineChart, BarChart, PieChart } from "@/components/charts";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
+import { Share2, Bell, Filter, ChevronDown, Copy, Mail } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface AnalyticsData {
   timeRange: string;
@@ -26,10 +33,25 @@ interface AnalyticsData {
   }[];
 }
 
+interface AlertConfig {
+  metric: string;
+  threshold: number;
+  enabled: boolean;
+}
+
 export const MonitoringAnalytics: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
   const [timeRange, setTimeRange] = useState("7d");
   const [exportFormat, setExportFormat] = useState("csv");
+  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [drillDownLevel, setDrillDownLevel] = useState(0);
+  const [alertConfigs, setAlertConfigs] = useState<AlertConfig[]>([
+    { metric: "successRate", threshold: 95, enabled: true },
+    { metric: "averageUpdateTime", threshold: 60, enabled: true },
+    { metric: "alertsGenerated", threshold: 50, enabled: true }
+  ]);
 
   // Dados mockados para exemplo
   const analyticsData: AnalyticsData = {
@@ -45,7 +67,6 @@ export const MonitoringAnalytics: React.FC = () => {
       { date: "2024-03-01", updates: 45, alerts: 3 },
       { date: "2024-03-02", updates: 52, alerts: 5 },
       { date: "2024-03-03", updates: 48, alerts: 2 },
-      // ... mais dados
     ],
     distribution: [
       { type: "Governo", count: 45 },
@@ -55,9 +76,42 @@ export const MonitoringAnalytics: React.FC = () => {
     ]
   };
 
-  const handleExportData = () => {
-    // Implementar exportação de dados
-    console.log(`Exportando dados em formato ${exportFormat}`);
+  // Compartilhamento de insights
+  const handleShare = (type: 'url' | 'email') => {
+    const currentUrl = window.location.href;
+    const shareUrl = `${currentUrl}?tab=${activeTab}&timeRange=${timeRange}`;
+    
+    if (type === 'url') {
+      navigator.clipboard.writeText(shareUrl);
+      toast.success("URL copiada para a área de transferência");
+    } else {
+      window.location.href = `mailto:?subject=Análise de Monitoramento&body=${encodeURIComponent(shareUrl)}`;
+    }
+  };
+
+  // Alertas baseados em análises
+  const handleAlertConfigChange = (index: number, field: keyof AlertConfig, value: any) => {
+    const newConfigs = [...alertConfigs];
+    newConfigs[index] = { ...newConfigs[index], [field]: value };
+    setAlertConfigs(newConfigs);
+
+    // Verificar limites e notificar
+    const metric = newConfigs[index].metric;
+    const currentValue = analyticsData.metrics[metric as keyof typeof analyticsData.metrics];
+    if (newConfigs[index].enabled && currentValue > newConfigs[index].threshold) {
+      toast.warning(`Alerta: ${metric} ultrapassou o limite definido`);
+    }
+  };
+
+  // Exploração ad-hoc
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleDrillDown = (category: string) => {
+    setDrillDownLevel(prev => prev + 1);
+    // Aqui você adicionaria lógica para buscar dados mais detalhados
+    toast.info(`Detalhando dados para: ${category}`);
   };
 
   return (
@@ -69,36 +123,86 @@ export const MonitoringAnalytics: React.FC = () => {
             Análise estatística e tendências dos monitoramentos
           </p>
         </div>
-        <div className="flex space-x-4">
-          <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Período" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="24h">Últimas 24 horas</SelectItem>
-              <SelectItem value="7d">Últimos 7 dias</SelectItem>
-              <SelectItem value="30d">Últimos 30 dias</SelectItem>
-              <SelectItem value="custom">Personalizado</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={exportFormat} onValueChange={setExportFormat}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Formato de Exportação" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="csv">CSV</SelectItem>
-              <SelectItem value="json">JSON</SelectItem>
-              <SelectItem value="excel">Excel</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Button onClick={handleExportData}>
-            Exportar Dados
+        
+        {/* Controles de Compartilhamento */}
+        <div className="flex space-x-2">
+          <Button variant="outline" onClick={() => handleShare('url')}>
+            <Copy className="w-4 h-4 mr-2" />
+            Copiar URL
+          </Button>
+          <Button variant="outline" onClick={() => handleShare('email')}>
+            <Mail className="w-4 h-4 mr-2" />
+            Compartilhar por Email
           </Button>
         </div>
       </div>
 
+      {/* Filtros Dinâmicos */}
+      <Card className="p-4">
+        <div className="flex space-x-4 items-center">
+          <Filter className="w-4 h-4" />
+          <Select value={filters.type || ''} onValueChange={(v) => handleFilterChange('type', v)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Tipo de Monitoramento" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="governo">Governo</SelectItem>
+              <SelectItem value="noticias">Notícias</SelectItem>
+              <SelectItem value="licitacoes">Licitações</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Select value={filters.status || ''} onValueChange={(v) => handleFilterChange('status', v)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ativo">Ativo</SelectItem>
+              <SelectItem value="inativo">Inativo</SelectItem>
+              <SelectItem value="erro">Com Erro</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {Object.keys(filters).length > 0 && (
+            <Button variant="ghost" onClick={() => setFilters({})}>
+              Limpar Filtros
+            </Button>
+          )}
+        </div>
+      </Card>
+
+      {/* Configuração de Alertas */}
+      <Card className="p-4">
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Bell className="w-4 h-4 mr-2" />
+            Configuração de Alertas
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {alertConfigs.map((config, index) => (
+              <div key={config.metric} className="flex items-center space-x-4">
+                <span className="w-32">{config.metric}</span>
+                <Slider
+                  value={[config.threshold]}
+                  onValueChange={(value) => handleAlertConfigChange(index, 'threshold', value[0])}
+                  max={100}
+                  step={1}
+                  className="w-48"
+                />
+                <span className="w-12">{config.threshold}</span>
+                <Switch
+                  checked={config.enabled}
+                  onCheckedChange={(checked) => handleAlertConfigChange(index, 'enabled', checked)}
+                />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Conteúdo Principal */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
@@ -109,38 +213,23 @@ export const MonitoringAnalytics: React.FC = () => {
 
         <TabsContent value="overview">
           <div className="grid grid-cols-3 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Taxa de Sucesso</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {analyticsData.metrics.successRate}%
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Tempo Médio de Atualização</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {analyticsData.metrics.averageUpdateTime} min
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Alertas Gerados</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {analyticsData.metrics.alertsGenerated}
-                </div>
-              </CardContent>
-            </Card>
+            {Object.entries(analyticsData.metrics).map(([key, value]) => (
+              <Card key={key} className="cursor-pointer hover:bg-accent/50" onClick={() => handleDrillDown(key)}>
+                <CardHeader>
+                  <CardTitle className="flex justify-between">
+                    {key}
+                    <ChevronDown className="w-4 h-4" />
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {typeof value === 'number' ? value.toFixed(1) : value}
+                    {key === 'successRate' && '%'}
+                    {key === 'averageUpdateTime' && ' min'}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
 
           <Card className="mt-4">
