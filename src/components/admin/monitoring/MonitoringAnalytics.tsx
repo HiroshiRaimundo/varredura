@@ -1,234 +1,192 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { LineChart, BarChart, PieChart } from "@/components/charts";
-import { MonitoringGroups } from "./groups/MonitoringGroups";
-import { toast } from "sonner";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface AnalyticsData {
-  trends: any[];
-  distribution: any[];
-  sources: Array<{ id: string; name: string; type: string }>;
+  timestamp: string;
+  value: number;
+  source: string;
+}
+
+interface MonitoringSource {
+  id: string;
+  name: string;
+  type: string;
+  metrics: string[];
 }
 
 export const MonitoringAnalytics: React.FC = () => {
+  const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>();
+  const [selectedMetric, setSelectedMetric] = useState<string>("");
   const [selectedSources, setSelectedSources] = useState<string[]>([]);
-  const [selectedMetrics, setSelectedMetrics] = useState<string[]>([]);
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsData>({
-    trends: [],
-    distribution: [],
-    sources: [
-      { id: "1", name: "Portal Gov", type: "governo" },
-      { id: "2", name: "G1", type: "noticias" },
-      // Adicione mais fontes conforme necessário
-    ]
-  });
+  const [sources, setSources] = useState<MonitoringSource[]>([]);
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData[]>([]);
 
-  const filterDataBySource = (data: any[]) => {
-    if (selectedSources.length === 0) return data;
-    return data.filter(item => 
-      selectedSources.includes(item.sourceId) || 
-      selectedSources.includes(item.source)
-    );
-  };
-
-  const handleSourceSelect = (sources: string[]) => {
-    setSelectedSources(sources);
-    
-    // Atualiza os dados filtrados
-    const filteredTrends = filterDataBySource(analyticsData.trends);
-    const filteredDistribution = filterDataBySource(analyticsData.distribution);
-    
-    // Atualiza o estado com os dados filtrados
-    setAnalyticsData(prev => ({
-      ...prev,
-      filteredTrends,
-      filteredDistribution
-    }));
-  };
-
-  const handleMetricSelect = (metric: string) => {
-    setSelectedMetrics(prev => {
-      const newMetrics = prev.includes(metric)
-        ? prev.filter(m => m !== metric)
-        : [...prev, metric];
-      return newMetrics;
-    });
-  };
-
-  const getFilteredData = () => {
-    const filteredTrends = filterDataBySource(analyticsData.trends);
-    const filteredDistribution = filterDataBySource(analyticsData.distribution);
-
-    return {
-      trends: filteredTrends,
-      distribution: filteredDistribution
+  // Buscar fontes de monitoramento e métricas disponíveis
+  useEffect(() => {
+    const fetchSources = async () => {
+      try {
+        // Aqui você faria uma chamada à API real
+        const response = await fetch('/api/monitoring/sources');
+        const data = await response.json();
+        setSources(data);
+      } catch (error) {
+        console.error('Erro ao buscar fontes:', error);
+        setSources([]);
+      }
     };
-  };
 
-  const { trends, distribution } = getFilteredData();
+    fetchSources();
+  }, []);
+
+  // Atualizar dados do gráfico quando os filtros mudarem
+  useEffect(() => {
+    const fetchAnalyticsData = async () => {
+      if (!dateRange?.from || !dateRange?.to || !selectedMetric || selectedSources.length === 0) {
+        return;
+      }
+
+      try {
+        // Aqui você faria a chamada à API real
+        const response = await fetch('/api/monitoring/analytics', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            startDate: dateRange.from,
+            endDate: dateRange.to,
+            metric: selectedMetric,
+            sources: selectedSources,
+          }),
+        });
+        const data = await response.json();
+        setAnalyticsData(data);
+      } catch (error) {
+        console.error('Erro ao buscar dados:', error);
+        setAnalyticsData([]);
+      }
+    };
+
+    fetchAnalyticsData();
+  }, [dateRange, selectedMetric, selectedSources]);
+
+  // Obter todas as métricas únicas das fontes selecionadas
+  const availableMetrics = Array.from(
+    new Set(
+      sources
+        .filter(source => selectedSources.includes(source.id))
+        .flatMap(source => source.metrics)
+    )
+  );
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Análise de Monitoramento</h2>
-          <p className="text-muted-foreground">
-            Análise detalhada do monitoramento de todas as fontes
-          </p>
-        </div>
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight">Análise de Monitoramento</h2>
+        <p className="text-muted-foreground">
+          Analise os dados coletados das suas fontes de monitoramento
+        </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Seleção de Fontes e Métricas</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <MonitoringGroups
-            sources={analyticsData.sources}
-            selectedSources={selectedSources}
-            onSourceSelect={handleSourceSelect}
-          />
-          
-          <div className="mt-4 space-y-2">
-            <div className="font-medium">Métricas para Análise</div>
-            <div className="flex flex-wrap gap-2">
-              {["updates", "alerts", "successRate", "avgTime"].map((metric) => (
-                <Button
-                  key={metric}
-                  variant={selectedMetrics.includes(metric) ? "default" : "outline"}
-                  onClick={() => handleMetricSelect(metric)}
-                >
-                  {metric}
-                </Button>
-              ))}
+      <div className="grid gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Filtros</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Período da Análise</label>
+              <DatePickerWithRange
+                date={dateRange}
+                setDate={setDateRange}
+              />
             </div>
-          </div>
-        </CardContent>
-      </Card>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Taxa de Sucesso</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {Math.round(
-                (trends.reduce((acc, curr) => acc + curr.successRate, 0) /
-                  trends.length) *
-                  100
-              )}
-              %
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Total de Alertas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {trends.reduce((acc, curr) => acc + curr.alerts, 0)}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Tempo Médio</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {Math.round(
-                trends.reduce((acc, curr) => acc + curr.avgTime, 0) /
-                  trends.length
-              )}
-              ms
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Total de Atualizações</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {trends.reduce((acc, curr) => acc + curr.updates, 0)}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Tendências ao Longo do Tempo</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <LineChart
-              data={trends}
-              xField="date"
-              yFields={selectedMetrics.length > 0 ? selectedMetrics : ["updates", "alerts"]}
-              height={300}
-            />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Distribuição por Tipo</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PieChart
-              data={distribution}
-              nameField="type"
-              valueField="count"
-              height={300}
-            />
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Análise Detalhada por Fonte</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[400px]">
-            <div className="space-y-8">
-              {selectedSources.map((sourceId) => {
-                const sourceData = trends.filter(t => t.sourceId === sourceId);
-                const source = analyticsData.sources.find(s => s.id === sourceId);
-                
-                return (
-                  <div key={sourceId} className="space-y-4">
-                    <h3 className="font-medium">{source?.name}</h3>
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <LineChart
-                        data={sourceData}
-                        xField="date"
-                        yFields={selectedMetrics.length > 0 ? selectedMetrics : ["updates", "alerts"]}
-                        height={200}
-                      />
-                      <BarChart
-                        data={sourceData}
-                        xField="date"
-                        yField="successRate"
-                        height={200}
-                      />
-                    </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Fontes</label>
+              <ScrollArea className="h-[200px] border rounded-md p-4">
+                {sources.map((source) => (
+                  <div key={source.id} className="flex items-center space-x-2 py-2">
+                    <input
+                      type="checkbox"
+                      id={source.id}
+                      checked={selectedSources.includes(source.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedSources([...selectedSources, source.id]);
+                        } else {
+                          setSelectedSources(selectedSources.filter(id => id !== source.id));
+                        }
+                      }}
+                      className="form-checkbox h-4 w-4"
+                    />
+                    <label htmlFor={source.id} className="text-sm">
+                      {source.name} ({source.type})
+                    </label>
                   </div>
-                );
-              })}
+                ))}
+              </ScrollArea>
             </div>
-          </ScrollArea>
-        </CardContent>
-      </Card>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Métrica</label>
+              <Select value={selectedMetric} onValueChange={setSelectedMetric}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione uma métrica" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableMetrics.map((metric) => (
+                    <SelectItem key={metric} value={metric}>
+                      {metric}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Gráfico de Análise</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[400px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={analyticsData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="timestamp"
+                    tickFormatter={(value) => new Date(value).toLocaleDateString()}
+                  />
+                  <YAxis />
+                  <Tooltip
+                    labelFormatter={(value) => new Date(value).toLocaleString()}
+                  />
+                  <Legend />
+                  {selectedSources.map((sourceId) => {
+                    const source = sources.find(s => s.id === sourceId);
+                    return (
+                      <Line
+                        key={sourceId}
+                        type="monotone"
+                        dataKey={`${source?.name}`}
+                        name={source?.name}
+                        stroke={`#${Math.floor(Math.random()*16777215).toString(16)}`}
+                      />
+                    );
+                  })}
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
