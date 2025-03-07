@@ -1,165 +1,160 @@
 import React, { useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Play, Pause, Settings, Trash2, AlertCircle, Search } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Search, Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-interface Monitoring {
+interface MonitoringItem {
   id: string;
   name: string;
-  url: string;
-  frequency: string;
-  lastCheck: string;
-  status: 'active' | 'paused' | 'error';
-  alerts: number;
   type: string;
+  status: string;
+  lastUpdate: string;
+  source: string;
+  url?: string;
+  apiEndpoint?: string;
 }
 
-const mockData: Monitoring[] = [
-  {
-    id: "1",
-    name: "Portal da Transparência",
-    url: "https://www.portaltransparencia.gov.br",
-    frequency: "1h",
-    lastCheck: "2025-03-06T14:30:00",
-    status: "active",
-    alerts: 3,
-    type: "governo"
-  },
-  {
-    id: "2",
-    name: "Diário Oficial",
-    url: "https://www.in.gov.br",
-    frequency: "30min",
-    lastCheck: "2025-03-06T14:45:00",
-    status: "active",
-    alerts: 0,
-    type: "governo"
-  }
-];
-
 export const MonitoringList: React.FC = () => {
-  const [monitorings, setMonitorings] = useState<Monitoring[]>(mockData);
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("all");
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedType, setSelectedType] = useState<string>("todos");
+  const [selectedStatus, setSelectedStatus] = useState<string>("todos");
 
-  const filteredMonitorings = monitorings.filter(monitoring => {
-    const matchesSearch = monitoring.name.toLowerCase().includes(search.toLowerCase()) ||
-                         monitoring.url.toLowerCase().includes(search.toLowerCase());
-    const matchesFilter = filter === "all" ? true : monitoring.status === filter;
-    return matchesSearch && matchesFilter;
-  });
+  // Dados mockados para exemplo
+  const monitoringItems: MonitoringItem[] = [
+    {
+      id: "1",
+      name: "Portal do Governo",
+      type: "url",
+      status: "ativo",
+      lastUpdate: "2024-03-07T14:30:00",
+      source: "governo",
+      url: "https://www.gov.br"
+    },
+    {
+      id: "2",
+      name: "API IBGE",
+      type: "api",
+      status: "ativo",
+      lastUpdate: "2024-03-07T14:35:00",
+      source: "api",
+      apiEndpoint: "https://api.ibge.gov.br"
+    }
+  ];
 
-  const toggleStatus = (id: string) => {
-    setMonitorings(prev => prev.map(monitoring => {
-      if (monitoring.id === id) {
-        return {
-          ...monitoring,
-          status: monitoring.status === 'active' ? 'paused' : 'active'
-        };
-      }
-      return monitoring;
-    }));
+  const filterItems = (items: MonitoringItem[]) => {
+    return items.filter(item => {
+      const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          (item.url?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+                          (item.apiEndpoint?.toLowerCase().includes(searchTerm.toLowerCase()) || false);
+      
+      const matchesType = selectedType === "todos" || item.type === selectedType;
+      const matchesStatus = selectedStatus === "todos" || item.status === selectedStatus;
+
+      return matchesSearch && matchesType && matchesStatus;
+    });
   };
 
-  const deleteMonitoring = (id: string) => {
-    setMonitorings(prev => prev.filter(monitoring => monitoring.id !== id));
+  const handleItemClick = (item: MonitoringItem) => {
+    navigate(`/admin/monitoring/${item.id}`);
   };
+
+  const handleAddNew = () => {
+    navigate("/admin/monitoring/new");
+  };
+
+  const filteredItems = filterItems(monitoringItems);
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Search className="h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar monitoramento..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-[300px]"
-          />
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Monitoramento</h2>
+          <p className="text-muted-foreground">
+            Gerencie suas fontes de monitoramento
+          </p>
         </div>
-        <Select value={filter} onValueChange={setFilter}>
-          <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Filtrar por status" />
+        <Button onClick={handleAddNew}>
+          <Plus className="mr-2 h-4 w-4" />
+          Novo Monitoramento
+        </Button>
+      </div>
+
+      <div className="flex space-x-4">
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar monitoramento..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+        </div>
+
+        <Select value={selectedType} onValueChange={setSelectedType}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Tipo" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            <SelectItem value="active">Ativos</SelectItem>
-            <SelectItem value="paused">Pausados</SelectItem>
-            <SelectItem value="error">Com Erro</SelectItem>
+            <SelectItem value="todos">Todos os Tipos</SelectItem>
+            <SelectItem value="url">URL</SelectItem>
+            <SelectItem value="api">API</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos os Status</SelectItem>
+            <SelectItem value="ativo">Ativo</SelectItem>
+            <SelectItem value="inativo">Inativo</SelectItem>
+            <SelectItem value="erro">Erro</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Nome</TableHead>
-            <TableHead>URL</TableHead>
-            <TableHead>Frequência</TableHead>
-            <TableHead>Última Verificação</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Alertas</TableHead>
-            <TableHead>Ações</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredMonitorings.map((monitoring) => (
-            <TableRow key={monitoring.id}>
-              <TableCell className="font-medium">{monitoring.name}</TableCell>
-              <TableCell className="text-muted-foreground">{monitoring.url}</TableCell>
-              <TableCell>{monitoring.frequency}</TableCell>
-              <TableCell>{new Date(monitoring.lastCheck).toLocaleString()}</TableCell>
-              <TableCell>
-                <Badge variant={
-                  monitoring.status === 'active' ? 'default' :
-                  monitoring.status === 'paused' ? 'secondary' : 'destructive'
-                }>
-                  {monitoring.status === 'active' ? 'Ativo' :
-                   monitoring.status === 'paused' ? 'Pausado' : 'Erro'}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                {monitoring.alerts > 0 ? (
-                  <Badge variant="destructive" className="flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3" />
-                    {monitoring.alerts}
-                  </Badge>
-                ) : (
-                  <Badge variant="secondary">0</Badge>
-                )}
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => toggleStatus(monitoring.id)}
-                  >
-                    {monitoring.status === 'active' ? (
-                      <Pause className="h-4 w-4" />
-                    ) : (
-                      <Play className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <Button variant="ghost" size="icon">
-                    <Settings className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => deleteMonitoring(monitoring.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+      <Card>
+        <CardHeader>
+          <CardTitle>Fontes de Monitoramento</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[500px]">
+            <div className="space-y-4">
+              {filteredItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent cursor-pointer"
+                  onClick={() => handleItemClick(item)}
+                >
+                  <div className="space-y-1">
+                    <div className="font-medium">{item.name}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {item.type === "url" ? item.url : item.apiEndpoint}
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <Badge variant={item.status === "ativo" ? "default" : "destructive"}>
+                      {item.status}
+                    </Badge>
+                    <div className="text-sm text-muted-foreground">
+                      Última atualização: {new Date(item.lastUpdate).toLocaleString()}
+                    </div>
+                  </div>
                 </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+              ))}
+            </div>
+          </ScrollArea>
+        </CardContent>
+      </Card>
     </div>
   );
 };
