@@ -20,4 +20,21 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      external: ['workers'],
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          charts: ['@nivo/core', '@nivo/geo'],
+        }
+      }
+    },
+    target: 'esnext',
+    sourcemap: true
+  },
+  worker: {
+    format: 'es',
+    plugins: []
+  }
 }));
