@@ -140,7 +140,7 @@ export const MonitoringAnalytics: React.FC = () => {
         </TabsList>
 
         <TabsContent value="visao-geral">
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <Card className="cursor-pointer hover:bg-accent/50" onClick={() => handleDrillDown('totalMonitorings')}>
               <CardHeader>
                 <CardTitle className="flex justify-between items-center text-sm">
@@ -171,23 +171,6 @@ export const MonitoringAnalytics: React.FC = () => {
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {((analyticsData.metrics.activeMonitorings / analyticsData.metrics.totalMonitorings) * 100).toFixed(1)}% do total
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="cursor-pointer hover:bg-accent/50" onClick={() => handleDrillDown('successRate')}>
-              <CardHeader>
-                <CardTitle className="flex justify-between items-center text-sm">
-                  Taxa de Sucesso
-                  <ChevronDown className="w-4 h-4" />
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {analyticsData.metrics.successRate}%
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Atualizações bem-sucedidas
                 </p>
               </CardContent>
             </Card>
