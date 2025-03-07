@@ -93,6 +93,20 @@ export const MonitoringAnalytics: React.FC = () => {
     toast.info(`Detalhando dados para: ${category}`);
   };
 
+  const filterDataBySource = (data: any) => {
+    if (selectedSource === "todos") return data;
+    
+    // Filtra os dados baseado na fonte selecionada
+    if (Array.isArray(data)) {
+      return data.filter(item => item.source === selectedSource || item.id === selectedSource);
+    }
+    return data;
+  };
+
+  // Aplica o filtro nos dados
+  const filteredTrends = filterDataBySource(analyticsData.trends);
+  const filteredDistribution = filterDataBySource(analyticsData.distribution);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -104,7 +118,15 @@ export const MonitoringAnalytics: React.FC = () => {
         </div>
         
         <div className="flex space-x-4">
-          <Select value={selectedSource} onValueChange={setSelectedSource}>
+          <Select 
+            value={selectedSource} 
+            onValueChange={(value) => {
+              setSelectedSource(value);
+              // Atualiza os dados filtrados
+              const filteredTrends = filterDataBySource(analyticsData.trends);
+              const filteredDistribution = filterDataBySource(analyticsData.distribution);
+            }}
+          >
             <SelectTrigger className="w-[220px]">
               <SelectValue placeholder="Selecionar Fonte" />
             </SelectTrigger>
@@ -199,7 +221,7 @@ export const MonitoringAnalytics: React.FC = () => {
             </CardHeader>
             <CardContent>
               <LineChart
-                data={analyticsData.trends}
+                data={filteredTrends}
                 xField="date"
                 yFields={["updates", "alerts"]}
                 height={300}
@@ -216,7 +238,7 @@ export const MonitoringAnalytics: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <LineChart
-                  data={analyticsData.trends}
+                  data={filteredTrends}
                   xField="date"
                   yFields={["successRate"]}
                   height={200}
@@ -232,7 +254,7 @@ export const MonitoringAnalytics: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <LineChart
-                  data={analyticsData.trends}
+                  data={filteredTrends}
                   xField="date"
                   yFields={["avgTime"]}
                   height={200}
@@ -263,7 +285,7 @@ export const MonitoringAnalytics: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <LineChart
-                  data={analyticsData.trends}
+                  data={filteredTrends}
                   xField="date"
                   yFields={["updates", "alerts"]}
                   height={200}
@@ -285,7 +307,7 @@ export const MonitoringAnalytics: React.FC = () => {
               </CardHeader>
               <CardContent className="pt-4">
                 <PieChart
-                  data={analyticsData.distribution}
+                  data={filteredDistribution}
                   nameField="type"
                   valueField="count"
                   height={250}
@@ -300,7 +322,7 @@ export const MonitoringAnalytics: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <BarChart
-                  data={analyticsData.distribution}
+                  data={filteredDistribution}
                   xField="type"
                   yField="avgSuccess"
                   height={250}
@@ -316,7 +338,7 @@ export const MonitoringAnalytics: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <BarChart
-                  data={analyticsData.distribution}
+                  data={filteredDistribution}
                   xField="type"
                   yField="avgTime"
                   height={250}
@@ -332,7 +354,7 @@ export const MonitoringAnalytics: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {analyticsData.distribution.map((item) => (
+                  {filteredDistribution.map((item) => (
                     <div key={item.type} className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span>{item.type}</span>

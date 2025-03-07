@@ -15,6 +15,7 @@ import { CalendarIcon, Download, FileText, Settings, AlertTriangle, Brain, Searc
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import toast from "@/components/ui/toast";
 
 interface ReportConfig {
   type: string;
@@ -103,8 +104,49 @@ export const MonitoringReports: React.FC = () => {
   };
 
   const handleExport = () => {
-    console.log("Exportando relatório com configuração:", reportConfig);
-    // Implementar lógica de exportação
+    if (!reportConfig.dateRange.from || !reportConfig.dateRange.to) {
+      toast({
+        title: "Erro na Exportação",
+        description: "Por favor, selecione um período para o relatório.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Prepara os dados para exportação
+    const reportData = {
+      title: "Relatório de Monitoramento",
+      period: {
+        from: format(reportConfig.dateRange.from, "dd/MM/yyyy"),
+        to: format(reportConfig.dateRange.to, "dd/MM/yyyy")
+      },
+      content: {
+        contentAnalysis,
+        predictiveAnalysis,
+        performanceMetrics
+      }
+    };
+
+    // Mock da exportação - em produção, isso chamaria um serviço real
+    setTimeout(() => {
+      toast({
+        title: "Relatório Exportado",
+        description: `Relatório gerado com sucesso no formato ${reportConfig.format.toUpperCase()}`,
+      });
+
+      // Em produção, aqui você faria o download real do arquivo
+      const mockDownload = new Blob([JSON.stringify(reportData, null, 2)], {
+        type: "application/json"
+      });
+      const url = window.URL.createObjectURL(mockDownload);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `relatorio-monitoramento.${reportConfig.format}`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    }, 1000);
   };
 
   const handleSchedule = () => {

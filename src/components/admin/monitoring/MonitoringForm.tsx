@@ -14,6 +14,9 @@ interface MonitoringFormData {
   keywords: string;
   description: string;
   notifications: boolean;
+  isApi: boolean;
+  apiKey?: string;
+  apiEndpoint?: string;
 }
 
 const initialFormData: MonitoringFormData = {
@@ -23,7 +26,10 @@ const initialFormData: MonitoringFormData = {
   frequency: "1h",
   keywords: "",
   description: "",
-  notifications: true
+  notifications: true,
+  isApi: false,
+  apiKey: "",
+  apiEndpoint: ""
 };
 
 export const MonitoringForm: React.FC = () => {
@@ -34,10 +40,19 @@ export const MonitoringForm: React.FC = () => {
     e.preventDefault();
     
     // Validação básica
-    if (!formData.name || !formData.url) {
+    if (!formData.name || (!formData.url && !formData.apiEndpoint)) {
       toast({
         title: "Erro de Validação",
         description: "Por favor, preencha todos os campos obrigatórios.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (formData.isApi && !formData.apiKey) {
+      toast({
+        title: "Erro de Validação",
+        description: "API Key é obrigatória para monitoramento de APIs.",
         variant: "destructive"
       });
       return;
@@ -69,16 +84,6 @@ export const MonitoringForm: React.FC = () => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="url">URL para Monitorar *</Label>
-          <Input
-            id="url"
-            value={formData.url}
-            onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
-            placeholder="https://..."
-          />
-        </div>
-
-        <div className="space-y-2">
           <Label htmlFor="type">Tipo de Monitoramento</Label>
           <Select
             value={formData.type}
@@ -92,6 +97,7 @@ export const MonitoringForm: React.FC = () => {
               <SelectItem value="noticias">Notícias</SelectItem>
               <SelectItem value="licitacoes">Licitações</SelectItem>
               <SelectItem value="diario">Diário Oficial</SelectItem>
+              <SelectItem value="api">API (IBGE, etc)</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -116,6 +122,56 @@ export const MonitoringForm: React.FC = () => {
             </SelectContent>
           </Select>
         </div>
+
+        <div className="space-y-2">
+          <Label>Tipo de Fonte</Label>
+          <Select
+            value={formData.isApi ? "api" : "url"}
+            onValueChange={(value) => setFormData(prev => ({ ...prev, isApi: value === "api" }))}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione o tipo de fonte" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="url">URL</SelectItem>
+              <SelectItem value="api">API</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {formData.isApi ? (
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="apiEndpoint">Endpoint da API *</Label>
+              <Input
+                id="apiEndpoint"
+                value={formData.apiEndpoint}
+                onChange={(e) => setFormData(prev => ({ ...prev, apiEndpoint: e.target.value }))}
+                placeholder="https://api.exemplo.com/v1/dados"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="apiKey">API Key *</Label>
+              <Input
+                id="apiKey"
+                type="password"
+                value={formData.apiKey}
+                onChange={(e) => setFormData(prev => ({ ...prev, apiKey: e.target.value }))}
+                placeholder="Sua chave de API"
+              />
+            </div>
+          </>
+        ) : (
+          <div className="space-y-2 col-span-2">
+            <Label htmlFor="url">URL para Monitorar *</Label>
+            <Input
+              id="url"
+              value={formData.url}
+              onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
+              placeholder="https://..."
+            />
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">

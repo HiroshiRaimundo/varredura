@@ -48,7 +48,7 @@ export const MonitoringList: React.FC = () => {
   const filteredMonitorings = monitorings.filter(monitoring => {
     const matchesSearch = monitoring.name.toLowerCase().includes(search.toLowerCase()) ||
                          monitoring.url.toLowerCase().includes(search.toLowerCase());
-    const matchesFilter = filter === "all" || monitoring.status === filter;
+    const matchesFilter = filter === "all" ? true : monitoring.status === filter;
     return matchesSearch && matchesFilter;
   });
 
