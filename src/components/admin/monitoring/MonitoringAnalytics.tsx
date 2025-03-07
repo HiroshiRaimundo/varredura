@@ -1,17 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { LineChart, BarChart, PieChart } from "@/components/charts";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
+import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
-import { Share2, Bell, Filter, ChevronDown, Copy, Mail } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
 
 interface AnalyticsData {
   timeRange: string;
@@ -33,25 +28,10 @@ interface AnalyticsData {
   }[];
 }
 
-interface AlertConfig {
-  metric: string;
-  threshold: number;
-  enabled: boolean;
-}
-
 export const MonitoringAnalytics: React.FC = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
   const [timeRange, setTimeRange] = useState("7d");
-  const [exportFormat, setExportFormat] = useState("csv");
-  const [filters, setFilters] = useState<Record<string, string>>({});
   const [drillDownLevel, setDrillDownLevel] = useState(0);
-  const [alertConfigs, setAlertConfigs] = useState<AlertConfig[]>([
-    { metric: "successRate", threshold: 95, enabled: true },
-    { metric: "averageUpdateTime", threshold: 60, enabled: true },
-    { metric: "alertsGenerated", threshold: 50, enabled: true }
-  ]);
 
   // Dados mockados para exemplo
   const analyticsData: AnalyticsData = {
@@ -76,41 +56,8 @@ export const MonitoringAnalytics: React.FC = () => {
     ]
   };
 
-  // Compartilhamento de insights
-  const handleShare = (type: 'url' | 'email') => {
-    const currentUrl = window.location.href;
-    const shareUrl = `${currentUrl}?tab=${activeTab}&timeRange=${timeRange}`;
-    
-    if (type === 'url') {
-      navigator.clipboard.writeText(shareUrl);
-      toast.success("URL copiada para a área de transferência");
-    } else {
-      window.location.href = `mailto:?subject=Análise de Monitoramento&body=${encodeURIComponent(shareUrl)}`;
-    }
-  };
-
-  // Alertas baseados em análises
-  const handleAlertConfigChange = (index: number, field: keyof AlertConfig, value: any) => {
-    const newConfigs = [...alertConfigs];
-    newConfigs[index] = { ...newConfigs[index], [field]: value };
-    setAlertConfigs(newConfigs);
-
-    // Verificar limites e notificar
-    const metric = newConfigs[index].metric;
-    const currentValue = analyticsData.metrics[metric as keyof typeof analyticsData.metrics];
-    if (newConfigs[index].enabled && currentValue > newConfigs[index].threshold) {
-      toast.warning(`Alerta: ${metric} ultrapassou o limite definido`);
-    }
-  };
-
-  // Exploração ad-hoc
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  };
-
   const handleDrillDown = (category: string) => {
     setDrillDownLevel(prev => prev + 1);
-    // Aqui você adicionaria lógica para buscar dados mais detalhados
     toast.info(`Detalhando dados para: ${category}`);
   };
 
@@ -124,83 +71,20 @@ export const MonitoringAnalytics: React.FC = () => {
           </p>
         </div>
         
-        {/* Controles de Compartilhamento */}
-        <div className="flex space-x-2">
-          <Button variant="outline" onClick={() => handleShare('url')}>
-            <Copy className="w-4 h-4 mr-2" />
-            Copiar URL
-          </Button>
-          <Button variant="outline" onClick={() => handleShare('email')}>
-            <Mail className="w-4 h-4 mr-2" />
-            Compartilhar por Email
-          </Button>
+        <div className="flex space-x-4">
+          <Select value={timeRange} onValueChange={setTimeRange}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Período" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="24h">Últimas 24 horas</SelectItem>
+              <SelectItem value="7d">Últimos 7 dias</SelectItem>
+              <SelectItem value="30d">Últimos 30 dias</SelectItem>
+              <SelectItem value="custom">Personalizado</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
-
-      {/* Filtros Dinâmicos */}
-      <Card className="p-4">
-        <div className="flex space-x-4 items-center">
-          <Filter className="w-4 h-4" />
-          <Select value={filters.type || ''} onValueChange={(v) => handleFilterChange('type', v)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Tipo de Monitoramento" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="governo">Governo</SelectItem>
-              <SelectItem value="noticias">Notícias</SelectItem>
-              <SelectItem value="licitacoes">Licitações</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          <Select value={filters.status || ''} onValueChange={(v) => handleFilterChange('status', v)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ativo">Ativo</SelectItem>
-              <SelectItem value="inativo">Inativo</SelectItem>
-              <SelectItem value="erro">Com Erro</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {Object.keys(filters).length > 0 && (
-            <Button variant="ghost" onClick={() => setFilters({})}>
-              Limpar Filtros
-            </Button>
-          )}
-        </div>
-      </Card>
-
-      {/* Configuração de Alertas */}
-      <Card className="p-4">
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Bell className="w-4 h-4 mr-2" />
-            Configuração de Alertas
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {alertConfigs.map((config, index) => (
-              <div key={config.metric} className="flex items-center space-x-4">
-                <span className="w-32">{config.metric}</span>
-                <Slider
-                  value={[config.threshold]}
-                  onValueChange={(value) => handleAlertConfigChange(index, 'threshold', value[0])}
-                  max={100}
-                  step={1}
-                  className="w-48"
-                />
-                <span className="w-12">{config.threshold}</span>
-                <Switch
-                  checked={config.enabled}
-                  onCheckedChange={(checked) => handleAlertConfigChange(index, 'enabled', checked)}
-                />
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Conteúdo Principal */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -292,13 +176,10 @@ export const MonitoringAnalytics: React.FC = () => {
         <TabsContent value="predictions">
           <Card>
             <CardHeader>
-              <CardTitle>Previsões de Atualização</CardTitle>
+              <CardTitle>Previsões</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">
-                Em desenvolvimento. Esta funcionalidade usará machine learning para prever
-                padrões de atualização e momentos prováveis de mudanças.
-              </p>
+              {/* Implementar visualizações de previsões */}
             </CardContent>
           </Card>
         </TabsContent>
