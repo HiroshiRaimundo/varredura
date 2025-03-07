@@ -7,6 +7,7 @@ import { MonitoringForm } from "./MonitoringForm";
 import { MonitoringStats } from "./MonitoringStats";
 import { MonitoringSettings } from "./MonitoringSettings";
 import { MonitoringAnalytics } from "./MonitoringAnalytics";
+import { MonitoringReports } from "./reports/MonitoringReports";
 
 export const AdminMonitoringDashboard: React.FC = () => {
   const location = useLocation();
@@ -77,15 +78,7 @@ export const AdminMonitoringDashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="reports">
-          <Card>
-            <CardHeader>
-              <CardTitle>Relatórios e Análises</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {/* Componente de relatórios será implementado posteriormente */}
-              <p>Em desenvolvimento...</p>
-            </CardContent>
-          </Card>
+          <MonitoringReports />
         </TabsContent>
       </Tabs>
     </div>
