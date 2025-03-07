@@ -1,0 +1,16 @@
+FROM apache/superset:latest
+
+USER root
+
+# Instalar dependências necessárias
+RUN pip install psycopg2-binary redis cryptography textblob geoalchemy2
+
+# Copiar arquivos do projeto
+COPY src/models.py /app/pythonpath/
+COPY src/init_db.py /app/pythonpath/
+COPY src/cache.py /app/pythonpath/
+COPY src/setup_superset_dashboards.py /app/pythonpath/
+COPY src/setup_monitoring.py /app/pythonpath/
+COPY src/spiders /app/pythonpath/spiders/
+
+USER superset
