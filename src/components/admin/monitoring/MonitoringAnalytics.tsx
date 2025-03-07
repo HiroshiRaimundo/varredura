@@ -1,379 +1,234 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { DatePickerWithRange } from "@/components/ui/date-range-picker";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { LineChart, BarChart, PieChart } from "@/components/charts";
-import { ChevronDown } from "lucide-react";
+import { MonitoringGroups } from "./groups/MonitoringGroups";
 import { toast } from "sonner";
 
 interface AnalyticsData {
-  timeRange: string;
-  metrics: {
-    totalMonitorings: number;
-    activeMonitorings: number;
-    successRate: number;
-    averageUpdateTime: number;
-    alertsGenerated: number;
-    lastUpdate: string;
-  };
-  trends: {
-    date: string;
-    updates: number;
-    alerts: number;
-    successRate: number;
-    avgTime: number;
-  }[];
-  distribution: {
-    type: string;
-    count: number;
-    avgSuccess: number;
-    avgTime: number;
-    active: number;
-  }[];
-  sources: {
-    id: string;
-    name: string;
-    type: string;
-  }[];
-  updateHours: {
-    hour: string;
-    count: number;
-  }[];
+  trends: any[];
+  distribution: any[];
+  sources: Array<{ id: string; name: string; type: string }>;
 }
 
 export const MonitoringAnalytics: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("visao-geral");
-  const [timeRange, setTimeRange] = useState("7d");
-  const [selectedSource, setSelectedSource] = useState<string>("todos");
-  const [drillDownLevel, setDrillDownLevel] = useState(0);
-
-  // Dados mockados para exemplo
-  const analyticsData: AnalyticsData = {
-    timeRange: "7d",
-    metrics: {
-      totalMonitorings: 150,
-      activeMonitorings: 120,
-      successRate: 98.5,
-      averageUpdateTime: 45,
-      alertsGenerated: 25,
-      lastUpdate: "2024-03-07T14:30:00"
-    },
-    trends: [
-      { date: "2024-03-01", updates: 45, alerts: 3, successRate: 98, avgTime: 42 },
-      { date: "2024-03-02", updates: 52, alerts: 5, successRate: 97, avgTime: 44 },
-      { date: "2024-03-03", updates: 48, alerts: 2, successRate: 99, avgTime: 40 },
-      { date: "2024-03-04", updates: 50, alerts: 4, successRate: 98, avgTime: 43 },
-      { date: "2024-03-05", updates: 47, alerts: 3, successRate: 98, avgTime: 45 },
-      { date: "2024-03-06", updates: 51, alerts: 4, successRate: 97, avgTime: 46 },
-      { date: "2024-03-07", updates: 49, alerts: 4, successRate: 98, avgTime: 45 }
-    ],
-    distribution: [
-      { type: "Governo", count: 45, avgSuccess: 98, avgTime: 43, active: 40 },
-      { type: "Notícias", count: 35, avgSuccess: 97, avgTime: 38, active: 32 },
-      { type: "Licitações", count: 40, avgSuccess: 99, avgTime: 41, active: 35 },
-      { type: "Diário Oficial", count: 30, avgSuccess: 98, avgTime: 47, active: 28 }
-    ],
+  const [selectedSources, setSelectedSources] = useState<string[]>([]);
+  const [selectedMetrics, setSelectedMetrics] = useState<string[]>([]);
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData>({
+    trends: [],
+    distribution: [],
     sources: [
-      { id: "gov1", name: "Portal do Governo", type: "Governo" },
-      { id: "news1", name: "Portal de Notícias", type: "Notícias" },
-      { id: "bid1", name: "Portal de Licitações", type: "Licitações" }
-    ],
-    updateHours: [
-      { hour: "00:00", count: 10 },
-      { hour: "06:00", count: 25 },
-      { hour: "12:00", count: 45 },
-      { hour: "18:00", count: 30 }
+      { id: "1", name: "Portal Gov", type: "governo" },
+      { id: "2", name: "G1", type: "noticias" },
+      // Adicione mais fontes conforme necessário
     ]
+  });
+
+  const filterDataBySource = (data: any[]) => {
+    if (selectedSources.length === 0) return data;
+    return data.filter(item => 
+      selectedSources.includes(item.sourceId) || 
+      selectedSources.includes(item.source)
+    );
   };
 
-  const handleDrillDown = (category: string) => {
-    setDrillDownLevel(prev => prev + 1);
-    toast.info(`Detalhando dados para: ${category}`);
-  };
-
-  const filterDataBySource = (data: any) => {
-    if (selectedSource === "todos") return data;
+  const handleSourceSelect = (sources: string[]) => {
+    setSelectedSources(sources);
     
-    // Filtra os dados baseado na fonte selecionada
-    if (Array.isArray(data)) {
-      return data.filter(item => item.source === selectedSource || item.id === selectedSource);
-    }
-    return data;
+    // Atualiza os dados filtrados
+    const filteredTrends = filterDataBySource(analyticsData.trends);
+    const filteredDistribution = filterDataBySource(analyticsData.distribution);
+    
+    // Atualiza o estado com os dados filtrados
+    setAnalyticsData(prev => ({
+      ...prev,
+      filteredTrends,
+      filteredDistribution
+    }));
   };
 
-  // Aplica o filtro nos dados
-  const filteredTrends = filterDataBySource(analyticsData.trends);
-  const filteredDistribution = filterDataBySource(analyticsData.distribution);
+  const handleMetricSelect = (metric: string) => {
+    setSelectedMetrics(prev => {
+      const newMetrics = prev.includes(metric)
+        ? prev.filter(m => m !== metric)
+        : [...prev, metric];
+      return newMetrics;
+    });
+  };
+
+  const getFilteredData = () => {
+    const filteredTrends = filterDataBySource(analyticsData.trends);
+    const filteredDistribution = filterDataBySource(analyticsData.distribution);
+
+    return {
+      trends: filteredTrends,
+      distribution: filteredDistribution
+    };
+  };
+
+  const { trends, distribution } = getFilteredData();
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold">Análise de Monitoramento</h2>
+          <h2 className="text-2xl font-bold tracking-tight">Análise de Monitoramento</h2>
           <p className="text-muted-foreground">
-            Análise estatística e tendências dos monitoramentos
+            Análise detalhada do monitoramento de todas as fontes
           </p>
-        </div>
-        
-        <div className="flex space-x-4">
-          <Select 
-            value={selectedSource} 
-            onValueChange={(value) => {
-              setSelectedSource(value);
-              // Atualiza os dados filtrados
-              const filteredTrends = filterDataBySource(analyticsData.trends);
-              const filteredDistribution = filterDataBySource(analyticsData.distribution);
-            }}
-          >
-            <SelectTrigger className="w-[220px]">
-              <SelectValue placeholder="Selecionar Fonte" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todas as Fontes</SelectItem>
-              {analyticsData.sources.map(source => (
-                <SelectItem key={source.id} value={source.id}>
-                  {source.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Período" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="24h">Últimas 24 horas</SelectItem>
-              <SelectItem value="7d">Últimos 7 dias</SelectItem>
-              <SelectItem value="30d">Últimos 30 dias</SelectItem>
-              <SelectItem value="custom">Personalizado</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="visao-geral">Visão Geral</TabsTrigger>
-          <TabsTrigger value="tendencias">Tendências</TabsTrigger>
-          <TabsTrigger value="distribuicao">Distribuição</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="visao-geral">
-          <div className="grid grid-cols-3 gap-4">
-            <Card className="cursor-pointer hover:bg-accent/50" onClick={() => handleDrillDown('totalMonitorings')}>
-              <CardHeader>
-                <CardTitle className="flex justify-between items-center text-sm">
-                  Total de Fontes
-                  <ChevronDown className="w-4 h-4" />
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {analyticsData.metrics.totalMonitorings}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Fontes cadastradas para monitoramento
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="cursor-pointer hover:bg-accent/50" onClick={() => handleDrillDown('activeMonitorings')}>
-              <CardHeader>
-                <CardTitle className="flex justify-between items-center text-sm">
-                  Fontes Ativas
-                  <ChevronDown className="w-4 h-4" />
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {analyticsData.metrics.activeMonitorings}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {((analyticsData.metrics.activeMonitorings / analyticsData.metrics.totalMonitorings) * 100).toFixed(1)}% do total
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="cursor-pointer hover:bg-accent/50" onClick={() => handleDrillDown('lastUpdate')}>
-              <CardHeader>
-                <CardTitle className="flex justify-between items-center text-sm">
-                  Última Atualização
-                  <ChevronDown className="w-4 h-4" />
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-xl font-bold">
-                  {new Date(analyticsData.metrics.lastUpdate).toLocaleTimeString()}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {new Date(analyticsData.metrics.lastUpdate).toLocaleDateString()}
-                </p>
-              </CardContent>
-            </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Seleção de Fontes e Métricas</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <MonitoringGroups
+            sources={analyticsData.sources}
+            selectedSources={selectedSources}
+            onSourceSelect={handleSourceSelect}
+          />
+          
+          <div className="mt-4 space-y-2">
+            <div className="font-medium">Métricas para Análise</div>
+            <div className="flex flex-wrap gap-2">
+              {["updates", "alerts", "successRate", "avgTime"].map((metric) => (
+                <Button
+                  key={metric}
+                  variant={selectedMetrics.includes(metric) ? "default" : "outline"}
+                  onClick={() => handleMetricSelect(metric)}
+                >
+                  {metric}
+                </Button>
+              ))}
+            </div>
           </div>
+        </CardContent>
+      </Card>
 
-          <Card className="mt-4">
-            <CardHeader>
-              <CardTitle>Atividade de Monitoramento</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <LineChart
-                data={filteredTrends}
-                xField="date"
-                yFields={["updates", "alerts"]}
-                height={300}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Taxa de Sucesso</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {Math.round(
+                (trends.reduce((acc, curr) => acc + curr.successRate, 0) /
+                  trends.length) *
+                  100
+              )}
+              %
+            </div>
+          </CardContent>
+        </Card>
 
-        <TabsContent value="tendencias">
-          <div className="grid grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Taxa de Sucesso ao Longo do Tempo</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <LineChart
-                  data={filteredTrends}
-                  xField="date"
-                  yFields={["successRate"]}
-                  height={200}
-                  tooltipTitle="Taxa de Sucesso"
-                  tooltipFormatter={(value) => `${value}%`}
-                />
-              </CardContent>
-            </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Total de Alertas</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {trends.reduce((acc, curr) => acc + curr.alerts, 0)}
+            </div>
+          </CardContent>
+        </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Tempo Médio de Atualização</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <LineChart
-                  data={filteredTrends}
-                  xField="date"
-                  yFields={["avgTime"]}
-                  height={200}
-                  tooltipTitle="Tempo Médio"
-                  tooltipFormatter={(value) => `${value} min`}
-                />
-              </CardContent>
-            </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Tempo Médio</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {Math.round(
+                trends.reduce((acc, curr) => acc + curr.avgTime, 0) /
+                  trends.length
+              )}
+              ms
+            </div>
+          </CardContent>
+        </Card>
 
-            <Card className="col-span-2">
-              <CardHeader>
-                <CardTitle className="text-base">Horários de Atualização</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <BarChart
-                  data={analyticsData.updateHours}
-                  xField="hour"
-                  yField="count"
-                  height={200}
-                  tooltipTitle="Atualizações"
-                />
-              </CardContent>
-            </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Total de Atualizações</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {trends.reduce((acc, curr) => acc + curr.updates, 0)}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-            <Card className="col-span-2">
-              <CardHeader>
-                <CardTitle className="text-base">Atividade de Monitoramento</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <LineChart
-                  data={filteredTrends}
-                  xField="date"
-                  yFields={["updates", "alerts"]}
-                  height={200}
-                  tooltipTitle="Quantidade"
-                  tooltipFormatter={(value, name) => 
-                    `${value} ${name === 'updates' ? 'atualizações' : 'alertas'}`
-                  }
-                />
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Tendências ao Longo do Tempo</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <LineChart
+              data={trends}
+              xField="date"
+              yFields={selectedMetrics.length > 0 ? selectedMetrics : ["updates", "alerts"]}
+              height={300}
+            />
+          </CardContent>
+        </Card>
 
-        <TabsContent value="distribuicao">
-          <div className="grid grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Distribuição por Tipo</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <PieChart
-                  data={filteredDistribution}
-                  nameField="type"
-                  valueField="count"
-                  height={250}
-                  tooltipTitle="Fontes"
-                />
-              </CardContent>
-            </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Distribuição por Tipo</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PieChart
+              data={distribution}
+              nameField="type"
+              valueField="count"
+              height={300}
+            />
+          </CardContent>
+        </Card>
+      </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Performance por Categoria</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <BarChart
-                  data={filteredDistribution}
-                  xField="type"
-                  yField="avgSuccess"
-                  height={250}
-                  tooltipTitle="Taxa de Sucesso"
-                  tooltipFormatter={(value) => `${value}%`}
-                />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Tempo Médio por Categoria</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <BarChart
-                  data={filteredDistribution}
-                  xField="type"
-                  yField="avgTime"
-                  height={250}
-                  tooltipTitle="Tempo Médio"
-                  tooltipFormatter={(value) => `${value} min`}
-                />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Status por Categoria</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {filteredDistribution.map((item) => (
-                    <div key={item.type} className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>{item.type}</span>
-                        <span>{item.active} de {item.count}</span>
-                      </div>
-                      <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary"
-                          style={{ width: `${(item.active / item.count) * 100}%` }}
-                        />
-                      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Análise Detalhada por Fonte</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[400px]">
+            <div className="space-y-8">
+              {selectedSources.map((sourceId) => {
+                const sourceData = trends.filter(t => t.sourceId === sourceId);
+                const source = analyticsData.sources.find(s => s.id === sourceId);
+                
+                return (
+                  <div key={sourceId} className="space-y-4">
+                    <h3 className="font-medium">{source?.name}</h3>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <LineChart
+                        data={sourceData}
+                        xField="date"
+                        yFields={selectedMetrics.length > 0 ? selectedMetrics : ["updates", "alerts"]}
+                        height={200}
+                      />
+                      <BarChart
+                        data={sourceData}
+                        xField="date"
+                        yField="successRate"
+                        height={200}
+                      />
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
+                  </div>
+                );
+              })}
+            </div>
+          </ScrollArea>
+        </CardContent>
+      </Card>
     </div>
   );
 };

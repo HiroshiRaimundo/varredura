@@ -21,89 +21,62 @@ interface ReportConfig {
   type: string;
   format: string;
   dateRange: {
-    from: Date | undefined;
-    to: Date | undefined;
+    from: Date | null;
+    to: Date | null;
   };
-  schedule: boolean;
-  frequency?: string;
-  filters: Record<string, any>;
+  sources: string[];
+  metrics: string[];
+  groupBy: string;
 }
 
+interface MonitoringGroup {
+  id: string;
+  name: string;
+  type: string;
+}
+
+const MonitoringGroups: React.FC<{
+  sources: MonitoringGroup[];
+  selectedSources: string[];
+  onSourceSelect: (sources: string[]) => void;
+}> = ({ sources, selectedSources, onSourceSelect }) => {
+  const handleSourceSelect = (sourceId: string) => {
+    if (selectedSources.includes(sourceId)) {
+      onSourceSelect(selectedSources.filter((id) => id !== sourceId));
+    } else {
+      onSourceSelect([...selectedSources, sourceId]);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      {sources.map((source) => (
+        <div key={source.id} className="flex items-center space-x-2">
+          <Switch
+            checked={selectedSources.includes(source.id)}
+            onCheckedChange={() => handleSourceSelect(source.id)}
+          />
+          <Label>{source.name}</Label>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 export const MonitoringReports: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("content");
   const [reportConfig, setReportConfig] = useState<ReportConfig>({
-    type: "content",
+    type: "performance",
     format: "pdf",
     dateRange: {
-      from: undefined,
-      to: undefined,
+      from: null,
+      to: null
     },
-    schedule: false,
-    filters: {},
+    sources: [],
+    metrics: ["updates", "alerts", "successRate", "avgTime"],
+    groupBy: "none"
   });
 
-  // Dados mockados para exemplo
-  const contentAnalysis = {
-    keywords: [
-      { word: "licitação", count: 145 },
-      { word: "edital", count: 98 },
-      { word: "pregão", count: 76 },
-      { word: "contrato", count: 65 },
-    ],
-    categories: [
-      { name: "Documentos Oficiais", count: 250 },
-      { name: "Notícias", count: 180 },
-      { name: "Editais", count: 120 },
-      { name: "Outros", count: 50 },
-    ],
-    sentiment: [
-      { type: "Neutro", value: 75 },
-      { type: "Positivo", value: 15 },
-      { type: "Negativo", value: 10 },
-    ],
-    entities: [
-      { type: "Organizações", count: 89 },
-      { type: "Locais", count: 67 },
-      { type: "Pessoas", count: 45 },
-      { type: "Datas", count: 123 },
-    ],
-  };
-
-  const predictiveAnalysis = {
-    nextUpdates: [
-      { source: "Portal Gov", probability: 0.85, expectedTime: "2024-03-08T10:00:00" },
-      { source: "Diário Oficial", probability: 0.92, expectedTime: "2024-03-08T08:00:00" },
-    ],
-    anomalies: [
-      { source: "Portal Licitações", type: "Frequência Anormal", severity: "Alta" },
-      { source: "Portal Notícias", type: "Padrão Suspeito", severity: "Média" },
-    ],
-    trends: [
-      { date: "2024-03-01", actual: 45, predicted: 48 },
-      { date: "2024-03-02", actual: 52, predicted: 50 },
-      { date: "2024-03-03", actual: 48, predicted: 49 },
-    ],
-  };
-
-  const performanceMetrics = {
-    responseTime: [
-      { source: "Portal Gov", time: 1.2 },
-      { source: "Diário Oficial", time: 0.8 },
-      { source: "Portal Licitações", time: 1.5 },
-    ],
-    availability: [
-      { source: "Portal Gov", uptime: 99.8 },
-      { source: "Diário Oficial", uptime: 99.9 },
-      { source: "Portal Licitações", uptime: 99.5 },
-    ],
-    efficiency: [
-      { metric: "CPU Usage", value: 45 },
-      { metric: "Memory Usage", value: 60 },
-      { metric: "Bandwidth", value: 30 },
-    ],
-  };
-
-  const handleExport = () => {
+  const handleExport = async () => {
     if (!reportConfig.dateRange.from || !reportConfig.dateRange.to) {
       toast({
         title: "Erro na Exportação",
@@ -113,406 +86,237 @@ export const MonitoringReports: React.FC = () => {
       return;
     }
 
-    // Prepara os dados para exportação
-    const reportData = {
-      title: "Relatório de Monitoramento",
-      period: {
-        from: format(reportConfig.dateRange.from, "dd/MM/yyyy"),
-        to: format(reportConfig.dateRange.to, "dd/MM/yyyy")
-      },
-      content: {
-        contentAnalysis,
-        predictiveAnalysis,
-        performanceMetrics
-      }
-    };
+    try {
+      // Prepara os dados para exportação
+      const reportData = {
+        title: "Relatório de Monitoramento",
+        period: {
+          from: format(reportConfig.dateRange.from, "dd/MM/yyyy"),
+          to: format(reportConfig.dateRange.to, "dd/MM/yyyy")
+        },
+        sources: reportConfig.sources,
+        metrics: reportConfig.metrics,
+        groupBy: reportConfig.groupBy,
+        content: {
+          // Adicione os dados de conteúdo aqui
+        }
+      };
 
-    // Mock da exportação - em produção, isso chamaria um serviço real
-    setTimeout(() => {
+      // Simula a geração do PDF
       toast({
-        title: "Relatório Exportado",
-        description: `Relatório gerado com sucesso no formato ${reportConfig.format.toUpperCase()}`,
+        title: "Gerando Relatório",
+        description: "Aguarde enquanto preparamos seu relatório..."
       });
 
-      // Em produção, aqui você faria o download real do arquivo
+      // Em produção, aqui você chamaria sua API de geração de PDF
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Simula o download
       const mockDownload = new Blob([JSON.stringify(reportData, null, 2)], {
         type: "application/json"
       });
       const url = window.URL.createObjectURL(mockDownload);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `relatorio-monitoramento.${reportConfig.format}`;
+      a.download = `relatorio-monitoramento-${format(new Date(), "dd-MM-yyyy")}.${reportConfig.format}`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-    }, 1000);
-  };
 
-  const handleSchedule = () => {
-    console.log("Agendando relatório com configuração:", reportConfig);
-    // Implementar lógica de agendamento
+      toast({
+        title: "Relatório Exportado",
+        description: `Relatório gerado com sucesso no formato ${reportConfig.format.toUpperCase()}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erro na Exportação",
+        description: "Ocorreu um erro ao gerar o relatório. Tente novamente.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-start">
+      <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold">Relatórios e Análises</h2>
+          <h2 className="text-2xl font-bold tracking-tight">Relatórios</h2>
           <p className="text-muted-foreground">
-            Gere relatórios detalhados e análises avançadas dos seus monitoramentos
+            Gere relatórios personalizados do seu monitoramento
           </p>
-        </div>
-
-        <div className="flex space-x-4">
-          <Select
-            value={reportConfig.format}
-            onValueChange={(value) => setReportConfig({ ...reportConfig, format: value })}
-          >
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Formato" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="pdf">PDF</SelectItem>
-              <SelectItem value="excel">Excel</SelectItem>
-              <SelectItem value="csv">CSV</SelectItem>
-              <SelectItem value="json">JSON</SelectItem>
-              <SelectItem value="html">HTML</SelectItem>
-              <SelectItem value="pptx">PowerPoint</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="w-[250px] justify-start text-left font-normal">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {reportConfig.dateRange.from ? (
-                  reportConfig.dateRange.to ? (
-                    <>
-                      {format(reportConfig.dateRange.from, "dd/MM/yy")} -{" "}
-                      {format(reportConfig.dateRange.to, "dd/MM/yy")}
-                    </>
-                  ) : (
-                    format(reportConfig.dateRange.from, "dd/MM/yy")
-                  )
-                ) : (
-                  <span>Selecione o período</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <Calendar
-                initialFocus
-                mode="range"
-                defaultMonth={reportConfig.dateRange.from}
-                selected={{
-                  from: reportConfig.dateRange.from,
-                  to: reportConfig.dateRange.to,
-                }}
-                onSelect={(range) =>
-                  setReportConfig({
-                    ...reportConfig,
-                    dateRange: {
-                      from: range?.from,
-                      to: range?.to,
-                    },
-                  })
-                }
-                locale={ptBR}
-                numberOfMonths={2}
-              />
-            </PopoverContent>
-          </Popover>
-
-          <div className="flex items-center space-x-2">
-            <Switch
-              checked={reportConfig.schedule}
-              onCheckedChange={(checked) =>
-                setReportConfig({ ...reportConfig, schedule: checked })
-              }
-            />
-            <Label>Agendar</Label>
-          </div>
-
-          <Button onClick={handleExport}>
-            <Download className="mr-2 h-4 w-4" />
-            Exportar
-          </Button>
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="content">
-            <Search className="mr-2 h-4 w-4" />
-            Análise de Conteúdo
-          </TabsTrigger>
-          <TabsTrigger value="predictive">
-            <Brain className="mr-2 h-4 w-4" />
-            Análise Preditiva
-          </TabsTrigger>
-          <TabsTrigger value="performance">
-            <BarChartIcon className="mr-2 h-4 w-4" />
-            Performance
-          </TabsTrigger>
-          <TabsTrigger value="compliance">
-            <FileText className="mr-2 h-4 w-4" />
-            Compliance
-          </TabsTrigger>
-          <TabsTrigger value="alerts">
-            <AlertTriangle className="mr-2 h-4 w-4" />
-            Alertas
-          </TabsTrigger>
-        </TabsList>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Card>
+          <CardHeader>
+            <CardTitle>Configurações do Relatório</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Tipo de Relatório</Label>
+              <Select
+                value={reportConfig.type}
+                onValueChange={(value) =>
+                  setReportConfig((prev) => ({ ...prev, type: value }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="performance">Performance</SelectItem>
+                  <SelectItem value="alerts">Alertas</SelectItem>
+                  <SelectItem value="content">Conteúdo</SelectItem>
+                  <SelectItem value="predictive">Análise Preditiva</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-        <TabsContent value="content" className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Palavras-chave Mais Frequentes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <BarChart
-                  data={contentAnalysis.keywords}
-                  xField="word"
-                  yField="count"
-                  height={200}
-                />
-              </CardContent>
-            </Card>
+            <div className="space-y-2">
+              <Label>Formato</Label>
+              <Select
+                value={reportConfig.format}
+                onValueChange={(value) =>
+                  setReportConfig((prev) => ({ ...prev, format: value }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o formato" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pdf">PDF</SelectItem>
+                  <SelectItem value="xlsx">Excel</SelectItem>
+                  <SelectItem value="csv">CSV</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Distribuição por Categoria</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <PieChart
-                  data={contentAnalysis.categories}
-                  nameField="name"
-                  valueField="count"
-                  height={200}
-                />
-              </CardContent>
-            </Card>
+            <div className="space-y-2">
+              <Label>Agrupar Por</Label>
+              <Select
+                value={reportConfig.groupBy}
+                onValueChange={(value) =>
+                  setReportConfig((prev) => ({ ...prev, groupBy: value }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o agrupamento" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Sem Agrupamento</SelectItem>
+                  <SelectItem value="source">Por Fonte</SelectItem>
+                  <SelectItem value="type">Por Tipo</SelectItem>
+                  <SelectItem value="group">Por Grupo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Análise de Sentimento</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <PieChart
-                  data={contentAnalysis.sentiment}
-                  nameField="type"
-                  valueField="value"
-                  height={200}
-                />
-              </CardContent>
-            </Card>
+            <div className="space-y-2">
+              <Label>Período</Label>
+              <div className="grid gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !reportConfig.dateRange.from && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {reportConfig.dateRange.from ? (
+                        format(reportConfig.dateRange.from, "PPP", {
+                          locale: ptBR,
+                        })
+                      ) : (
+                        <span>Data Inicial</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={reportConfig.dateRange.from || undefined}
+                      onSelect={(date) =>
+                        setReportConfig((prev) => ({
+                          ...prev,
+                          dateRange: { ...prev.dateRange, from: date },
+                        }))
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Entidades Identificadas</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <BarChart
-                  data={contentAnalysis.entities}
-                  xField="type"
-                  yField="count"
-                  height={200}
-                />
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !reportConfig.dateRange.to && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {reportConfig.dateRange.to ? (
+                        format(reportConfig.dateRange.to, "PPP", {
+                          locale: ptBR,
+                        })
+                      ) : (
+                        <span>Data Final</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={reportConfig.dateRange.to || undefined}
+                      onSelect={(date) =>
+                        setReportConfig((prev) => ({
+                          ...prev,
+                          dateRange: { ...prev.dateRange, to: date },
+                        }))
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-        <TabsContent value="predictive" className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Próximas Atualizações Previstas</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[200px]">
-                  {predictiveAnalysis.nextUpdates.map((update, index) => (
-                    <div key={index} className="flex justify-between items-center mb-4">
-                      <div>
-                        <p className="font-medium">{update.source}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {format(new Date(update.expectedTime), "dd/MM HH:mm")}
-                        </p>
-                      </div>
-                      <Badge variant={update.probability > 0.9 ? "default" : "secondary"}>
-                        {(update.probability * 100).toFixed(0)}%
-                      </Badge>
-                    </div>
-                  ))}
-                </ScrollArea>
-              </CardContent>
-            </Card>
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Seleção de Fontes</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <MonitoringGroups
+              sources={[
+                { id: "1", name: "Portal Gov", type: "governo" },
+                { id: "2", name: "G1", type: "noticias" },
+                // Adicione mais fontes conforme necessário
+              ]}
+              selectedSources={reportConfig.sources}
+              onSourceSelect={(sources) =>
+                setReportConfig((prev) => ({ ...prev, sources }))
+              }
+            />
+          </CardContent>
+        </Card>
+      </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Detecção de Anomalias</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[200px]">
-                  {predictiveAnalysis.anomalies.map((anomaly, index) => (
-                    <div key={index} className="mb-4">
-                      <div className="flex justify-between items-center">
-                        <p className="font-medium">{anomaly.source}</p>
-                        <Badge variant={anomaly.severity === "Alta" ? "destructive" : "default"}>
-                          {anomaly.severity}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{anomaly.type}</p>
-                    </div>
-                  ))}
-                </ScrollArea>
-              </CardContent>
-            </Card>
-
-            <Card className="col-span-2">
-              <CardHeader>
-                <CardTitle className="text-base">Tendências e Previsões</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <LineChart
-                  data={predictiveAnalysis.trends}
-                  xField="date"
-                  yFields={["actual", "predicted"]}
-                  height={300}
-                />
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="performance" className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Tempo de Resposta por Fonte</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <BarChart
-                  data={performanceMetrics.responseTime}
-                  xField="source"
-                  yField="time"
-                  height={200}
-                />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Disponibilidade</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <BarChart
-                  data={performanceMetrics.availability}
-                  xField="source"
-                  yField="uptime"
-                  height={200}
-                />
-              </CardContent>
-            </Card>
-
-            <Card className="col-span-2">
-              <CardHeader>
-                <CardTitle className="text-base">Métricas de Eficiência</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <BarChart
-                  data={performanceMetrics.efficiency}
-                  xField="metric"
-                  yField="value"
-                  height={200}
-                />
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="compliance" className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Retenção de Dados</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {/* Implementar visualização de retenção */}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Histórico de Acessos</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {/* Implementar log de acessos */}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Alterações Críticas</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {/* Implementar registro de alterações */}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Auditoria</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {/* Implementar logs de auditoria */}
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="alerts" className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Resumo de Alertas</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {/* Implementar resumo de alertas */}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Histórico de Notificações</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {/* Implementar histórico */}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Efetividade dos Alertas</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {/* Implementar métricas de efetividade */}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Tempo de Resposta</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {/* Implementar métricas de tempo de resposta */}
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
+      <div className="flex justify-end space-x-4">
+        <Button variant="outline" onClick={() => window.history.back()}>
+          Cancelar
+        </Button>
+        <Button onClick={handleExport}>
+          <Download className="w-4 h-4 mr-2" />
+          Exportar Relatório
+        </Button>
+      </div>
     </div>
   );
 };
