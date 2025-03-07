@@ -24,17 +24,51 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       external: ['workers'],
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          charts: ['@nivo/core', '@nivo/geo'],
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('scheduler')) {
+              return 'vendor-react';
+            }
+            if (id.includes('@radix-ui')) {
+              return 'vendor-ui';
+            }
+            if (id.includes('@nivo')) {
+              return 'vendor-charts';
+            }
+            if (id.includes('@tiptap')) {
+              return 'vendor-editor';
+            }
+            if (id.includes('date-fns') || 
+                id.includes('zod') || 
+                id.includes('@hookform') || 
+                id.includes('clsx') || 
+                id.includes('class-variance-authority') || 
+                id.includes('tailwind-merge')) {
+              return 'vendor-utils';
+            }
+            return 'vendor';
+          }
         }
       }
     },
     target: 'esnext',
-    sourcemap: true
+    sourcemap: true,
+    chunkSizeWarningLimit: 500
   },
   worker: {
     format: 'es',
-    plugins: []
+    plugins: () => []
+  },
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@nivo/core',
+      '@nivo/geo',
+      '@nivo/line',
+      '@nivo/bar',
+      '@nivo/pie'
+    ]
   }
 }));
