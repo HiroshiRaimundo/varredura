@@ -30,6 +30,12 @@ interface MonitoringFormData {
   categories: Category[];
   customCategories: string[];
   metrics?: string[];
+  groupAnalysis?: {
+    enabled: boolean;
+    crossAnalysis: boolean;
+    analysisTypes: string[];
+  };
+  analysisTypes?: string[];
 }
 
 export const MonitoringForm: React.FC = () => {
@@ -44,7 +50,13 @@ export const MonitoringForm: React.FC = () => {
     description: "",
     keywords: [],
     categories: [],
-    customCategories: []
+    customCategories: [],
+    analysisTypes: [],
+    groupAnalysis: {
+      enabled: false,
+      crossAnalysis: false,
+      analysisTypes: []
+    }
   });
 
   const [newKeyword, setNewKeyword] = useState("");
@@ -261,56 +273,6 @@ export const MonitoringForm: React.FC = () => {
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
                     <Switch
-                      id="metricUptime"
-                      checked={formData.metrics?.includes("uptime")}
-                      onCheckedChange={(checked) => {
-                        const metrics = formData.metrics || [];
-                        setFormData({
-                          ...formData,
-                          metrics: checked 
-                            ? [...metrics, "uptime"]
-                            : metrics.filter(m => m !== "uptime")
-                        });
-                      }}
-                    />
-                    <Label htmlFor="metricUptime">Uptime</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="metricResponseTime"
-                      checked={formData.metrics?.includes("responseTime")}
-                      onCheckedChange={(checked) => {
-                        const metrics = formData.metrics || [];
-                        setFormData({
-                          ...formData,
-                          metrics: checked 
-                            ? [...metrics, "responseTime"]
-                            : metrics.filter(m => m !== "responseTime")
-                        });
-                      }}
-                    />
-                    <Label htmlFor="metricResponseTime">Tempo de Resposta</Label>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="metricErrorRate"
-                      checked={formData.metrics?.includes("errorRate")}
-                      onCheckedChange={(checked) => {
-                        const metrics = formData.metrics || [];
-                        setFormData({
-                          ...formData,
-                          metrics: checked 
-                            ? [...metrics, "errorRate"]
-                            : metrics.filter(m => m !== "errorRate")
-                        });
-                      }}
-                    />
-                    <Label htmlFor="metricErrorRate">Taxa de Erro</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
                       id="metricContentAnalysis"
                       checked={formData.metrics?.includes("contentAnalysis")}
                       onCheckedChange={(checked) => {
@@ -324,6 +286,56 @@ export const MonitoringForm: React.FC = () => {
                       }}
                     />
                     <Label htmlFor="metricContentAnalysis">Análise de Conteúdo</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="metricPredictive"
+                      checked={formData.metrics?.includes("predictive")}
+                      onCheckedChange={(checked) => {
+                        const metrics = formData.metrics || [];
+                        setFormData({
+                          ...formData,
+                          metrics: checked 
+                            ? [...metrics, "predictive"]
+                            : metrics.filter(m => m !== "predictive")
+                        });
+                      }}
+                    />
+                    <Label htmlFor="metricPredictive">Análise Preditiva</Label>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="metricSentiment"
+                      checked={formData.metrics?.includes("sentiment")}
+                      onCheckedChange={(checked) => {
+                        const metrics = formData.metrics || [];
+                        setFormData({
+                          ...formData,
+                          metrics: checked 
+                            ? [...metrics, "sentiment"]
+                            : metrics.filter(m => m !== "sentiment")
+                        });
+                      }}
+                    />
+                    <Label htmlFor="metricSentiment">Análise de Sentimento</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="metricTrends"
+                      checked={formData.metrics?.includes("trends")}
+                      onCheckedChange={(checked) => {
+                        const metrics = formData.metrics || [];
+                        setFormData({
+                          ...formData,
+                          metrics: checked 
+                            ? [...metrics, "trends"]
+                            : metrics.filter(m => m !== "trends")
+                        });
+                      }}
+                    />
+                    <Label htmlFor="metricTrends">Análise de Tendências</Label>
                   </div>
                 </div>
               </div>
@@ -407,15 +419,162 @@ export const MonitoringForm: React.FC = () => {
                 </Button>
               </div>
             </div>
+
+            <div className="space-y-2">
+              <Label>Tipos de Análise</Label>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="analysisContent"
+                      checked={formData.analysisTypes?.includes("content")}
+                      onCheckedChange={(checked) => {
+                        const types = formData.analysisTypes || [];
+                        setFormData({
+                          ...formData,
+                          analysisTypes: checked 
+                            ? [...types, "content"]
+                            : types.filter(t => t !== "content")
+                        });
+                      }}
+                    />
+                    <Label htmlFor="analysisContent">Análise de Conteúdo</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="analysisPredictive"
+                      checked={formData.analysisTypes?.includes("predictive")}
+                      onCheckedChange={(checked) => {
+                        const types = formData.analysisTypes || [];
+                        setFormData({
+                          ...formData,
+                          analysisTypes: checked 
+                            ? [...types, "predictive"]
+                            : types.filter(t => t !== "predictive")
+                        });
+                      }}
+                    />
+                    <Label htmlFor="analysisPredictive">Análise Preditiva</Label>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="analysisSentiment"
+                      checked={formData.analysisTypes?.includes("sentiment")}
+                      onCheckedChange={(checked) => {
+                        const types = formData.analysisTypes || [];
+                        setFormData({
+                          ...formData,
+                          analysisTypes: checked 
+                            ? [...types, "sentiment"]
+                            : types.filter(t => t !== "sentiment")
+                        });
+                      }}
+                    />
+                    <Label htmlFor="analysisSentiment">Análise de Sentimento</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="analysisTrend"
+                      checked={formData.analysisTypes?.includes("trend")}
+                      onCheckedChange={(checked) => {
+                        const types = formData.analysisTypes || [];
+                        setFormData({
+                          ...formData,
+                          analysisTypes: checked 
+                            ? [...types, "trend"]
+                            : types.filter(t => t !== "trend")
+                        });
+                      }}
+                    />
+                    <Label htmlFor="analysisTrend">Análise de Tendências</Label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Análise em Grupo</Label>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="groupAnalysis"
+                    checked={formData.groupAnalysis?.enabled}
+                    onCheckedChange={(checked) => {
+                      setFormData({
+                        ...formData,
+                        groupAnalysis: {
+                          enabled: checked,
+                          crossAnalysis: formData.groupAnalysis?.crossAnalysis || false,
+                          analysisTypes: formData.groupAnalysis?.analysisTypes || []
+                        }
+                      });
+                    }}
+                  />
+                  <Label htmlFor="groupAnalysis">Habilitar Análise em Grupo</Label>
+                </div>
+
+                {formData.groupAnalysis?.enabled && (
+                  <>
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="crossAnalysis"
+                        checked={formData.groupAnalysis.crossAnalysis}
+                        onCheckedChange={(checked) => {
+                          setFormData({
+                            ...formData,
+                            groupAnalysis: {
+                              ...formData.groupAnalysis,
+                              crossAnalysis: checked
+                            }
+                          });
+                        }}
+                      />
+                      <Label htmlFor="crossAnalysis">Permitir Análises Cruzadas</Label>
+                    </div>
+
+                    <div className="pl-6 space-y-2">
+                      <Label>Tipos de Análise em Grupo</Label>
+                      <div className="grid grid-cols-2 gap-4">
+                        {(formData.analysisTypes || []).map(type => (
+                          <div key={type} className="flex items-center space-x-2">
+                            <Switch
+                              id={`groupAnalysis${type}`}
+                              checked={formData.groupAnalysis?.analysisTypes.includes(type)}
+                              onCheckedChange={(checked) => {
+                                const types = formData.groupAnalysis?.analysisTypes || [];
+                                setFormData({
+                                  ...formData,
+                                  groupAnalysis: {
+                                    ...formData.groupAnalysis!,
+                                    analysisTypes: checked 
+                                      ? [...types, type]
+                                      : types.filter(t => t !== type)
+                                  }
+                                });
+                              }}
+                            />
+                            <Label htmlFor={`groupAnalysis${type}`}>
+                              {type.charAt(0).toUpperCase() + type.slice(1)}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-4">
+              <Button type="button" variant="outline" onClick={handleCancel}>
+                Cancelar
+              </Button>
+              <Button type="submit">Criar Monitoramento</Button>
+            </div>
           </CardContent>
         </Card>
-
-        <div className="flex justify-end space-x-4">
-          <Button type="button" variant="outline" onClick={handleCancel}>
-            Cancelar
-          </Button>
-          <Button type="submit">Criar Monitoramento</Button>
-        </div>
       </form>
     </div>
   );
