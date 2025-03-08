@@ -7,6 +7,14 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
+import { Plus, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+
+interface Category {
+  id: string;
+  name: string;
+}
 
 interface MonitoringFormData {
   name: string;
@@ -16,6 +24,11 @@ interface MonitoringFormData {
   apiKey?: string;
   frequency: string;
   active: boolean;
+  responsible: string;
+  description: string;
+  keywords: string[];
+  categories: Category[];
+  customCategories: string[];
 }
 
 export const MonitoringForm: React.FC = () => {
@@ -24,18 +37,69 @@ export const MonitoringForm: React.FC = () => {
     name: "",
     type: "url",
     url: "",
-    frequency: "5min",
-    active: true
+    frequency: "30min",
+    active: true,
+    responsible: "",
+    description: "",
+    keywords: [],
+    categories: [],
+    customCategories: []
   });
+
+  const [newKeyword, setNewKeyword] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+
+  const frequencies = [
+    { value: "30min", label: "30 minutos" },
+    { value: "1h", label: "1 hora" },
+    { value: "12h", label: "12 horas" },
+    { value: "24h", label: "24 horas" },
+    { value: "weekly", label: "Semanal" },
+    { value: "monthly", label: "Mensal" }
+  ];
+
+  const handleAddKeyword = () => {
+    if (newKeyword.trim()) {
+      setFormData({
+        ...formData,
+        keywords: [...formData.keywords, newKeyword.trim()]
+      });
+      setNewKeyword("");
+    }
+  };
+
+  const handleRemoveKeyword = (keyword: string) => {
+    setFormData({
+      ...formData,
+      keywords: formData.keywords.filter(k => k !== keyword)
+    });
+  };
+
+  const handleAddCategory = () => {
+    if (newCategory.trim()) {
+      setFormData({
+        ...formData,
+        customCategories: [...formData.customCategories, newCategory.trim()]
+      });
+      setNewCategory("");
+    }
+  };
+
+  const handleRemoveCategory = (category: string) => {
+    setFormData({
+      ...formData,
+      customCategories: formData.customCategories.filter(c => c !== category)
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validação básica
-    if (!formData.name) {
+    if (!formData.name || !formData.responsible) {
       toast({
         title: "Erro de Validação",
-        description: "O nome é obrigatório",
+        description: "Nome e Responsável são campos obrigatórios",
         variant: "destructive"
       });
       return;
@@ -89,14 +153,26 @@ export const MonitoringForm: React.FC = () => {
             <CardTitle>Informações Básicas</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Nome</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Nome do monitoramento"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Nome do Monitoramento</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Nome do monitoramento"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="responsible">Responsável</Label>
+                <Input
+                  id="responsible"
+                  value={formData.responsible}
+                  onChange={(e) => setFormData({ ...formData, responsible: e.target.value })}
+                  placeholder="Nome do responsável"
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -167,16 +243,76 @@ export const MonitoringForm: React.FC = () => {
                   <SelectValue placeholder="Selecione a frequência" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1min">1 minuto</SelectItem>
-                  <SelectItem value="5min">5 minutos</SelectItem>
-                  <SelectItem value="15min">15 minutos</SelectItem>
-                  <SelectItem value="30min">30 minutos</SelectItem>
-                  <SelectItem value="1h">1 hora</SelectItem>
-                  <SelectItem value="6h">6 horas</SelectItem>
-                  <SelectItem value="12h">12 horas</SelectItem>
-                  <SelectItem value="24h">24 horas</SelectItem>
+                  {frequencies.map((freq) => (
+                    <SelectItem key={freq.value} value={freq.value}>
+                      {freq.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="description">Descrição</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Descreva o objetivo deste monitoramento..."
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Palavras-chave</Label>
+              <div className="flex space-x-2">
+                <Input
+                  value={newKeyword}
+                  onChange={(e) => setNewKeyword(e.target.value)}
+                  placeholder="Adicionar palavra-chave"
+                  onKeyPress={(e) => e.key === 'Enter' && handleAddKeyword()}
+                />
+                <Button type="button" onClick={handleAddKeyword}>
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {formData.keywords.map((keyword) => (
+                  <Badge key={keyword} variant="secondary" className="flex items-center gap-1">
+                    {keyword}
+                    <X
+                      className="h-3 w-3 cursor-pointer"
+                      onClick={() => handleRemoveKeyword(keyword)}
+                    />
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Categorias</Label>
+              <div className="flex space-x-2">
+                <Input
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  placeholder="Adicionar categoria"
+                  onKeyPress={(e) => e.key === 'Enter' && handleAddCategory()}
+                />
+                <Button type="button" onClick={handleAddCategory}>
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {formData.customCategories.map((category) => (
+                  <Badge key={category} variant="secondary" className="flex items-center gap-1">
+                    {category}
+                    <X
+                      className="h-3 w-3 cursor-pointer"
+                      onClick={() => handleRemoveCategory(category)}
+                    />
+                  </Badge>
+                ))}
+              </div>
             </div>
 
             <div className="flex items-center space-x-2">

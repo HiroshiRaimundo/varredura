@@ -1,83 +1,100 @@
-import React, { useState } from "react";
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useLocation, useNavigate } from "react-router-dom";
 import { MonitoringList } from "./MonitoringList";
 import { MonitoringForm } from "./MonitoringForm";
-import { MonitoringStats } from "./MonitoringStats";
-import { MonitoringSettings } from "./MonitoringSettings";
 import { MonitoringAnalytics } from "./MonitoringAnalytics";
 import { MonitoringReports } from "./reports/MonitoringReports";
+import { MonitoringOverview } from "./overview/MonitoringOverview";
+
+interface MonitoringSummary {
+  total: number;
+  active: number;
+  inAnalysis: number;
+  pendingAnalysis: number;
+  lastUpdated: string;
+}
 
 export const AdminMonitoringDashboard: React.FC = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const path = location.pathname.split("/").pop() || "overview";
-  const [activeTab, setActiveTab] = useState(path);
-
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-    navigate(`/admin/monitoring/${value === "overview" ? "" : value}`);
+  // Dados mockados para exemplo
+  const summary: MonitoringSummary = {
+    total: 25,
+    active: 18,
+    inAnalysis: 5,
+    pendingAnalysis: 2,
+    lastUpdated: new Date().toLocaleString()
   };
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-2">Central de Monitoramento</h2>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight">Monitoramento</h2>
         <p className="text-muted-foreground">
-          Gerencie todos os monitoramentos do sistema
+          Gerencie e analise seus monitoramentos
         </p>
       </div>
 
-      <MonitoringStats />
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total de Monitoramentos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{summary.total}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Monitoramentos Ativos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{summary.active}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Em Análise</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{summary.inAnalysis}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Análises Pendentes</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{summary.pendingAnalysis}</div>
+          </CardContent>
+        </Card>
+      </div>
 
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-6">
-        <TabsList className="grid w-full grid-cols-5">
+      <Tabs defaultValue="overview" className="space-y-4">
+        <TabsList>
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-          <TabsTrigger value="add">Novo Monitoramento</TabsTrigger>
-          <TabsTrigger value="analytics">Análises</TabsTrigger>
-          <TabsTrigger value="settings">Configurações</TabsTrigger>
+          <TabsTrigger value="monitoring">Monitoramentos</TabsTrigger>
+          <TabsTrigger value="new">Novo Monitoramento</TabsTrigger>
+          <TabsTrigger value="analytics">Análise</TabsTrigger>
           <TabsTrigger value="reports">Relatórios</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview">
-          <Card>
-            <CardHeader>
-              <CardTitle>Monitoramentos Ativos</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <MonitoringList />
-            </CardContent>
-          </Card>
+        <TabsContent value="overview" className="space-y-4">
+          <MonitoringOverview />
         </TabsContent>
 
-        <TabsContent value="add">
-          <Card>
-            <CardHeader>
-              <CardTitle>Adicionar Novo Monitoramento</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <MonitoringForm />
-            </CardContent>
-          </Card>
+        <TabsContent value="monitoring" className="space-y-4">
+          <MonitoringList />
         </TabsContent>
 
-        <TabsContent value="analytics">
+        <TabsContent value="new" className="space-y-4">
+          <MonitoringForm />
+        </TabsContent>
+
+        <TabsContent value="analytics" className="space-y-4">
           <MonitoringAnalytics />
         </TabsContent>
 
-        <TabsContent value="settings">
-          <Card>
-            <CardHeader>
-              <CardTitle>Configurações de Monitoramento</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <MonitoringSettings />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="reports">
+        <TabsContent value="reports" className="space-y-4">
           <MonitoringReports />
         </TabsContent>
       </Tabs>
