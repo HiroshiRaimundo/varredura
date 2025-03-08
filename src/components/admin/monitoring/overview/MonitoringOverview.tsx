@@ -16,6 +16,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Filter, Pause, Play, Trash2, Settings } from "lucide-react";
 import { toast } from "sonner";
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 
 interface Monitoring {
   id: string;
@@ -29,9 +30,15 @@ interface Monitoring {
   url: string;
 }
 
+interface Filter {
+  search: string;
+  group: string;
+  status: string;
+}
+
 export const MonitoringOverview: React.FC = () => {
   const [page, setPage] = useState(1);
-  const [filter, setFilter] = useState({
+  const [filter, setFilter] = useState<Filter>({
     search: "",
     group: "all",
     status: "all"
@@ -61,6 +68,23 @@ export const MonitoringOverview: React.FC = () => {
     },
     // Adicione mais itens mockados aqui para testar a paginação
   ]);
+
+  // Dados mockados para os gráficos
+  const analysisData = [
+    { name: 'Jan', sentiment: 75, relevance: 65, accuracy: 80 },
+    { name: 'Fev', sentiment: 82, relevance: 70, accuracy: 85 },
+    { name: 'Mar', sentiment: 78, relevance: 75, accuracy: 82 },
+    { name: 'Abr', sentiment: 85, relevance: 80, accuracy: 88 },
+    { name: 'Mai', sentiment: 90, relevance: 85, accuracy: 90 },
+  ];
+
+  const statusData = [
+    { name: 'Ativos', value: monitorings.filter(m => m.status === 'active').length },
+    { name: 'Inativos', value: monitorings.filter(m => m.status === 'inactive').length },
+    { name: 'Em Análise', value: monitorings.filter(m => m.status === 'analyzing').length },
+  ];
+
+  const COLORS = ['#10b981', '#6366f1', '#f59e0b'];
 
   const itemsPerPage = 10;
   const totalPages = Math.ceil(monitorings.length / itemsPerPage);
@@ -125,6 +149,59 @@ export const MonitoringOverview: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Tendências de Análise</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={analysisData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="sentiment" stroke="#10b981" name="Sentimento" />
+                  <Line type="monotone" dataKey="relevance" stroke="#6366f1" name="Relevância" />
+                  <Line type="monotone" dataKey="accuracy" stroke="#f59e0b" name="Precisão" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Status dos Monitoramentos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={statusData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, value }) => `${name}: ${value}`}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {statusData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Monitoramentos Ativos</CardTitle>
@@ -144,7 +221,7 @@ export const MonitoringOverview: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos os Grupos</SelectItem>
-                <SelectItem value="portals">Portais</SelectItem>
+                <SelectItem value="portais">Portais</SelectItem>
                 <SelectItem value="blogs">Blogs</SelectItem>
                 <SelectItem value="apis">APIs</SelectItem>
               </SelectContent>
