@@ -29,6 +29,7 @@ interface MonitoringFormData {
   keywords: string[];
   categories: Category[];
   customCategories: string[];
+  metrics?: string[];
 }
 
 export const MonitoringForm: React.FC = () => {
@@ -252,6 +253,80 @@ export const MonitoringForm: React.FC = () => {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Métricas para Monitoramento</Label>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="metricUptime"
+                      checked={formData.metrics?.includes("uptime")}
+                      onCheckedChange={(checked) => {
+                        const metrics = formData.metrics || [];
+                        setFormData({
+                          ...formData,
+                          metrics: checked 
+                            ? [...metrics, "uptime"]
+                            : metrics.filter(m => m !== "uptime")
+                        });
+                      }}
+                    />
+                    <Label htmlFor="metricUptime">Uptime</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="metricResponseTime"
+                      checked={formData.metrics?.includes("responseTime")}
+                      onCheckedChange={(checked) => {
+                        const metrics = formData.metrics || [];
+                        setFormData({
+                          ...formData,
+                          metrics: checked 
+                            ? [...metrics, "responseTime"]
+                            : metrics.filter(m => m !== "responseTime")
+                        });
+                      }}
+                    />
+                    <Label htmlFor="metricResponseTime">Tempo de Resposta</Label>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="metricErrorRate"
+                      checked={formData.metrics?.includes("errorRate")}
+                      onCheckedChange={(checked) => {
+                        const metrics = formData.metrics || [];
+                        setFormData({
+                          ...formData,
+                          metrics: checked 
+                            ? [...metrics, "errorRate"]
+                            : metrics.filter(m => m !== "errorRate")
+                        });
+                      }}
+                    />
+                    <Label htmlFor="metricErrorRate">Taxa de Erro</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="metricContentAnalysis"
+                      checked={formData.metrics?.includes("contentAnalysis")}
+                      onCheckedChange={(checked) => {
+                        const metrics = formData.metrics || [];
+                        setFormData({
+                          ...formData,
+                          metrics: checked 
+                            ? [...metrics, "contentAnalysis"]
+                            : metrics.filter(m => m !== "contentAnalysis")
+                        });
+                      }}
+                    />
+                    <Label htmlFor="metricContentAnalysis">Análise de Conteúdo</Label>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="flex items-center space-x-2">

@@ -36,9 +36,7 @@ export const MonitoringOverview: React.FC = () => {
     group: "all",
     status: "all"
   });
-
-  // Dados mockados para exemplo
-  const monitorings: Monitoring[] = [
+  const [monitorings, setMonitorings] = useState<Monitoring[]>([
     {
       id: "1",
       name: "Portal Principal",
@@ -62,7 +60,7 @@ export const MonitoringOverview: React.FC = () => {
       url: "https://blog.exemplo.com"
     },
     // Adicione mais itens mockados aqui para testar a paginação
-  ];
+  ]);
 
   const itemsPerPage = 10;
   const totalPages = Math.ceil(monitorings.length / itemsPerPage);
@@ -81,19 +79,34 @@ export const MonitoringOverview: React.FC = () => {
   );
 
   const handleRemoveMonitoring = (id: string) => {
-    // Aqui você implementaria a lógica real de remoção
-    toast({
-      title: "Monitoramento Removido",
-      description: "O monitoramento foi removido com sucesso."
-    });
+    if (window.confirm("Tem certeza que deseja remover este monitoramento?")) {
+      setTimeout(() => {
+        setMonitorings(prev => prev.filter(m => m.id !== id));
+        toast({
+          title: "Monitoramento Removido",
+          description: "O monitoramento foi removido com sucesso."
+        });
+      }, 500);
+    }
   };
 
   const handleToggleStatus = (id: string, currentStatus: string) => {
-    // Aqui você implementaria a lógica real de alteração de status
     const newStatus = currentStatus === "active" ? "inactive" : "active";
+    setTimeout(() => {
+      setMonitorings(prev => prev.map(m => 
+        m.id === id ? { ...m, status: newStatus } : m
+      ));
+      toast({
+        title: "Status Alterado",
+        description: `O monitoramento foi ${newStatus === "active" ? "ativado" : "desativado"}.`
+      });
+    }, 500);
+  };
+
+  const handleOpenSettings = (monitoring: Monitoring) => {
     toast({
-      title: "Status Alterado",
-      description: `O monitoramento foi ${newStatus === "active" ? "ativado" : "desativado"}.`
+      title: "Configurações",
+      description: `Abrindo configurações de ${monitoring.name}`,
     });
   };
 
@@ -191,6 +204,7 @@ export const MonitoringOverview: React.FC = () => {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleToggleStatus(monitoring.id, monitoring.status)}
+                      title={monitoring.status === "active" ? "Pausar" : "Ativar"}
                     >
                       {monitoring.status === "active" ? (
                         <Pause className="h-4 w-4" />
@@ -202,10 +216,16 @@ export const MonitoringOverview: React.FC = () => {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleRemoveMonitoring(monitoring.id)}
+                      title="Remover"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon">
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => handleOpenSettings(monitoring)}
+                      title="Configurações"
+                    >
                       <Settings className="h-4 w-4" />
                     </Button>
                   </TableCell>
