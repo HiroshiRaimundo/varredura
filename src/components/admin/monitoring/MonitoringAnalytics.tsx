@@ -1,192 +1,248 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { DatePickerWithRange } from "@/components/ui/date-range-picker";
+import { DateRange } from "react-day-picker";
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
+import { Plus, X } from "lucide-react";
 
-interface AnalyticsData {
-  timestamp: string;
-  value: number;
-  source: string;
-}
+interface AnalyticsProps {}
 
-interface MonitoringSource {
-  id: string;
-  name: string;
-  type: string;
-  metrics: string[];
-}
-
-export const MonitoringAnalytics: React.FC = () => {
-  const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>();
-  const [selectedMetric, setSelectedMetric] = useState<string>("");
+export const MonitoringAnalytics: React.FC<AnalyticsProps> = () => {
   const [selectedSources, setSelectedSources] = useState<string[]>([]);
-  const [sources, setSources] = useState<MonitoringSource[]>([]);
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsData[]>([]);
+  const [date, setDate] = useState<DateRange | undefined>();
+  const [activeTab, setActiveTab] = useState("predictive");
 
-  // Buscar fontes de monitoramento e métricas disponíveis
-  useEffect(() => {
-    const fetchSources = async () => {
-      try {
-        // Aqui você faria uma chamada à API real
-        const response = await fetch('/api/monitoring/sources');
-        const data = await response.json();
-        setSources(data);
-      } catch (error) {
-        console.error('Erro ao buscar fontes:', error);
-        setSources([]);
-      }
-    };
+  // Dados mockados
+  const sources = [
+    { id: "1", name: "Portal Principal", type: "website" },
+    { id: "2", name: "Blog Corporativo", type: "blog" },
+    { id: "3", name: "API de Produtos", type: "api" },
+  ];
 
-    fetchSources();
-  }, []);
+  const predictiveData = [
+    { time: "1h", actual: 250, predicted: 255 },
+    { time: "2h", actual: 280, predicted: 275 },
+    { time: "3h", actual: 260, predicted: 265 },
+    { time: "4h", actual: 290, predicted: 285 },
+    { time: "5h", actual: 270, predicted: 275 },
+  ];
 
-  // Atualizar dados do gráfico quando os filtros mudarem
-  useEffect(() => {
-    const fetchAnalyticsData = async () => {
-      if (!dateRange?.from || !dateRange?.to || !selectedMetric || selectedSources.length === 0) {
-        return;
-      }
+  const contentAnalysis = [
+    { 
+      source: "Portal Principal",
+      keywords: ["tecnologia", "inovação", "desenvolvimento"],
+      sentiment: "positivo",
+      relevance: 0.85
+    },
+    {
+      source: "Blog Corporativo",
+      keywords: ["mercado", "tendências", "análise"],
+      sentiment: "neutro",
+      relevance: 0.75
+    }
+  ];
 
-      try {
-        // Aqui você faria a chamada à API real
-        const response = await fetch('/api/monitoring/analytics', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            startDate: dateRange.from,
-            endDate: dateRange.to,
-            metric: selectedMetric,
-            sources: selectedSources,
-          }),
-        });
-        const data = await response.json();
-        setAnalyticsData(data);
-      } catch (error) {
-        console.error('Erro ao buscar dados:', error);
-        setAnalyticsData([]);
-      }
-    };
-
-    fetchAnalyticsData();
-  }, [dateRange, selectedMetric, selectedSources]);
-
-  // Obter todas as métricas únicas das fontes selecionadas
-  const availableMetrics = Array.from(
-    new Set(
-      sources
-        .filter(source => selectedSources.includes(source.id))
-        .flatMap(source => source.metrics)
-    )
-  );
+  const handleSourceToggle = (sourceId: string) => {
+    setSelectedSources(prev => 
+      prev.includes(sourceId)
+        ? prev.filter(id => id !== sourceId)
+        : [...prev, sourceId]
+    );
+  };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight">Análise de Monitoramento</h2>
-        <p className="text-muted-foreground">
-          Analise os dados coletados das suas fontes de monitoramento
-        </p>
-      </div>
-
-      <div className="grid gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Filtros</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Período da Análise</label>
-              <DatePickerWithRange
-                date={dateRange}
-                setDate={setDateRange}
-              />
+      <Card>
+        <CardHeader>
+          <CardTitle>Configuração da Análise</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium">Fontes para Análise</h4>
+            <div className="flex flex-wrap gap-2">
+              {sources.map((source) => (
+                <Badge
+                  key={source.id}
+                  variant={selectedSources.includes(source.id) ? "default" : "outline"}
+                  className="cursor-pointer"
+                  onClick={() => handleSourceToggle(source.id)}
+                >
+                  {source.name}
+                </Badge>
+              ))}
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Fontes</label>
-              <ScrollArea className="h-[200px] border rounded-md p-4">
-                {sources.map((source) => (
-                  <div key={source.id} className="flex items-center space-x-2 py-2">
-                    <input
-                      type="checkbox"
-                      id={source.id}
-                      checked={selectedSources.includes(source.id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedSources([...selectedSources, source.id]);
-                        } else {
-                          setSelectedSources(selectedSources.filter(id => id !== source.id));
-                        }
-                      }}
-                      className="form-checkbox h-4 w-4"
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium">Período de Análise</h4>
+            <DatePickerWithRange date={date} setDate={setDate} />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="predictive">Análise Preditiva</TabsTrigger>
+          <TabsTrigger value="content">Análise de Conteúdo</TabsTrigger>
+          <TabsTrigger value="cross">Análise Cruzada</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="predictive" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Previsão de Comportamento</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={predictiveData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="time" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="actual"
+                      stroke="#6366f1"
+                      name="Valor Real"
                     />
-                    <label htmlFor={source.id} className="text-sm">
-                      {source.name} ({source.type})
-                    </label>
-                  </div>
-                ))}
-              </ScrollArea>
-            </div>
+                    <Line
+                      type="monotone"
+                      dataKey="predicted"
+                      stroke="#10b981"
+                      name="Previsão"
+                      strokeDasharray="5 5"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Métrica</label>
-              <Select value={selectedMetric} onValueChange={setSelectedMetric}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione uma métrica" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableMetrics.map((metric) => (
-                    <SelectItem key={metric} value={metric}>
-                      {metric}
-                    </SelectItem>
+          <Card>
+            <CardHeader>
+              <CardTitle>Detecção de Anomalias</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Fonte</TableHead>
+                    <TableHead>Métrica</TableHead>
+                    <TableHead>Valor Atual</TableHead>
+                    <TableHead>Valor Esperado</TableHead>
+                    <TableHead>Desvio</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>Portal Principal</TableCell>
+                    <TableCell>Tempo de Resposta</TableCell>
+                    <TableCell>350ms</TableCell>
+                    <TableCell>250ms</TableCell>
+                    <TableCell className="text-red-500">+40%</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="content" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise de Conteúdo</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Fonte</TableHead>
+                    <TableHead>Palavras-chave</TableHead>
+                    <TableHead>Sentimento</TableHead>
+                    <TableHead>Relevância</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {contentAnalysis.map((item, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{item.source}</TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {item.keywords.map((keyword, idx) => (
+                            <Badge key={idx} variant="outline">
+                              {keyword}
+                            </Badge>
+                          ))}
+                        </div>
+                      </TableCell>
+                      <TableCell>{item.sentiment}</TableCell>
+                      <TableCell>{(item.relevance * 100).toFixed(1)}%</TableCell>
+                    </TableRow>
                   ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Gráfico de Análise</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[400px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={analyticsData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis
-                    dataKey="timestamp"
-                    tickFormatter={(value) => new Date(value).toLocaleDateString()}
-                  />
-                  <YAxis />
-                  <Tooltip
-                    labelFormatter={(value) => new Date(value).toLocaleString()}
-                  />
-                  <Legend />
-                  {selectedSources.map((sourceId) => {
-                    const source = sources.find(s => s.id === sourceId);
-                    return (
-                      <Line
-                        key={sourceId}
-                        type="monotone"
-                        dataKey={`${source?.name}`}
-                        name={source?.name}
-                        stroke={`#${Math.floor(Math.random()*16777215).toString(16)}`}
-                      />
-                    );
-                  })}
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+        <TabsContent value="cross" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise Cruzada</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Grupo de Análise</h4>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um grupo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="performance">Performance</SelectItem>
+                      <SelectItem value="availability">Disponibilidade</SelectItem>
+                      <SelectItem value="errors">Erros</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Tipo de Comparação</h4>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o tipo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="trend">Tendência</SelectItem>
+                      <SelectItem value="correlation">Correlação</SelectItem>
+                      <SelectItem value="comparison">Comparação Direta</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    {/* Gráfico será preenchido com dados reais */}
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

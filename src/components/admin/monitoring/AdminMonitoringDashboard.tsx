@@ -1,7 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MonitoringList } from "./MonitoringList";
 import { MonitoringForm } from "./MonitoringForm";
 import { MonitoringAnalytics } from "./MonitoringAnalytics";
 import { MonitoringReports } from "./reports/MonitoringReports";
@@ -72,7 +71,6 @@ export const AdminMonitoringDashboard: React.FC = () => {
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-          <TabsTrigger value="monitoring">Monitoramentos</TabsTrigger>
           <TabsTrigger value="new">Novo Monitoramento</TabsTrigger>
           <TabsTrigger value="analytics">Análise</TabsTrigger>
           <TabsTrigger value="reports">Relatórios</TabsTrigger>
@@ -80,10 +78,6 @@ export const AdminMonitoringDashboard: React.FC = () => {
 
         <TabsContent value="overview" className="space-y-4">
           <MonitoringOverview />
-        </TabsContent>
-
-        <TabsContent value="monitoring" className="space-y-4">
-          <MonitoringList />
         </TabsContent>
 
         <TabsContent value="new" className="space-y-4">

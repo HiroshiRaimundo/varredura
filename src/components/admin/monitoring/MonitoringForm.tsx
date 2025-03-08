@@ -199,7 +199,7 @@ export const MonitoringForm: React.FC = () => {
               </Select>
             </div>
 
-            {formData.type === "url" ? (
+            {formData.type === "url" && (
               <div className="space-y-2">
                 <Label htmlFor="url">URL</Label>
                 <Input
@@ -209,7 +209,9 @@ export const MonitoringForm: React.FC = () => {
                   placeholder="https://exemplo.com"
                 />
               </div>
-            ) : (
+            )}
+
+            {formData.type === "api" && (
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="apiEndpoint">Endpoint da API</Label>
@@ -217,7 +219,7 @@ export const MonitoringForm: React.FC = () => {
                     id="apiEndpoint"
                     value={formData.apiEndpoint}
                     onChange={(e) => setFormData({ ...formData, apiEndpoint: e.target.value })}
-                    placeholder="https://api.exemplo.com/v1"
+                    placeholder="https://api.exemplo.com/endpoint"
                   />
                 </div>
                 <div className="space-y-2">
@@ -234,7 +236,7 @@ export const MonitoringForm: React.FC = () => {
             )}
 
             <div className="space-y-2">
-              <Label>Frequência de Monitoramento</Label>
+              <Label htmlFor="frequency">Frequência de Monitoramento</Label>
               <Select
                 value={formData.frequency}
                 onValueChange={(value) => setFormData({ ...formData, frequency: value })}
@@ -252,31 +254,36 @@ export const MonitoringForm: React.FC = () => {
               </Select>
             </div>
 
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="active"
+                checked={formData.active}
+                onCheckedChange={(checked) => setFormData({ ...formData, active: checked })}
+              />
+              <Label htmlFor="active">Ativar monitoramento imediatamente</Label>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Detalhes do Monitoramento</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="description">Descrição</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Descreva o objetivo deste monitoramento..."
-                rows={3}
+                placeholder="Descreva o propósito deste monitoramento"
+                rows={4}
               />
             </div>
 
             <div className="space-y-2">
               <Label>Palavras-chave</Label>
-              <div className="flex space-x-2">
-                <Input
-                  value={newKeyword}
-                  onChange={(e) => setNewKeyword(e.target.value)}
-                  placeholder="Adicionar palavra-chave"
-                  onKeyPress={(e) => e.key === 'Enter' && handleAddKeyword()}
-                />
-                <Button type="button" onClick={handleAddKeyword}>
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-2 mt-2">
+              <div className="flex flex-wrap gap-2 mb-2">
                 {formData.keywords.map((keyword) => (
                   <Badge key={keyword} variant="secondary" className="flex items-center gap-1">
                     {keyword}
@@ -287,22 +294,22 @@ export const MonitoringForm: React.FC = () => {
                   </Badge>
                 ))}
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Categorias</Label>
-              <div className="flex space-x-2">
+              <div className="flex gap-2">
                 <Input
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                  placeholder="Adicionar categoria"
-                  onKeyPress={(e) => e.key === 'Enter' && handleAddCategory()}
+                  value={newKeyword}
+                  onChange={(e) => setNewKeyword(e.target.value)}
+                  placeholder="Adicionar palavra-chave"
+                  onKeyPress={(e) => e.key === "Enter" && handleAddKeyword()}
                 />
-                <Button type="button" onClick={handleAddCategory}>
+                <Button type="button" variant="outline" size="icon" onClick={handleAddKeyword}>
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
-              <div className="flex flex-wrap gap-2 mt-2">
+            </div>
+
+            <div className="space-y-2">
+              <Label>Categorias Personalizadas</Label>
+              <div className="flex flex-wrap gap-2 mb-2">
                 {formData.customCategories.map((category) => (
                   <Badge key={category} variant="secondary" className="flex items-center gap-1">
                     {category}
@@ -313,25 +320,26 @@ export const MonitoringForm: React.FC = () => {
                   </Badge>
                 ))}
               </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Switch
-                checked={formData.active}
-                onCheckedChange={(checked) => setFormData({ ...formData, active: checked })}
-              />
-              <Label>Ativar monitoramento imediatamente</Label>
+              <div className="flex gap-2">
+                <Input
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  placeholder="Adicionar categoria"
+                  onKeyPress={(e) => e.key === "Enter" && handleAddCategory()}
+                />
+                <Button type="button" variant="outline" size="icon" onClick={handleAddCategory}>
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         <div className="flex justify-end space-x-4">
-          <Button variant="outline" onClick={handleCancel}>
+          <Button type="button" variant="outline" onClick={handleCancel}>
             Cancelar
           </Button>
-          <Button type="submit">
-            Criar Monitoramento
-          </Button>
+          <Button type="submit">Criar Monitoramento</Button>
         </div>
       </form>
     </div>
