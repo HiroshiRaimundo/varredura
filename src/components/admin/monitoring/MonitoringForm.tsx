@@ -331,7 +331,11 @@ export const MonitoringForm: React.FC = () => {
     });
   };
 
-  const handleToggleAnalysisType = (typeId: string) => {
+  const handleToggleAnalysisType = (typeId: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setFormData(prev => {
       const currentTypes = prev.analysisTypes || [];
       const newTypes = currentTypes.includes(typeId)
@@ -344,7 +348,11 @@ export const MonitoringForm: React.FC = () => {
     });
   };
 
-  const handleToggleMetric = (metricId: string) => {
+  const handleToggleMetric = (metricId: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setFormData(prev => {
       const currentMetrics = prev.metrics || [];
       const newMetrics = currentMetrics.includes(metricId)
@@ -468,20 +476,13 @@ export const MonitoringForm: React.FC = () => {
                       ? "bg-primary/10 hover:bg-primary/20" 
                       : "hover:bg-secondary/10"
                   )}
+                  onClick={(e) => handleToggleAnalysisType(type.id, e)}
                 >
-                  <CardContent 
-                    className="flex items-center gap-2 p-4"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleToggleAnalysisType(type.id);
-                    }}
-                  >
+                  <CardContent className="flex items-center gap-2 p-4">
                     <Switch
                       checked={formData.analysisTypes?.includes(type.id)}
-                      onCheckedChange={(checked) => {
-                        handleToggleAnalysisType(type.id);
-                      }}
+                      onCheckedChange={() => handleToggleAnalysisType(type.id)}
+                      onClick={(e) => e.stopPropagation()}
                     />
                     <div>
                       <div className="font-medium">{type.name}</div>
@@ -672,20 +673,13 @@ export const MonitoringForm: React.FC = () => {
                       ? "bg-primary/10 hover:bg-primary/20" 
                       : "hover:bg-secondary/10"
                   )}
+                  onClick={(e) => handleToggleMetric(metric.id, e)}
                 >
-                  <CardContent 
-                    className="flex items-center gap-2 p-4"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleToggleMetric(metric.id);
-                    }}
-                  >
+                  <CardContent className="flex items-center gap-2 p-4">
                     <Switch
                       checked={formData.metrics?.includes(metric.id)}
-                      onCheckedChange={(checked) => {
-                        handleToggleMetric(metric.id);
-                      }}
+                      onCheckedChange={() => handleToggleMetric(metric.id)}
+                      onClick={(e) => e.stopPropagation()}
                     />
                     <div>
                       <div className="font-medium">{metric.name}</div>

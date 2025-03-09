@@ -5,6 +5,8 @@ import { MonitoringForm } from "./MonitoringForm";
 import { MonitoringAnalytics } from "./MonitoringAnalytics";
 import { MonitoringReports } from "./reports/MonitoringReports";
 import { MonitoringOverview } from "./overview/MonitoringOverview";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 interface MonitoringSummary {
   total: number;
@@ -22,6 +24,22 @@ export const AdminMonitoringDashboard: React.FC = () => {
     inAnalysis: 5,
     pendingAnalysis: 2,
     lastUpdated: new Date().toLocaleString()
+  };
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const currentTab = location.pathname.includes("new") ? "new" : location.pathname.includes("analytics") ? "analytics" : location.pathname.includes("reports") ? "reports" : "overview";
+
+  const handleTabChange = (value: string) => {
+    if (value === "new") {
+      navigate("/admin/monitoring/new", { replace: true });
+    } else if (value === "analytics") {
+      navigate("/admin/monitoring/analytics", { replace: true });
+    } else if (value === "reports") {
+      navigate("/admin/monitoring/reports", { replace: true });
+    } else {
+      navigate("/admin/monitoring", { replace: true });
+    }
   };
 
   return (
@@ -68,7 +86,7 @@ export const AdminMonitoringDashboard: React.FC = () => {
         </Card>
       </div>
 
-      <Tabs defaultValue="overview" className="space-y-4">
+      <Tabs defaultValue={currentTab} onValueChange={handleTabChange} className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="new">Novo Monitoramento</TabsTrigger>
