@@ -269,26 +269,24 @@ export const MonitoringForm: React.FC = () => {
 
             <div className="space-y-2">
               <Label>Tipo de Monitoramento</Label>
-              <Select
-                value={formData.type}
-                onValueChange={(value: "url" | "api") => {
-                  setFormData({
-                    ...formData,
-                    type: value,
-                    url: value === "url" ? "" : undefined,
-                    apiEndpoint: value === "api" ? "" : undefined,
-                    apiKey: value === "api" ? "" : undefined
-                  });
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione o tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="url">URL</SelectItem>
-                  <SelectItem value="api">API</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex gap-2 w-48">
+                <Button
+                  type="button"
+                  variant={formData.type === "url" ? "default" : "outline"}
+                  className="flex-1"
+                  onClick={() => setFormData({ ...formData, type: "url" })}
+                >
+                  URL
+                </Button>
+                <Button
+                  type="button"
+                  variant={formData.type === "api" ? "default" : "outline"}
+                  className="flex-1"
+                  onClick={() => setFormData({ ...formData, type: "api" })}
+                >
+                  API
+                </Button>
+              </div>
             </div>
 
             {formData.type === "url" && (
