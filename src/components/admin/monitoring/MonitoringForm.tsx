@@ -31,178 +31,127 @@ interface MonitoringFormData {
   categories: Category[];
   customCategories: string[];
   metrics?: string[];
+  analysisTypes?: string[];
   groupAnalysis?: {
     enabled: boolean;
     crossAnalysis: boolean;
     analysisTypes: string[];
   };
-  analysisTypes?: string[];
 }
 
 const metrics = [
-  // Análise de Conteúdo
-  {
-    id: "content_analysis",
-    name: "Análise de Conteúdo",
-    description: "Análise completa do conteúdo da página"
-  },
-  {
-    id: "content_changes",
-    name: "Mudanças de Conteúdo",
-    description: "Detecta alterações no conteúdo"
-  },
-  {
-    id: "keyword_presence",
-    name: "Presença de Palavras-chave",
-    description: "Monitora palavras-chave específicas"
-  },
-  {
-    id: "text_extraction",
-    name: "Extração de Texto",
-    description: "Extrai e analisa texto relevante"
-  },
-
-  // Análise Preditiva
-  {
-    id: "predictive_analysis",
-    name: "Análise Preditiva",
-    description: "Previsão de tendências e comportamentos"
-  },
-  {
-    id: "pattern_detection",
-    name: "Detecção de Padrões",
-    description: "Identifica padrões recorrentes"
-  },
-  {
-    id: "anomaly_detection",
-    name: "Detecção de Anomalias",
-    description: "Identifica comportamentos anormais"
-  },
-
-  // Análise de Sentimento
-  {
-    id: "sentiment_analysis",
-    name: "Análise de Sentimento",
-    description: "Analisa o sentimento do conteúdo"
-  },
-  {
-    id: "emotional_tone",
-    name: "Tom Emocional",
-    description: "Avalia o tom emocional do conteúdo"
-  },
-  {
-    id: "opinion_mining",
-    name: "Mineração de Opinião",
-    description: "Extrai e analisa opiniões"
-  },
-
-  // Análise de Tendências
-  {
-    id: "trend_analysis",
-    name: "Análise de Tendências",
-    description: "Identifica tendências ao longo do tempo"
-  },
-  {
-    id: "temporal_patterns",
-    name: "Padrões Temporais",
-    description: "Analisa padrões ao longo do tempo"
-  },
-  {
-    id: "growth_analysis",
-    name: "Análise de Crescimento",
-    description: "Monitora taxas de crescimento"
-  },
-
-  // Análise de Frequência
-  {
-    id: "frequency_analysis",
-    name: "Análise de Frequência",
-    description: "Analisa frequência de termos/elementos"
-  },
-  {
-    id: "term_frequency",
-    name: "Frequência de Termos",
-    description: "Monitora termos mais comuns"
-  },
-
-  // Análise de Links
-  {
-    id: "link_analysis",
-    name: "Análise de Links",
-    description: "Analisa estrutura de links"
-  },
-  {
-    id: "broken_links",
-    name: "Links Quebrados",
-    description: "Detecta links quebrados"
-  },
-  {
-    id: "link_structure",
-    name: "Estrutura de Links",
-    description: "Mapeia estrutura de navegação"
-  },
-
-  // Análise de Performance
-  {
-    id: "performance_analysis",
-    name: "Análise de Performance",
-    description: "Monitora desempenho geral"
-  },
-  {
-    id: "load_time",
-    name: "Tempo de Carregamento",
-    description: "Monitora tempo de carregamento"
-  },
   {
     id: "response_time",
     name: "Tempo de Resposta",
-    description: "Monitora tempo de resposta"
-  },
-
-  // Análise de Disponibilidade
-  {
-    id: "availability_analysis",
-    name: "Análise de Disponibilidade",
-    description: "Monitora disponibilidade do site"
+    description: "Monitora o tempo de resposta das requisições"
   },
   {
-    id: "uptime_monitoring",
-    name: "Monitoramento de Uptime",
-    description: "Monitora tempo online"
+    id: "status_code",
+    name: "Código de Status",
+    description: "Verifica os códigos de status HTTP"
   },
-
-  // Análise de Metadados
   {
-    id: "metadata_analysis",
-    name: "Análise de Metadados",
-    description: "Analisa metadados da página"
+    id: "content_length",
+    name: "Tamanho do Conteúdo",
+    description: "Monitora alterações no tamanho"
+  },
+  {
+    id: "html_structure",
+    name: "Estrutura HTML",
+    description: "Detecta mudanças na estrutura"
   },
   {
     id: "meta_tags",
     name: "Meta Tags",
-    description: "Monitora meta tags"
+    description: "Monitora alterações em meta tags"
+  },
+  {
+    id: "links",
+    name: "Links",
+    description: "Verifica links quebrados e alterações"
+  },
+  {
+    id: "images",
+    name: "Imagens",
+    description: "Monitora alterações em imagens"
+  },
+  {
+    id: "javascript",
+    name: "JavaScript",
+    description: "Detecta mudanças em scripts"
+  },
+  {
+    id: "css",
+    name: "CSS",
+    description: "Monitora alterações no estilo"
   },
   {
     id: "headers",
     name: "Headers HTTP",
-    description: "Analisa headers de resposta"
+    description: "Monitora headers de resposta"
   },
+  {
+    id: "ssl_cert",
+    name: "Certificado SSL",
+    description: "Verifica validade do certificado"
+  },
+  {
+    id: "redirect_chain",
+    name: "Redirecionamentos",
+    description: "Monitora cadeia de redirecionamentos"
+  }
+];
 
-  // Análise de Dados Estruturados
+const analysisTypes = [
+  {
+    id: "content",
+    name: "Análise de Conteúdo",
+    description: "Análise detalhada do conteúdo e estrutura"
+  },
+  {
+    id: "predictive",
+    name: "Análise Preditiva",
+    description: "Previsão de tendências e comportamentos"
+  },
+  {
+    id: "sentiment",
+    name: "Análise de Sentimento",
+    description: "Análise do sentimento do conteúdo"
+  },
+  {
+    id: "trends",
+    name: "Análise de Tendências",
+    description: "Identificação de padrões temporais"
+  },
+  {
+    id: "frequency",
+    name: "Análise de Frequência",
+    description: "Análise de termos e elementos frequentes"
+  },
+  {
+    id: "links",
+    name: "Análise de Links",
+    description: "Análise da estrutura de navegação"
+  },
+  {
+    id: "performance",
+    name: "Análise de Performance",
+    description: "Análise do desempenho e disponibilidade"
+  },
+  {
+    id: "availability",
+    name: "Análise de Disponibilidade",
+    description: "Monitoramento de uptime e resposta"
+  },
+  {
+    id: "metadata",
+    name: "Análise de Metadados",
+    description: "Análise de meta informações"
+  },
   {
     id: "structured_data",
-    name: "Dados Estruturados",
-    description: "Analisa dados estruturados"
-  },
-  {
-    id: "json_ld",
-    name: "JSON-LD",
-    description: "Analisa marcação JSON-LD"
-  },
-  {
-    id: "microdata",
-    name: "Microdata",
-    description: "Analisa marcação Microdata"
+    name: "Análise de Dados Estruturados",
+    description: "Análise de dados em formatos específicos"
   }
 ];
 
@@ -677,75 +626,44 @@ export const MonitoringForm: React.FC = () => {
 
             <div className="space-y-2">
               <Label>Tipos de Análise</Label>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="analysisContent"
-                      checked={formData.analysisTypes?.includes("content")}
-                      onCheckedChange={(checked) => {
-                        const types = formData.analysisTypes || [];
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {analysisTypes.map((type) => (
+                  <Card key={type.id} className="cursor-pointer">
+                    <CardContent
+                      className="flex items-center gap-2 p-4"
+                      onClick={() => {
+                        const currentTypes = formData.analysisTypes || [];
+                        const newTypes = currentTypes.includes(type.id)
+                          ? currentTypes.filter(id => id !== type.id)
+                          : [...currentTypes, type.id];
                         setFormData({
                           ...formData,
-                          analysisTypes: checked 
-                            ? [...types, "content"]
-                            : types.filter(t => t !== "content")
+                          analysisTypes: newTypes
                         });
                       }}
-                    />
-                    <Label htmlFor="analysisContent">Análise de Conteúdo</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="analysisPredictive"
-                      checked={formData.analysisTypes?.includes("predictive")}
-                      onCheckedChange={(checked) => {
-                        const types = formData.analysisTypes || [];
-                        setFormData({
-                          ...formData,
-                          analysisTypes: checked 
-                            ? [...types, "predictive"]
-                            : types.filter(t => t !== "predictive")
-                        });
-                      }}
-                    />
-                    <Label htmlFor="analysisPredictive">Análise Preditiva</Label>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="analysisSentiment"
-                      checked={formData.analysisTypes?.includes("sentiment")}
-                      onCheckedChange={(checked) => {
-                        const types = formData.analysisTypes || [];
-                        setFormData({
-                          ...formData,
-                          analysisTypes: checked 
-                            ? [...types, "sentiment"]
-                            : types.filter(t => t !== "sentiment")
-                        });
-                      }}
-                    />
-                    <Label htmlFor="analysisSentiment">Análise de Sentimento</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="analysisTrend"
-                      checked={formData.analysisTypes?.includes("trend")}
-                      onCheckedChange={(checked) => {
-                        const types = formData.analysisTypes || [];
-                        setFormData({
-                          ...formData,
-                          analysisTypes: checked 
-                            ? [...types, "trend"]
-                            : types.filter(t => t !== "trend")
-                        });
-                      }}
-                    />
-                    <Label htmlFor="analysisTrend">Análise de Tendências</Label>
-                  </div>
-                </div>
+                    >
+                      <Switch
+                        checked={formData.analysisTypes?.includes(type.id)}
+                        onCheckedChange={() => {
+                          const currentTypes = formData.analysisTypes || [];
+                          const newTypes = currentTypes.includes(type.id)
+                            ? currentTypes.filter(id => id !== type.id)
+                            : [...currentTypes, type.id];
+                          setFormData({
+                            ...formData,
+                            analysisTypes: newTypes
+                          });
+                        }}
+                      />
+                      <div>
+                        <div className="font-medium">{type.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {type.description}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             </div>
 
