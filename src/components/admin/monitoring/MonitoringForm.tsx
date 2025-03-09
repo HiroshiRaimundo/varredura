@@ -763,7 +763,7 @@ export const MonitoringForm: React.FC = () => {
                 setFormData(prev => ({ ...prev, frequency: value }));
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger id="frequency" className="w-[200px]">
                 <SelectValue placeholder="Selecione a frequência" />
               </SelectTrigger>
               <SelectContent>
@@ -771,7 +771,7 @@ export const MonitoringForm: React.FC = () => {
                   <SelectItem 
                     key={freq.value} 
                     value={freq.value}
-                    onSelect={(e) => e.preventDefault()}
+                    onClick={(e) => e.preventDefault()}
                   >
                     {freq.label}
                   </SelectItem>
@@ -791,10 +791,11 @@ export const MonitoringForm: React.FC = () => {
         </CardContent>
       </Card>
 
-      <div className="flex justify-end space-x-4">
+      <div className="flex justify-end gap-4">
         <Button 
           variant="outline" 
           type="button"
+          className="w-[150px]"
           onClick={(e) => {
             e.preventDefault();
             navigate("/admin/monitoring", { replace: true });
@@ -802,7 +803,7 @@ export const MonitoringForm: React.FC = () => {
         >
           Cancelar
         </Button>
-        <Button type="submit">
+        <Button type="submit" className="w-[150px]">
           Criar Monitoramento
         </Button>
       </div>
