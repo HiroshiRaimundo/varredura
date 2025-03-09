@@ -40,80 +40,169 @@ interface MonitoringFormData {
 }
 
 const metrics = [
+  // Análise de Conteúdo
   {
-    id: "response_time",
-    name: "Tempo de Resposta",
-    description: "Monitora o tempo de resposta das requisições"
-  },
-  {
-    id: "status_code",
-    name: "Código de Status",
-    description: "Verifica os códigos de status HTTP retornados"
-  },
-  {
-    id: "content_length",
-    name: "Tamanho do Conteúdo",
-    description: "Monitora alterações no tamanho do conteúdo"
+    id: "content_analysis",
+    name: "Análise de Conteúdo",
+    description: "Análise completa do conteúdo da página"
   },
   {
     id: "content_changes",
     name: "Mudanças de Conteúdo",
-    description: "Detecta alterações no conteúdo da página"
+    description: "Detecta alterações no conteúdo"
   },
   {
     id: "keyword_presence",
     name: "Presença de Palavras-chave",
-    description: "Monitora a presença de palavras-chave específicas"
+    description: "Monitora palavras-chave específicas"
   },
   {
-    id: "html_structure",
-    name: "Estrutura HTML",
-    description: "Detecta mudanças na estrutura HTML"
+    id: "text_extraction",
+    name: "Extração de Texto",
+    description: "Extrai e analisa texto relevante"
+  },
+
+  // Análise Preditiva
+  {
+    id: "predictive_analysis",
+    name: "Análise Preditiva",
+    description: "Previsão de tendências e comportamentos"
   },
   {
-    id: "meta_tags",
-    name: "Meta Tags",
-    description: "Monitora alterações em meta tags importantes"
+    id: "pattern_detection",
+    name: "Detecção de Padrões",
+    description: "Identifica padrões recorrentes"
   },
   {
-    id: "links",
-    name: "Links",
-    description: "Verifica links quebrados e alterações em URLs"
+    id: "anomaly_detection",
+    name: "Detecção de Anomalias",
+    description: "Identifica comportamentos anormais"
+  },
+
+  // Análise de Sentimento
+  {
+    id: "sentiment_analysis",
+    name: "Análise de Sentimento",
+    description: "Analisa o sentimento do conteúdo"
   },
   {
-    id: "images",
-    name: "Imagens",
-    description: "Monitora alterações em imagens e seus atributos"
+    id: "emotional_tone",
+    name: "Tom Emocional",
+    description: "Avalia o tom emocional do conteúdo"
   },
   {
-    id: "javascript",
-    name: "JavaScript",
-    description: "Detecta mudanças em scripts e comportamentos"
+    id: "opinion_mining",
+    name: "Mineração de Opinião",
+    description: "Extrai e analisa opiniões"
+  },
+
+  // Análise de Tendências
+  {
+    id: "trend_analysis",
+    name: "Análise de Tendências",
+    description: "Identifica tendências ao longo do tempo"
   },
   {
-    id: "css",
-    name: "CSS",
-    description: "Monitora alterações no estilo da página"
+    id: "temporal_patterns",
+    name: "Padrões Temporais",
+    description: "Analisa padrões ao longo do tempo"
   },
   {
-    id: "headers",
-    name: "Headers HTTP",
-    description: "Monitora headers de resposta importantes"
+    id: "growth_analysis",
+    name: "Análise de Crescimento",
+    description: "Monitora taxas de crescimento"
+  },
+
+  // Análise de Frequência
+  {
+    id: "frequency_analysis",
+    name: "Análise de Frequência",
+    description: "Analisa frequência de termos/elementos"
   },
   {
-    id: "ssl_cert",
-    name: "Certificado SSL",
-    description: "Verifica validade e alterações no certificado SSL"
+    id: "term_frequency",
+    name: "Frequência de Termos",
+    description: "Monitora termos mais comuns"
+  },
+
+  // Análise de Links
+  {
+    id: "link_analysis",
+    name: "Análise de Links",
+    description: "Analisa estrutura de links"
   },
   {
-    id: "redirect_chain",
-    name: "Cadeia de Redirecionamento",
-    description: "Monitora redirecionamentos e suas alterações"
+    id: "broken_links",
+    name: "Links Quebrados",
+    description: "Detecta links quebrados"
+  },
+  {
+    id: "link_structure",
+    name: "Estrutura de Links",
+    description: "Mapeia estrutura de navegação"
+  },
+
+  // Análise de Performance
+  {
+    id: "performance_analysis",
+    name: "Análise de Performance",
+    description: "Monitora desempenho geral"
   },
   {
     id: "load_time",
     name: "Tempo de Carregamento",
-    description: "Monitora o tempo total de carregamento"
+    description: "Monitora tempo de carregamento"
+  },
+  {
+    id: "response_time",
+    name: "Tempo de Resposta",
+    description: "Monitora tempo de resposta"
+  },
+
+  // Análise de Disponibilidade
+  {
+    id: "availability_analysis",
+    name: "Análise de Disponibilidade",
+    description: "Monitora disponibilidade do site"
+  },
+  {
+    id: "uptime_monitoring",
+    name: "Monitoramento de Uptime",
+    description: "Monitora tempo online"
+  },
+
+  // Análise de Metadados
+  {
+    id: "metadata_analysis",
+    name: "Análise de Metadados",
+    description: "Analisa metadados da página"
+  },
+  {
+    id: "meta_tags",
+    name: "Meta Tags",
+    description: "Monitora meta tags"
+  },
+  {
+    id: "headers",
+    name: "Headers HTTP",
+    description: "Analisa headers de resposta"
+  },
+
+  // Análise de Dados Estruturados
+  {
+    id: "structured_data",
+    name: "Dados Estruturados",
+    description: "Analisa dados estruturados"
+  },
+  {
+    id: "json_ld",
+    name: "JSON-LD",
+    description: "Analisa marcação JSON-LD"
+  },
+  {
+    id: "microdata",
+    name: "Microdata",
+    description: "Analisa marcação Microdata"
   }
 ];
 
@@ -140,6 +229,7 @@ export const MonitoringForm: React.FC = () => {
 
   const [newKeyword, setNewKeyword] = useState("");
   const [newCategory, setNewCategory] = useState("");
+  const [monitoringType, setMonitoringType] = useState<"url" | "api">("url");
 
   const frequencies = [
     { value: "30min", label: "30 minutos" },
@@ -269,27 +359,40 @@ export const MonitoringForm: React.FC = () => {
 
             <div className="space-y-2">
               <Label>Tipo de Monitoramento</Label>
-              <Select
-                value={formData.type}
-                onValueChange={(value: "url" | "api") => {
-                  setFormData({
-                    ...formData,
-                    type: value,
-                    urls: value === "url" ? [] : undefined,
-                    url: value === "url" ? "" : undefined,
-                    apiEndpoint: value === "api" ? "" : undefined,
-                    apiKey: value === "api" ? "" : undefined
-                  });
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione o tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="url">URL</SelectItem>
-                  <SelectItem value="api">API</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex gap-4">
+                <Button
+                  type="button"
+                  variant={monitoringType === "url" ? "default" : "outline"}
+                  onClick={() => {
+                    setMonitoringType("url");
+                    setFormData({
+                      ...formData,
+                      type: "url",
+                      url: "",
+                      urls: [],
+                      apiEndpoint: ""
+                    });
+                  }}
+                >
+                  URL
+                </Button>
+                <Button
+                  type="button"
+                  variant={monitoringType === "api" ? "default" : "outline"}
+                  onClick={() => {
+                    setMonitoringType("api");
+                    setFormData({
+                      ...formData,
+                      type: "api",
+                      url: "",
+                      urls: [],
+                      apiEndpoint: ""
+                    });
+                  }}
+                >
+                  API
+                </Button>
+              </div>
             </div>
 
             {formData.type === "url" && (
