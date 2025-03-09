@@ -167,18 +167,61 @@ export const MonitoringForm: React.FC = () => {
     analysisTypes: []
   });
 
+  const [urlInput, setUrlInput] = useState("");
   const [newKeyword, setNewKeyword] = useState("");
   const [newCategory, setNewCategory] = useState("");
-  const [urlInput, setUrlInput] = useState("");
 
-  const frequencies = [
-    { value: "30min", label: "30 minutos" },
-    { value: "1h", label: "1 hora" },
-    { value: "3h", label: "3 horas" },
-    { value: "6h", label: "6 horas" },
-    { value: "12h", label: "12 horas" },
-    { value: "24h", label: "24 horas" }
-  ];
+  const handleAddUrl = () => {
+    if (!urlInput?.trim()) {
+      toast({
+        title: "Erro",
+        description: "Digite uma URL válida",
+        variant: "destructive"
+      });
+      return;
+    }
+    try {
+      new URL(urlInput);
+      if (formData.urls?.includes(urlInput)) {
+        toast({
+          title: "Erro",
+          description: "Esta URL já foi adicionada",
+          variant: "destructive"
+        });
+        return;
+      }
+      setFormData(prev => ({
+        ...prev,
+        urls: [...(prev.urls || []), urlInput]
+      }));
+      setUrlInput("");
+      toast({
+        title: "Sucesso",
+        description: "URL adicionada à lista",
+      });
+    } catch (e) {
+      toast({
+        title: "Erro",
+        description: "URL inválida",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleRemoveUrl = (index: number) => {
+    setFormData(prev => {
+      const urls = [...(prev.urls || [])];
+      urls.splice(index, 1);
+      return {
+        ...prev,
+        urls
+      };
+    });
+    toast({
+      title: "URL removida",
+      description: "URL removida da lista",
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -256,6 +299,15 @@ export const MonitoringForm: React.FC = () => {
       customCategories: formData.customCategories.filter(c => c !== category)
     });
   };
+
+  const frequencies = [
+    { value: "30min", label: "30 minutos" },
+    { value: "1h", label: "1 hora" },
+    { value: "3h", label: "3 horas" },
+    { value: "6h", label: "6 horas" },
+    { value: "12h", label: "12 horas" },
+    { value: "24h", label: "24 horas" }
+  ];
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
@@ -404,13 +456,11 @@ export const MonitoringForm: React.FC = () => {
                 type="button"
                 variant={formData.type === "url" ? "default" : "outline"}
                 onClick={() => {
-                  setFormData({
-                    ...formData,
+                  setFormData(prev => ({
+                    ...prev,
                     type: "url",
-                    urls: [],
-                    apiEndpoint: ""
-                  });
-                  setUrlInput("");
+                    apiEndpoint: "",
+                  }));
                 }}
               >
                 URL
@@ -419,12 +469,11 @@ export const MonitoringForm: React.FC = () => {
                 type="button"
                 variant={formData.type === "api" ? "default" : "outline"}
                 onClick={() => {
-                  setFormData({
-                    ...formData,
+                  setFormData(prev => ({
+                    ...prev,
                     type: "api",
                     urls: [],
-                    apiEndpoint: ""
-                  });
+                  }));
                   setUrlInput("");
                 }}
               >
@@ -445,116 +494,41 @@ export const MonitoringForm: React.FC = () => {
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
-                        if (!urlInput?.trim()) {
-                          toast({
-                            title: "Erro",
-                            description: "Digite uma URL válida",
-                            variant: "destructive"
-                          });
-                          return;
-                        }
-                        try {
-                          new URL(urlInput);
-                          if (formData.urls?.includes(urlInput)) {
-                            toast({
-                              title: "Erro",
-                              description: "Esta URL já foi adicionada",
-                              variant: "destructive"
-                            });
-                            return;
-                          }
-                          setFormData({
-                            ...formData,
-                            urls: [...(formData.urls || []), urlInput]
-                          });
-                          setUrlInput("");
-                          toast({
-                            title: "Sucesso",
-                            description: "URL adicionada à lista",
-                          });
-                        } catch (e) {
-                          toast({
-                            title: "Erro",
-                            description: "URL inválida",
-                            variant: "destructive"
-                          });
-                        }
+                        handleAddUrl();
                       }
                     }}
                   />
                   <Button 
                     type="button"
-                    onClick={() => {
-                      if (!urlInput?.trim()) {
-                        toast({
-                          title: "Erro",
-                          description: "Digite uma URL válida",
-                          variant: "destructive"
-                        });
-                        return;
-                      }
-                      try {
-                        new URL(urlInput);
-                        if (formData.urls?.includes(urlInput)) {
-                          toast({
-                            title: "Erro",
-                            description: "Esta URL já foi adicionada",
-                            variant: "destructive"
-                          });
-                          return;
-                        }
-                        setFormData({
-                          ...formData,
-                          urls: [...(formData.urls || []), urlInput]
-                        });
-                        setUrlInput("");
-                        toast({
-                          title: "Sucesso",
-                          description: "URL adicionada à lista",
-                        });
-                      } catch (e) {
-                        toast({
-                          title: "Erro",
-                          description: "URL inválida",
-                          variant: "destructive"
-                        });
-                      }
-                    }}
+                    onClick={handleAddUrl}
                   >
                     Adicionar
                   </Button>
                 </div>
-                {formData.urls && formData.urls.length > 0 && (
-                  <div className="mt-4">
-                    <div className="space-y-2">
-                      {formData.urls.map((url, index) => (
-                        <div key={index} className="flex items-center gap-2 bg-secondary/20 p-2 rounded-md">
-                          <span className="flex-1 text-sm">{url}</span>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              const urls = [...(formData.urls || [])];
-                              urls.splice(index, 1);
-                              setFormData({
-                                ...formData,
-                                urls
-                              });
-                              toast({
-                                title: "URL removida",
-                                description: "URL removida da lista",
-                              });
-                            }}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
+              
+              {formData.urls && formData.urls.length > 0 && (
+                <div className="border rounded-lg p-4">
+                  <Label className="text-sm text-muted-foreground mb-2 block">
+                    {formData.urls.length === 1 ? "URL Adicionada:" : "URLs Adicionadas:"}
+                  </Label>
+                  <div className="space-y-2">
+                    {formData.urls.map((url, index) => (
+                      <div key={index} className="flex items-center gap-2 bg-secondary/20 p-2 rounded-md">
+                        <span className="flex-1 text-sm">{url}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemoveUrl(index)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -563,7 +537,10 @@ export const MonitoringForm: React.FC = () => {
               <Label>URL da API</Label>
               <Input
                 value={formData.apiEndpoint || ""}
-                onChange={(e) => setFormData({ ...formData, apiEndpoint: e.target.value })}
+                onChange={(e) => setFormData(prev => ({
+                  ...prev,
+                  apiEndpoint: e.target.value
+                }))}
                 placeholder="https://api.exemplo.com/endpoint"
               />
             </div>
