@@ -335,11 +335,7 @@ export const MonitoringForm: React.FC = () => {
     });
   };
 
-  const handleToggleAnalysisType = (typeId: string, e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+  const handleToggleAnalysisType = (typeId: string) => {
     setFormData(prev => {
       const currentTypes = prev.analysisTypes || [];
       const newTypes = currentTypes.includes(typeId)
@@ -350,13 +346,12 @@ export const MonitoringForm: React.FC = () => {
         analysisTypes: newTypes
       };
     });
+    if (errors.analysisTypes) {
+      setErrors(prev => ({ ...prev, analysisTypes: false }));
+    }
   };
 
-  const handleToggleMetric = (metricId: string, e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+  const handleToggleMetric = (metricId: string) => {
     setFormData(prev => {
       const currentMetrics = prev.metrics || [];
       const newMetrics = currentMetrics.includes(metricId)
@@ -367,12 +362,8 @@ export const MonitoringForm: React.FC = () => {
         metrics: newMetrics
       };
     });
-  };
-
-  const handleCardClick = (e: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
+    if (errors.metrics) {
+      setErrors(prev => ({ ...prev, metrics: false }));
     }
   };
 
@@ -502,33 +493,34 @@ export const MonitoringForm: React.FC = () => {
               errors.analysisTypes && "border border-red-500 rounded-lg p-2"
             )}>
               {analysisTypes.map((type) => (
-                <Card 
-                  key={type.id} 
-                  className={cn(
-                    "cursor-pointer transition-colors",
-                    formData.analysisTypes?.includes(type.id) 
-                      ? "bg-primary/10 hover:bg-primary/20" 
-                      : "hover:bg-secondary/10"
-                  )}
-                  onClick={(e) => handleToggleAnalysisType(type.id, e)}
+                <button
+                  key={type.id}
+                  type="button"
+                  onClick={() => handleToggleAnalysisType(type.id)}
+                  className="text-left w-full"
                 >
-                  <CardContent 
-                    className="flex items-center gap-2 p-4"
-                    onClick={handleCardClick}
+                  <Card 
+                    className={cn(
+                      "cursor-pointer transition-colors",
+                      formData.analysisTypes?.includes(type.id) 
+                        ? "bg-primary/10 hover:bg-primary/20" 
+                        : "hover:bg-secondary/10"
+                    )}
                   >
-                    <Switch
-                      checked={formData.analysisTypes?.includes(type.id)}
-                      onCheckedChange={() => handleToggleAnalysisType(type.id)}
-                      onClick={handleCardClick}
-                    />
-                    <div onClick={handleCardClick}>
-                      <div className="font-medium">{type.name}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {type.description}
+                    <CardContent className="flex items-center gap-2 p-4">
+                      <Switch
+                        checked={formData.analysisTypes?.includes(type.id)}
+                        onCheckedChange={() => handleToggleAnalysisType(type.id)}
+                      />
+                      <div>
+                        <div className="font-medium">{type.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {type.description}
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </button>
               ))}
             </div>
             {errors.analysisTypes && (
@@ -551,26 +543,14 @@ export const MonitoringForm: React.FC = () => {
               <Button
                 type="button"
                 variant={formData.type === "url" ? "default" : "outline"}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setFormData(prev => ({
-                    ...prev,
-                    type: "url",
-                  }));
-                }}
+                onClick={() => setFormData(prev => ({ ...prev, type: "url" }))}
               >
                 URL
               </Button>
               <Button
                 type="button"
                 variant={formData.type === "api" ? "default" : "outline"}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setFormData(prev => ({
-                    ...prev,
-                    type: "api",
-                  }));
-                }}
+                onClick={() => setFormData(prev => ({ ...prev, type: "api" }))}
               >
                 API
               </Button>
@@ -710,33 +690,34 @@ export const MonitoringForm: React.FC = () => {
               errors.metrics && "border border-red-500 rounded-lg p-2"
             )}>
               {metrics.map((metric) => (
-                <Card 
-                  key={metric.id} 
-                  className={cn(
-                    "cursor-pointer transition-colors",
-                    formData.metrics?.includes(metric.id) 
-                      ? "bg-primary/10 hover:bg-primary/20" 
-                      : "hover:bg-secondary/10"
-                  )}
-                  onClick={(e) => handleToggleMetric(metric.id, e)}
+                <button
+                  key={metric.id}
+                  type="button"
+                  onClick={() => handleToggleMetric(metric.id)}
+                  className="text-left w-full"
                 >
-                  <CardContent 
-                    className="flex items-center gap-2 p-4"
-                    onClick={handleCardClick}
+                  <Card 
+                    className={cn(
+                      "cursor-pointer transition-colors",
+                      formData.metrics?.includes(metric.id) 
+                        ? "bg-primary/10 hover:bg-primary/20" 
+                        : "hover:bg-secondary/10"
+                    )}
                   >
-                    <Switch
-                      checked={formData.metrics?.includes(metric.id)}
-                      onCheckedChange={() => handleToggleMetric(metric.id)}
-                      onClick={handleCardClick}
-                    />
-                    <div onClick={handleCardClick}>
-                      <div className="font-medium">{metric.name}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {metric.description}
+                    <CardContent className="flex items-center gap-2 p-4">
+                      <Switch
+                        checked={formData.metrics?.includes(metric.id)}
+                        onCheckedChange={() => handleToggleMetric(metric.id)}
+                      />
+                      <div>
+                        <div className="font-medium">{metric.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {metric.description}
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </button>
               ))}
             </div>
             {errors.metrics && (
@@ -749,7 +730,7 @@ export const MonitoringForm: React.FC = () => {
           <div className="space-y-2">
             <Label htmlFor="frequency">Frequência de Monitoramento</Label>
             <Select
-              value={formData.frequency}
+              defaultValue={formData.frequency}
               onValueChange={(value) => {
                 setFormData(prev => ({ ...prev, frequency: value }));
               }}
@@ -757,16 +738,14 @@ export const MonitoringForm: React.FC = () => {
               <SelectTrigger 
                 id="frequency" 
                 className="w-[200px]"
-                onClick={handleCardClick}
               >
                 <SelectValue placeholder="Selecione a frequência" />
               </SelectTrigger>
-              <SelectContent onCloseAutoFocus={(e) => e.preventDefault()}>
+              <SelectContent>
                 {frequencies.map((freq) => (
                   <SelectItem 
                     key={freq.value} 
                     value={freq.value}
-                    onSelect={(e) => e.preventDefault()}
                   >
                     {freq.label}
                   </SelectItem>
