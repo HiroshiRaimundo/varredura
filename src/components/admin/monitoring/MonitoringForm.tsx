@@ -32,11 +32,6 @@ interface MonitoringFormData {
   customCategories: string[];
   metrics?: string[];
   analysisTypes?: string[];
-  groupAnalysis?: {
-    enabled: boolean;
-    crossAnalysis: boolean;
-    analysisTypes: string[];
-  };
 }
 
 const metrics = [
@@ -161,33 +156,72 @@ export const MonitoringForm: React.FC = () => {
     name: "",
     type: "url",
     urls: [],
-    frequency: "30min",
+    frequency: "1h",
     active: true,
     responsible: "",
     description: "",
     keywords: [],
     categories: [],
     customCategories: [],
-    analysisTypes: [],
-    groupAnalysis: {
-      enabled: false,
-      crossAnalysis: false,
-      analysisTypes: []
-    }
+    metrics: [],
+    analysisTypes: []
   });
 
   const [newKeyword, setNewKeyword] = useState("");
   const [newCategory, setNewCategory] = useState("");
-  const [monitoringType, setMonitoringType] = useState<"url" | "api">("url");
+  const [urlInput, setUrlInput] = useState("");
 
   const frequencies = [
     { value: "30min", label: "30 minutos" },
     { value: "1h", label: "1 hora" },
+    { value: "3h", label: "3 horas" },
+    { value: "6h", label: "6 horas" },
     { value: "12h", label: "12 horas" },
-    { value: "24h", label: "24 horas" },
-    { value: "weekly", label: "Semanal" },
-    { value: "monthly", label: "Mensal" }
+    { value: "24h", label: "24 horas" }
   ];
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (formData.type === "url" && (!formData.urls || formData.urls.length === 0)) {
+      toast({
+        title: "Erro",
+        description: "Adicione pelo menos uma URL para monitorar",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (formData.type === "api" && !formData.apiEndpoint) {
+      toast({
+        title: "Erro",
+        description: "Informe a URL da API",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // Aqui vai a lógica de salvar
+      console.log("Dados do formulário:", formData);
+      
+      toast({
+        title: "Sucesso",
+        description: formData.urls && formData.urls.length > 1 
+          ? "Grupo de monitoramento criado com sucesso!"
+          : "Monitoramento criado com sucesso!"
+      });
+      
+      navigate("/admin/monitoring");
+    } catch (error) {
+      console.error("Erro ao criar monitoramento:", error);
+      toast({
+        title: "Erro",
+        description: "Erro ao criar monitoramento",
+        variant: "destructive"
+      });
+    }
+  };
 
   const handleAddKeyword = () => {
     if (newKeyword.trim()) {
@@ -223,181 +257,62 @@ export const MonitoringForm: React.FC = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Validação básica
-    if (!formData.name || !formData.responsible) {
-      toast({
-        title: "Erro de Validação",
-        description: "Nome e Responsável são campos obrigatórios",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (formData.type === "url" && (!formData.urls || formData.urls.length === 0)) {
-      toast({
-        title: "Erro de Validação",
-        description: "Pelo menos uma URL é obrigatória para monitoramento de URL",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (formData.type === "api" && (!formData.apiEndpoint || !formData.apiKey)) {
-      toast({
-        title: "Erro de Validação",
-        description: "O endpoint e a chave da API são obrigatórios para monitoramento de API",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Aqui você faria a chamada para a API
-    console.log("Dados do formulário:", formData);
-    
-    toast({
-      title: "Sucesso",
-      description: "Monitoramento criado com sucesso!"
-    });
-
-    navigate("/admin/monitoring");
-  };
-
-  const handleCancel = () => {
-    navigate("/admin/monitoring");
-  };
-
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight">Novo Monitoramento</h2>
-        <p className="text-muted-foreground">
-          Configure uma nova fonte de monitoramento
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Informações Básicas</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nome do Monitoramento</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Nome do monitoramento"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="responsible">Responsável</Label>
-                <Input
-                  id="responsible"
-                  value={formData.responsible}
-                  onChange={(e) => setFormData({ ...formData, responsible: e.target.value })}
-                  placeholder="Nome do responsável"
-                />
-              </div>
+    <form onSubmit={handleSubmit} className="space-y-8">
+      <Card>
+        <CardHeader>
+          <CardTitle>Novo Monitoramento</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <Label>Tipo de Monitoramento</Label>
+            <div className="flex gap-4">
+              <Button
+                type="button"
+                variant={formData.type === "url" ? "default" : "outline"}
+                onClick={() => {
+                  setFormData({
+                    ...formData,
+                    type: "url",
+                    urls: [],
+                    apiEndpoint: ""
+                  });
+                  setUrlInput("");
+                }}
+              >
+                URL
+              </Button>
+              <Button
+                type="button"
+                variant={formData.type === "api" ? "default" : "outline"}
+                onClick={() => {
+                  setFormData({
+                    ...formData,
+                    type: "api",
+                    urls: [],
+                    apiEndpoint: ""
+                  });
+                  setUrlInput("");
+                }}
+              >
+                API
+              </Button>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label>Tipo de Monitoramento</Label>
-              <div className="flex gap-4">
-                <Button
-                  type="button"
-                  variant={monitoringType === "url" ? "default" : "outline"}
-                  onClick={() => {
-                    setMonitoringType("url");
-                    setFormData({
-                      ...formData,
-                      type: "url",
-                      url: "",
-                      urls: [],
-                      apiEndpoint: ""
-                    });
-                  }}
-                >
-                  URL
-                </Button>
-                <Button
-                  type="button"
-                  variant={monitoringType === "api" ? "default" : "outline"}
-                  onClick={() => {
-                    setMonitoringType("api");
-                    setFormData({
-                      ...formData,
-                      type: "api",
-                      url: "",
-                      urls: [],
-                      apiEndpoint: ""
-                    });
-                  }}
-                >
-                  API
-                </Button>
-              </div>
-            </div>
-
-            {formData.type === "url" && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>URLs para Monitoramento</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      value={formData.url || ""}
-                      onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                      placeholder="https://exemplo.com"
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          if (!formData.url?.trim()) {
-                            toast({
-                              title: "Erro",
-                              description: "Digite uma URL válida",
-                              variant: "destructive"
-                            });
-                            return;
-                          }
-                          try {
-                            new URL(formData.url);
-                            const urls = formData.urls || [];
-                            if (urls.includes(formData.url)) {
-                              toast({
-                                title: "Erro",
-                                description: "Esta URL já foi adicionada",
-                                variant: "destructive"
-                              });
-                              return;
-                            }
-                            setFormData({
-                              ...formData,
-                              urls: [...urls, formData.url],
-                              url: ""
-                            });
-                            toast({
-                              title: "Sucesso",
-                              description: "URL adicionada à lista",
-                            });
-                          } catch (e) {
-                            toast({
-                              title: "Erro",
-                              description: "URL inválida",
-                              variant: "destructive"
-                            });
-                          }
-                        }
-                      }}
-                    />
-                    <Button 
-                      type="button"
-                      onClick={() => {
-                        if (!formData.url?.trim()) {
+          {formData.type === "url" && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>URLs para Monitoramento</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={urlInput}
+                    onChange={(e) => setUrlInput(e.target.value)}
+                    placeholder="https://exemplo.com"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (!urlInput?.trim()) {
                           toast({
                             title: "Erro",
                             description: "Digite uma URL válida",
@@ -406,9 +321,8 @@ export const MonitoringForm: React.FC = () => {
                           return;
                         }
                         try {
-                          new URL(formData.url);
-                          const urls = formData.urls || [];
-                          if (urls.includes(formData.url)) {
+                          new URL(urlInput);
+                          if (formData.urls?.includes(urlInput)) {
                             toast({
                               title: "Erro",
                               description: "Esta URL já foi adicionada",
@@ -418,9 +332,9 @@ export const MonitoringForm: React.FC = () => {
                           }
                           setFormData({
                             ...formData,
-                            urls: [...urls, formData.url],
-                            url: ""
+                            urls: [...(formData.urls || []), urlInput]
                           });
+                          setUrlInput("");
                           toast({
                             title: "Sucesso",
                             description: "URL adicionada à lista",
@@ -432,84 +346,128 @@ export const MonitoringForm: React.FC = () => {
                             variant: "destructive"
                           });
                         }
-                      }}
-                    >
-                      Adicionar
-                    </Button>
+                      }
+                    }}
+                  />
+                  <Button 
+                    type="button"
+                    onClick={() => {
+                      if (!urlInput?.trim()) {
+                        toast({
+                          title: "Erro",
+                          description: "Digite uma URL válida",
+                          variant: "destructive"
+                        });
+                        return;
+                      }
+                      try {
+                        new URL(urlInput);
+                        if (formData.urls?.includes(urlInput)) {
+                          toast({
+                            title: "Erro",
+                            description: "Esta URL já foi adicionada",
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+                        setFormData({
+                          ...formData,
+                          urls: [...(formData.urls || []), urlInput]
+                        });
+                        setUrlInput("");
+                        toast({
+                          title: "Sucesso",
+                          description: "URL adicionada à lista",
+                        });
+                      } catch (e) {
+                        toast({
+                          title: "Erro",
+                          description: "URL inválida",
+                          variant: "destructive"
+                        });
+                      }
+                    }}
+                  >
+                    Adicionar
+                  </Button>
+                </div>
+              </div>
+              {formData.urls && formData.urls.length > 0 && (
+                <div className="space-y-2 border rounded-lg p-4">
+                  <Label className="text-sm text-muted-foreground">
+                    {formData.urls.length === 1 ? "URL Adicionada:" : "URLs Adicionadas:"}
+                  </Label>
+                  <div className="space-y-2">
+                    {formData.urls.map((url, index) => (
+                      <div key={index} className="flex items-center gap-2 bg-secondary/20 p-2 rounded-md hover:bg-secondary/30">
+                        <span className="flex-1 text-sm truncate">{url}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            const urls = [...(formData.urls || [])];
+                            urls.splice(index, 1);
+                            setFormData({
+                              ...formData,
+                              urls
+                            });
+                            toast({
+                              title: "URL removida",
+                              description: "URL removida da lista",
+                            });
+                          }}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                {formData.urls && formData.urls.length > 0 && (
-                  <div className="space-y-2 border rounded-lg p-4">
-                    <Label className="text-sm text-muted-foreground">URLs Adicionadas:</Label>
-                    <div className="space-y-2">
-                      {formData.urls.map((url, index) => (
-                        <div key={index} className="flex items-center gap-2 bg-secondary/20 p-2 rounded-md hover:bg-secondary/30">
-                          <span className="flex-1 text-sm truncate">{url}</span>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              const urls = [...(formData.urls || [])];
-                              urls.splice(index, 1);
-                              setFormData({
-                                ...formData,
-                                urls
-                              });
-                              toast({
-                                title: "URL removida",
-                                description: "URL removida da lista",
-                              });
-                            }}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {formData.type === "api" && (
-              <div className="space-y-2">
-                <Label>URL da API</Label>
-                <Input
-                  value={formData.apiEndpoint || ""}
-                  onChange={(e) => setFormData({ ...formData, apiEndpoint: e.target.value })}
-                  placeholder="https://api.exemplo.com/endpoint"
-                />
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <Label htmlFor="frequency">Frequência de Monitoramento</Label>
-              <Select
-                value={formData.frequency}
-                onValueChange={(value) => setFormData({ ...formData, frequency: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione a frequência" />
-                </SelectTrigger>
-                <SelectContent>
-                  {frequencies.map((freq) => (
-                    <SelectItem key={freq.value} value={freq.value}>
-                      {freq.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              )}
             </div>
+          )}
 
-            <div className="space-y-2">
-              <Label>Métricas de Monitoramento</Label>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {metrics.map((metric) => (
-                  <Card key={metric.id} className="cursor-pointer">
-                    <CardContent
-                      className="flex items-center gap-2 p-4"
-                      onClick={() => {
+          <div className="space-y-2">
+            <Label htmlFor="frequency">Frequência de Monitoramento</Label>
+            <Select
+              value={formData.frequency}
+              onValueChange={(value) => setFormData({ ...formData, frequency: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione a frequência" />
+              </SelectTrigger>
+              <SelectContent>
+                {frequencies.map((freq) => (
+                  <SelectItem key={freq.value} value={freq.value}>
+                    {freq.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Métricas de Monitoramento</Label>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {metrics.map((metric) => (
+                <Card key={metric.id} className="cursor-pointer">
+                  <CardContent
+                    className="flex items-center gap-2 p-4"
+                    onClick={() => {
+                      const currentMetrics = formData.metrics || [];
+                      const newMetrics = currentMetrics.includes(metric.id)
+                        ? currentMetrics.filter(id => id !== metric.id)
+                        : [...currentMetrics, metric.id];
+                      setFormData({
+                        ...formData,
+                        metrics: newMetrics
+                      });
+                    }}
+                  >
+                    <Switch
+                      checked={formData.metrics?.includes(metric.id)}
+                      onCheckedChange={() => {
                         const currentMetrics = formData.metrics || [];
                         const newMetrics = currentMetrics.includes(metric.id)
                           ? currentMetrics.filter(id => id !== metric.id)
@@ -519,119 +477,139 @@ export const MonitoringForm: React.FC = () => {
                           metrics: newMetrics
                         });
                       }}
-                    >
-                      <Switch
-                        checked={formData.metrics?.includes(metric.id)}
-                        onCheckedChange={() => {
-                          const currentMetrics = formData.metrics || [];
-                          const newMetrics = currentMetrics.includes(metric.id)
-                            ? currentMetrics.filter(id => id !== metric.id)
-                            : [...currentMetrics, metric.id];
-                          setFormData({
-                            ...formData,
-                            metrics: newMetrics
-                          });
-                        }}
-                      />
-                      <div>
-                        <div className="font-medium">{metric.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {metric.description}
-                        </div>
+                    />
+                    <div>
+                      <div className="font-medium">{metric.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {metric.description}
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
+          </div>
 
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="active"
-                checked={formData.active}
-                onCheckedChange={(checked) => setFormData({ ...formData, active: checked })}
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="active"
+              checked={formData.active}
+              onCheckedChange={(checked) => setFormData({ ...formData, active: checked })}
+            />
+            <Label htmlFor="active">Ativar monitoramento imediatamente</Label>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Detalhes do Monitoramento</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Nome do Monitoramento</Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="Nome do monitoramento"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="responsible">Responsável</Label>
+            <Input
+              id="responsible"
+              value={formData.responsible}
+              onChange={(e) => setFormData({ ...formData, responsible: e.target.value })}
+              placeholder="Nome do responsável"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Descrição</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Descreva o propósito deste monitoramento"
+              rows={4}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Palavras-chave</Label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {formData.keywords.map((keyword) => (
+                <Badge key={keyword} variant="secondary" className="flex items-center gap-1">
+                  {keyword}
+                  <X
+                    className="h-3 w-3 cursor-pointer"
+                    onClick={() => handleRemoveKeyword(keyword)}
+                  />
+                </Badge>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                value={newKeyword}
+                onChange={(e) => setNewKeyword(e.target.value)}
+                placeholder="Adicionar palavra-chave"
+                onKeyPress={(e) => e.key === "Enter" && handleAddKeyword()}
               />
-              <Label htmlFor="active">Ativar monitoramento imediatamente</Label>
+              <Button type="button" variant="outline" size="icon" onClick={handleAddKeyword}>
+                <Plus className="h-4 w-4" />
+              </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Detalhes do Monitoramento</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="description">Descrição</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Descreva o propósito deste monitoramento"
-                rows={4}
+          <div className="space-y-2">
+            <Label>Categorias Personalizadas</Label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {formData.customCategories.map((category) => (
+                <Badge key={category} variant="secondary" className="flex items-center gap-1">
+                  {category}
+                  <X
+                    className="h-3 w-3 cursor-pointer"
+                    onClick={() => handleRemoveCategory(category)}
+                  />
+                </Badge>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+                placeholder="Adicionar categoria"
+                onKeyPress={(e) => e.key === "Enter" && handleAddCategory()}
               />
+              <Button type="button" variant="outline" size="icon" onClick={handleAddCategory}>
+                <Plus className="h-4 w-4" />
+              </Button>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label>Palavras-chave</Label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {formData.keywords.map((keyword) => (
-                  <Badge key={keyword} variant="secondary" className="flex items-center gap-1">
-                    {keyword}
-                    <X
-                      className="h-3 w-3 cursor-pointer"
-                      onClick={() => handleRemoveKeyword(keyword)}
-                    />
-                  </Badge>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <Input
-                  value={newKeyword}
-                  onChange={(e) => setNewKeyword(e.target.value)}
-                  placeholder="Adicionar palavra-chave"
-                  onKeyPress={(e) => e.key === "Enter" && handleAddKeyword()}
-                />
-                <Button type="button" variant="outline" size="icon" onClick={handleAddKeyword}>
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Categorias Personalizadas</Label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {formData.customCategories.map((category) => (
-                  <Badge key={category} variant="secondary" className="flex items-center gap-1">
-                    {category}
-                    <X
-                      className="h-3 w-3 cursor-pointer"
-                      onClick={() => handleRemoveCategory(category)}
-                    />
-                  </Badge>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <Input
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                  placeholder="Adicionar categoria"
-                  onKeyPress={(e) => e.key === "Enter" && handleAddCategory()}
-                />
-                <Button type="button" variant="outline" size="icon" onClick={handleAddCategory}>
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Tipos de Análise</Label>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {analysisTypes.map((type) => (
-                  <Card key={type.id} className="cursor-pointer">
-                    <CardContent
-                      className="flex items-center gap-2 p-4"
-                      onClick={() => {
+          <div className="space-y-2">
+            <Label>Tipos de Análise</Label>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {analysisTypes.map((type) => (
+                <Card key={type.id} className="cursor-pointer">
+                  <CardContent
+                    className="flex items-center gap-2 p-4"
+                    onClick={() => {
+                      const currentTypes = formData.analysisTypes || [];
+                      const newTypes = currentTypes.includes(type.id)
+                        ? currentTypes.filter(id => id !== type.id)
+                        : [...currentTypes, type.id];
+                      setFormData({
+                        ...formData,
+                        analysisTypes: newTypes
+                      });
+                    }}
+                  >
+                    <Switch
+                      checked={formData.analysisTypes?.includes(type.id)}
+                      onCheckedChange={() => {
                         const currentTypes = formData.analysisTypes || [];
                         const newTypes = currentTypes.includes(type.id)
                           ? currentTypes.filter(id => id !== type.id)
@@ -641,114 +619,27 @@ export const MonitoringForm: React.FC = () => {
                           analysisTypes: newTypes
                         });
                       }}
-                    >
-                      <Switch
-                        checked={formData.analysisTypes?.includes(type.id)}
-                        onCheckedChange={() => {
-                          const currentTypes = formData.analysisTypes || [];
-                          const newTypes = currentTypes.includes(type.id)
-                            ? currentTypes.filter(id => id !== type.id)
-                            : [...currentTypes, type.id];
-                          setFormData({
-                            ...formData,
-                            analysisTypes: newTypes
-                          });
-                        }}
-                      />
-                      <div>
-                        <div className="font-medium">{type.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {type.description}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Análise em Grupo</Label>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="groupAnalysis"
-                    checked={formData.groupAnalysis?.enabled}
-                    onCheckedChange={(checked) => {
-                      setFormData({
-                        ...formData,
-                        groupAnalysis: {
-                          enabled: checked,
-                          crossAnalysis: formData.groupAnalysis?.crossAnalysis || false,
-                          analysisTypes: formData.groupAnalysis?.analysisTypes || []
-                        }
-                      });
-                    }}
-                  />
-                  <Label htmlFor="groupAnalysis">Habilitar Análise em Grupo</Label>
-                </div>
-
-                {formData.groupAnalysis?.enabled && (
-                  <>
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="crossAnalysis"
-                        checked={formData.groupAnalysis.crossAnalysis}
-                        onCheckedChange={(checked) => {
-                          setFormData({
-                            ...formData,
-                            groupAnalysis: {
-                              ...formData.groupAnalysis,
-                              crossAnalysis: checked
-                            }
-                          });
-                        }}
-                      />
-                      <Label htmlFor="crossAnalysis">Permitir Análises Cruzadas</Label>
-                    </div>
-
-                    <div className="pl-6 space-y-2">
-                      <Label>Tipos de Análise em Grupo</Label>
-                      <div className="grid grid-cols-2 gap-4">
-                        {(formData.analysisTypes || []).map(type => (
-                          <div key={type} className="flex items-center space-x-2">
-                            <Switch
-                              id={`groupAnalysis${type}`}
-                              checked={formData.groupAnalysis?.analysisTypes.includes(type)}
-                              onCheckedChange={(checked) => {
-                                const types = formData.groupAnalysis?.analysisTypes || [];
-                                setFormData({
-                                  ...formData,
-                                  groupAnalysis: {
-                                    ...formData.groupAnalysis!,
-                                    analysisTypes: checked 
-                                      ? [...types, type]
-                                      : types.filter(t => t !== type)
-                                  }
-                                });
-                              }}
-                            />
-                            <Label htmlFor={`groupAnalysis${type}`}>
-                              {type.charAt(0).toUpperCase() + type.slice(1)}
-                            </Label>
-                          </div>
-                        ))}
+                    />
+                    <div>
+                      <div className="font-medium">{type.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {type.description}
                       </div>
                     </div>
-                  </>
-                )}
-              </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
+          </div>
 
-            <div className="flex justify-end space-x-4">
-              <Button type="button" variant="outline" onClick={handleCancel}>
-                Cancelar
-              </Button>
-              <Button type="submit">Criar Monitoramento</Button>
-            </div>
-          </CardContent>
-        </Card>
-      </form>
-    </div>
+          <div className="flex justify-end space-x-4">
+            <Button type="button" variant="outline" onClick={() => navigate("/admin/monitoring")}>
+              Cancelar
+            </Button>
+            <Button type="submit">Criar Monitoramento</Button>
+          </div>
+        </CardContent>
+      </Card>
+    </form>
   );
 };
