@@ -153,7 +153,8 @@ const analysisTypes = [
 
 export const MonitoringForm: React.FC = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<MonitoringFormData>({
+
+  const initialFormState: MonitoringFormData = {
     name: "",
     type: "url",
     urls: [],
@@ -165,9 +166,11 @@ export const MonitoringForm: React.FC = () => {
     categories: [],
     customCategories: [],
     metrics: [],
-    analysisTypes: []
-  });
+    analysisTypes: [],
+    apiEndpoint: ""
+  };
 
+  const [formData, setFormData] = useState<MonitoringFormData>(initialFormState);
   const [urlInput, setUrlInput] = useState("");
   const [newKeyword, setNewKeyword] = useState("");
   const [newCategory, setNewCategory] = useState("");
@@ -279,14 +282,24 @@ export const MonitoringForm: React.FC = () => {
       // Aqui irá a chamada para a API
       console.log("Dados do formulário:", formData);
       
+      // Mostra toast de sucesso
       toast({
-        title: "Sucesso",
+        title: "Monitoramento Criado",
         description: formData.urls && formData.urls.length > 1 
           ? "Grupo de monitoramento criado com sucesso!"
-          : "Monitoramento criado com sucesso!"
+          : "Monitoramento criado com sucesso!",
+        variant: "default"
       });
+
+      // Limpa o formulário
+      setFormData(initialFormState);
+      setUrlInput("");
+      setNewKeyword("");
+      setNewCategory("");
       
-      navigate("/admin/monitoring");
+      // Redireciona para a visão geral
+      navigate("/admin/monitoring", { replace: true });
+      
     } catch (error) {
       console.error("Erro ao criar monitoramento:", error);
       toast({
