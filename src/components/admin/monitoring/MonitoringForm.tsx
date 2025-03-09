@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import cn from "classnames";
 
 interface Category {
   id: string;
@@ -468,10 +469,17 @@ export const MonitoringForm: React.FC = () => {
               {analysisTypes.map((type) => (
                 <Card 
                   key={type.id} 
-                  className="cursor-pointer hover:bg-secondary/10 transition-colors"
-                  onClick={() => handleToggleAnalysisType(type.id)}
+                  className={cn(
+                    "cursor-pointer transition-colors",
+                    formData.analysisTypes?.includes(type.id) 
+                      ? "bg-primary/10 hover:bg-primary/20" 
+                      : "hover:bg-secondary/10"
+                  )}
                 >
-                  <CardContent className="flex items-center gap-2 p-4">
+                  <CardContent 
+                    className="flex items-center gap-2 p-4"
+                    onClick={() => handleToggleAnalysisType(type.id)}
+                  >
                     <Switch
                       checked={formData.analysisTypes?.includes(type.id)}
                       onCheckedChange={() => handleToggleAnalysisType(type.id)}
@@ -554,14 +562,17 @@ export const MonitoringForm: React.FC = () => {
               </div>
               
               {formData.urls && formData.urls.length > 0 && (
-                <div className="border rounded-lg p-4">
+                <div className="border rounded-lg p-4 bg-card">
                   <Label className="text-sm text-muted-foreground mb-2 block">
                     {formData.urls.length === 1 ? "URL Adicionada:" : "URLs Adicionadas:"}
                   </Label>
                   <div className="space-y-2">
                     {formData.urls.map((url, index) => (
-                      <div key={index} className="flex items-center gap-2 bg-secondary/20 p-2 rounded-md">
-                        <span className="flex-1 text-sm">{url}</span>
+                      <div 
+                        key={index} 
+                        className="flex items-center gap-2 bg-secondary/20 p-2 rounded-md"
+                      >
+                        <span className="flex-1 text-sm font-medium break-all">{url}</span>
                         <Button
                           type="button"
                           variant="ghost"
@@ -579,18 +590,100 @@ export const MonitoringForm: React.FC = () => {
           )}
 
           {formData.type === "api" && (
-            <div className="space-y-2">
-              <Label>URL da API</Label>
-              <Input
-                value={formData.apiEndpoint || ""}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  apiEndpoint: e.target.value
-                }))}
-                placeholder="https://api.exemplo.com/endpoint"
-              />
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>URL da API</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={formData.apiEndpoint || ""}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      apiEndpoint: e.target.value
+                    }))}
+                    placeholder="https://api.exemplo.com/endpoint"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter' && formData.apiEndpoint?.trim()) {
+                        e.preventDefault();
+                        toast({
+                          title: "API Configurada",
+                          description: "Endpoint da API foi configurado com sucesso!"
+                        });
+                      }
+                    }}
+                  />
+                  <Button 
+                    type="button"
+                    onClick={() => {
+                      if (formData.apiEndpoint?.trim()) {
+                        toast({
+                          title: "API Configurada",
+                          description: "Endpoint da API foi configurado com sucesso!"
+                        });
+                      }
+                    }}
+                  >
+                    Configurar
+                  </Button>
+                </div>
+              </div>
+
+              {formData.apiEndpoint && (
+                <div className="border rounded-lg p-4 bg-card">
+                  <Label className="text-sm text-muted-foreground mb-2 block">
+                    API Configurada:
+                  </Label>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 bg-secondary/20 p-2 rounded-md">
+                      <span className="flex-1 text-sm font-medium break-all">
+                        {formData.apiEndpoint}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setFormData(prev => ({ ...prev, apiEndpoint: "" }))}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
+
+          <div className="space-y-2">
+            <Label>Métricas de Monitoramento</Label>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {metrics.map((metric) => (
+                <Card 
+                  key={metric.id} 
+                  className={cn(
+                    "cursor-pointer transition-colors",
+                    formData.metrics?.includes(metric.id) 
+                      ? "bg-primary/10 hover:bg-primary/20" 
+                      : "hover:bg-secondary/10"
+                  )}
+                >
+                  <CardContent 
+                    className="flex items-center gap-2 p-4"
+                    onClick={() => handleToggleMetric(metric.id)}
+                  >
+                    <Switch
+                      checked={formData.metrics?.includes(metric.id)}
+                      onCheckedChange={() => handleToggleMetric(metric.id)}
+                    />
+                    <div>
+                      <div className="font-medium">{metric.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {metric.description}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
 
           <div className="space-y-2">
             <Label htmlFor="frequency">Frequência de Monitoramento</Label>
@@ -609,32 +702,6 @@ export const MonitoringForm: React.FC = () => {
                 ))}
               </SelectContent>
             </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Métricas de Monitoramento</Label>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {metrics.map((metric) => (
-                <Card 
-                  key={metric.id} 
-                  className="cursor-pointer hover:bg-secondary/10 transition-colors"
-                  onClick={() => handleToggleMetric(metric.id)}
-                >
-                  <CardContent className="flex items-center gap-2 p-4">
-                    <Switch
-                      checked={formData.metrics?.includes(metric.id)}
-                      onCheckedChange={() => handleToggleMetric(metric.id)}
-                    />
-                    <div>
-                      <div className="font-medium">{metric.name}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {metric.description}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
           </div>
 
           <div className="flex items-center space-x-2">
