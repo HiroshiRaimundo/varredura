@@ -226,6 +226,25 @@ export const MonitoringForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validações básicas
+    if (!formData.name?.trim()) {
+      toast({
+        title: "Erro",
+        description: "Nome do monitoramento é obrigatório",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!formData.responsible?.trim()) {
+      toast({
+        title: "Erro",
+        description: "Responsável é obrigatório",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (formData.type === "url" && (!formData.urls || formData.urls.length === 0)) {
       toast({
         title: "Erro",
@@ -235,7 +254,7 @@ export const MonitoringForm: React.FC = () => {
       return;
     }
 
-    if (formData.type === "api" && !formData.apiEndpoint) {
+    if (formData.type === "api" && !formData.apiEndpoint?.trim()) {
       toast({
         title: "Erro",
         description: "Informe a URL da API",
@@ -244,8 +263,26 @@ export const MonitoringForm: React.FC = () => {
       return;
     }
 
+    if (!formData.analysisTypes || formData.analysisTypes.length === 0) {
+      toast({
+        title: "Erro",
+        description: "Selecione pelo menos um tipo de análise",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!formData.metrics || formData.metrics.length === 0) {
+      toast({
+        title: "Erro",
+        description: "Selecione pelo menos uma métrica",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
-      // Aqui vai a lógica de salvar
+      // Aqui irá a chamada para a API
       console.log("Dados do formulário:", formData);
       
       toast({
@@ -260,7 +297,7 @@ export const MonitoringForm: React.FC = () => {
       console.error("Erro ao criar monitoramento:", error);
       toast({
         title: "Erro",
-        description: "Erro ao criar monitoramento",
+        description: "Erro ao criar monitoramento. Tente novamente.",
         variant: "destructive"
       });
     }
@@ -297,6 +334,32 @@ export const MonitoringForm: React.FC = () => {
     setFormData({
       ...formData,
       customCategories: formData.customCategories.filter(c => c !== category)
+    });
+  };
+
+  const handleToggleAnalysisType = (typeId: string) => {
+    setFormData(prev => {
+      const currentTypes = prev.analysisTypes || [];
+      const newTypes = currentTypes.includes(typeId)
+        ? currentTypes.filter(id => id !== typeId)
+        : [...currentTypes, typeId];
+      return {
+        ...prev,
+        analysisTypes: newTypes
+      };
+    });
+  };
+
+  const handleToggleMetric = (metricId: string) => {
+    setFormData(prev => {
+      const currentMetrics = prev.metrics || [];
+      const newMetrics = currentMetrics.includes(metricId)
+        ? currentMetrics.filter(id => id !== metricId)
+        : [...currentMetrics, metricId];
+      return {
+        ...prev,
+        metrics: newMetrics
+      };
     });
   };
 
@@ -403,32 +466,15 @@ export const MonitoringForm: React.FC = () => {
             <Label>Tipos de Análise</Label>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {analysisTypes.map((type) => (
-                <Card key={type.id} className="cursor-pointer">
-                  <CardContent
-                    className="flex items-center gap-2 p-4"
-                    onClick={() => {
-                      const currentTypes = formData.analysisTypes || [];
-                      const newTypes = currentTypes.includes(type.id)
-                        ? currentTypes.filter(id => id !== type.id)
-                        : [...currentTypes, type.id];
-                      setFormData({
-                        ...formData,
-                        analysisTypes: newTypes
-                      });
-                    }}
-                  >
+                <Card 
+                  key={type.id} 
+                  className="cursor-pointer hover:bg-secondary/10 transition-colors"
+                  onClick={() => handleToggleAnalysisType(type.id)}
+                >
+                  <CardContent className="flex items-center gap-2 p-4">
                     <Switch
                       checked={formData.analysisTypes?.includes(type.id)}
-                      onCheckedChange={() => {
-                        const currentTypes = formData.analysisTypes || [];
-                        const newTypes = currentTypes.includes(type.id)
-                          ? currentTypes.filter(id => id !== type.id)
-                          : [...currentTypes, type.id];
-                        setFormData({
-                          ...formData,
-                          analysisTypes: newTypes
-                        });
-                      }}
+                      onCheckedChange={() => handleToggleAnalysisType(type.id)}
                     />
                     <div>
                       <div className="font-medium">{type.name}</div>
@@ -569,32 +615,15 @@ export const MonitoringForm: React.FC = () => {
             <Label>Métricas de Monitoramento</Label>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {metrics.map((metric) => (
-                <Card key={metric.id} className="cursor-pointer">
-                  <CardContent
-                    className="flex items-center gap-2 p-4"
-                    onClick={() => {
-                      const currentMetrics = formData.metrics || [];
-                      const newMetrics = currentMetrics.includes(metric.id)
-                        ? currentMetrics.filter(id => id !== metric.id)
-                        : [...currentMetrics, metric.id];
-                      setFormData({
-                        ...formData,
-                        metrics: newMetrics
-                      });
-                    }}
-                  >
+                <Card 
+                  key={metric.id} 
+                  className="cursor-pointer hover:bg-secondary/10 transition-colors"
+                  onClick={() => handleToggleMetric(metric.id)}
+                >
+                  <CardContent className="flex items-center gap-2 p-4">
                     <Switch
                       checked={formData.metrics?.includes(metric.id)}
-                      onCheckedChange={() => {
-                        const currentMetrics = formData.metrics || [];
-                        const newMetrics = currentMetrics.includes(metric.id)
-                          ? currentMetrics.filter(id => id !== metric.id)
-                          : [...currentMetrics, metric.id];
-                        setFormData({
-                          ...formData,
-                          metrics: newMetrics
-                        });
-                      }}
+                      onCheckedChange={() => handleToggleMetric(metric.id)}
                     />
                     <div>
                       <div className="font-medium">{metric.name}</div>
