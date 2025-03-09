@@ -38,6 +38,84 @@ interface MonitoringFormData {
   analysisTypes?: string[];
 }
 
+const metrics = [
+  {
+    id: "response_time",
+    name: "Tempo de Resposta",
+    description: "Monitora o tempo de resposta das requisições"
+  },
+  {
+    id: "status_code",
+    name: "Código de Status",
+    description: "Verifica os códigos de status HTTP retornados"
+  },
+  {
+    id: "content_length",
+    name: "Tamanho do Conteúdo",
+    description: "Monitora alterações no tamanho do conteúdo"
+  },
+  {
+    id: "content_changes",
+    name: "Mudanças de Conteúdo",
+    description: "Detecta alterações no conteúdo da página"
+  },
+  {
+    id: "keyword_presence",
+    name: "Presença de Palavras-chave",
+    description: "Monitora a presença de palavras-chave específicas"
+  },
+  {
+    id: "html_structure",
+    name: "Estrutura HTML",
+    description: "Detecta mudanças na estrutura HTML"
+  },
+  {
+    id: "meta_tags",
+    name: "Meta Tags",
+    description: "Monitora alterações em meta tags importantes"
+  },
+  {
+    id: "links",
+    name: "Links",
+    description: "Verifica links quebrados e alterações em URLs"
+  },
+  {
+    id: "images",
+    name: "Imagens",
+    description: "Monitora alterações em imagens e seus atributos"
+  },
+  {
+    id: "javascript",
+    name: "JavaScript",
+    description: "Detecta mudanças em scripts e comportamentos"
+  },
+  {
+    id: "css",
+    name: "CSS",
+    description: "Monitora alterações no estilo da página"
+  },
+  {
+    id: "headers",
+    name: "Headers HTTP",
+    description: "Monitora headers de resposta importantes"
+  },
+  {
+    id: "ssl_cert",
+    name: "Certificado SSL",
+    description: "Verifica validade e alterações no certificado SSL"
+  },
+  {
+    id: "redirect_chain",
+    name: "Cadeia de Redirecionamento",
+    description: "Monitora redirecionamentos e suas alterações"
+  },
+  {
+    id: "load_time",
+    name: "Tempo de Carregamento",
+    description: "Monitora o tempo total de carregamento"
+  }
+];
+
 export const MonitoringForm: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<MonitoringFormData>({
@@ -61,6 +139,7 @@ export const MonitoringForm: React.FC = () => {
 
   const [newKeyword, setNewKeyword] = useState("");
   const [newCategory, setNewCategory] = useState("");
+  const [newUrl, setNewUrl] = useState("");
 
   const frequencies = [
     { value: "30min", label: "30 minutos" },
@@ -214,13 +293,56 @@ export const MonitoringForm: React.FC = () => {
 
             {formData.type === "url" && (
               <div className="space-y-2">
-                <Label htmlFor="url">URL</Label>
-                <Input
-                  id="url"
-                  value={formData.url}
-                  onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                  placeholder="https://exemplo.com"
-                />
+                <Label>URLs para Monitoramento</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={newUrl}
+                    onChange={(e) => setNewUrl(e.target.value)}
+                    placeholder="https://exemplo.com"
+                  />
+                  <Button 
+                    type="button" 
+                    onClick={() => {
+                      if (!newUrl.trim()) {
+                        toast.error("Digite uma URL válida");
+                        return;
+                      }
+                      try {
+                        new URL(newUrl);
+                        const updatedUrls = [...(formData.url ? [formData.url] : []), newUrl];
+                        setFormData({
+                          ...formData,
+                          url: undefined,
+                          urls: updatedUrls
+                        });
+                        setNewUrl("");
+                      } catch (e) {
+                        toast.error("URL inválida");
+                      }
+                    }}
+                  >
+                    Adicionar
+                  </Button>
+                </div>
+                {formData.urls && formData.urls.map((url, index) => (
+                  <div key={index} className="flex items-center gap-2 bg-secondary/20 p-2 rounded-md">
+                    <span className="flex-1 text-sm truncate">{url}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        const updatedUrls = formData.urls.filter((_, i) => i !== index);
+                        setFormData({
+                          ...formData,
+                          urls: updatedUrls
+                        });
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
               </div>
             )}
 
@@ -268,76 +390,45 @@ export const MonitoringForm: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <Label>Métricas para Monitoramento</Label>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="metricContentAnalysis"
-                      checked={formData.metrics?.includes("contentAnalysis")}
-                      onCheckedChange={(checked) => {
-                        const metrics = formData.metrics || [];
+              <Label>Métricas de Monitoramento</Label>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {metrics.map((metric) => (
+                  <Card key={metric.id} className="cursor-pointer">
+                    <CardContent
+                      className="flex items-center gap-2 p-4"
+                      onClick={() => {
+                        const currentMetrics = formData.metrics || [];
+                        const newMetrics = currentMetrics.includes(metric.id)
+                          ? currentMetrics.filter(id => id !== metric.id)
+                          : [...currentMetrics, metric.id];
                         setFormData({
                           ...formData,
-                          metrics: checked 
-                            ? [...metrics, "contentAnalysis"]
-                            : metrics.filter(m => m !== "contentAnalysis")
+                          metrics: newMetrics
                         });
                       }}
-                    />
-                    <Label htmlFor="metricContentAnalysis">Análise de Conteúdo</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="metricPredictive"
-                      checked={formData.metrics?.includes("predictive")}
-                      onCheckedChange={(checked) => {
-                        const metrics = formData.metrics || [];
-                        setFormData({
-                          ...formData,
-                          metrics: checked 
-                            ? [...metrics, "predictive"]
-                            : metrics.filter(m => m !== "predictive")
-                        });
-                      }}
-                    />
-                    <Label htmlFor="metricPredictive">Análise Preditiva</Label>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="metricSentiment"
-                      checked={formData.metrics?.includes("sentiment")}
-                      onCheckedChange={(checked) => {
-                        const metrics = formData.metrics || [];
-                        setFormData({
-                          ...formData,
-                          metrics: checked 
-                            ? [...metrics, "sentiment"]
-                            : metrics.filter(m => m !== "sentiment")
-                        });
-                      }}
-                    />
-                    <Label htmlFor="metricSentiment">Análise de Sentimento</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="metricTrends"
-                      checked={formData.metrics?.includes("trends")}
-                      onCheckedChange={(checked) => {
-                        const metrics = formData.metrics || [];
-                        setFormData({
-                          ...formData,
-                          metrics: checked 
-                            ? [...metrics, "trends"]
-                            : metrics.filter(m => m !== "trends")
-                        });
-                      }}
-                    />
-                    <Label htmlFor="metricTrends">Análise de Tendências</Label>
-                  </div>
-                </div>
+                    >
+                      <Switch
+                        checked={formData.metrics?.includes(metric.id)}
+                        onCheckedChange={() => {
+                          const currentMetrics = formData.metrics || [];
+                          const newMetrics = currentMetrics.includes(metric.id)
+                            ? currentMetrics.filter(id => id !== metric.id)
+                            : [...currentMetrics, metric.id];
+                          setFormData({
+                            ...formData,
+                            metrics: newMetrics
+                          });
+                        }}
+                      />
+                      <div>
+                        <div className="font-medium">{metric.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {metric.description}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             </div>
 
