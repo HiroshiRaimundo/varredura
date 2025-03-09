@@ -261,7 +261,140 @@ export const MonitoringForm: React.FC = () => {
     <form onSubmit={handleSubmit} className="space-y-8">
       <Card>
         <CardHeader>
-          <CardTitle>Novo Monitoramento</CardTitle>
+          <CardTitle>Detalhes do Monitoramento</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Nome do Monitoramento</Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="Nome do monitoramento"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="responsible">Responsável</Label>
+            <Input
+              id="responsible"
+              value={formData.responsible}
+              onChange={(e) => setFormData({ ...formData, responsible: e.target.value })}
+              placeholder="Nome do responsável"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Descrição</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Descreva o propósito deste monitoramento"
+              rows={4}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Palavras-chave</Label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {formData.keywords.map((keyword) => (
+                <Badge key={keyword} variant="secondary" className="flex items-center gap-1">
+                  {keyword}
+                  <X
+                    className="h-3 w-3 cursor-pointer"
+                    onClick={() => handleRemoveKeyword(keyword)}
+                  />
+                </Badge>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                value={newKeyword}
+                onChange={(e) => setNewKeyword(e.target.value)}
+                placeholder="Adicionar palavra-chave"
+                onKeyPress={(e) => e.key === "Enter" && handleAddKeyword()}
+              />
+              <Button type="button" variant="outline" size="icon" onClick={handleAddKeyword}>
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Categorias Personalizadas</Label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {formData.customCategories.map((category) => (
+                <Badge key={category} variant="secondary" className="flex items-center gap-1">
+                  {category}
+                  <X
+                    className="h-3 w-3 cursor-pointer"
+                    onClick={() => handleRemoveCategory(category)}
+                  />
+                </Badge>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+                placeholder="Adicionar categoria"
+                onKeyPress={(e) => e.key === "Enter" && handleAddCategory()}
+              />
+              <Button type="button" variant="outline" size="icon" onClick={handleAddCategory}>
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Tipos de Análise</Label>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {analysisTypes.map((type) => (
+                <Card key={type.id} className="cursor-pointer">
+                  <CardContent
+                    className="flex items-center gap-2 p-4"
+                    onClick={() => {
+                      const currentTypes = formData.analysisTypes || [];
+                      const newTypes = currentTypes.includes(type.id)
+                        ? currentTypes.filter(id => id !== type.id)
+                        : [...currentTypes, type.id];
+                      setFormData({
+                        ...formData,
+                        analysisTypes: newTypes
+                      });
+                    }}
+                  >
+                    <Switch
+                      checked={formData.analysisTypes?.includes(type.id)}
+                      onCheckedChange={() => {
+                        const currentTypes = formData.analysisTypes || [];
+                        const newTypes = currentTypes.includes(type.id)
+                          ? currentTypes.filter(id => id !== type.id)
+                          : [...currentTypes, type.id];
+                        setFormData({
+                          ...formData,
+                          analysisTypes: newTypes
+                        });
+                      }}
+                    />
+                    <div>
+                      <div className="font-medium">{type.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {type.description}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Configuração do Monitoramento</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
@@ -501,145 +634,12 @@ export const MonitoringForm: React.FC = () => {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Detalhes do Monitoramento</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Nome do Monitoramento</Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Nome do monitoramento"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="responsible">Responsável</Label>
-            <Input
-              id="responsible"
-              value={formData.responsible}
-              onChange={(e) => setFormData({ ...formData, responsible: e.target.value })}
-              placeholder="Nome do responsável"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Descrição</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Descreva o propósito deste monitoramento"
-              rows={4}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Palavras-chave</Label>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {formData.keywords.map((keyword) => (
-                <Badge key={keyword} variant="secondary" className="flex items-center gap-1">
-                  {keyword}
-                  <X
-                    className="h-3 w-3 cursor-pointer"
-                    onClick={() => handleRemoveKeyword(keyword)}
-                  />
-                </Badge>
-              ))}
-            </div>
-            <div className="flex gap-2">
-              <Input
-                value={newKeyword}
-                onChange={(e) => setNewKeyword(e.target.value)}
-                placeholder="Adicionar palavra-chave"
-                onKeyPress={(e) => e.key === "Enter" && handleAddKeyword()}
-              />
-              <Button type="button" variant="outline" size="icon" onClick={handleAddKeyword}>
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Categorias Personalizadas</Label>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {formData.customCategories.map((category) => (
-                <Badge key={category} variant="secondary" className="flex items-center gap-1">
-                  {category}
-                  <X
-                    className="h-3 w-3 cursor-pointer"
-                    onClick={() => handleRemoveCategory(category)}
-                  />
-                </Badge>
-              ))}
-            </div>
-            <div className="flex gap-2">
-              <Input
-                value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)}
-                placeholder="Adicionar categoria"
-                onKeyPress={(e) => e.key === "Enter" && handleAddCategory()}
-              />
-              <Button type="button" variant="outline" size="icon" onClick={handleAddCategory}>
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Tipos de Análise</Label>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {analysisTypes.map((type) => (
-                <Card key={type.id} className="cursor-pointer">
-                  <CardContent
-                    className="flex items-center gap-2 p-4"
-                    onClick={() => {
-                      const currentTypes = formData.analysisTypes || [];
-                      const newTypes = currentTypes.includes(type.id)
-                        ? currentTypes.filter(id => id !== type.id)
-                        : [...currentTypes, type.id];
-                      setFormData({
-                        ...formData,
-                        analysisTypes: newTypes
-                      });
-                    }}
-                  >
-                    <Switch
-                      checked={formData.analysisTypes?.includes(type.id)}
-                      onCheckedChange={() => {
-                        const currentTypes = formData.analysisTypes || [];
-                        const newTypes = currentTypes.includes(type.id)
-                          ? currentTypes.filter(id => id !== type.id)
-                          : [...currentTypes, type.id];
-                        setFormData({
-                          ...formData,
-                          analysisTypes: newTypes
-                        });
-                      }}
-                    />
-                    <div>
-                      <div className="font-medium">{type.name}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {type.description}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex justify-end space-x-4">
-            <Button type="button" variant="outline" onClick={() => navigate("/admin/monitoring")}>
-              Cancelar
-            </Button>
-            <Button type="submit">Criar Monitoramento</Button>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex justify-end space-x-4">
+        <Button type="button" variant="outline" onClick={() => navigate("/admin/monitoring")}>
+          Cancelar
+        </Button>
+        <Button type="submit">Criar Monitoramento</Button>
+      </div>
     </form>
   );
 };
