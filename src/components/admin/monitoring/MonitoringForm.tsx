@@ -369,6 +369,13 @@ export const MonitoringForm: React.FC = () => {
     });
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+
   const frequencies = [
     { value: "30min", label: "30 minutos" },
     { value: "1h", label: "1 hora" },
@@ -503,25 +510,18 @@ export const MonitoringForm: React.FC = () => {
                       ? "bg-primary/10 hover:bg-primary/20" 
                       : "hover:bg-secondary/10"
                   )}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleToggleAnalysisType(type.id, e);
-                    if (errors.analysisTypes) {
-                      setErrors(prev => ({ ...prev, analysisTypes: false }));
-                    }
-                  }}
+                  onClick={(e) => handleToggleAnalysisType(type.id, e)}
                 >
-                  <CardContent className="flex items-center gap-2 p-4">
+                  <CardContent 
+                    className="flex items-center gap-2 p-4"
+                    onClick={handleCardClick}
+                  >
                     <Switch
                       checked={formData.analysisTypes?.includes(type.id)}
-                      onCheckedChange={() => {
-                        handleToggleAnalysisType(type.id);
-                        if (errors.analysisTypes) {
-                          setErrors(prev => ({ ...prev, analysisTypes: false }));
-                        }
-                      }}
+                      onCheckedChange={() => handleToggleAnalysisType(type.id)}
+                      onClick={handleCardClick}
                     />
-                    <div>
+                    <div onClick={handleCardClick}>
                       <div className="font-medium">{type.name}</div>
                       <div className="text-sm text-muted-foreground">
                         {type.description}
@@ -718,25 +718,18 @@ export const MonitoringForm: React.FC = () => {
                       ? "bg-primary/10 hover:bg-primary/20" 
                       : "hover:bg-secondary/10"
                   )}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleToggleMetric(metric.id, e);
-                    if (errors.metrics) {
-                      setErrors(prev => ({ ...prev, metrics: false }));
-                    }
-                  }}
+                  onClick={(e) => handleToggleMetric(metric.id, e)}
                 >
-                  <CardContent className="flex items-center gap-2 p-4">
+                  <CardContent 
+                    className="flex items-center gap-2 p-4"
+                    onClick={handleCardClick}
+                  >
                     <Switch
                       checked={formData.metrics?.includes(metric.id)}
-                      onCheckedChange={() => {
-                        handleToggleMetric(metric.id);
-                        if (errors.metrics) {
-                          setErrors(prev => ({ ...prev, metrics: false }));
-                        }
-                      }}
+                      onCheckedChange={() => handleToggleMetric(metric.id)}
+                      onClick={handleCardClick}
                     />
-                    <div>
+                    <div onClick={handleCardClick}>
                       <div className="font-medium">{metric.name}</div>
                       <div className="text-sm text-muted-foreground">
                         {metric.description}
@@ -761,14 +754,19 @@ export const MonitoringForm: React.FC = () => {
                 setFormData(prev => ({ ...prev, frequency: value }));
               }}
             >
-              <SelectTrigger id="frequency" className="w-[200px]">
+              <SelectTrigger 
+                id="frequency" 
+                className="w-[200px]"
+                onClick={handleCardClick}
+              >
                 <SelectValue placeholder="Selecione a frequência" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent onCloseAutoFocus={(e) => e.preventDefault()}>
                 {frequencies.map((freq) => (
                   <SelectItem 
                     key={freq.value} 
                     value={freq.value}
+                    onSelect={(e) => e.preventDefault()}
                   >
                     {freq.label}
                   </SelectItem>
