@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import { MonitoringProvider } from '@/contexts/MonitoringContext';
 
 // Admin pages
 import Admin from '@/pages/Admin';
@@ -38,140 +39,142 @@ import Unauthorized from '@/pages/Unauthorized';
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          {/* Página inicial pública */}
-          <Route path="/" element={<Index />} />
+      <MonitoringProvider>
+        <Router>
+          <Routes>
+            {/* Página inicial pública */}
+            <Route path="/" element={<Index />} />
 
-          {/* Rotas de login */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/client-login" element={<ClientLoginPage />} />
-          
-          {/* Rotas de serviço */}
-          <Route path="/service/:serviceId" element={<ServiceLanding />} />
-          <Route path="/client" element={<Client />} />
-          <Route path="/payment" element={<Payment />} />
-          <Route path="/example-client" element={<ExampleClient />} />
-          
-          {/* Rota de erro de autorização */}
-          <Route path="/unauthorized" element={<Unauthorized />} />
+            {/* Rotas de login */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/client-login" element={<ClientLoginPage />} />
+            
+            {/* Rotas de serviço */}
+            <Route path="/service/:serviceId" element={<ServiceLanding />} />
+            <Route path="/client" element={<Client />} />
+            <Route path="/payment" element={<Payment />} />
+            <Route path="/example-client" element={<ExampleClient />} />
+            
+            {/* Rota de erro de autorização */}
+            <Route path="/unauthorized" element={<Unauthorized />} />
 
-          {/* Rotas administrativas */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute allowedTypes={['admin']}>
-                <Admin />
-              </ProtectedRoute>
-            }
-          />
-          
-          {/* Rota única para monitoramento */}
-          <Route
-            path="/admin/monitoring/*"
-            element={
-              <ProtectedRoute allowedTypes={['admin']}>
-                <AdminMonitoringDashboard />
-              </ProtectedRoute>
-            }
-          />
+            {/* Rotas administrativas */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute allowedTypes={['admin']}>
+                  <Admin />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Rota única para monitoramento */}
+            <Route
+              path="/admin/monitoring/*"
+              element={
+                <ProtectedRoute allowedTypes={['admin']}>
+                  <AdminMonitoringDashboard />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/admin/clients"
-            element={
-              <ProtectedRoute allowedTypes={['admin']}>
-                <ClientManagement />
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route
-            path="/admin/content"
-            element={
-              <ProtectedRoute allowedTypes={['admin']}>
-                <ContentManagement />
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route
-            path="/admin/contacts"
-            element={
-              <ProtectedRoute allowedTypes={['admin']}>
-                <MediaContactsManagement />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/admin/clients"
+              element={
+                <ProtectedRoute allowedTypes={['admin']}>
+                  <ClientManagement />
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/admin/content"
+              element={
+                <ProtectedRoute allowedTypes={['admin']}>
+                  <ContentManagement />
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/admin/contacts"
+              element={
+                <ProtectedRoute allowedTypes={['admin']}>
+                  <MediaContactsManagement />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Rotas específicas de cada tipo de cliente na área admin */}
-          <Route
-            path="/admin/client/:clientType"
-            element={
-              <ProtectedRoute allowedTypes={['admin']}>
-                <ClientManagement />
-              </ProtectedRoute>
-            }
-          />
+            {/* Rotas específicas de cada tipo de cliente na área admin */}
+            <Route
+              path="/admin/client/:clientType"
+              element={
+                <ProtectedRoute allowedTypes={['admin']}>
+                  <ClientManagement />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Rotas dos clientes */}
-          <Route
-            path="/clients/observatory"
-            element={
-              <ProtectedRoute allowedTypes={['admin', 'observatory']}>
-                <ObservatoryClient />
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route
-            path="/clients/researcher"
-            element={
-              <ProtectedRoute allowedTypes={['admin', 'researcher']}>
-                <ResearcherClient />
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route
-            path="/clients/politician"
-            element={
-              <ProtectedRoute allowedTypes={['admin', 'politician']}>
-                <PoliticianClient />
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route
-            path="/clients/institution"
-            element={
-              <ProtectedRoute allowedTypes={['admin', 'institution']}>
-                <InstitutionClient />
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route
-            path="/clients/journalist"
-            element={
-              <ProtectedRoute allowedTypes={['admin', 'journalist']}>
-                <JournalistClient />
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route
-            path="/clients/press"
-            element={
-              <ProtectedRoute allowedTypes={['admin', 'press']}>
-                <PressClient />
-              </ProtectedRoute>
-            }
-          />
+            {/* Rotas dos clientes */}
+            <Route
+              path="/clients/observatory"
+              element={
+                <ProtectedRoute allowedTypes={['admin', 'observatory']}>
+                  <ObservatoryClient />
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/clients/researcher"
+              element={
+                <ProtectedRoute allowedTypes={['admin', 'researcher']}>
+                  <ResearcherClient />
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/clients/politician"
+              element={
+                <ProtectedRoute allowedTypes={['admin', 'politician']}>
+                  <PoliticianClient />
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/clients/institution"
+              element={
+                <ProtectedRoute allowedTypes={['admin', 'institution']}>
+                  <InstitutionClient />
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/clients/journalist"
+              element={
+                <ProtectedRoute allowedTypes={['admin', 'journalist']}>
+                  <JournalistClient />
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/clients/press"
+              element={
+                <ProtectedRoute allowedTypes={['admin', 'press']}>
+                  <PressClient />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Rota 404 */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Router>
+            {/* Rota 404 */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Router>
+      </MonitoringProvider>
     </AuthProvider>
   );
 }

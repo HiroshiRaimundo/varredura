@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Plus, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useMonitoring } from "@/contexts/MonitoringContext";
 
 interface Category {
   id: string;
@@ -153,6 +154,7 @@ const analysisTypes = [
 
 export const MonitoringForm: React.FC = () => {
   const navigate = useNavigate();
+  const { addMonitoring } = useMonitoring();
 
   const initialFormState: MonitoringFormData = {
     name: "",
@@ -220,8 +222,11 @@ export const MonitoringForm: React.FC = () => {
     }
 
     try {
-      // Simula chamada API (remover quando integrar com backend real)
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Adiciona o monitoramento ao contexto global
+      addMonitoring({
+        ...formData,
+        active: true,
+      });
       
       toast({
         title: "Monitoramento Criado",
@@ -231,12 +236,14 @@ export const MonitoringForm: React.FC = () => {
         variant: "default"
       });
 
+      // Limpa o formulário
       setFormData(initialFormState);
       setUrlInput("");
       setNewKeyword("");
       setNewCategory("");
       setErrors({});
       
+      // Redireciona para a visão geral
       navigate("/admin/monitoring", { replace: true });
       
     } catch (error) {
