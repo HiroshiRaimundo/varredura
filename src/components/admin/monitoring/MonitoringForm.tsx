@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -378,8 +378,24 @@ export const MonitoringForm: React.FC = () => {
     { value: "24h", label: "24 horas" }
   ];
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  useEffect(() => {
+    // Previne comportamento padrão de todos os cliques no formulário
+    const form = document.getElementById('monitoring-form');
+    if (form) {
+      form.addEventListener('click', handleClick as any);
+      return () => {
+        form.removeEventListener('click', handleClick as any);
+      };
+    }
+  }, []);
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form id="monitoring-form" onSubmit={handleSubmit} className="space-y-8" onClick={handleClick}>
       <Card>
         <CardHeader>
           <CardTitle>Detalhes do Monitoramento</CardTitle>
@@ -505,6 +521,7 @@ export const MonitoringForm: React.FC = () => {
                   )}
                   onClick={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     handleToggleAnalysisType(type.id, e);
                     if (errors.analysisTypes) {
                       setErrors(prev => ({ ...prev, analysisTypes: false }));
@@ -520,7 +537,10 @@ export const MonitoringForm: React.FC = () => {
                           setErrors(prev => ({ ...prev, analysisTypes: false }));
                         }
                       }}
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
                     />
                     <div>
                       <div className="font-medium">{type.name}</div>
@@ -721,6 +741,7 @@ export const MonitoringForm: React.FC = () => {
                   )}
                   onClick={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     handleToggleMetric(metric.id, e);
                     if (errors.metrics) {
                       setErrors(prev => ({ ...prev, metrics: false }));
@@ -736,7 +757,10 @@ export const MonitoringForm: React.FC = () => {
                           setErrors(prev => ({ ...prev, metrics: false }));
                         }
                       }}
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
                     />
                     <div>
                       <div className="font-medium">{metric.name}</div>
@@ -762,16 +786,29 @@ export const MonitoringForm: React.FC = () => {
               onValueChange={(value) => {
                 setFormData(prev => ({ ...prev, frequency: value }));
               }}
+              onOpenChange={(open) => {
+                if (open) {
+                  // Previne qualquer propagação quando o select é aberto
+                  document.body.style.pointerEvents = 'none';
+                } else {
+                  setTimeout(() => {
+                    document.body.style.pointerEvents = '';
+                  }, 0);
+                }
+              }}
             >
-              <SelectTrigger id="frequency" className="w-[200px]">
+              <SelectTrigger id="frequency" className="w-[200px]" onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}>
                 <SelectValue placeholder="Selecione a frequência" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent onClick={(e) => e.stopPropagation()}>
                 {frequencies.map((freq) => (
                   <SelectItem 
                     key={freq.value} 
                     value={freq.value}
-                    onClick={(e) => e.preventDefault()}
+                    onClick={(e) => e.stopPropagation()}
                   >
                     {freq.label}
                   </SelectItem>
