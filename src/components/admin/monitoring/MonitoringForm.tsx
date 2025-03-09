@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import cn from "classnames";
+import { cn } from "@/lib/utils";
 
 interface Category {
   id: string;
