@@ -176,37 +176,30 @@ export const MonitoringForm: React.FC = () => {
     if (!urlInput?.trim()) {
       toast({
         title: "Erro",
-        description: "Digite uma URL válida",
+        description: "Digite um endereço válido",
         variant: "destructive"
       });
       return;
     }
-    try {
-      new URL(urlInput);
-      if (formData.urls?.includes(urlInput)) {
-        toast({
-          title: "Erro",
-          description: "Esta URL já foi adicionada",
-          variant: "destructive"
-        });
-        return;
-      }
-      setFormData(prev => ({
-        ...prev,
-        urls: [...(prev.urls || []), urlInput]
-      }));
-      setUrlInput("");
-      toast({
-        title: "Sucesso",
-        description: "URL adicionada à lista",
-      });
-    } catch (e) {
+
+    if (formData.urls?.includes(urlInput)) {
       toast({
         title: "Erro",
-        description: "URL inválida",
+        description: "Este endereço já foi adicionado",
         variant: "destructive"
       });
+      return;
     }
+
+    setFormData(prev => ({
+      ...prev,
+      urls: [...(prev.urls || []), urlInput]
+    }));
+    setUrlInput("");
+    toast({
+      title: "Sucesso",
+      description: "Endereço adicionado à lista",
+    });
   };
 
   const handleRemoveUrl = (index: number) => {
@@ -249,7 +242,7 @@ export const MonitoringForm: React.FC = () => {
     if (formData.type === "url" && (!formData.urls || formData.urls.length === 0)) {
       toast({
         title: "Erro",
-        description: "Adicione pelo menos uma URL para monitorar",
+        description: "Adicione pelo menos um endereço para monitorar",
         variant: "destructive"
       });
       return;
@@ -478,11 +471,17 @@ export const MonitoringForm: React.FC = () => {
                 >
                   <CardContent 
                     className="flex items-center gap-2 p-4"
-                    onClick={() => handleToggleAnalysisType(type.id)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleToggleAnalysisType(type.id);
+                    }}
                   >
                     <Switch
                       checked={formData.analysisTypes?.includes(type.id)}
-                      onCheckedChange={() => handleToggleAnalysisType(type.id)}
+                      onCheckedChange={(checked) => {
+                        handleToggleAnalysisType(type.id);
+                      }}
                     />
                     <div>
                       <div className="font-medium">{type.name}</div>
@@ -509,11 +508,11 @@ export const MonitoringForm: React.FC = () => {
               <Button
                 type="button"
                 variant={formData.type === "url" ? "default" : "outline"}
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
                   setFormData(prev => ({
                     ...prev,
                     type: "url",
-                    apiEndpoint: "",
                   }));
                 }}
               >
@@ -522,13 +521,12 @@ export const MonitoringForm: React.FC = () => {
               <Button
                 type="button"
                 variant={formData.type === "api" ? "default" : "outline"}
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
                   setFormData(prev => ({
                     ...prev,
                     type: "api",
-                    urls: [],
                   }));
-                  setUrlInput("");
                 }}
               >
                 API
@@ -539,12 +537,12 @@ export const MonitoringForm: React.FC = () => {
           {formData.type === "url" && (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>URLs para Monitoramento</Label>
+                <Label>Endereços para Monitoramento</Label>
                 <div className="flex gap-2">
                   <Input
                     value={urlInput}
                     onChange={(e) => setUrlInput(e.target.value)}
-                    placeholder="https://exemplo.com"
+                    placeholder="exemplo.com"
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -554,7 +552,10 @@ export const MonitoringForm: React.FC = () => {
                   />
                   <Button 
                     type="button"
-                    onClick={handleAddUrl}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleAddUrl();
+                    }}
                   >
                     Adicionar
                   </Button>
@@ -564,7 +565,7 @@ export const MonitoringForm: React.FC = () => {
               {formData.urls && formData.urls.length > 0 && (
                 <div className="border rounded-lg p-4 bg-card">
                   <Label className="text-sm text-muted-foreground mb-2 block">
-                    {formData.urls.length === 1 ? "URL Adicionada:" : "URLs Adicionadas:"}
+                    {formData.urls.length === 1 ? "Endereço Adicionado:" : "Endereços Adicionados:"}
                   </Label>
                   <div className="space-y-2">
                     {formData.urls.map((url, index) => (
@@ -577,7 +578,10 @@ export const MonitoringForm: React.FC = () => {
                           type="button"
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleRemoveUrl(index)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleRemoveUrl(index);
+                          }}
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -600,7 +604,7 @@ export const MonitoringForm: React.FC = () => {
                       ...prev,
                       apiEndpoint: e.target.value
                     }))}
-                    placeholder="https://api.exemplo.com/endpoint"
+                    placeholder="api.exemplo.com/endpoint"
                     onKeyPress={(e) => {
                       if (e.key === 'Enter' && formData.apiEndpoint?.trim()) {
                         e.preventDefault();
@@ -613,7 +617,8 @@ export const MonitoringForm: React.FC = () => {
                   />
                   <Button 
                     type="button"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
                       if (formData.apiEndpoint?.trim()) {
                         toast({
                           title: "API Configurada",
@@ -641,7 +646,10 @@ export const MonitoringForm: React.FC = () => {
                         type="button"
                         variant="ghost"
                         size="sm"
-                        onClick={() => setFormData(prev => ({ ...prev, apiEndpoint: "" }))}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setFormData(prev => ({ ...prev, apiEndpoint: "" }));
+                        }}
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -667,11 +675,17 @@ export const MonitoringForm: React.FC = () => {
                 >
                   <CardContent 
                     className="flex items-center gap-2 p-4"
-                    onClick={() => handleToggleMetric(metric.id)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleToggleMetric(metric.id);
+                    }}
                   >
                     <Switch
                       checked={formData.metrics?.includes(metric.id)}
-                      onCheckedChange={() => handleToggleMetric(metric.id)}
+                      onCheckedChange={(checked) => {
+                        handleToggleMetric(metric.id);
+                      }}
                     />
                     <div>
                       <div className="font-medium">{metric.name}</div>
