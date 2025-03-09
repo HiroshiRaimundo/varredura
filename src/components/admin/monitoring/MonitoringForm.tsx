@@ -174,6 +174,80 @@ export const MonitoringForm: React.FC = () => {
   const [urlInput, setUrlInput] = useState("");
   const [newKeyword, setNewKeyword] = useState("");
   const [newCategory, setNewCategory] = useState("");
+  const [errors, setErrors] = useState<Record<string, boolean>>({});
+
+  const validateForm = () => {
+    const newErrors: Record<string, boolean> = {};
+    
+    if (!formData.name?.trim()) {
+      newErrors.name = true;
+    }
+    
+    if (!formData.responsible?.trim()) {
+      newErrors.responsible = true;
+    }
+    
+    if (formData.type === "url" && (!formData.urls || formData.urls.length === 0)) {
+      newErrors.urls = true;
+    }
+    
+    if (formData.type === "api" && !formData.apiEndpoint?.trim()) {
+      newErrors.apiEndpoint = true;
+    }
+    
+    if (!formData.analysisTypes || formData.analysisTypes.length === 0) {
+      newErrors.analysisTypes = true;
+    }
+    
+    if (!formData.metrics || formData.metrics.length === 0) {
+      newErrors.metrics = true;
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      toast({
+        title: "Campos Obrigatórios",
+        description: "Por favor, preencha todos os campos obrigatórios destacados em vermelho.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // Simula chamada API (remover quando integrar com backend real)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Monitoramento Criado",
+        description: formData.urls && formData.urls.length > 1 
+          ? "Grupo de monitoramento criado com sucesso!"
+          : "Monitoramento criado com sucesso!",
+        variant: "default"
+      });
+
+      setFormData(initialFormState);
+      setUrlInput("");
+      setNewKeyword("");
+      setNewCategory("");
+      setErrors({});
+      
+      navigate("/admin/monitoring", { replace: true });
+      
+    } catch (error) {
+      console.error("Erro ao criar monitoramento:", error);
+      toast({
+        title: "Erro",
+        description: "Erro ao criar monitoramento. Tente novamente.",
+        variant: "destructive"
+      });
+    }
+  };
 
   const handleAddUrl = () => {
     if (!urlInput?.trim()) {
@@ -218,96 +292,6 @@ export const MonitoringForm: React.FC = () => {
       title: "URL removida",
       description: "URL removida da lista",
     });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validações básicas
-    if (!formData.name?.trim()) {
-      toast({
-        title: "Erro",
-        description: "Nome do monitoramento é obrigatório",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!formData.responsible?.trim()) {
-      toast({
-        title: "Erro",
-        description: "Responsável é obrigatório",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (formData.type === "url" && (!formData.urls || formData.urls.length === 0)) {
-      toast({
-        title: "Erro",
-        description: "Adicione pelo menos um endereço para monitorar",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (formData.type === "api" && !formData.apiEndpoint?.trim()) {
-      toast({
-        title: "Erro",
-        description: "Informe a URL da API",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!formData.analysisTypes || formData.analysisTypes.length === 0) {
-      toast({
-        title: "Erro",
-        description: "Selecione pelo menos um tipo de análise",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!formData.metrics || formData.metrics.length === 0) {
-      toast({
-        title: "Erro",
-        description: "Selecione pelo menos uma métrica",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      // Aqui irá a chamada para a API
-      console.log("Dados do formulário:", formData);
-      
-      // Mostra toast de sucesso
-      toast({
-        title: "Monitoramento Criado",
-        description: formData.urls && formData.urls.length > 1 
-          ? "Grupo de monitoramento criado com sucesso!"
-          : "Monitoramento criado com sucesso!",
-        variant: "default"
-      });
-
-      // Limpa o formulário
-      setFormData(initialFormState);
-      setUrlInput("");
-      setNewKeyword("");
-      setNewCategory("");
-      
-      // Redireciona para a visão geral
-      navigate("/admin/monitoring", { replace: true });
-      
-    } catch (error) {
-      console.error("Erro ao criar monitoramento:", error);
-      toast({
-        title: "Erro",
-        description: "Erro ao criar monitoramento. Tente novamente.",
-        variant: "destructive"
-      });
-    }
   };
 
   const handleAddKeyword = () => {
@@ -395,27 +379,47 @@ export const MonitoringForm: React.FC = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Nome do Monitoramento</Label>
+            <Label>Nome do Monitoramento</Label>
             <Input
-              id="name"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Nome do monitoramento"
+              onChange={(e) => {
+                setFormData(prev => ({ ...prev, name: e.target.value }));
+                if (errors.name) {
+                  setErrors(prev => ({ ...prev, name: false }));
+                }
+              }}
+              className={cn(errors.name && "border-red-500")}
+              placeholder="Digite o nome do monitoramento"
             />
+            {errors.name && (
+              <span className="text-sm text-red-500">
+                Nome é obrigatório
+              </span>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="responsible">Responsável</Label>
+            <Label>Responsável</Label>
             <Input
-              id="responsible"
               value={formData.responsible}
-              onChange={(e) => setFormData({ ...formData, responsible: e.target.value })}
-              placeholder="Nome do responsável"
+              onChange={(e) => {
+                setFormData(prev => ({ ...prev, responsible: e.target.value }));
+                if (errors.responsible) {
+                  setErrors(prev => ({ ...prev, responsible: false }));
+                }
+              }}
+              className={cn(errors.responsible && "border-red-500")}
+              placeholder="Digite o nome do responsável"
             />
+            {errors.responsible && (
+              <span className="text-sm text-red-500">
+                Responsável é obrigatório
+              </span>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Descrição</Label>
+            <Label>Descrição</Label>
             <Textarea
               id="description"
               value={formData.description}
@@ -479,7 +483,10 @@ export const MonitoringForm: React.FC = () => {
 
           <div className="space-y-2">
             <Label>Tipos de Análise</Label>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className={cn(
+              "grid gap-4 md:grid-cols-2 lg:grid-cols-3",
+              errors.analysisTypes && "border border-red-500 rounded-lg p-2"
+            )}>
               {analysisTypes.map((type) => (
                 <Card 
                   key={type.id} 
@@ -489,12 +496,23 @@ export const MonitoringForm: React.FC = () => {
                       ? "bg-primary/10 hover:bg-primary/20" 
                       : "hover:bg-secondary/10"
                   )}
-                  onClick={(e) => handleToggleAnalysisType(type.id, e)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleToggleAnalysisType(type.id, e);
+                    if (errors.analysisTypes) {
+                      setErrors(prev => ({ ...prev, analysisTypes: false }));
+                    }
+                  }}
                 >
                   <CardContent className="flex items-center gap-2 p-4">
                     <Switch
                       checked={formData.analysisTypes?.includes(type.id)}
-                      onCheckedChange={() => handleToggleAnalysisType(type.id)}
+                      onCheckedChange={() => {
+                        handleToggleAnalysisType(type.id);
+                        if (errors.analysisTypes) {
+                          setErrors(prev => ({ ...prev, analysisTypes: false }));
+                        }
+                      }}
                       onClick={(e) => e.stopPropagation()}
                     />
                     <div>
@@ -507,6 +525,11 @@ export const MonitoringForm: React.FC = () => {
                 </Card>
               ))}
             </div>
+            {errors.analysisTypes && (
+              <span className="text-sm text-red-500">
+                Selecione pelo menos um tipo de análise
+              </span>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -676,7 +699,10 @@ export const MonitoringForm: React.FC = () => {
 
           <div className="space-y-2">
             <Label>Métricas de Monitoramento</Label>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className={cn(
+              "grid gap-4 md:grid-cols-2 lg:grid-cols-3",
+              errors.metrics && "border border-red-500 rounded-lg p-2"
+            )}>
               {metrics.map((metric) => (
                 <Card 
                   key={metric.id} 
@@ -686,12 +712,23 @@ export const MonitoringForm: React.FC = () => {
                       ? "bg-primary/10 hover:bg-primary/20" 
                       : "hover:bg-secondary/10"
                   )}
-                  onClick={(e) => handleToggleMetric(metric.id, e)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleToggleMetric(metric.id, e);
+                    if (errors.metrics) {
+                      setErrors(prev => ({ ...prev, metrics: false }));
+                    }
+                  }}
                 >
                   <CardContent className="flex items-center gap-2 p-4">
                     <Switch
                       checked={formData.metrics?.includes(metric.id)}
-                      onCheckedChange={() => handleToggleMetric(metric.id)}
+                      onCheckedChange={() => {
+                        handleToggleMetric(metric.id);
+                        if (errors.metrics) {
+                          setErrors(prev => ({ ...prev, metrics: false }));
+                        }
+                      }}
                       onClick={(e) => e.stopPropagation()}
                     />
                     <div>
@@ -704,20 +741,31 @@ export const MonitoringForm: React.FC = () => {
                 </Card>
               ))}
             </div>
+            {errors.metrics && (
+              <span className="text-sm text-red-500">
+                Selecione pelo menos uma métrica
+              </span>
+            )}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="frequency">Frequência de Monitoramento</Label>
             <Select
               value={formData.frequency}
-              onValueChange={(value) => setFormData({ ...formData, frequency: value })}
+              onValueChange={(value) => {
+                setFormData(prev => ({ ...prev, frequency: value }));
+              }}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Selecione a frequência" />
               </SelectTrigger>
               <SelectContent>
                 {frequencies.map((freq) => (
-                  <SelectItem key={freq.value} value={freq.value}>
+                  <SelectItem 
+                    key={freq.value} 
+                    value={freq.value}
+                    onSelect={(e) => e.preventDefault()}
+                  >
                     {freq.label}
                   </SelectItem>
                 ))}
@@ -737,10 +785,19 @@ export const MonitoringForm: React.FC = () => {
       </Card>
 
       <div className="flex justify-end space-x-4">
-        <Button type="button" variant="outline" onClick={() => navigate("/admin/monitoring")}>
+        <Button 
+          variant="outline" 
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            navigate("/admin/monitoring", { replace: true });
+          }}
+        >
           Cancelar
         </Button>
-        <Button type="submit">Criar Monitoramento</Button>
+        <Button type="submit">
+          Criar Monitoramento
+        </Button>
       </div>
     </form>
   );
