@@ -524,40 +524,48 @@ export const MonitoringForm: React.FC = () => {
                     Adicionar
                   </Button>
                 </div>
-              </div>
-              {formData.urls && formData.urls.length > 0 && (
-                <div className="space-y-2 border rounded-lg p-4">
-                  <Label className="text-sm text-muted-foreground">
-                    {formData.urls.length === 1 ? "URL Adicionada:" : "URLs Adicionadas:"}
-                  </Label>
-                  <div className="space-y-2">
-                    {formData.urls.map((url, index) => (
-                      <div key={index} className="flex items-center gap-2 bg-secondary/20 p-2 rounded-md hover:bg-secondary/30">
-                        <span className="flex-1 text-sm truncate">{url}</span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            const urls = [...(formData.urls || [])];
-                            urls.splice(index, 1);
-                            setFormData({
-                              ...formData,
-                              urls
-                            });
-                            toast({
-                              title: "URL removida",
-                              description: "URL removida da lista",
-                            });
-                          }}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
+                {formData.urls && formData.urls.length > 0 && (
+                  <div className="mt-4">
+                    <div className="space-y-2">
+                      {formData.urls.map((url, index) => (
+                        <div key={index} className="flex items-center gap-2 bg-secondary/20 p-2 rounded-md">
+                          <span className="flex-1 text-sm">{url}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              const urls = [...(formData.urls || [])];
+                              urls.splice(index, 1);
+                              setFormData({
+                                ...formData,
+                                urls
+                              });
+                              toast({
+                                title: "URL removida",
+                                description: "URL removida da lista",
+                              });
+                            }}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+            </div>
+          )}
+
+          {formData.type === "api" && (
+            <div className="space-y-2">
+              <Label>URL da API</Label>
+              <Input
+                value={formData.apiEndpoint || ""}
+                onChange={(e) => setFormData({ ...formData, apiEndpoint: e.target.value })}
+                placeholder="https://api.exemplo.com/endpoint"
+              />
             </div>
           )}
 
