@@ -6,10 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Progress } from "@/components/ui/progress";
 import {
   TrendingUp, Filter, AlertCircle, ExternalLink, 
   Clock, Activity, BarChart2, PieChart as PieChartIcon,
-  AlertTriangle, CheckCircle, XCircle, Info
+  AlertTriangle, CheckCircle, XCircle, Info, Link2,
+  FileCode, Image, Code, Database, Gauge, Brain,
+  Heart, Trending, Hash, FileJson
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -18,6 +21,15 @@ import {
 } from 'recharts';
 import { useMonitoring } from "@/contexts/MonitoringContext";
 import { cn } from "@/lib/utils";
+import { 
+  ContentAnalysis, 
+  PerformanceMetrics,
+  ContentMetrics,
+  SentimentAnalysis,
+  PredictiveAnalysis,
+  StructuredDataAnalysis,
+  MetadataAnalysis
+} from "@/services/analysisService";
 
 interface AnalysisMetric {
   id: string;
@@ -49,6 +61,12 @@ interface ContentAnalysis {
     details: string;
     timestamp: string;
   }[];
+  performance?: PerformanceMetrics;
+  content?: ContentMetrics;
+  sentiment?: SentimentAnalysis;
+  predictive?: PredictiveAnalysis;
+  structuredData?: StructuredDataAnalysis;
+  metadata?: MetadataAnalysis;
 }
 
 const AnalysisContent: React.FC = () => {
@@ -284,6 +302,316 @@ const AnalysisContent: React.FC = () => {
     </div>
   );
 
+  const renderPerformanceAnalysis = (performance: PerformanceMetrics) => (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Gauge className="h-5 w-5" />
+          Análise de Performance
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Tempo de Resposta</p>
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-bold">{performance.responseTime.toFixed(0)}ms</span>
+              <Badge variant={performance.responseTime < 500 ? "success" : "warning"}>
+                {performance.responseTime < 500 ? "Bom" : "Alto"}
+              </Badge>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Uptime</p>
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-bold">{performance.uptime}%</span>
+              <Badge variant={performance.uptime > 99 ? "success" : "warning"}>
+                {performance.uptime > 99 ? "Estável" : "Instável"}
+              </Badge>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <p className="text-sm font-medium">SSL</p>
+            <div className="flex items-center justify-between">
+              <span className="text-sm">{new Date(performance.sslStatus.expiryDate).toLocaleDateString()}</span>
+              <Badge variant={performance.sslStatus.valid ? "success" : "destructive"}>
+                {performance.sslStatus.valid ? "Válido" : "Inválido"}
+              </Badge>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const renderContentAnalysis = (content: ContentMetrics) => (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <FileCode className="h-5 w-5" />
+          Análise de Conteúdo
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium">HTML</p>
+                <span className="text-sm text-muted-foreground">{content.htmlChanges} mudanças</span>
+              </div>
+              <Progress value={content.htmlChanges} max={100} />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium">CSS</p>
+                <span className="text-sm text-muted-foreground">{content.cssChanges} mudanças</span>
+              </div>
+              <Progress value={content.cssChanges} max={50} />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium">JavaScript</p>
+                <span className="text-sm text-muted-foreground">{content.jsChanges} mudanças</span>
+              </div>
+              <Progress value={content.jsChanges} max={30} />
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium">Imagens</p>
+                <span className="text-sm text-muted-foreground">{content.imageChanges} mudanças</span>
+              </div>
+              <Progress value={content.imageChanges} max={20} />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium">Links Quebrados</p>
+                <Badge variant={content.brokenLinks === 0 ? "success" : "destructive"}>
+                  {content.brokenLinks} encontrados
+                </Badge>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium">Tamanho Total</p>
+                <span className="text-sm text-muted-foreground">
+                  {(content.totalSize / 1024).toFixed(2)} KB
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const renderSentimentAnalysis = (sentiment: SentimentAnalysis) => (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Heart className="h-5 w-5" />
+          Análise de Sentimento
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Geral</p>
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-bold">{sentiment.overall.toFixed(1)}%</span>
+              <Badge variant={sentiment.overall > 60 ? "success" : "warning"}>
+                {sentiment.overall > 60 ? "Positivo" : "Neutro"}
+              </Badge>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Positivo vs Negativo</p>
+            <div className="flex items-center gap-2">
+              <Progress value={sentiment.positive} className="bg-green-100" />
+              <Progress value={sentiment.negative} className="bg-red-100" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Tópicos</p>
+            <ScrollArea className="h-[100px]">
+              {sentiment.topics.map((topic, index) => (
+                <div key={index} className="flex items-center justify-between py-1">
+                  <span className="text-sm">{topic.name}</span>
+                  <Badge variant={topic.sentiment > 60 ? "success" : "warning"}>
+                    {topic.sentiment.toFixed(1)}%
+                  </Badge>
+                </div>
+              ))}
+            </ScrollArea>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const renderPredictiveAnalysis = (predictive: PredictiveAnalysis) => (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Brain className="h-5 w-5" />
+          Análise Preditiva
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <div className="mb-4">
+              <p className="text-sm font-medium">Previsão</p>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-bold">{predictive.prediction.toFixed(1)}%</span>
+                <Badge>
+                  Confiança: {predictive.confidence.toFixed(1)}%
+                </Badge>
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium mb-2">Fatores de Impacto</p>
+              {predictive.factors.map((factor, index) => (
+                <div key={index} className="space-y-2 mb-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">{factor.name}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {factor.impact.toFixed(1)}%
+                    </span>
+                  </div>
+                  <Progress value={factor.impact} />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="text-sm font-medium mb-2">Tendência Histórica</p>
+            <div className="h-[200px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={predictive.historicalData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="date" 
+                    tickFormatter={(date) => new Date(date).toLocaleDateString()}
+                  />
+                  <YAxis />
+                  <Tooltip 
+                    labelFormatter={(date) => new Date(date).toLocaleDateString()}
+                  />
+                  <Line type="monotone" dataKey="value" stroke="#8884d8" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const renderStructuredDataAnalysis = (data: StructuredDataAnalysis) => (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Database className="h-5 w-5" />
+          Análise de Dados Estruturados
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm font-medium">Schema</p>
+              <div className="flex items-center justify-between">
+                <span className="text-xl">{data.schema}</span>
+                <Badge variant="outline">
+                  {data.coverage.toFixed(1)}% cobertura
+                </Badge>
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium">Qualidade</p>
+              <div className="flex items-center gap-2">
+                <Progress value={data.quality} />
+                <span className="text-sm">{data.quality.toFixed(1)}%</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p className="text-sm font-medium mb-2">Erros Encontrados</p>
+            <ScrollArea className="h-[150px]">
+              {data.errors.map((error, index) => (
+                <div key={index} className="flex items-center justify-between py-2">
+                  <span className="text-sm">{error.type}</span>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={
+                      error.severity === 'low' ? 'secondary' :
+                      error.severity === 'medium' ? 'warning' : 'destructive'
+                    }>
+                      {error.count}
+                    </Badge>
+                    <Badge variant="outline">{error.severity}</Badge>
+                  </div>
+                </div>
+              ))}
+            </ScrollArea>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const renderMetadataAnalysis = (metadata: MetadataAnalysis) => (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Hash className="h-5 w-5" />
+          Análise de Metadados
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <p className="text-sm font-medium mb-2">Meta Tags</p>
+            <ScrollArea className="h-[200px]">
+              {metadata.tags.map((tag, index) => (
+                <div key={index} className="flex items-center justify-between py-2">
+                  <div>
+                    <p className="text-sm font-medium">{tag.name}</p>
+                    <p className="text-sm text-muted-foreground">{tag.value}</p>
+                  </div>
+                  <Badge variant="outline">
+                    {tag.frequency.toFixed(1)}%
+                  </Badge>
+                </div>
+              ))}
+            </ScrollArea>
+          </div>
+          <div>
+            <p className="text-sm font-medium mb-2">Headers HTTP</p>
+            <ScrollArea className="h-[200px]">
+              {metadata.headers.map((header, index) => (
+                <div key={index} className="flex items-center justify-between py-2">
+                  <div>
+                    <p className="text-sm font-medium">{header.name}</p>
+                    <p className="text-sm text-muted-foreground">{header.value}</p>
+                  </div>
+                  <Badge variant={
+                    header.status === 'ok' ? 'success' :
+                    header.status === 'warning' ? 'warning' : 'destructive'
+                  }>
+                    {header.status}
+                  </Badge>
+                </div>
+              ))}
+            </ScrollArea>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="space-y-6">
       {/* Cabeçalho com Filtros */}
@@ -346,31 +674,13 @@ const AnalysisContent: React.FC = () => {
               {analysis.metrics.map(metric => renderMetricCard(metric))}
             </div>
 
-            {/* Gráfico de Tendências */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Tendências de {theme}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={analysis.trends}>
-                      <defs>
-                        <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
-                        </linearGradient>
-                      </defs>
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <Tooltip />
-                      <Area type="monotone" dataKey="value" stroke="#8884d8" fillOpacity={1} fill="url(#colorValue)" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Análises Específicas */}
+            {analysis.performance && renderPerformanceAnalysis(analysis.performance)}
+            {analysis.content && renderContentAnalysis(analysis.content)}
+            {analysis.sentiment && renderSentimentAnalysis(analysis.sentiment)}
+            {analysis.predictive && renderPredictiveAnalysis(analysis.predictive)}
+            {analysis.structuredData && renderStructuredDataAnalysis(analysis.structuredData)}
+            {analysis.metadata && renderMetadataAnalysis(analysis.metadata)}
 
             {/* Análise de Palavras-chave */}
             {renderKeywordAnalysis(analysis.keywords)}

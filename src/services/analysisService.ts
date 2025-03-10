@@ -28,12 +28,100 @@ interface MonitoringData {
   name: string;
   theme: string;
   metrics: string[];
+  analysisTypes?: string[];
+}
+
+interface AnalysisMetric {
+  id: string;
+  name: string;
+  value: number;
+  trend: number;
+  status: 'success' | 'warning' | 'error' | 'info';
+  description: string;
+}
+
+interface KeywordAnalysis {
+  keyword: string;
+  mentions: number;
+  sentiment: number;
+  relevance: number;
+  trend: number;
+  sources: { name: string; count: number }[];
+}
+
+interface PerformanceMetrics {
+  responseTime: number;
+  statusCode: number;
+  uptime: number;
+  lastCheck: string;
+  sslStatus: {
+    valid: boolean;
+    expiryDate: string;
+  };
+}
+
+interface ContentMetrics {
+  totalSize: number;
+  htmlChanges: number;
+  cssChanges: number;
+  jsChanges: number;
+  imageChanges: number;
+  brokenLinks: number;
+}
+
+interface SentimentAnalysis {
+  overall: number;
+  positive: number;
+  negative: number;
+  neutral: number;
+  topics: {
+    name: string;
+    sentiment: number;
+    count: number;
+  }[];
+}
+
+interface PredictiveAnalysis {
+  prediction: number;
+  confidence: number;
+  factors: {
+    name: string;
+    impact: number;
+  }[];
+  historicalData: {
+    date: string;
+    value: number;
+  }[];
+}
+
+interface StructuredDataAnalysis {
+  schema: string;
+  coverage: number;
+  quality: number;
+  errors: {
+    type: string;
+    count: number;
+    severity: 'low' | 'medium' | 'high';
+  }[];
+}
+
+interface MetadataAnalysis {
+  tags: {
+    name: string;
+    value: string;
+    frequency: number;
+  }[];
+  headers: {
+    name: string;
+    value: string;
+    status: 'ok' | 'warning' | 'error';
+  }[];
 }
 
 interface ContentAnalysis {
   type: string;
-  metrics: AnalysisService['calculateMetrics'][0][];
-  keywords: AnalysisService['analyzeKeywords'][0][];
+  metrics: AnalysisMetric[];
+  keywords: KeywordAnalysis[];
   trends: { date: string; value: number }[];
   alerts: {
     id: string;
@@ -42,6 +130,12 @@ interface ContentAnalysis {
     details: string;
     timestamp: string;
   }[];
+  performance?: PerformanceMetrics;
+  content?: ContentMetrics;
+  sentiment?: SentimentAnalysis;
+  predictive?: PredictiveAnalysis;
+  structuredData?: StructuredDataAnalysis;
+  metadata?: MetadataAnalysis;
 }
 
 export const useAnalysisService = () => {
@@ -59,7 +153,8 @@ export const useAnalysisService = () => {
       setMonitoringResults(prev => [...prev, {
         name: 'Exemplo',
         theme: 'Tecnologia',
-        metrics: ['Inovação', 'Sustentabilidade', 'Impacto Social']
+        metrics: ['Inovação', 'Sustentabilidade', 'Impacto Social'],
+        analysisTypes: ['performance', 'content', 'sentiment', 'predictive', 'structured_data', 'metadata']
       }]);
     }, 60000);
 
