@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -6,10 +6,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { DateRange } from "react-day-picker";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart, Bar, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
-import { AlertCircle, TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
+import { AlertCircle, TrendingUp, TrendingDown, AlertTriangle, Search, Filter, Grid, List } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { Pagination } from "@/components/ui/pagination";
 
 interface ActiveMonitoring {
   id: string;
@@ -31,6 +34,11 @@ export const MonitoringAnalytics: React.FC = () => {
   const [selectedSources, setSelectedSources] = useState<string[]>([]);
   const [date, setDate] = useState<DateRange | undefined>();
   const [activeTab, setActiveTab] = useState("predictive");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [groupBy, setGroupBy] = useState<'category' | 'type' | 'none'>('category');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const itemsPerPage = 10;
 
   // Dados mockados para exemplo
   const sentimentData = [
@@ -103,8 +111,97 @@ export const MonitoringAnalytics: React.FC = () => {
     }
   ];
 
+  // Dados mockados para exemplo de temas
+  const themes = [
+    { id: '1', name: 'Site Principal', category: 'Sites', type: 'Performance' },
+    { id: '2', name: 'Blog Corporativo', category: 'Sites', type: 'Conteúdo' },
+    { id: '3', name: 'API de Produtos', category: 'APIs', type: 'Performance' },
+    { id: '4', name: 'API de Usuários', category: 'APIs', type: 'Segurança' },
+    { id: '5', name: 'Grupo de Redes Sociais', category: 'Grupos', type: 'Sentimento' },
+    // ... mais temas
+  ];
+
+  // Filtragem e agrupamento de temas
+  const filteredAndGroupedThemes = useMemo(() => {
+    let filtered = themes;
+    
+    // Aplicar busca
+    if (searchQuery) {
+      filtered = filtered.filter(theme => 
+        theme.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        theme.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        theme.type.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Agrupar resultados
+    if (groupBy === 'none') {
+      return { ungrouped: filtered };
+    }
+
+    return filtered.reduce((groups: { [key: string]: typeof themes }, theme) => {
+      const key = groupBy === 'category' ? theme.category : theme.type;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(theme);
+      return groups;
+    }, {});
+  }, [themes, searchQuery, groupBy]);
+
+  // Paginação
+  const totalPages = Math.ceil(Object.values(filteredAndGroupedThemes).flat().length / itemsPerPage);
+  const paginatedThemes = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    const allThemes = Object.values(filteredAndGroupedThemes).flat();
+    return allThemes.slice(start, start + itemsPerPage);
+  }, [filteredAndGroupedThemes, currentPage]);
+
   return (
     <div className="space-y-6">
+      {/* Barra de Ferramentas */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="flex gap-2 items-center w-full md:w-auto">
+              <Search className="w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar temas..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full md:w-[300px]"
+              />
+            </div>
+            <div className="flex gap-4 items-center w-full md:w-auto">
+              <Select value={groupBy} onValueChange={(value: 'category' | 'type' | 'none') => setGroupBy(value)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Agrupar por..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="category">Categoria</SelectItem>
+                  <SelectItem value="type">Tipo de Análise</SelectItem>
+                  <SelectItem value="none">Sem Agrupamento</SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="flex gap-1 border rounded-md p-1">
+                <Button
+                  variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
+                  size="icon"
+                  onClick={() => setViewMode('grid')}
+                >
+                  <Grid className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === 'list' ? 'secondary' : 'ghost'}
+                  size="icon"
+                  onClick={() => setViewMode('list')}
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Alertas importantes */}
       <div className="grid gap-4 md:grid-cols-2">
         {alerts.map(alert => (
@@ -141,6 +238,99 @@ export const MonitoringAnalytics: React.FC = () => {
           </Card>
         ))}
       </div>
+
+      {/* Lista de Temas */}
+      <div className="space-y-6">
+        {Object.entries(filteredAndGroupedThemes).map(([group, items]) => (
+          <Card key={group}>
+            <CardHeader>
+              <CardTitle>{group === 'ungrouped' ? 'Todos os Temas' : group}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className={cn(
+                "grid gap-4",
+                viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'
+              )}>
+                {items.map((theme) => (
+                  <Card key={theme.id}>
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle className="text-lg">{theme.name}</CardTitle>
+                          <p className="text-sm text-muted-foreground">{theme.category}</p>
+                        </div>
+                        <Badge>{theme.type}</Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <Tabs defaultValue="overview" className="space-y-4">
+                        <TabsList>
+                          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+                          <TabsTrigger value="metrics">Métricas</TabsTrigger>
+                          <TabsTrigger value="details">Detalhes</TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="overview">
+                          <div className="space-y-2">
+                            <div className="flex justify-between">
+                              <span>Status</span>
+                              <Badge variant="outline">Ativo</Badge>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Última Análise</span>
+                              <span className="text-muted-foreground">2 min atrás</span>
+                            </div>
+                          </div>
+                        </TabsContent>
+                        <TabsContent value="metrics">
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span>Precisão</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-green-600">95%</span>
+                                <TrendingUp className="w-4 h-4 text-green-600" />
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span>Cobertura</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-amber-600">85%</span>
+                                <TrendingDown className="w-4 h-4 text-amber-600" />
+                              </div>
+                            </div>
+                          </div>
+                        </TabsContent>
+                        <TabsContent value="details">
+                          <div className="space-y-2">
+                            <p className="text-sm text-muted-foreground">
+                              Última atualização: {new Date().toLocaleString()}
+                            </p>
+                            <div className="flex gap-2">
+                              <Badge variant="outline">API</Badge>
+                              <Badge variant="outline">Performance</Badge>
+                              <Badge variant="outline">Monitorado</Badge>
+                            </div>
+                          </div>
+                        </TabsContent>
+                      </Tabs>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Paginação */}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-4">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </div>
+      )}
 
       <Card>
         <CardHeader>
