@@ -497,7 +497,8 @@ export const MonitoringForm: React.FC = () => {
                   type="button"
                   variant={formData.metrics?.includes(metric.id) ? "default" : "outline"}
                   className={cn(
-                    "h-auto flex flex-col items-start gap-1 p-4",
+                    "h-auto w-full text-left px-4 py-3 space-y-1.5",
+                    formData.metrics?.includes(metric.id) ? "bg-primary/10 hover:bg-primary/20" : "hover:bg-secondary/10",
                     errors.metrics && "border-red-500"
                   )}
                   onClick={(e) => {
@@ -505,8 +506,8 @@ export const MonitoringForm: React.FC = () => {
                     handleToggleMetric(metric.id);
                   }}
                 >
-                  <div className="font-semibold">{metric.name}</div>
-                  <div className="text-sm text-muted-foreground">{metric.description}</div>
+                  <div className="font-medium text-base">{metric.name}</div>
+                  <div className="text-sm text-muted-foreground leading-relaxed">{metric.description}</div>
                 </Button>
               ))}
             </CardContent>
@@ -523,7 +524,8 @@ export const MonitoringForm: React.FC = () => {
                   type="button"
                   variant={formData.analysisTypes?.includes(type.id) ? "default" : "outline"}
                   className={cn(
-                    "h-auto flex flex-col items-start gap-1 p-4",
+                    "h-auto w-full text-left px-4 py-3 space-y-1.5",
+                    formData.analysisTypes?.includes(type.id) ? "bg-primary/10 hover:bg-primary/20" : "hover:bg-secondary/10",
                     errors.analysisTypes && "border-red-500"
                   )}
                   onClick={(e) => {
@@ -531,8 +533,8 @@ export const MonitoringForm: React.FC = () => {
                     handleToggleAnalysisType(type.id);
                   }}
                 >
-                  <div className="font-semibold">{type.name}</div>
-                  <div className="text-sm text-muted-foreground">{type.description}</div>
+                  <div className="font-medium text-base">{type.name}</div>
+                  <div className="text-sm text-muted-foreground leading-relaxed">{type.description}</div>
                 </Button>
               ))}
             </CardContent>
@@ -543,23 +545,32 @@ export const MonitoringForm: React.FC = () => {
               <CardTitle>Frequência de Monitoramento</CardTitle>
             </CardHeader>
             <CardContent>
-              <Select 
-                value={formData.frequency} 
-                onValueChange={(value) => {
-                  setFormData(prev => ({ ...prev, frequency: value }));
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione a frequência" />
-                </SelectTrigger>
-                <SelectContent>
-                  {frequencies.map((freq) => (
-                    <SelectItem key={freq.value} value={freq.value}>
-                      {freq.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="w-full max-w-[240px]">
+                <Select 
+                  defaultValue={formData.frequency}
+                  onValueChange={(value) => {
+                    setFormData(prev => ({ ...prev, frequency: value }));
+                  }}
+                >
+                  <SelectTrigger 
+                    className="w-full"
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    <SelectValue placeholder="Selecione a frequência" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {frequencies.map((freq) => (
+                      <SelectItem 
+                        key={freq.value} 
+                        value={freq.value}
+                        className="cursor-pointer"
+                      >
+                        {freq.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </CardContent>
           </Card>
         </CardContent>
