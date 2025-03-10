@@ -486,49 +486,82 @@ export const MonitoringForm: React.FC = () => {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>Tipos de Análise</Label>
-            <div className={cn(
-              "grid gap-4 md:grid-cols-2 lg:grid-cols-3",
-              errors.analysisTypes && "border border-red-500 rounded-lg p-2"
-            )}>
+          <Card>
+            <CardHeader>
+              <CardTitle>Métricas de Monitoramento</CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {metrics.map((metric) => (
+                <Button
+                  key={metric.id}
+                  type="button"
+                  variant={formData.metrics?.includes(metric.id) ? "default" : "outline"}
+                  className={cn(
+                    "h-auto flex flex-col items-start gap-1 p-4",
+                    errors.metrics && "border-red-500"
+                  )}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleToggleMetric(metric.id);
+                  }}
+                >
+                  <div className="font-semibold">{metric.name}</div>
+                  <div className="text-sm text-muted-foreground">{metric.description}</div>
+                </Button>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Tipos de Análise</CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {analysisTypes.map((type) => (
-                <button
+                <Button
                   key={type.id}
                   type="button"
-                  onClick={() => handleToggleAnalysisType(type.id)}
-                  className="text-left w-full"
+                  variant={formData.analysisTypes?.includes(type.id) ? "default" : "outline"}
+                  className={cn(
+                    "h-auto flex flex-col items-start gap-1 p-4",
+                    errors.analysisTypes && "border-red-500"
+                  )}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleToggleAnalysisType(type.id);
+                  }}
                 >
-                  <Card 
-                    className={cn(
-                      "cursor-pointer transition-colors",
-                      formData.analysisTypes?.includes(type.id) 
-                        ? "bg-primary/10 hover:bg-primary/20" 
-                        : "hover:bg-secondary/10"
-                    )}
-                  >
-                    <CardContent className="flex items-center gap-2 p-4">
-                      <Switch
-                        checked={formData.analysisTypes?.includes(type.id)}
-                        onCheckedChange={() => handleToggleAnalysisType(type.id)}
-                      />
-                      <div>
-                        <div className="font-medium">{type.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {type.description}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </button>
+                  <div className="font-semibold">{type.name}</div>
+                  <div className="text-sm text-muted-foreground">{type.description}</div>
+                </Button>
               ))}
-            </div>
-            {errors.analysisTypes && (
-              <span className="text-sm text-red-500">
-                Selecione pelo menos um tipo de análise
-              </span>
-            )}
-          </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Frequência de Monitoramento</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Select 
+                value={formData.frequency} 
+                onValueChange={(value) => {
+                  setFormData(prev => ({ ...prev, frequency: value }));
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione a frequência" />
+                </SelectTrigger>
+                <SelectContent>
+                  {frequencies.map((freq) => (
+                    <SelectItem key={freq.value} value={freq.value}>
+                      {freq.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </CardContent>
+          </Card>
         </CardContent>
       </Card>
 
@@ -684,83 +717,12 @@ export const MonitoringForm: React.FC = () => {
           )}
 
           <div className="space-y-2">
-            <Label>Métricas de Monitoramento</Label>
-            <div className={cn(
-              "grid gap-4 md:grid-cols-2 lg:grid-cols-3",
-              errors.metrics && "border border-red-500 rounded-lg p-2"
-            )}>
-              {metrics.map((metric) => (
-                <button
-                  key={metric.id}
-                  type="button"
-                  onClick={() => handleToggleMetric(metric.id)}
-                  className="text-left w-full"
-                >
-                  <Card 
-                    className={cn(
-                      "cursor-pointer transition-colors",
-                      formData.metrics?.includes(metric.id) 
-                        ? "bg-primary/10 hover:bg-primary/20" 
-                        : "hover:bg-secondary/10"
-                    )}
-                  >
-                    <CardContent className="flex items-center gap-2 p-4">
-                      <Switch
-                        checked={formData.metrics?.includes(metric.id)}
-                        onCheckedChange={() => handleToggleMetric(metric.id)}
-                      />
-                      <div>
-                        <div className="font-medium">{metric.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {metric.description}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </button>
-              ))}
-            </div>
-            {errors.metrics && (
-              <span className="text-sm text-red-500">
-                Selecione pelo menos uma métrica
-              </span>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="frequency">Frequência de Monitoramento</Label>
-            <Select
-              defaultValue={formData.frequency}
-              onValueChange={(value) => {
-                setFormData(prev => ({ ...prev, frequency: value }));
-              }}
-            >
-              <SelectTrigger 
-                id="frequency" 
-                className="w-[200px]"
-              >
-                <SelectValue placeholder="Selecione a frequência" />
-              </SelectTrigger>
-              <SelectContent>
-                {frequencies.map((freq) => (
-                  <SelectItem 
-                    key={freq.value} 
-                    value={freq.value}
-                  >
-                    {freq.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center space-x-2">
+            <Label>Ativar monitoramento imediatamente</Label>
             <Switch
               id="active"
               checked={formData.active}
               onCheckedChange={(checked) => setFormData({ ...formData, active: checked })}
             />
-            <Label htmlFor="active">Ativar monitoramento imediatamente</Label>
           </div>
         </CardContent>
       </Card>
