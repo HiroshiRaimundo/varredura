@@ -18,7 +18,7 @@ import { Filter, Pause, Play, Trash2, Settings } from "lucide-react";
 import { toast } from "sonner";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 import { useMonitoring } from "@/contexts/MonitoringContext";
-import cn from 'classnames';
+import cn from 'clsx';
 
 interface Monitoring {
   id: string;
