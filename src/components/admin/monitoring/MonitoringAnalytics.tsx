@@ -171,14 +171,19 @@ export const MonitoringAnalytics: React.FC = () => {
               />
             </div>
             <div className="flex gap-4 items-center w-full md:w-auto">
-              <Select value={groupBy} onValueChange={(value: 'category' | 'type' | 'none') => setGroupBy(value)}>
-                <SelectTrigger className="w-[180px]">
+              <Select 
+                defaultValue={groupBy}
+                onValueChange={(value: 'category' | 'type' | 'none') => {
+                  setGroupBy(value);
+                }}
+              >
+                <SelectTrigger className="w-[180px]" onClick={(e) => e.preventDefault()}>
                   <SelectValue placeholder="Agrupar por..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="category">Categoria</SelectItem>
-                  <SelectItem value="type">Tipo de Análise</SelectItem>
-                  <SelectItem value="none">Sem Agrupamento</SelectItem>
+                  <SelectItem value="category" onSelect={(e) => e.preventDefault()}>Categoria</SelectItem>
+                  <SelectItem value="type" onSelect={(e) => e.preventDefault()}>Tipo de Análise</SelectItem>
+                  <SelectItem value="none" onSelect={(e) => e.preventDefault()}>Sem Agrupamento</SelectItem>
                 </SelectContent>
               </Select>
               <div className="flex gap-1 border rounded-md p-1">
