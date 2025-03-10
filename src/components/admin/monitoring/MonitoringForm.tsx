@@ -210,59 +210,52 @@ export const MonitoringForm: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) {
-      toast({
-        title: "Campos Obrigatórios",
-        description: "Por favor, preencha todos os campos obrigatórios destacados em vermelho.",
-        variant: "destructive"
-      });
-      return;
-    }
+    const newMonitoring: any = {
+      id: Math.random().toString(36).substr(2, 9),
+      name: formData.name,
+      responsible: formData.responsible,
+      description: formData.description,
+      frequency: formData.frequency,
+      urls: formData.urls,
+      metrics: formData.metrics,
+      analysisTypes: formData.analysisTypes,
+      status: "active",
+      createdAt: new Date().toISOString(),
+    };
 
-    try {
-      // Adiciona o monitoramento ao contexto global
-      addMonitoring({
-        ...formData,
-        active: true,
-      });
-      
-      // Notificação mais informativa
-      toast({
-        title: "✨ Novo Monitoramento Criado",
-        description: (
-          <div className="space-y-2">
-            <p className="font-medium">{formData.name}</p>
-            <div className="text-sm text-muted-foreground">
-              <p>• {formData.urls?.length || 1} {formData.urls?.length === 1 ? "URL" : "URLs"} monitorada(s)</p>
-              <p>• {formData.metrics?.length} métricas configuradas</p>
-              <p>• Frequência: {frequencies.find(f => f.value === formData.frequency)?.label}</p>
-            </div>
-          </div>
-        ),
-        duration: 5000
-      });
+    addMonitoring(newMonitoring);
 
-      // Limpa o formulário
-      setFormData(initialFormState);
-      setUrlInput("");
-      setNewKeyword("");
-      setNewCategory("");
-      setErrors({});
-      
-      // Redireciona para a visão geral
-      navigate("/admin/monitoring");
-      
-    } catch (error) {
-      console.error("Erro ao criar monitoramento:", error);
-      toast({
-        title: "Erro",
-        description: "Erro ao criar monitoramento. Tente novamente.",
-        variant: "destructive"
-      });
-    }
+    toast.success(
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <span className="text-xl">✨</span>
+          <span className="font-medium">Monitoramento criado com sucesso!</span>
+        </div>
+        <div className="text-sm text-muted-foreground">
+          <p><strong>Nome:</strong> {newMonitoring.name}</p>
+          <p><strong>URLs:</strong> {newMonitoring.urls?.length || 0} endereços</p>
+          <p><strong>Métricas:</strong> {newMonitoring.metrics?.length || 0} configuradas</p>
+          <p><strong>Frequência:</strong> {formData.frequency}</p>
+        </div>
+        <div className="text-sm text-muted-foreground mt-1">
+          <p>O monitoramento já está disponível em <strong>Visão Geral</strong> nos monitoramentos ativos.</p>
+        </div>
+      </div>,
+      {
+        duration: 5000,
+        position: "top-right",
+        style: {
+          background: "var(--background)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--radius)",
+        },
+      }
+    );
+
+    navigate("/admin/monitoring");
   };
 
   const handleAddUrl = () => {

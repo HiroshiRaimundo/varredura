@@ -18,6 +18,7 @@ import { Filter, Pause, Play, Trash2, Settings } from "lucide-react";
 import { toast } from "sonner";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 import { useMonitoring } from "@/contexts/MonitoringContext";
+import cn from 'classnames';
 
 interface Monitoring {
   id: string;
@@ -41,6 +42,25 @@ interface Filter {
   group: string;
   status: string;
 }
+
+const frequencies = [
+  { value: '1m', label: '1 minuto' },
+  { value: '5m', label: '5 minutos' },
+  { value: '10m', label: '10 minutos' },
+  { value: '30m', label: '30 minutos' },
+  { value: '1h', label: '1 hora' },
+  { value: '2h', label: '2 horas' },
+  { value: '4h', label: '4 horas' },
+  { value: '8h', label: '8 horas' },
+  { value: '12h', label: '12 horas' },
+  { value: '1d', label: '1 dia' },
+  { value: '2d', label: '2 dias' },
+  { value: '3d', label: '3 dias' },
+  { value: '4d', label: '4 dias' },
+  { value: '5d', label: '5 dias' },
+  { value: '6d', label: '6 dias' },
+  { value: '7d', label: '7 dias' },
+];
 
 export const MonitoringOverview: React.FC = () => {
   const { monitorings } = useMonitoring();
@@ -115,207 +135,169 @@ export const MonitoringOverview: React.FC = () => {
     });
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return "bg-green-500";
-      case "inactive":
-        return "bg-red-500";
-      case "analyzing":
-        return "bg-yellow-500";
-      default:
-        return "bg-gray-500";
-    }
-  };
-
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Tendências de Análise</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={analysisData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="sentiment" stroke="#10b981" name="Sentimento" />
-                  <Line type="monotone" dataKey="relevance" stroke="#6366f1" name="Relevância" />
-                  <Line type="monotone" dataKey="accuracy" stroke="#f59e0b" name="Precisão" />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Status dos Monitoramentos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={statusData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, value }) => `${name}: ${value}`}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {statusData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
+      {/* Filtros */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Monitoramentos Ativos</CardTitle>
-          <div className="flex items-center space-x-2">
-            <Input
-              placeholder="Buscar monitoramento..."
-              value={filter.search}
-              onChange={(e) => setFilter({ ...filter, search: e.target.value })}
-              className="w-64"
-            />
-            <Select
-              value={filter.group}
-              onValueChange={(value) => setFilter({ ...filter, group: value })}
-            >
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Grupo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos os Grupos</SelectItem>
-                <SelectItem value="portais">Portais</SelectItem>
-                <SelectItem value="blogs">Blogs</SelectItem>
-                <SelectItem value="apis">APIs</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select
-              value={filter.status}
-              onValueChange={(value) => setFilter({ ...filter, status: value })}
-            >
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos os Status</SelectItem>
-                <SelectItem value="active">Ativo</SelectItem>
-                <SelectItem value="inactive">Inativo</SelectItem>
-                <SelectItem value="analyzing">Em Análise</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="outline" size="icon">
-              <Filter className="h-4 w-4" />
-            </Button>
+        <CardContent className="pt-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <Input
+                placeholder="Buscar por nome ou responsável..."
+                value={filter.search}
+                onChange={(e) => setFilter(prev => ({ ...prev, search: e.target.value }))}
+                className="w-full"
+              />
+            </div>
+            <div className="flex gap-4">
+              <Select
+                value={filter.status}
+                onValueChange={(value) => setFilter(prev => ({ ...prev, status: value }))}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="active">Ativos</SelectItem>
+                  <SelectItem value="inactive">Inativos</SelectItem>
+                  <SelectItem value="analyzing">Em Análise</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Lista de Monitoramentos */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Monitoramentos Ativos</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>Grupo</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Responsável</TableHead>
-                <TableHead>Última Atualização</TableHead>
-                <TableHead>Uptime</TableHead>
-                <TableHead>Tempo de Resposta</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedMonitorings.map((monitoring) => (
-                <TableRow key={monitoring.id}>
-                  <TableCell>{monitoring.name}</TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">{monitoring.group}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(monitoring.status)}>
-                      {monitoring.status === "active" ? "Ativo" : 
-                       monitoring.status === "inactive" ? "Inativo" : "Em Análise"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{monitoring.responsible}</TableCell>
-                  <TableCell>{monitoring.lastUpdate}</TableCell>
-                  <TableCell>{monitoring.uptime}%</TableCell>
-                  <TableCell>{monitoring.responseTime}ms</TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleToggleStatus(monitoring.id, monitoring.status)}
-                      title={monitoring.status === "active" ? "Pausar" : "Ativar"}
-                    >
-                      {monitoring.status === "active" ? (
-                        <Pause className="h-4 w-4" />
-                      ) : (
-                        <Play className="h-4 w-4" />
-                      )}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleRemoveMonitoring(monitoring.id)}
-                      title="Remover"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => handleOpenSettings(monitoring)}
-                      title="Configurações"
-                    >
-                      <Settings className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>URLs</TableHead>
+                  <TableHead>Responsável</TableHead>
+                  <TableHead>Métricas</TableHead>
+                  <TableHead>Frequência</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {paginatedMonitorings.map((monitoring) => (
+                  <TableRow key={monitoring.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <div className={cn(
+                          "h-2.5 w-2.5 rounded-full",
+                          monitoring.status === "active" && "bg-green-500",
+                          monitoring.status === "inactive" && "bg-red-500",
+                          monitoring.status === "analyzing" && "bg-yellow-500",
+                          !monitoring.status && "bg-gray-500"
+                        )} />
+                        <span className="capitalize">
+                          {monitoring.status || "Indefinido"}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium">{monitoring.name}</TableCell>
+                    <TableCell>
+                      {monitoring.urls ? (
+                        <div className="flex flex-col gap-1">
+                          {monitoring.urls.map((url, index) => (
+                            <span key={index} className="text-sm truncate max-w-[200px]">
+                              {url}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">Nenhuma URL</span>
+                      )}
+                    </TableCell>
+                    <TableCell>{monitoring.responsible}</TableCell>
+                    <TableCell>
+                      {monitoring.metrics?.length ? (
+                        <Badge variant="secondary">
+                          {monitoring.metrics.length} métricas
+                        </Badge>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {monitoring.frequency ? (
+                        <Badge variant="outline">
+                          {frequencies.find(f => f.value === monitoring.frequency)?.label || monitoring.frequency}
+                        </Badge>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleToggleStatus(monitoring.id, monitoring.status || "")}
+                        >
+                          {monitoring.status === "active" ? (
+                            <Pause className="h-4 w-4" />
+                          ) : (
+                            <Play className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleOpenSettings(monitoring)}
+                        >
+                          <Settings className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleRemoveMonitoring(monitoring.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
 
+          {/* Paginação */}
           {totalPages > 1 && (
-            <div className="mt-4">
+            <div className="mt-4 flex justify-center">
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious 
-                      onClick={() => setPage(p => Math.max(1, p - 1))}
-                      aria-disabled={page === 1}
+                      onClick={() => setPage(prev => Math.max(1, prev - 1))}
+                      className={cn(page === 1 && "pointer-events-none opacity-50")}
                     />
                   </PaginationItem>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                    <PaginationItem key={pageNum}>
+                  {[...Array(totalPages)].map((_, i) => (
+                    <PaginationItem key={i + 1}>
                       <PaginationLink
-                        onClick={() => setPage(pageNum)}
-                        isActive={pageNum === page}
+                        onClick={() => setPage(i + 1)}
+                        isActive={page === i + 1}
                       >
-                        {pageNum}
+                        {i + 1}
                       </PaginationLink>
                     </PaginationItem>
                   ))}
                   <PaginationItem>
-                    <PaginationNext
-                      onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                      aria-disabled={page === totalPages}
+                    <PaginationNext 
+                      onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
+                      className={cn(page === totalPages && "pointer-events-none opacity-50")}
                     />
                   </PaginationItem>
                 </PaginationContent>
