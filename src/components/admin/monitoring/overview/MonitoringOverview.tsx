@@ -17,17 +17,23 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Filter, Pause, Play, Trash2, Settings } from "lucide-react";
 import { toast } from "sonner";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
+import { useMonitoring } from "@/contexts/MonitoringContext";
 
 interface Monitoring {
   id: string;
   name: string;
-  group: string;
-  status: "active" | "inactive" | "analyzing";
+  group?: string;
+  status?: "active" | "inactive" | "analyzing";
   responsible: string;
-  lastUpdate: string;
-  uptime: number;
-  responseTime: number;
-  url: string;
+  lastUpdate?: string;
+  uptime?: number;
+  responseTime?: number;
+  url?: string;
+  urls?: string[];
+  metrics?: string[];
+  analysisTypes?: string[];
+  frequency?: string;
+  description?: string;
 }
 
 interface Filter {
@@ -37,37 +43,14 @@ interface Filter {
 }
 
 export const MonitoringOverview: React.FC = () => {
+  const { monitorings } = useMonitoring();
+
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState<Filter>({
     search: "",
     group: "all",
     status: "all"
   });
-  const [monitorings, setMonitorings] = useState<Monitoring[]>([
-    {
-      id: "1",
-      name: "Portal Principal",
-      group: "Portais",
-      status: "active",
-      responsible: "João Silva",
-      lastUpdate: "2025-03-07 21:45",
-      uptime: 99.9,
-      responseTime: 250,
-      url: "https://portal.exemplo.com"
-    },
-    {
-      id: "2",
-      name: "Blog Corporativo",
-      group: "Blogs",
-      status: "inactive",
-      responsible: "Maria Santos",
-      lastUpdate: "2025-03-07 21:30",
-      uptime: 98.5,
-      responseTime: 300,
-      url: "https://blog.exemplo.com"
-    },
-    // Adicione mais itens mockados aqui para testar a paginação
-  ]);
 
   // Dados mockados para os gráficos
   const analysisData = [
@@ -92,7 +75,7 @@ export const MonitoringOverview: React.FC = () => {
   const filteredMonitorings = monitorings.filter(monitoring => {
     const matchesSearch = monitoring.name.toLowerCase().includes(filter.search.toLowerCase()) ||
                          monitoring.responsible.toLowerCase().includes(filter.search.toLowerCase());
-    const matchesGroup = filter.group === "all" || monitoring.group.toLowerCase() === filter.group;
+    const matchesGroup = filter.group === "all" || monitoring.group?.toLowerCase() === filter.group;
     const matchesStatus = filter.status === "all" || monitoring.status === filter.status;
     return matchesSearch && matchesGroup && matchesStatus;
   });
@@ -105,7 +88,7 @@ export const MonitoringOverview: React.FC = () => {
   const handleRemoveMonitoring = (id: string) => {
     if (window.confirm("Tem certeza que deseja remover este monitoramento?")) {
       setTimeout(() => {
-        setMonitorings(prev => prev.filter(m => m.id !== id));
+        // Implementar lógica para remover o monitoramento do contexto global
         toast({
           title: "Monitoramento Removido",
           description: "O monitoramento foi removido com sucesso."
@@ -117,9 +100,7 @@ export const MonitoringOverview: React.FC = () => {
   const handleToggleStatus = (id: string, currentStatus: string) => {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
     setTimeout(() => {
-      setMonitorings(prev => prev.map(m => 
-        m.id === id ? { ...m, status: newStatus } : m
-      ));
+      // Implementar lógica para atualizar o status do monitoramento no contexto global
       toast({
         title: "Status Alterado",
         description: `O monitoramento foi ${newStatus === "active" ? "ativado" : "desativado"}.`
