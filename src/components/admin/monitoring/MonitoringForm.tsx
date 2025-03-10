@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,6 +11,8 @@ import { Plus, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useMonitoring } from "@/contexts/MonitoringContext";
+import * as SelectPrimitive from "@radix-ui/react-select";
+import { Check, ChevronDown } from "lucide-react";
 
 interface Category {
   id: string;
@@ -556,233 +557,236 @@ export const MonitoringForm: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="w-full max-w-[240px]">
-                <Select 
+                <SelectPrimitive.Root
                   value={formData.frequency}
                   onValueChange={(value) => {
                     setFormData(prev => ({ ...prev, frequency: value }));
                   }}
-                  onOpenChange={(open) => {
-                    // Previne o comportamento padrão quando o select é aberto/fechado
-                    if (open) {
-                      setTimeout(() => {
-                        const listbox = document.querySelector('[role="listbox"]');
-                        if (listbox) {
-                          listbox.addEventListener('mousedown', (e) => {
-                            e.preventDefault();
-                          });
-                        }
-                      }, 0);
-                    }
-                  }}
                 >
-                  <SelectTrigger 
-                    className="w-full"
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={(e) => e.preventDefault()}
+                  <SelectPrimitive.Trigger 
+                    className={cn(
+                      "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1"
+                    )}
                   >
-                    <SelectValue placeholder="Selecione a frequência" />
-                  </SelectTrigger>
-                  <SelectContent 
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    {frequencies.map((freq) => (
-                      <SelectItem 
-                        key={freq.value} 
-                        value={freq.value}
-                        className="cursor-pointer"
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        {freq.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                    <SelectPrimitive.Value placeholder="Selecione a frequência" />
+                    <SelectPrimitive.Icon>
+                      <ChevronDown className="h-4 w-4 opacity-50" />
+                    </SelectPrimitive.Icon>
+                  </SelectPrimitive.Trigger>
+
+                  <SelectPrimitive.Portal>
+                    <SelectPrimitive.Content
+                      className={cn(
+                        "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+                        "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1"
+                      )}
+                      position="popper"
+                      side="bottom"
+                      sideOffset={4}
+                    >
+                      <SelectPrimitive.Viewport className="p-1">
+                        {frequencies.map((freq) => (
+                          <SelectPrimitive.Item
+                            key={freq.value}
+                            value={freq.value}
+                            className={cn(
+                              "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                            )}
+                          >
+                            <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+                              <SelectPrimitive.ItemIndicator>
+                                <Check className="h-4 w-4" />
+                              </SelectPrimitive.ItemIndicator>
+                            </span>
+                            <SelectPrimitive.ItemText>{freq.label}</SelectPrimitive.ItemText>
+                          </SelectPrimitive.Item>
+                        ))}
+                      </SelectPrimitive.Viewport>
+                    </SelectPrimitive.Content>
+                  </SelectPrimitive.Portal>
+                </SelectPrimitive.Root>
               </div>
             </CardContent>
           </Card>
-        </CardContent>
-      </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Configuração do Monitoramento</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <Label>Tipo de Monitoramento</Label>
-            <div className="flex gap-4">
-              <Button
-                type="button"
-                variant={formData.type === "url" ? "default" : "outline"}
-                onClick={() => setFormData(prev => ({ ...prev, type: "url" }))}
-              >
-                URL
-              </Button>
-              <Button
-                type="button"
-                variant={formData.type === "api" ? "default" : "outline"}
-                onClick={() => setFormData(prev => ({ ...prev, type: "api" }))}
-              >
-                API
-              </Button>
-            </div>
-          </div>
-
-          {formData.type === "url" && (
-            <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Configuração do Monitoramento</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label>Endereços para Monitoramento</Label>
-                <div className="flex gap-2">
-                  <Input
-                    value={urlInput}
-                    onChange={(e) => setUrlInput(e.target.value)}
-                    placeholder="exemplo.com"
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleAddUrl();
-                      }
-                    }}
-                  />
-                  <Button 
+                <Label>Tipo de Monitoramento</Label>
+                <div className="flex gap-4">
+                  <Button
                     type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleAddUrl();
-                    }}
+                    variant={formData.type === "url" ? "default" : "outline"}
+                    onClick={() => setFormData(prev => ({ ...prev, type: "url" }))}
                   >
-                    Adicionar
+                    URL
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={formData.type === "api" ? "default" : "outline"}
+                    onClick={() => setFormData(prev => ({ ...prev, type: "api" }))}
+                  >
+                    API
                   </Button>
                 </div>
               </div>
-              
-              {formData.urls && formData.urls.length > 0 && (
-                <div className="border rounded-lg p-4 bg-card">
-                  <Label className="text-sm text-muted-foreground mb-2 block">
-                    {formData.urls.length === 1 ? "Endereço Adicionado:" : "Endereços Adicionados:"}
-                  </Label>
+
+              {formData.type === "url" && (
+                <div className="space-y-4">
                   <div className="space-y-2">
-                    {formData.urls.map((url, index) => (
-                      <div 
-                        key={index} 
-                        className="flex items-center gap-2 bg-secondary/20 p-2 rounded-md"
-                      >
-                        <span className="flex-1 text-sm font-medium break-all">{url}</span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
+                    <Label>Endereços para Monitoramento</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={urlInput}
+                        onChange={(e) => setUrlInput(e.target.value)}
+                        placeholder="exemplo.com"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
                             e.preventDefault();
-                            handleRemoveUrl(index);
-                          }}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {formData.type === "api" && (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>URL da API</Label>
-                <div className="flex gap-2">
-                  <Input
-                    value={formData.apiEndpoint || ""}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      apiEndpoint: e.target.value
-                    }))}
-                    placeholder="api.exemplo.com/endpoint"
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter' && formData.apiEndpoint?.trim()) {
-                        e.preventDefault();
-                        toast({
-                          title: "API Configurada",
-                          description: "Endpoint da API foi configurado com sucesso!"
-                        });
-                      }
-                    }}
-                  />
-                  <Button 
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (formData.apiEndpoint?.trim()) {
-                        toast({
-                          title: "API Configurada",
-                          description: "Endpoint da API foi configurado com sucesso!"
-                        });
-                      }
-                    }}
-                  >
-                    Configurar
-                  </Button>
-                </div>
-              </div>
-
-              {formData.apiEndpoint && (
-                <div className="border rounded-lg p-4 bg-card">
-                  <Label className="text-sm text-muted-foreground mb-2 block">
-                    API Configurada:
-                  </Label>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 bg-secondary/20 p-2 rounded-md">
-                      <span className="flex-1 text-sm font-medium break-all">
-                        {formData.apiEndpoint}
-                      </span>
-                      <Button
+                            handleAddUrl();
+                          }
+                        }}
+                      />
+                      <Button 
                         type="button"
-                        variant="ghost"
-                        size="sm"
                         onClick={(e) => {
                           e.preventDefault();
-                          setFormData(prev => ({ ...prev, apiEndpoint: "" }));
+                          handleAddUrl();
                         }}
                       >
-                        <X className="h-4 w-4" />
+                        Adicionar
                       </Button>
                     </div>
                   </div>
+                  
+                  {formData.urls && formData.urls.length > 0 && (
+                    <div className="border rounded-lg p-4 bg-card">
+                      <Label className="text-sm text-muted-foreground mb-2 block">
+                        {formData.urls.length === 1 ? "Endereço Adicionado:" : "Endereços Adicionados:"}
+                      </Label>
+                      <div className="space-y-2">
+                        {formData.urls.map((url, index) => (
+                          <div 
+                            key={index} 
+                            className="flex items-center gap-2 bg-secondary/20 p-2 rounded-md"
+                          >
+                            <span className="flex-1 text-sm font-medium break-all">{url}</span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handleRemoveUrl(index);
+                              }}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
-          )}
 
-          <div className="space-y-2">
-            <Label>Ativar monitoramento imediatamente</Label>
-            <Switch
-              id="active"
-              checked={formData.active}
-              onCheckedChange={(checked) => setFormData({ ...formData, active: checked })}
-            />
+              {formData.type === "api" && (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>URL da API</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={formData.apiEndpoint || ""}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          apiEndpoint: e.target.value
+                        }))}
+                        placeholder="api.exemplo.com/endpoint"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && formData.apiEndpoint?.trim()) {
+                            e.preventDefault();
+                            toast({
+                              title: "API Configurada",
+                              description: "Endpoint da API foi configurado com sucesso!"
+                            });
+                          }
+                        }}
+                      />
+                      <Button 
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (formData.apiEndpoint?.trim()) {
+                            toast({
+                              title: "API Configurada",
+                              description: "Endpoint da API foi configurado com sucesso!"
+                            });
+                          }
+                        }}
+                      >
+                        Configurar
+                      </Button>
+                    </div>
+                  </div>
+
+                  {formData.apiEndpoint && (
+                    <div className="border rounded-lg p-4 bg-card">
+                      <Label className="text-sm text-muted-foreground mb-2 block">
+                        API Configurada:
+                      </Label>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 bg-secondary/20 p-2 rounded-md">
+                          <span className="flex-1 text-sm font-medium break-all">
+                            {formData.apiEndpoint}
+                          </span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setFormData(prev => ({ ...prev, apiEndpoint: "" }));
+                            }}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label>Ativar monitoramento imediatamente</Label>
+                <Switch
+                  id="active"
+                  checked={formData.active}
+                  onCheckedChange={(checked) => setFormData({ ...formData, active: checked })}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="flex justify-end gap-4">
+            <Button 
+              variant="outline" 
+              type="button"
+              className="w-[150px]"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/admin/monitoring", { replace: true });
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button type="submit" className="w-[150px]">
+              Criar Monitoramento
+            </Button>
           </div>
-        </CardContent>
-      </Card>
-
-      <div className="flex justify-end gap-4">
-        <Button 
-          variant="outline" 
-          type="button"
-          className="w-[150px]"
-          onClick={(e) => {
-            e.preventDefault();
-            navigate("/admin/monitoring", { replace: true });
-          }}
-        >
-          Cancelar
-        </Button>
-        <Button type="submit" className="w-[150px]">
-          Criar Monitoramento
-        </Button>
-      </div>
-    </form>
-  );
-};
+        </form>
+      );
+    };
