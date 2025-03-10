@@ -153,7 +153,71 @@ const AnalysisContent: React.FC = () => {
             details: 'Nova fonte de dados relevante encontrada',
             timestamp: new Date().toISOString()
           }
-        ]
+        ],
+        performance: {
+          responseTime: 250 + Math.random() * 200,
+          statusCode: 200,
+          uptime: 99.5 + Math.random() * 0.5,
+          lastCheck: new Date().toISOString(),
+          sslStatus: {
+            valid: true,
+            expiryDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
+          }
+        },
+        content: {
+          totalSize: 1024 * (10 + Math.random() * 5),
+          htmlChanges: Math.floor(Math.random() * 50),
+          cssChanges: Math.floor(Math.random() * 20),
+          jsChanges: Math.floor(Math.random() * 15),
+          imageChanges: Math.floor(Math.random() * 10),
+          brokenLinks: Math.floor(Math.random() * 3)
+        },
+        sentiment: {
+          overall: 70 + Math.random() * 20,
+          positive: 65 + Math.random() * 15,
+          negative: 25 + Math.random() * 10,
+          neutral: 10 + Math.random() * 5,
+          topics: [
+            { name: 'Qualidade', sentiment: 85, count: 120 },
+            { name: 'Preço', sentiment: 65, count: 80 },
+            { name: 'Atendimento', sentiment: 90, count: 150 }
+          ]
+        },
+        predictive: {
+          prediction: 75 + Math.random() * 15,
+          confidence: 85 + Math.random() * 10,
+          factors: [
+            { name: 'Sazonalidade', impact: 80 },
+            { name: 'Tendência de Mercado', impact: 65 },
+            { name: 'Eventos', impact: 45 }
+          ],
+          historicalData: Array.from({ length: 10 }, (_, i) => ({
+            date: new Date(Date.now() - (9 - i) * 24 * 60 * 60 * 1000).toISOString(),
+            value: 50 + Math.random() * 30
+          }))
+        },
+        structuredData: {
+          schema: 'Product',
+          coverage: 85 + Math.random() * 10,
+          quality: 90 + Math.random() * 5,
+          errors: [
+            { type: 'Campo Obrigatório', count: 2, severity: 'high' },
+            { type: 'Formato Inválido', count: 5, severity: 'medium' },
+            { type: 'Valor Fora do Range', count: 3, severity: 'low' }
+          ]
+        },
+        metadata: {
+          tags: [
+            { name: 'title', value: 'Produto Principal', frequency: 100 },
+            { name: 'description', value: 'Descrição do produto', frequency: 95 },
+            { name: 'keywords', value: 'produto, categoria, marca', frequency: 90 }
+          ],
+          headers: [
+            { name: 'Content-Type', value: 'text/html', status: 'ok' },
+            { name: 'Cache-Control', value: 'no-cache', status: 'warning' },
+            { name: 'X-Frame-Options', value: 'DENY', status: 'ok' }
+          ]
+        }
       };
     });
 
