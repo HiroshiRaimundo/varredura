@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { MonitoredItem } from './monitoringService';
+import { AnalysisService } from './analysisService';
 
 interface SourceDistribution {
   name: string;
@@ -23,50 +24,43 @@ interface Analytics {
   qualitativeAnalysis: QualitativeAnalysis[];
 }
 
-export const useAnalysisService = () => {
-  const [monitoringResults, setMonitoringResults] = useState<any[]>([]);
+interface MonitoringData {
+  name: string;
+  theme: string;
+  metrics: string[];
+}
 
-  const getAnalytics = (results: any[]): Analytics => {
-    // Simulação de dados de análise
-    return {
-      sourceDistribution: [
-        { name: 'Portais de Notícias', value: 45 },
-        { name: 'Blogs', value: 25 },
-        { name: 'Redes Sociais', value: 20 },
-        { name: 'Outros', value: 10 }
-      ],
-      mentionsOverTime: Array.from({ length: 7 }, (_, i) => {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        return {
-          date: date.toLocaleDateString(),
-          mentions: Math.floor(Math.random() * 50) + 10
-        };
-      }).reverse(),
-      qualitativeAnalysis: [
-        {
-          title: 'Principais Temas',
-          content: 'Os temas mais discutidos incluem inovação tecnológica, sustentabilidade e impacto social.',
-          keywords: ['inovação', 'tecnologia', 'sustentabilidade', 'impacto social']
-        },
-        {
-          title: 'Sentimento Geral',
-          content: 'A maioria das menções apresenta um sentimento positivo, com foco em resultados e benefícios.',
-          keywords: ['positivo', 'resultados', 'benefícios']
-        },
-        {
-          title: 'Alcance e Engajamento',
-          content: 'Alto engajamento em portais de notícias especializados e redes profissionais.',
-          keywords: ['engajamento', 'alcance', 'especializado']
-        }
-      ]
-    };
+interface ContentAnalysis {
+  type: string;
+  metrics: AnalysisService['calculateMetrics'][0][];
+  keywords: AnalysisService['analyzeKeywords'][0][];
+  trends: { date: string; value: number }[];
+  alerts: {
+    id: string;
+    type: 'error' | 'warning' | 'info' | 'success';
+    message: string;
+    details: string;
+    timestamp: string;
+  }[];
+}
+
+export const useAnalysisService = () => {
+  const [monitoringResults, setMonitoringResults] = useState<MonitoringData[]>([]);
+  const [contentAnalysis, setContentAnalysis] = useState<ContentAnalysis | null>(null);
+
+  const getAnalytics = async (results: MonitoringData[]) => {
+    const analysis = await AnalysisService.analyzeMonitoring(results[0]);
+    setContentAnalysis(analysis);
   };
 
   // Simula atualização periódica dos dados
   useEffect(() => {
     const interval = setInterval(() => {
-      setMonitoringResults(prev => [...prev, {}]);
+      setMonitoringResults(prev => [...prev, {
+        name: 'Exemplo',
+        theme: 'Tecnologia',
+        metrics: ['Inovação', 'Sustentabilidade', 'Impacto Social']
+      }]);
     }, 60000);
 
     return () => clearInterval(interval);
@@ -74,6 +68,7 @@ export const useAnalysisService = () => {
 
   return {
     monitoringResults,
+    contentAnalysis,
     getAnalytics
   };
 };
