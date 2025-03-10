@@ -5,8 +5,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { DateRange } from "react-day-picker";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart, Bar, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
+import { AlertCircle, TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
+import { cn } from "@/lib/utils";
 
 interface ActiveMonitoring {
   id: string;
@@ -14,6 +17,14 @@ interface ActiveMonitoring {
   type: string;
   metrics: string[];
   status: "active" | "inactive" | "analyzing";
+}
+
+interface Alert {
+  id: string;
+  type: 'error' | 'warning' | 'info' | 'success';
+  title: string;
+  description: string;
+  timestamp: string;
 }
 
 export const MonitoringAnalytics: React.FC = () => {
@@ -45,8 +56,92 @@ export const MonitoringAnalytics: React.FC = () => {
     { subject: "Impacto", A: 88, B: 80, C: 78 },
   ];
 
+  // Dados de alertas
+  const alerts: Alert[] = [
+    {
+      id: '1',
+      type: 'warning',
+      title: 'Aumento em Menções Negativas',
+      description: 'Detectado um aumento de 25% nas menções negativas nas últimas 24 horas.',
+      timestamp: new Date().toISOString()
+    },
+    {
+      id: '2',
+      type: 'error',
+      title: 'Falha na Coleta de Dados',
+      description: 'A fonte "Portal XYZ" está inacessível nos últimos 30 minutos.',
+      timestamp: new Date().toISOString()
+    },
+    {
+      id: '3',
+      type: 'info',
+      title: 'Nova Tendência Identificada',
+      description: 'Nova tendência positiva detectada relacionada ao termo "inovação".',
+      timestamp: new Date().toISOString()
+    }
+  ];
+
+  // Dados de métricas em tempo real
+  const realtimeMetrics = [
+    {
+      name: 'Menções Totais',
+      value: 1250,
+      change: 15,
+      trend: 'up'
+    },
+    {
+      name: 'Sentimento Médio',
+      value: 78,
+      change: -2,
+      trend: 'down'
+    },
+    {
+      name: 'Engajamento',
+      value: 92,
+      change: 8,
+      trend: 'up'
+    }
+  ];
+
   return (
     <div className="space-y-6">
+      {/* Alertas importantes */}
+      <div className="grid gap-4 md:grid-cols-2">
+        {alerts.map(alert => (
+          <Alert key={alert.id} variant={alert.type === 'error' ? 'destructive' : 'default'}>
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>{alert.title}</AlertTitle>
+            <AlertDescription className="mt-2 flex justify-between items-center">
+              <span>{alert.description}</span>
+              <Badge variant="outline" className="ml-2">
+                {new Date(alert.timestamp).toLocaleTimeString()}
+              </Badge>
+            </AlertDescription>
+          </Alert>
+        ))}
+      </div>
+
+      {/* Métricas em Tempo Real */}
+      <div className="grid gap-4 md:grid-cols-3">
+        {realtimeMetrics.map((metric) => (
+          <Card key={metric.name}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{metric.name}</CardTitle>
+              <div className={cn(
+                "flex items-center space-x-1",
+                metric.trend === 'up' ? "text-green-600" : "text-red-600"
+              )}>
+                {metric.trend === 'up' ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
+                <span>{Math.abs(metric.change)}%</span>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{metric.value}</div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>Configuração da Análise</CardTitle>
