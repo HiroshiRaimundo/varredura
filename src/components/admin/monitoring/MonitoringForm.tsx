@@ -553,19 +553,38 @@ export const MonitoringForm: React.FC = () => {
                   onValueChange={(value) => {
                     setFormData(prev => ({ ...prev, frequency: value }));
                   }}
+                  onOpenChange={(open) => {
+                    // Previne o comportamento padrão quando o select é aberto/fechado
+                    if (open) {
+                      setTimeout(() => {
+                        const listbox = document.querySelector('[role="listbox"]');
+                        if (listbox) {
+                          listbox.addEventListener('mousedown', (e) => {
+                            e.preventDefault();
+                          });
+                        }
+                      }, 0);
+                    }
+                  }}
                 >
                   <SelectTrigger 
                     className="w-full"
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={(e) => e.preventDefault()}
                   >
                     <SelectValue placeholder="Selecione a frequência" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent 
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={(e) => e.preventDefault()}
+                  >
                     {frequencies.map((freq) => (
                       <SelectItem 
                         key={freq.value} 
                         value={freq.value}
                         className="cursor-pointer"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={(e) => e.preventDefault()}
                       >
                         {freq.label}
                       </SelectItem>
