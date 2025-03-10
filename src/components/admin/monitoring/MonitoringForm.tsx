@@ -228,12 +228,20 @@ export const MonitoringForm: React.FC = () => {
         active: true,
       });
       
+      // Notificação mais informativa
       toast({
-        title: "Monitoramento Criado",
-        description: formData.urls && formData.urls.length > 1 
-          ? "Grupo de monitoramento criado com sucesso!"
-          : "Monitoramento criado com sucesso!",
-        variant: "default"
+        title: "✨ Novo Monitoramento Criado",
+        description: (
+          <div className="space-y-2">
+            <p className="font-medium">{formData.name}</p>
+            <div className="text-sm text-muted-foreground">
+              <p>• {formData.urls?.length || 1} {formData.urls?.length === 1 ? "URL" : "URLs"} monitorada(s)</p>
+              <p>• {formData.metrics?.length} métricas configuradas</p>
+              <p>• Frequência: {frequencies.find(f => f.value === formData.frequency)?.label}</p>
+            </div>
+          </div>
+        ),
+        duration: 5000
       });
 
       // Limpa o formulário
@@ -244,7 +252,7 @@ export const MonitoringForm: React.FC = () => {
       setErrors({});
       
       // Redireciona para a visão geral
-      navigate("/admin/monitoring", { replace: true });
+      navigate("/admin/monitoring");
       
     } catch (error) {
       console.error("Erro ao criar monitoramento:", error);
