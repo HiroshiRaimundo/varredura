@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,7 @@ interface Monitoring {
   analysisTypes?: string[];
   frequency?: string;
   description?: string;
+  theme?: string;
 }
 
 interface Filter {
@@ -63,34 +64,47 @@ const frequencies = [
 ];
 
 export const MonitoringOverview: React.FC = () => {
-  const { monitorings } = useMonitoring();
+  const { monitorings, removeMonitoring } = useMonitoring();
 
-  const [page, setPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>({
     search: "",
     group: "all",
     status: "all"
   });
 
-  // Dados mockados para os gráficos
-  const analysisData = [
-    { name: 'Jan', sentiment: 75, relevance: 65, accuracy: 80 },
-    { name: 'Fev', sentiment: 82, relevance: 70, accuracy: 85 },
-    { name: 'Mar', sentiment: 78, relevance: 75, accuracy: 82 },
-    { name: 'Abr', sentiment: 85, relevance: 80, accuracy: 88 },
-    { name: 'Mai', sentiment: 90, relevance: 85, accuracy: 90 },
-  ];
-
-  const statusData = [
-    { name: 'Ativos', value: monitorings.filter(m => m.status === 'active').length },
-    { name: 'Inativos', value: monitorings.filter(m => m.status === 'inactive').length },
-    { name: 'Em Análise', value: monitorings.filter(m => m.status === 'analyzing').length },
-  ];
-
-  const COLORS = ['#10b981', '#6366f1', '#f59e0b'];
-
   const itemsPerPage = 10;
-  const totalPages = Math.ceil(monitorings.length / itemsPerPage);
+
+  // Agrupar monitoramentos por tema
+  const groupedMonitorings = useMemo(() => {
+    const groups: { [key: string]: Monitoring[] } = {};
+    monitorings.forEach(monitoring => {
+      const theme = monitoring.theme || monitoring.description?.toLowerCase().split(' ').slice(0, 3).join(' ') || 'outros';
+      if (!groups[theme]) {
+        groups[theme] = [];
+      }
+      groups[theme].push(monitoring);
+    });
+    return groups;
+  }, [monitorings]);
+
+  // Paginação
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const totalMonitorings = monitorings.length;
+  const totalPages = Math.ceil(totalMonitorings / itemsPerPage);
+  const paginatedMonitorings = monitorings.slice(startIndex, endIndex);
+
+  const handleDelete = async (id: string) => {
+    try {
+      await removeMonitoring(id);
+      setDeleteConfirm(null);
+      toast.success("Monitoramento removido com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao remover monitoramento");
+    }
+  };
 
   const filteredMonitorings = monitorings.filter(monitoring => {
     const matchesSearch = monitoring.name.toLowerCase().includes(filter.search.toLowerCase()) ||
@@ -99,41 +113,6 @@ export const MonitoringOverview: React.FC = () => {
     const matchesStatus = filter.status === "all" || monitoring.status === filter.status;
     return matchesSearch && matchesGroup && matchesStatus;
   });
-
-  const paginatedMonitorings = filteredMonitorings.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage
-  );
-
-  const handleRemoveMonitoring = (id: string) => {
-    if (window.confirm("Tem certeza que deseja remover este monitoramento?")) {
-      setTimeout(() => {
-        // Implementar lógica para remover o monitoramento do contexto global
-        toast({
-          title: "Monitoramento Removido",
-          description: "O monitoramento foi removido com sucesso."
-        });
-      }, 500);
-    }
-  };
-
-  const handleToggleStatus = (id: string, currentStatus: string) => {
-    const newStatus = currentStatus === "active" ? "inactive" : "active";
-    setTimeout(() => {
-      // Implementar lógica para atualizar o status do monitoramento no contexto global
-      toast({
-        title: "Status Alterado",
-        description: `O monitoramento foi ${newStatus === "active" ? "ativado" : "desativado"}.`
-      });
-    }, 500);
-  };
-
-  const handleOpenSettings = (monitoring: Monitoring) => {
-    toast({
-      title: "Configurações",
-      description: `Abrindo configurações de ${monitoring.name}`,
-    });
-  };
 
   return (
     <div className="space-y-6">
@@ -181,7 +160,7 @@ export const MonitoringOverview: React.FC = () => {
                 <TableRow>
                   <TableHead>Status</TableHead>
                   <TableHead>Nome</TableHead>
-                  <TableHead>URLs</TableHead>
+                  <TableHead>Tema</TableHead>
                   <TableHead>Responsável</TableHead>
                   <TableHead>Métricas</TableHead>
                   <TableHead>Frequência</TableHead>
@@ -189,7 +168,7 @@ export const MonitoringOverview: React.FC = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedMonitorings.map((monitoring) => (
+                {filteredMonitorings.map((monitoring) => (
                   <TableRow key={monitoring.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -207,17 +186,9 @@ export const MonitoringOverview: React.FC = () => {
                     </TableCell>
                     <TableCell className="font-medium">{monitoring.name}</TableCell>
                     <TableCell>
-                      {monitoring.urls ? (
-                        <div className="flex flex-col gap-1">
-                          {monitoring.urls.map((url, index) => (
-                            <span key={index} className="text-sm truncate max-w-[200px]">
-                              {url}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground">Nenhuma URL</span>
-                      )}
+                      <Badge variant="outline">
+                        {monitoring.theme || monitoring.description?.toLowerCase().split(' ').slice(0, 3).join(' ') || 'outros'}
+                      </Badge>
                     </TableCell>
                     <TableCell>{monitoring.responsible}</TableCell>
                     <TableCell>
@@ -240,31 +211,33 @@ export const MonitoringOverview: React.FC = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleToggleStatus(monitoring.id, monitoring.status || "")}
-                        >
-                          {monitoring.status === "active" ? (
-                            <Pause className="h-4 w-4" />
-                          ) : (
-                            <Play className="h-4 w-4" />
-                          )}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleOpenSettings(monitoring)}
-                        >
-                          <Settings className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleRemoveMonitoring(monitoring.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        {deleteConfirm === monitoring.id ? (
+                          <>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleDelete(monitoring.id)}
+                            >
+                              Confirmar
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setDeleteConfirm(null)}
+                            >
+                              Cancelar
+                            </Button>
+                          </>
+                        ) : (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setDeleteConfirm(monitoring.id)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -280,15 +253,15 @@ export const MonitoringOverview: React.FC = () => {
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious 
-                      onClick={() => setPage(prev => Math.max(1, prev - 1))}
-                      className={cn(page === 1 && "pointer-events-none opacity-50")}
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      className={cn(currentPage === 1 && "pointer-events-none opacity-50")}
                     />
                   </PaginationItem>
                   {[...Array(totalPages)].map((_, i) => (
                     <PaginationItem key={i + 1}>
                       <PaginationLink
-                        onClick={() => setPage(i + 1)}
-                        isActive={page === i + 1}
+                        onClick={() => setCurrentPage(i + 1)}
+                        isActive={currentPage === i + 1}
                       >
                         {i + 1}
                       </PaginationLink>
@@ -296,8 +269,8 @@ export const MonitoringOverview: React.FC = () => {
                   ))}
                   <PaginationItem>
                     <PaginationNext 
-                      onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
-                      className={cn(page === totalPages && "pointer-events-none opacity-50")}
+                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      className={cn(currentPage === totalPages && "pointer-events-none opacity-50")}
                     />
                   </PaginationItem>
                 </PaginationContent>

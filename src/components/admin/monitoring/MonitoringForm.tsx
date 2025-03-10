@@ -217,6 +217,12 @@ export const MonitoringForm: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!validateForm()) {
+      toast.error("Por favor, preencha todos os campos obrigatórios");
+      return;
+    }
+
+    const theme = formData.description.toLowerCase().split(' ').slice(0, 3).join(' ');
     const newMonitoring = {
       id: generateId(),
       name: formData.name,
@@ -228,7 +234,7 @@ export const MonitoringForm: React.FC = () => {
       analysisTypes: formData.analysisTypes,
       status: "active",
       createdAt: new Date().toISOString(),
-      theme: formData.description.toLowerCase().split(' ').slice(0, 3).join(' ') // Extrair tema dos primeiros 3 palavras da descrição
+      theme
     };
 
     addMonitoring(newMonitoring);
@@ -240,33 +246,69 @@ export const MonitoringForm: React.FC = () => {
     setNewCategory('');
     setErrors({});
 
-    toast.success(
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          <span className="text-xl">✨</span>
-          <span className="font-medium">Monitoramento criado com sucesso!</span>
+    // Alerta de sucesso personalizado
+    toast.custom((t) => (
+      <div className={cn(
+        "pointer-events-auto flex w-full max-w-md rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5",
+        "dark:bg-gray-800 dark:ring-white dark:ring-opacity-10",
+        "p-6 transition-all duration-300 ease-in-out",
+        t.visible ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+      )}>
+        <div className="w-full">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <svg className="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="ml-3 w-0 flex-1">
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                Monitoramento criado com sucesso!
+              </p>
+              <div className="mt-3 border-t border-gray-200 dark:border-gray-700 pt-3">
+                <dl className="grid grid-cols-1 gap-2 text-sm">
+                  <div>
+                    <dt className="font-medium text-gray-500 dark:text-gray-400">Nome:</dt>
+                    <dd className="mt-1 text-gray-900 dark:text-white">{newMonitoring.name}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-gray-500 dark:text-gray-400">Tema:</dt>
+                    <dd className="mt-1 text-gray-900 dark:text-white">{theme}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-gray-500 dark:text-gray-400">URLs:</dt>
+                    <dd className="mt-1 text-gray-900 dark:text-white">{newMonitoring.urls?.length || 0} endereços</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-gray-500 dark:text-gray-400">Métricas:</dt>
+                    <dd className="mt-1 text-gray-900 dark:text-white">{newMonitoring.metrics?.length || 0} configuradas</dd>
+                  </div>
+                </dl>
+                <p className="mt-3 text-sm text-blue-600 dark:text-blue-400">
+                  Disponível em Visão Geral nos monitoramentos ativos
+                </p>
+              </div>
+            </div>
+            <div className="ml-4 flex-shrink-0 flex">
+              <button
+                className="bg-white dark:bg-gray-800 rounded-md inline-flex text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 focus:outline-none"
+                onClick={() => toast.dismiss(t.id)}
+              >
+                <span className="sr-only">Fechar</span>
+                <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="text-sm text-muted-foreground">
-          <p><strong>Nome:</strong> {newMonitoring.name}</p>
-          <p><strong>URLs:</strong> {newMonitoring.urls?.length || 0} endereços</p>
-          <p><strong>Métricas:</strong> {newMonitoring.metrics?.length || 0} configuradas</p>
-          <p><strong>Frequência:</strong> {formData.frequency}</p>
-        </div>
-        <div className="text-sm text-muted-foreground mt-1">
-          <p>O monitoramento já está disponível em <strong>Visão Geral</strong> nos monitoramentos ativos.</p>
-        </div>
-      </div>,
-      {
-        duration: 5000,
-        position: "top-right",
-        style: {
-          background: "var(--background)",
-          border: "1px solid var(--border)",
-          borderRadius: "var(--radius)",
-        },
-      }
-    );
+      </div>
+    ), {
+      duration: 6000,
+      position: "top-right",
+    });
 
+    // Redirecionar para a visão geral
     navigate("/admin/monitoring");
   };
 
