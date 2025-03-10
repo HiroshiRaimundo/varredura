@@ -490,25 +490,26 @@ export const MonitoringForm: React.FC = () => {
             <CardHeader>
               <CardTitle>Métricas de Monitoramento</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {metrics.map((metric) => (
-                <Button
+                <div
                   key={metric.id}
-                  type="button"
-                  variant={formData.metrics?.includes(metric.id) ? "default" : "outline"}
                   className={cn(
-                    "h-auto w-full text-left px-4 py-3 space-y-1.5",
-                    formData.metrics?.includes(metric.id) ? "bg-primary/10 hover:bg-primary/20" : "hover:bg-secondary/10",
-                    errors.metrics && "border-red-500"
+                    "flex items-start space-x-4 p-3 rounded-lg",
+                    formData.metrics?.includes(metric.id) ? "bg-secondary/20" : "bg-background",
+                    errors.metrics && "border border-red-500"
                   )}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleToggleMetric(metric.id);
-                  }}
                 >
-                  <div className="font-medium text-base">{metric.name}</div>
-                  <div className="text-sm text-muted-foreground leading-relaxed">{metric.description}</div>
-                </Button>
+                  <Switch
+                    checked={formData.metrics?.includes(metric.id)}
+                    onCheckedChange={() => handleToggleMetric(metric.id)}
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <div className="font-medium text-foreground">{metric.name}</div>
+                    <div className="text-sm text-muted-foreground">{metric.description}</div>
+                  </div>
+                </div>
               ))}
             </CardContent>
           </Card>
@@ -517,25 +518,26 @@ export const MonitoringForm: React.FC = () => {
             <CardHeader>
               <CardTitle>Tipos de Análise</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {analysisTypes.map((type) => (
-                <Button
+                <div
                   key={type.id}
-                  type="button"
-                  variant={formData.analysisTypes?.includes(type.id) ? "default" : "outline"}
                   className={cn(
-                    "h-auto w-full text-left px-4 py-3 space-y-1.5",
-                    formData.analysisTypes?.includes(type.id) ? "bg-primary/10 hover:bg-primary/20" : "hover:bg-secondary/10",
-                    errors.analysisTypes && "border-red-500"
+                    "flex items-start space-x-4 p-3 rounded-lg",
+                    formData.analysisTypes?.includes(type.id) ? "bg-secondary/20" : "bg-background",
+                    errors.analysisTypes && "border border-red-500"
                   )}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleToggleAnalysisType(type.id);
-                  }}
                 >
-                  <div className="font-medium text-base">{type.name}</div>
-                  <div className="text-sm text-muted-foreground leading-relaxed">{type.description}</div>
-                </Button>
+                  <Switch
+                    checked={formData.analysisTypes?.includes(type.id)}
+                    onCheckedChange={() => handleToggleAnalysisType(type.id)}
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <div className="font-medium text-foreground">{type.name}</div>
+                    <div className="text-sm text-muted-foreground">{type.description}</div>
+                  </div>
+                </div>
               ))}
             </CardContent>
           </Card>
