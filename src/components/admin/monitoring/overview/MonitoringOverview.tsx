@@ -64,7 +64,7 @@ const frequencies = [
 ];
 
 export const MonitoringOverview: React.FC = () => {
-  const { monitorings, removeMonitoring } = useMonitoring();
+  const { monitorings, removeMonitoring, updateMonitoring } = useMonitoring();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -103,6 +103,22 @@ export const MonitoringOverview: React.FC = () => {
       toast.success("Monitoramento removido com sucesso!");
     } catch (error) {
       toast.error("Erro ao remover monitoramento");
+    }
+  };
+
+  const handleToggleStatus = async (id: string, currentStatus: string) => {
+    try {
+      const monitoring = monitorings.find(m => m.id === id);
+      if (monitoring) {
+        const updatedMonitoring = {
+          ...monitoring,
+          status: currentStatus === "active" ? "inactive" : "active"
+        };
+        await updateMonitoring(updatedMonitoring);
+        toast.success(`Monitoramento ${currentStatus === "active" ? "pausado" : "retomado"} com sucesso!`);
+      }
+    } catch (error) {
+      toast.error("Erro ao alterar status do monitoramento");
     }
   };
 
@@ -211,6 +227,20 @@ export const MonitoringOverview: React.FC = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleToggleStatus(monitoring.id, monitoring.status || "")}
+                          className={cn(
+                            monitoring.status === "active" ? "text-yellow-500 hover:text-yellow-700" : "text-green-500 hover:text-green-700"
+                          )}
+                        >
+                          {monitoring.status === "active" ? (
+                            <Pause className="h-4 w-4" />
+                          ) : (
+                            <Play className="h-4 w-4" />
+                          )}
+                        </Button>
                         {deleteConfirm === monitoring.id ? (
                           <>
                             <Button
