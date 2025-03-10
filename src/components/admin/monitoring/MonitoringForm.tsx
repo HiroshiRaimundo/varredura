@@ -555,30 +555,51 @@ export const MonitoringForm: React.FC = () => {
               <CardTitle>Frequência de Monitoramento</CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={(e) => e.preventDefault()}>
-                <div className="w-full max-w-[240px]">
-                  <Select 
-                    value={formData.frequency}
-                    onValueChange={(value) => {
-                      setFormData(prev => ({ ...prev, frequency: value }));
-                    }}
+              <div className="w-full max-w-[240px]">
+                <Select 
+                  value={formData.frequency}
+                  onValueChange={(value) => {
+                    setFormData(prev => ({ ...prev, frequency: value }));
+                  }}
+                  onOpenChange={(open) => {
+                    // Previne o comportamento padrão quando o select é aberto/fechado
+                    if (open) {
+                      setTimeout(() => {
+                        const listbox = document.querySelector('[role="listbox"]');
+                        if (listbox) {
+                          listbox.addEventListener('mousedown', (e) => {
+                            e.preventDefault();
+                          });
+                        }
+                      }, 0);
+                    }
+                  }}
+                >
+                  <SelectTrigger 
+                    className="w-full"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={(e) => e.preventDefault()}
                   >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Selecione a frequência" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {frequencies.map((freq) => (
-                        <SelectItem 
-                          key={freq.value} 
-                          value={freq.value}
-                        >
-                          {freq.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </form>
+                    <SelectValue placeholder="Selecione a frequência" />
+                  </SelectTrigger>
+                  <SelectContent 
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    {frequencies.map((freq) => (
+                      <SelectItem 
+                        key={freq.value} 
+                        value={freq.value}
+                        className="cursor-pointer"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={(e) => e.preventDefault()}
+                      >
+                        {freq.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </CardContent>
           </Card>
         </CardContent>
