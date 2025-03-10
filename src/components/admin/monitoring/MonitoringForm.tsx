@@ -210,11 +210,15 @@ export const MonitoringForm: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const generateId = () => {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const newMonitoring: any = {
-      id: Math.random().toString(36).substr(2, 9),
+    const newMonitoring = {
+      id: generateId(),
       name: formData.name,
       responsible: formData.responsible,
       description: formData.description,
@@ -224,9 +228,17 @@ export const MonitoringForm: React.FC = () => {
       analysisTypes: formData.analysisTypes,
       status: "active",
       createdAt: new Date().toISOString(),
+      theme: formData.description.toLowerCase().split(' ').slice(0, 3).join(' ') // Extrair tema dos primeiros 3 palavras da descrição
     };
 
     addMonitoring(newMonitoring);
+
+    // Limpar formulário
+    setFormData(initialFormState);
+    setUrlInput('');
+    setNewKeyword('');
+    setNewCategory('');
+    setErrors({});
 
     toast.success(
       <div className="flex flex-col gap-2">
