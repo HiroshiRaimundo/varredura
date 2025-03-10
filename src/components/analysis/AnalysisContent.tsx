@@ -12,7 +12,7 @@ import {
   Clock, Activity, BarChart2, PieChart as PieChartIcon,
   AlertTriangle, CheckCircle, XCircle, Info, Link2,
   FileCode, Image, Code, Database, Gauge, Brain,
-  Heart, Trending, Hash, FileJson
+  Heart, Trending, Hash, FileJson, LayoutGrid, List
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -75,8 +75,13 @@ const AnalysisContent: React.FC = () => {
   const [timeRange, setTimeRange] = useState('30d');
   const [selectedMetrics, setSelectedMetrics] = useState<string[]>([]);
   const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [groupBy, setGroupBy] = useState<'category' | 'type' | 'none'>('category');
+  const itemsPerPage = 10;
 
-  // Agrupar monitoramentos por tema
+  // Agrupar monitoramentos por tema e categoria
   const monitoringsByTheme = useMemo(() => {
     const themes: { [key: string]: any[] } = {};
     monitorings.forEach(monitoring => {
@@ -223,6 +228,52 @@ const AnalysisContent: React.FC = () => {
 
     return analysis;
   }, [monitoringsByTheme]);
+
+  // Filtrar e agrupar temas
+  const filteredAndGroupedThemes = useMemo(() => {
+    let themes = Object.entries(contentAnalysis);
+
+    // Filtrar por termo de busca
+    if (searchTerm) {
+      themes = themes.filter(([theme]) => 
+        theme.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Agrupar por categoria ou tipo
+    if (groupBy !== 'none') {
+      const grouped: { [key: string]: [string, ContentAnalysis][] } = {};
+      themes.forEach(([theme, analysis]) => {
+        const key = groupBy === 'category' ? 
+          (analysis.type || 'Sem Categoria') : 
+          getAnalysisType(analysis);
+        
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push([theme, analysis]);
+      });
+      return grouped;
+    }
+
+    // Paginação
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    
+    return { 'all': themes.slice(startIndex, endIndex) };
+  }, [contentAnalysis, searchTerm, groupBy, currentPage]);
+
+  // Função auxiliar para determinar o tipo principal de análise
+  const getAnalysisType = (analysis: ContentAnalysis) => {
+    if (analysis.performance) return 'Performance';
+    if (analysis.content) return 'Conteúdo';
+    if (analysis.sentiment) return 'Sentimento';
+    if (analysis.predictive) return 'Preditiva';
+    if (analysis.structuredData) return 'Dados Estruturados';
+    if (analysis.metadata) return 'Metadados';
+    return 'Geral';
+  };
+
+  // Total de páginas
+  const totalPages = Math.ceil(Object.keys(contentAnalysis).length / itemsPerPage);
 
   const renderMetricCard = (metric: AnalysisMetric) => (
     <Card key={metric.id} className="hover:shadow-lg transition-shadow">
@@ -679,29 +730,70 @@ const AnalysisContent: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Cabeçalho com Filtros */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Análise de Monitoramentos</h2>
-          <p className="text-muted-foreground">
-            Análise detalhada por tema e métrica
-          </p>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold">Análise de Monitoramentos</h2>
+            <p className="text-muted-foreground">
+              Análise detalhada por tema e métrica
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Select value={timeRange} onValueChange={setTimeRange}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Período" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="7d">Últimos 7 dias</SelectItem>
+                <SelectItem value="30d">Últimos 30 dias</SelectItem>
+                <SelectItem value="90d">Últimos 90 dias</SelectItem>
+                <SelectItem value="1y">Último ano</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Select value={timeRange} onValueChange={setTimeRange}>
+
+        {/* Barra de Ferramentas */}
+        <div className="flex items-center gap-4 bg-background/95 p-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="flex-1">
+            <input
+              type="search"
+              placeholder="Buscar temas..."
+              className="w-full rounded-md border px-3 py-2"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <Select value={groupBy} onValueChange={(value: any) => setGroupBy(value)}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Período" />
+              <SelectValue placeholder="Agrupar por" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="7d">Últimos 7 dias</SelectItem>
-              <SelectItem value="30d">Últimos 30 dias</SelectItem>
-              <SelectItem value="90d">Últimos 90 dias</SelectItem>
-              <SelectItem value="1y">Último ano</SelectItem>
+              <SelectItem value="category">Categoria</SelectItem>
+              <SelectItem value="type">Tipo de Análise</SelectItem>
+              <SelectItem value="none">Sem Agrupamento</SelectItem>
             </SelectContent>
           </Select>
+          <div className="flex items-center gap-2 border rounded-md p-1">
+            <Button
+              variant={viewMode === 'grid' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('grid')}
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === 'list' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('list')}
+            >
+              <List className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Alertas Importantes */}
+      {/* Alertas */}
       <div className="space-y-2">
         {Object.values(contentAnalysis).flatMap(analysis => 
           analysis.alerts
@@ -721,36 +813,84 @@ const AnalysisContent: React.FC = () => {
         )}
       </div>
 
-      {/* Navegação por Temas */}
-      <Tabs defaultValue={Object.keys(contentAnalysis)[0]} className="space-y-4">
-        <TabsList className="flex-wrap">
-          {Object.keys(contentAnalysis).map(theme => (
-            <TabsTrigger key={theme} value={theme} className="capitalize">
-              {theme}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      {/* Conteúdo Agrupado */}
+      <div className="space-y-8">
+        {Object.entries(filteredAndGroupedThemes).map(([group, themes]) => (
+          <div key={group} className="space-y-4">
+            {group !== 'all' && (
+              <h3 className="text-lg font-semibold border-b pb-2">{group}</h3>
+            )}
+            
+            <div className={cn(
+              "grid gap-4",
+              viewMode === 'grid' ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"
+            )}>
+              {themes.map(([theme, analysis]) => (
+                <Card key={theme} className="overflow-hidden">
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <span>{theme}</span>
+                      <Badge>{getAnalysisType(analysis)}</Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Tabs defaultValue="overview" className="space-y-4">
+                      <TabsList className="grid w-full grid-cols-3">
+                        <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+                        <TabsTrigger value="metrics">Métricas</TabsTrigger>
+                        <TabsTrigger value="details">Detalhes</TabsTrigger>
+                      </TabsList>
 
-        {Object.entries(contentAnalysis).map(([theme, analysis]) => (
-          <TabsContent key={theme} value={theme} className="space-y-6">
-            {/* Métricas Principais */}
-            <div className="grid gap-4 md:grid-cols-3">
-              {analysis.metrics.map(metric => renderMetricCard(metric))}
+                      <TabsContent value="overview">
+                        <div className="grid gap-4 md:grid-cols-2">
+                          {analysis.metrics.slice(0, 2).map(metric => renderMetricCard(metric))}
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="metrics">
+                        {analysis.performance && renderPerformanceAnalysis(analysis.performance)}
+                        {analysis.content && renderContentAnalysis(analysis.content)}
+                        {analysis.sentiment && renderSentimentAnalysis(analysis.sentiment)}
+                      </TabsContent>
+
+                      <TabsContent value="details">
+                        {analysis.predictive && renderPredictiveAnalysis(analysis.predictive)}
+                        {analysis.structuredData && renderStructuredDataAnalysis(analysis.structuredData)}
+                        {analysis.metadata && renderMetadataAnalysis(analysis.metadata)}
+                      </TabsContent>
+                    </Tabs>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-
-            {/* Análises Específicas */}
-            {analysis.performance && renderPerformanceAnalysis(analysis.performance)}
-            {analysis.content && renderContentAnalysis(analysis.content)}
-            {analysis.sentiment && renderSentimentAnalysis(analysis.sentiment)}
-            {analysis.predictive && renderPredictiveAnalysis(analysis.predictive)}
-            {analysis.structuredData && renderStructuredDataAnalysis(analysis.structuredData)}
-            {analysis.metadata && renderMetadataAnalysis(analysis.metadata)}
-
-            {/* Análise de Palavras-chave */}
-            {renderKeywordAnalysis(analysis.keywords)}
-          </TabsContent>
+          </div>
         ))}
-      </Tabs>
+      </div>
+
+      {/* Paginação */}
+      {groupBy === 'none' && totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 py-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+          >
+            Anterior
+          </Button>
+          <span className="text-sm">
+            Página {currentPage} de {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+          >
+            Próxima
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
