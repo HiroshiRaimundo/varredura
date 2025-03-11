@@ -1,0 +1,12 @@
+# Redirects for Netlify deployments
+/api/*  /index.php  200
+/admin/*  /index.php  200
+/*  /index.html  200
+
+/*
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/assets/*
+  Cache-Control: public, max-age=0, must-revalidate
