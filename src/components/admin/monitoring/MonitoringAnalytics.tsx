@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { LineChart, BarChart, PieChart } from "@/components/charts";
+import { useMonitoringData } from "@/contexts/MonitoringDataContext";
 
 interface AnalyticsData {
   timeRange: string;
@@ -26,13 +27,14 @@ interface AnalyticsData {
   }[];
 }
 
-export const MonitoringAnalytics: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("overview");
-  const [timeRange, setTimeRange] = useState("7d");
-  const [exportFormat, setExportFormat] = useState("csv");
+const generateMockData = () => {
+  const dates = Array.from({ length: 7 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    return date.toISOString().split('T')[0];
+  }).reverse();
 
-  // Dados mockados para exemplo
-  const analyticsData: AnalyticsData = {
+  return {
     timeRange: "7d",
     metrics: {
       totalMonitorings: 150,
@@ -41,12 +43,11 @@ export const MonitoringAnalytics: React.FC = () => {
       averageUpdateTime: 45,
       alertsGenerated: 25
     },
-    trends: [
-      { date: "2024-03-01", updates: 45, alerts: 3 },
-      { date: "2024-03-02", updates: 52, alerts: 5 },
-      { date: "2024-03-03", updates: 48, alerts: 2 },
-      // ... mais dados
-    ],
+    trends: dates.map(date => ({
+      date,
+      updates: Math.floor(Math.random() * 30) + 30,
+      alerts: Math.floor(Math.random() * 5)
+    })),
     distribution: [
       { type: "Governo", count: 45 },
       { type: "Notícias", count: 35 },
@@ -54,9 +55,18 @@ export const MonitoringAnalytics: React.FC = () => {
       { type: "Diário Oficial", count: 30 }
     ]
   };
+};
+
+export const MonitoringAnalytics: React.FC = () => {
+  const [activeTab, setActiveTab] = useState("overview");
+  const [timeRange, setTimeRange] = useState("7d");
+  const [exportFormat, setExportFormat] = useState("csv");
+  const { monitoringData } = useMonitoringData();
+
+  // Usando a função de mock data
+  const analyticsData: AnalyticsData = generateMockData();
 
   const handleExportData = () => {
-    // Implementar exportação de dados
     console.log(`Exportando dados em formato ${exportFormat}`);
   };
 
@@ -102,9 +112,11 @@ export const MonitoringAnalytics: React.FC = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-          <TabsTrigger value="trends">Tendências</TabsTrigger>
-          <TabsTrigger value="distribution">Distribuição</TabsTrigger>
-          <TabsTrigger value="predictions">Previsões</TabsTrigger>
+          <TabsTrigger value="predictive">Análise Preditiva</TabsTrigger>
+          <TabsTrigger value="content">Análise de Conteúdo</TabsTrigger>
+          <TabsTrigger value="sentiment">Análise de Sentimento</TabsTrigger>
+          <TabsTrigger value="performance">Performance</TabsTrigger>
+          <TabsTrigger value="metadata">Metadados</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
@@ -158,58 +170,206 @@ export const MonitoringAnalytics: React.FC = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="trends">
+        <TabsContent value="predictive">
           <Card>
             <CardHeader>
-              <CardTitle>Análise de Tendências</CardTitle>
+              <CardTitle>Previsão de Tendências</CardTitle>
             </CardHeader>
             <CardContent>
               <LineChart
-                data={analyticsData.trends}
+                data={monitoringData?.map(m => ({
+                  date: new Date(m.metrics[0]?.timestamp || Date.now()).toLocaleDateString(),
+                  value: m.metrics[0]?.value || 0
+                })) || []}
                 xField="date"
-                yFields={["updates"]}
+                yFields={["value"]}
                 height={400}
               />
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="distribution">
+        <TabsContent value="content">
           <Card>
             <CardHeader>
-              <CardTitle>Distribuição por Tipo</CardTitle>
+              <CardTitle>Análise de Conteúdo</CardTitle>
             </CardHeader>
-            <CardContent className="flex justify-around">
-              <div className="w-1/2">
-                <PieChart
-                  data={analyticsData.distribution}
-                  nameField="type"
-                  valueField="count"
-                  height={300}
-                />
-              </div>
-              <div className="w-1/2">
-                <BarChart
-                  data={analyticsData.distribution}
-                  xField="type"
-                  yField="count"
-                  height={300}
-                />
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Palavras-chave Mais Frequentes</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <BarChart
+                      data={[
+                        { keyword: "licitação", count: 45 },
+                        { keyword: "edital", count: 38 },
+                        { keyword: "contrato", count: 32 }
+                      ]}
+                      xField="keyword"
+                      yField="count"
+                      height={300}
+                    />
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Distribuição de Tópicos</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <PieChart
+                      data={[
+                        { topic: "Administrativo", value: 40 },
+                        { topic: "Financeiro", value: 30 },
+                        { topic: "Técnico", value: 30 }
+                      ]}
+                      nameField="topic"
+                      valueField="value"
+                      height={300}
+                    />
+                  </CardContent>
+                </Card>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="predictions">
+        <TabsContent value="sentiment">
           <Card>
             <CardHeader>
-              <CardTitle>Previsões de Atualização</CardTitle>
+              <CardTitle>Análise de Sentimento</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">
-                Em desenvolvimento. Esta funcionalidade usará machine learning para prever
-                padrões de atualização e momentos prováveis de mudanças.
-              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Tendência de Sentimento</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <LineChart
+                      data={[
+                        { date: "2024-03-01", positive: 75, negative: 25 },
+                        { date: "2024-03-02", positive: 80, negative: 20 },
+                        { date: "2024-03-03", positive: 85, negative: 15 }
+                      ]}
+                      xField="date"
+                      yFields={["positive", "negative"]}
+                      height={300}
+                    />
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Distribuição de Sentimento</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <PieChart
+                      data={[
+                        { sentiment: "Positivo", value: 60 },
+                        { sentiment: "Neutro", value: 30 },
+                        { sentiment: "Negativo", value: 10 }
+                      ]}
+                      nameField="sentiment"
+                      valueField="value"
+                      height={300}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="performance">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise de Performance</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Tempo de Resposta</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <LineChart
+                      data={monitoringData?.map(m => ({
+                        date: new Date(m.metrics[1]?.timestamp || Date.now()).toLocaleDateString(),
+                        responseTime: m.metrics[1]?.value || 0
+                      })) || []}
+                      xField="date"
+                      yFields={["responseTime"]}
+                      height={300}
+                    />
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Métricas de Performance</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <BarChart
+                      data={[
+                        { metric: "CPU", value: 45 },
+                        { metric: "Memória", value: 65 },
+                        { metric: "Disco", value: 30 },
+                        { metric: "Rede", value: 80 }
+                      ]}
+                      xField="metric"
+                      yField="value"
+                      height={300}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="metadata">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise de Metadados</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Tipos de Arquivo</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <PieChart
+                      data={[
+                        { type: "HTML", value: 50 },
+                        { type: "PDF", value: 30 },
+                        { type: "DOC", value: 20 }
+                      ]}
+                      nameField="type"
+                      valueField="value"
+                      height={300}
+                    />
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Tamanho dos Arquivos</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <BarChart
+                      data={[
+                        { range: "0-1MB", count: 45 },
+                        { range: "1-5MB", count: 30 },
+                        { range: "5-10MB", count: 15 },
+                        { range: ">10MB", count: 10 }
+                      ]}
+                      xField="range"
+                      yField="count"
+                      height={300}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
