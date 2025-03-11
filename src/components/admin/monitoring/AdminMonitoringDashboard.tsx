@@ -7,6 +7,9 @@ import { MonitoringForm } from "./MonitoringForm";
 import { MonitoringStats } from "./MonitoringStats";
 import { MonitoringSettings } from "./MonitoringSettings";
 import { MonitoringAnalytics } from "./MonitoringAnalytics";
+import { MonitoringReports } from "./MonitoringReports";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 export const AdminMonitoringDashboard: React.FC = () => {
   const location = useLocation();
@@ -19,13 +22,28 @@ export const AdminMonitoringDashboard: React.FC = () => {
     navigate(`/admin/monitoring/${value === "overview" ? "" : value}`);
   };
 
+  const handleBackToAdmin = () => {
+    navigate("/admin");
+  };
+
   return (
     <div className="p-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-2">Central de Monitoramento</h2>
-        <p className="text-muted-foreground">
-          Gerencie todos os monitoramentos do sistema
-        </p>
+      <div className="flex items-center gap-4 mb-6">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleBackToAdmin}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Voltar
+        </Button>
+        <div>
+          <h2 className="text-2xl font-bold mb-2">Central de Monitoramento</h2>
+          <p className="text-muted-foreground">
+            Gerencie todos os monitoramentos do sistema
+          </p>
+        </div>
       </div>
 
       <MonitoringStats />
@@ -82,8 +100,7 @@ export const AdminMonitoringDashboard: React.FC = () => {
               <CardTitle>Relatórios e Análises</CardTitle>
             </CardHeader>
             <CardContent>
-              {/* Componente de relatórios será implementado posteriormente */}
-              <p>Em desenvolvimento...</p>
+              <MonitoringReports />
             </CardContent>
           </Card>
         </TabsContent>
