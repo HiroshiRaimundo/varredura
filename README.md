@@ -1,69 +1,69 @@
-# Welcome to your Lovable project
+# Sistema de Monitoramento - Koga
 
-## Project info
+## Visão Geral
 
-**URL**: https://lovable.dev/projects/b75a93f0-491f-47e4-81c9-33e7c4d11dde
+Sistema de monitoramento para análise de dados e geração de relatórios. O projeto utiliza React, TypeScript e ShadCN UI para criar uma interface moderna e responsiva.
 
-## How can I edit this code?
+## Executando o Projeto Localmente
 
-There are several ways of editing your application.
+### Método Simples (Recomendado)
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/b75a93f0-491f-47e4-81c9-33e7c4d11dde) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Para iniciar o projeto localmente de forma rápida e fácil, execute o arquivo batch incluído:
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+# No Windows, basta clicar duas vezes no arquivo ou executar:
+start-local.bat
 ```
 
-**Edit a file directly in GitHub**
+Este script irá:
+1. Instalar todas as dependências necessárias
+2. Iniciar o servidor de desenvolvimento
+3. Abrir automaticamente o navegador com o projeto
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Método Manual
 
-**Use GitHub Codespaces**
+Se preferir executar os comandos manualmente:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```sh
+# Instalar dependências (use --legacy-peer-deps para evitar conflitos)
+npm install --legacy-peer-deps
 
-## What technologies are used for this project?
+# Iniciar o servidor de desenvolvimento
+npm run dev
 
-This project is built with .
+# OU para acessar de outros dispositivos na mesma rede
+npm run dev:host
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+O projeto estará disponível em:
+- Local: http://localhost:5173
+- Rede (se usar dev:host): http://seu-ip:5173
 
-## How can I deploy this project?
+## Acesso à Área Administrativa
 
-Simply open [Lovable](https://lovable.dev/projects/b75a93f0-491f-47e4-81c9-33e7c4d11dde) and click on Share -> Publish.
+Para acessar a área administrativa, use:
 
-## I want to use a custom domain - is that possible?
+- **Email**: admin@koga.com
+- **Senha**: admin123
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## Estrutura do Projeto
+
+- `/src/components` - Componentes reutilizáveis
+- `/src/pages` - Páginas da aplicação
+- `/src/contexts` - Contextos para gerenciamento de estado
+- `/src/hooks` - Hooks personalizados
+
+## Configurações Importantes
+
+- O sistema de monitoramento utiliza o MonitoringContext para gerenciar o estado global
+- O localhost é configurado como fonte fixa do sistema
+- Os componentes de monitoramento estão localizados em `/src/components/admin/monitoring`
+
+## Solução de Problemas
+
+Se encontrar problemas ao executar o projeto:
+
+1. Verifique se todas as dependências foram instaladas corretamente
+2. Tente limpar o cache do npm: `npm cache clean --force`
+3. Remova a pasta node_modules e reinstale: `rm -rf node_modules && npm install --legacy-peer-deps`
+4. Verifique se está usando a versão correta do Node.js (recomendado: v18+)
