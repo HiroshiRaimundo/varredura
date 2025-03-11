@@ -110,13 +110,16 @@ export const MonitoringAnalytics: React.FC = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
+        <TabsList className="grid grid-cols-4 lg:grid-cols-8">
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+          <TabsTrigger value="detailed">Análise Detalhada</TabsTrigger>
           <TabsTrigger value="predictive">Análise Preditiva</TabsTrigger>
-          <TabsTrigger value="content">Análise de Conteúdo</TabsTrigger>
           <TabsTrigger value="sentiment">Análise de Sentimento</TabsTrigger>
-          <TabsTrigger value="performance">Performance</TabsTrigger>
-          <TabsTrigger value="metadata">Metadados</TabsTrigger>
+          <TabsTrigger value="trends">Análise de Tendências</TabsTrigger>
+          <TabsTrigger value="frequency">Análise de Frequência</TabsTrigger>
+          <TabsTrigger value="links">Análise de Links</TabsTrigger>
+          <TabsTrigger value="performance">Análise de Performance</TabsTrigger>
+          <TabsTrigger value="availability">Análise de Disponibilidade</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
@@ -170,6 +173,52 @@ export const MonitoringAnalytics: React.FC = () => {
           </Card>
         </TabsContent>
 
+        <TabsContent value="detailed">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise Detalhada do Conteúdo e Estrutura</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Estrutura do Conteúdo</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <BarChart
+                      data={[
+                        { type: "Texto", count: 65 },
+                        { type: "Imagens", count: 20 },
+                        { type: "Links", count: 10 },
+                        { type: "Tabelas", count: 5 }
+                      ]}
+                      xField="type"
+                      yFields={["count"]}
+                      height={200}
+                    />
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Análise de Elementos</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <PieChart
+                      data={[
+                        { label: "Títulos", value: 30 },
+                        { label: "Parágrafos", value: 45 },
+                        { label: "Listas", value: 15 },
+                        { label: "Outros", value: 10 }
+                      ]}
+                      height={200}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="predictive">
           <Card>
             <CardHeader>
@@ -189,44 +238,41 @@ export const MonitoringAnalytics: React.FC = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="content">
+        <TabsContent value="sentiment">
           <Card>
             <CardHeader>
-              <CardTitle>Análise de Conteúdo</CardTitle>
+              <CardTitle>Análise de Sentimento do Conteúdo</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Palavras-chave Mais Frequentes</CardTitle>
+                    <CardTitle>Distribuição de Sentimento</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <BarChart
+                    <PieChart
                       data={[
-                        { keyword: "licitação", count: 45 },
-                        { keyword: "edital", count: 38 },
-                        { keyword: "contrato", count: 32 }
+                        { label: "Positivo", value: 45 },
+                        { label: "Neutro", value: 35 },
+                        { label: "Negativo", value: 20 }
                       ]}
-                      xField="keyword"
-                      yField="count"
-                      height={300}
+                      height={200}
                     />
                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader>
-                    <CardTitle>Distribuição de Tópicos</CardTitle>
+                    <CardTitle>Evolução do Sentimento</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <PieChart
-                      data={[
-                        { topic: "Administrativo", value: 40 },
-                        { topic: "Financeiro", value: 30 },
-                        { topic: "Técnico", value: 30 }
-                      ]}
-                      nameField="topic"
-                      valueField="value"
-                      height={300}
+                    <LineChart
+                      data={analyticsData.trends.map(t => ({
+                        ...t,
+                        sentiment: Math.random() * 100
+                      }))}
+                      xField="date"
+                      yFields={["sentiment"]}
+                      height={200}
                     />
                   </CardContent>
                 </Card>
@@ -235,44 +281,131 @@ export const MonitoringAnalytics: React.FC = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="sentiment">
+        <TabsContent value="trends">
           <Card>
             <CardHeader>
-              <CardTitle>Análise de Sentimento</CardTitle>
+              <CardTitle>Identificação de Padrões Temporais</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Tendência de Sentimento</CardTitle>
+                    <CardTitle>Padrões de Atualização</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <LineChart
-                      data={[
-                        { date: "2024-03-01", positive: 75, negative: 25 },
-                        { date: "2024-03-02", positive: 80, negative: 20 },
-                        { date: "2024-03-03", positive: 85, negative: 15 }
-                      ]}
+                      data={analyticsData.trends}
                       xField="date"
-                      yFields={["positive", "negative"]}
-                      height={300}
+                      yFields={["updates"]}
+                      height={200}
                     />
                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader>
-                    <CardTitle>Distribuição de Sentimento</CardTitle>
+                    <CardTitle>Sazonalidade</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <BarChart
+                      data={[
+                        { period: "Manhã", count: 40 },
+                        { period: "Tarde", count: 35 },
+                        { period: "Noite", count: 25 }
+                      ]}
+                      xField="period"
+                      yFields={["count"]}
+                      height={200}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="frequency">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise de Termos e Elementos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Frequência de Termos</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <BarChart
+                      data={[
+                        { term: "Termo 1", frequency: 85 },
+                        { term: "Termo 2", frequency: 65 },
+                        { term: "Termo 3", frequency: 45 },
+                        { term: "Termo 4", frequency: 35 }
+                      ]}
+                      xField="term"
+                      yFields={["frequency"]}
+                      height={200}
+                    />
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Elementos Monitorados</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <PieChart
                       data={[
-                        { sentiment: "Positivo", value: 60 },
-                        { sentiment: "Neutro", value: 30 },
-                        { sentiment: "Negativo", value: 10 }
+                        { label: "URLs", value: 40 },
+                        { label: "Textos", value: 30 },
+                        { label: "Imagens", value: 20 },
+                        { label: "Outros", value: 10 }
                       ]}
-                      nameField="sentiment"
-                      valueField="value"
-                      height={300}
+                      height={200}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="links">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise da Estrutura de Navegação</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Distribuição de Links</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <PieChart
+                      data={[
+                        { label: "Internos", value: 60 },
+                        { label: "Externos", value: 30 },
+                        { label: "Quebrados", value: 10 }
+                      ]}
+                      height={200}
+                    />
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Profundidade de Navegação</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <BarChart
+                      data={[
+                        { level: "Nível 1", count: 50 },
+                        { level: "Nível 2", count: 30 },
+                        { level: "Nível 3", count: 15 },
+                        { level: "Nível 4+", count: 5 }
+                      ]}
+                      xField="level"
+                      yFields={["count"]}
+                      height={200}
                     />
                   </CardContent>
                 </Card>
@@ -284,7 +417,7 @@ export const MonitoringAnalytics: React.FC = () => {
         <TabsContent value="performance">
           <Card>
             <CardHeader>
-              <CardTitle>Análise de Performance</CardTitle>
+              <CardTitle>Análise de Desempenho</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
@@ -294,31 +427,30 @@ export const MonitoringAnalytics: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <LineChart
-                      data={monitoringData?.map(m => ({
-                        date: new Date(m.metrics[1]?.timestamp || Date.now()).toLocaleDateString(),
-                        responseTime: m.metrics[1]?.value || 0
-                      })) || []}
+                      data={analyticsData.trends.map(t => ({
+                        ...t,
+                        responseTime: Math.random() * 1000
+                      }))}
                       xField="date"
                       yFields={["responseTime"]}
-                      height={300}
+                      height={200}
                     />
                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader>
-                    <CardTitle>Métricas de Performance</CardTitle>
+                    <CardTitle>Recursos Consumidos</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <BarChart
                       data={[
-                        { metric: "CPU", value: 45 },
-                        { metric: "Memória", value: 65 },
-                        { metric: "Disco", value: 30 },
-                        { metric: "Rede", value: 80 }
+                        { resource: "CPU", usage: 45 },
+                        { resource: "Memória", usage: 60 },
+                        { resource: "Banda", usage: 30 }
                       ]}
-                      xField="metric"
-                      yField="value"
-                      height={300}
+                      xField="resource"
+                      yFields={["usage"]}
+                      height={200}
                     />
                   </CardContent>
                 </Card>
@@ -327,45 +459,48 @@ export const MonitoringAnalytics: React.FC = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="metadata">
+        <TabsContent value="availability">
           <Card>
             <CardHeader>
-              <CardTitle>Análise de Metadados</CardTitle>
+              <CardTitle>Monitoramento de Tempo de Atividade e Resposta</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Tipos de Arquivo</CardTitle>
+                    <CardTitle>Uptime</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <PieChart
-                      data={[
-                        { type: "HTML", value: 50 },
-                        { type: "PDF", value: 30 },
-                        { type: "DOC", value: 20 }
-                      ]}
-                      nameField="type"
-                      valueField="value"
-                      height={300}
+                    <div className="text-4xl font-bold text-center mb-4">
+                      99.9%
+                    </div>
+                    <LineChart
+                      data={analyticsData.trends.map(t => ({
+                        ...t,
+                        uptime: 99.9 + (Math.random() * 0.1)
+                      }))}
+                      xField="date"
+                      yFields={["uptime"]}
+                      height={150}
                     />
                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader>
-                    <CardTitle>Tamanho dos Arquivos</CardTitle>
+                    <CardTitle>Tempo de Resposta</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <BarChart
-                      data={[
-                        { range: "0-1MB", count: 45 },
-                        { range: "1-5MB", count: 30 },
-                        { range: "5-10MB", count: 15 },
-                        { range: ">10MB", count: 10 }
-                      ]}
-                      xField="range"
-                      yField="count"
-                      height={300}
+                    <div className="text-4xl font-bold text-center mb-4">
+                      245ms
+                    </div>
+                    <LineChart
+                      data={analyticsData.trends.map(t => ({
+                        ...t,
+                        response: 200 + (Math.random() * 100)
+                      }))}
+                      xField="date"
+                      yFields={["response"]}
+                      height={150}
                     />
                   </CardContent>
                 </Card>
