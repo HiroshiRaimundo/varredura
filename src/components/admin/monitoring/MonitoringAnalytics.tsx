@@ -346,14 +346,45 @@ export const MonitoringAnalytics: React.FC = () => {
             <h4 className="text-sm font-medium">Período da Análise</h4>
             <DatePickerWithRange date={date} setDate={setDate} />
           </div>
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium">Análises</h4>
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="outline">Análise de Sentimento</Badge>
+              <Badge variant="outline">Análise de Tendências</Badge>
+              <Badge variant="outline">Análise de Frequência</Badge>
+              <Badge variant="outline">Análise de Links</Badge>
+              <Badge variant="outline">Análise da Estrutura de Navegação</Badge>
+              <Badge variant="outline">Análise de Performance</Badge>
+              <Badge variant="outline">Análise do Desempenho e Disponibilidade</Badge>
+              <Badge variant="outline">Análise de Disponibilidade</Badge>
+              <Badge variant="outline">Monitoramento de Uptime e Resposta</Badge>
+              <Badge variant="outline">Análise de Metadados</Badge>
+              <Badge variant="outline">Análise de Meta Informações</Badge>
+              <Badge variant="outline">Análise de Dados Estruturados</Badge>
+              <Badge variant="outline">Análise de Dados em Formatos Específicos</Badge>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-3 w-[400px]">
+        <TabsList className="grid w-full grid-cols-4 md:grid-cols-4 lg:grid-cols-4 overflow-auto">
           <TabsTrigger value="predictive">Análise Preditiva</TabsTrigger>
           <TabsTrigger value="content">Análise de Conteúdo</TabsTrigger>
           <TabsTrigger value="cross">Análise Cruzada</TabsTrigger>
+          <TabsTrigger value="sentiment">Análise de Sentimento</TabsTrigger>
+          <TabsTrigger value="trends">Análise de Tendências</TabsTrigger>
+          <TabsTrigger value="frequency">Análise de Frequência</TabsTrigger>
+          <TabsTrigger value="links">Análise de Links</TabsTrigger>
+          <TabsTrigger value="navigation">Análise da Estrutura de Navegação</TabsTrigger>
+          <TabsTrigger value="performance">Análise de Performance</TabsTrigger>
+          <TabsTrigger value="availability">Análise de Disponibilidade</TabsTrigger>
+          <TabsTrigger value="uptime">Monitoramento de Uptime e Resposta</TabsTrigger>
+          <TabsTrigger value="metadata">Análise de Metadados</TabsTrigger>
+          <TabsTrigger value="metainfo">Análise de Meta Informações</TabsTrigger>
+          <TabsTrigger value="structured">Análise de Dados Estruturados</TabsTrigger>
+          <TabsTrigger value="specificformats">Análise de Dados em Formatos Específicos</TabsTrigger>
+          <TabsTrigger value="performance_availability">Análise do Desempenho e Disponibilidade</TabsTrigger>
         </TabsList>
 
         <TabsContent value="predictive" className="space-y-4">
@@ -457,6 +488,196 @@ export const MonitoringAnalytics: React.FC = () => {
                     <Tooltip />
                   </RadarChart>
                 </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="sentiment" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise de Sentimento</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={sentimentData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="period" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="positive" fill="#10b981" name="Positivo" />
+                    <Bar dataKey="negative" fill="#ef4444" name="Negativo" />
+                    <Bar dataKey="neutral" fill="#6366f1" name="Neutro" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="trends" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise de Tendências</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={sentimentData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="period" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="positive" stroke="#10b981" name="Tendência Positiva" />
+                    <Line type="monotone" dataKey="negative" stroke="#ef4444" name="Tendência Negativa" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="frequency" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise de Frequência</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="p-4 text-center text-muted-foreground">
+                Dados de análise de frequência serão exibidos aqui com base no monitoramento selecionado.
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="links" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise de Links</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="p-4 text-center text-muted-foreground">
+                Dados de análise de links serão exibidos aqui com base no monitoramento selecionado.
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="navigation" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise da Estrutura de Navegação</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="p-4 text-center text-muted-foreground">
+                Dados de análise da estrutura de navegação serão exibidos aqui com base no monitoramento selecionado.
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="performance" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise de Performance</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="p-4 text-center text-muted-foreground">
+                Dados de análise de performance serão exibidos aqui com base no monitoramento selecionado.
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="availability" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise de Disponibilidade</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="p-4 text-center text-muted-foreground">
+                Dados de análise de disponibilidade serão exibidos aqui com base no monitoramento selecionado.
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="uptime" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Monitoramento de Uptime e Resposta</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="p-4 text-center text-muted-foreground">
+                Dados de monitoramento de uptime e resposta serão exibidos aqui com base no monitoramento selecionado.
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="metadata" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise de Metadados</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="p-4 text-center text-muted-foreground">
+                Dados de análise de metadados serão exibidos aqui com base no monitoramento selecionado.
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="metainfo" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise de Meta Informações</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="p-4 text-center text-muted-foreground">
+                Dados de análise de meta informações serão exibidos aqui com base no monitoramento selecionado.
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="structured" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise de Dados Estruturados</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="p-4 text-center text-muted-foreground">
+                Dados de análise de dados estruturados serão exibidos aqui com base no monitoramento selecionado.
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="specificformats" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise de Dados em Formatos Específicos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="p-4 text-center text-muted-foreground">
+                Dados de análise de dados em formatos específicos serão exibidos aqui com base no monitoramento selecionado.
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="performance_availability" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise do Desempenho e Disponibilidade</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="p-4 text-center text-muted-foreground">
+                Dados de análise do desempenho e disponibilidade serão exibidos aqui com base no monitoramento selecionado.
               </div>
             </CardContent>
           </Card>

@@ -166,46 +166,6 @@ export const MonitoringReports: React.FC<MonitoringReportsProps> = () => {
             </div>
           </CardContent>
         </Card>
-
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Métricas Disponíveis</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Métrica</TableHead>
-                  <TableHead>Descrição</TableHead>
-                  <TableHead className="w-24">Incluir</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {metrics.map((metric) => (
-                  <TableRow key={metric.id}>
-                    <TableCell>{metric.name}</TableCell>
-                    <TableCell>{metric.description}</TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={selectedMetrics.includes(metric.id) ? "default" : "outline"}
-                        className="cursor-pointer"
-                        onClick={() => {
-                          setSelectedMetrics((prev) =>
-                            prev.includes(metric.id)
-                              ? prev.filter((id) => id !== metric.id)
-                              : [...prev, metric.id]
-                          );
-                        }}
-                      >
-                        {selectedMetrics.includes(metric.id) ? "Selecionada" : "Selecionar"}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
       </div>
 
       <div className="flex justify-end">
