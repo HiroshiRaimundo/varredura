@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, lazy, Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,14 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Image, Video, Link, Send } from "lucide-react";
-import dynamic from "next/dynamic";
 import BackToAdminButton from "@/components/admin/BackToAdminButton";
 
-// Editor rico com carregamento dinâmico para evitar erros de SSR
-const Editor = dynamic(() => import("@/components/editor/RichTextEditor"), {
-  ssr: false,
-  loading: () => <p>Carregando editor...</p>
-});
+// Importação lazy do editor
+const RichTextEditor = lazy(() => import("@/components/editor/RichTextEditor"));
 
 interface Content {
   id: string;
@@ -162,11 +158,13 @@ const ContentManagement: React.FC = () => {
                         </div>
                         <div className="space-y-2">
                           <Label>Conteúdo</Label>
-                          <Editor 
-                            value={editorContent}
-                            onChange={setEditorContent}
-                            placeholder="Digite o conteúdo do release..."
-                          />
+                          <Suspense fallback={<div>Carregando editor...</div>}>
+                            <RichTextEditor 
+                              value={editorContent}
+                              onChange={setEditorContent}
+                              placeholder="Digite o conteúdo do release..."
+                            />
+                          </Suspense>
                         </div>
                         <div className="space-y-2">
                           <Label>Mídia</Label>
@@ -307,11 +305,13 @@ const ContentManagement: React.FC = () => {
                         </div>
                         <div className="space-y-2">
                           <Label>Conteúdo</Label>
-                          <Editor 
-                            value={editorContent}
-                            onChange={setEditorContent}
-                            placeholder="Digite o conteúdo da reportagem..."
-                          />
+                          <Suspense fallback={<div>Carregando editor...</div>}>
+                            <RichTextEditor 
+                              value={editorContent}
+                              onChange={setEditorContent}
+                              placeholder="Digite o conteúdo da reportagem..."
+                            />
+                          </Suspense>
                         </div>
                         <div className="space-y-2">
                           <Label>Mídia</Label>
