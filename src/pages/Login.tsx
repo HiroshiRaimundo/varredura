@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
@@ -9,58 +9,33 @@ import { Eye, EyeOff, LogIn, Loader2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { toast } from "@/components/ui/use-toast";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const auth = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberPassword, setRememberPassword] = useState(false);
-  const [isInitializing, setIsInitializing] = useState(true);
-
-  // Apenas inicializa o componente
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsInitializing(false);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmitWithRemember = (data: any) => {
-    // If remember password is checked, save to localStorage
-    if (rememberPassword) {
-      localStorage.setItem('savedEmail', data.email);
-      localStorage.setItem('rememberPassword', 'true');
-    } else {
-      // Clear saved data if option is unchecked
-      localStorage.removeItem('savedEmail');
-      localStorage.removeItem('rememberPassword');
+  const handleSubmit = async (data: { email: string; password: string }) => {
+    try {
+      await auth.handleLogin(data);
+      toast({
+        title: "Login realizado com sucesso!",
+        description: "Redirecionando para o painel administrativo..."
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao fazer login",
+        description: "Email ou senha incorretos",
+        variant: "destructive"
+      });
     }
-    auth.handleLogin(data);
   };
-
-  // Check for saved credentials on component mount
-  useEffect(() => {
-    const savedEmail = localStorage.getItem('savedEmail');
-    const hasRememberedPassword = localStorage.getItem('rememberPassword') === 'true';
-    
-    if (savedEmail && hasRememberedPassword) {
-      auth.form.setValue('email', savedEmail);
-      setRememberPassword(true);
-    }
-  }, [auth.form]);
-
-  // Show loading screen during initialization
-  if (isInitializing) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background p-6 flex flex-col">
@@ -74,23 +49,24 @@ const Login: React.FC = () => {
         <div className="flex items-center justify-center py-12">
           <Card className="w-full max-w-md">
             <CardHeader>
-              <CardTitle>Acesso ao Sistema</CardTitle>
+              <CardTitle>Acesso Administrativo</CardTitle>
               <CardDescription>
-                Entre com suas credenciais para acessar funcionalidades de administração.
+                Entre com suas credenciais para acessar o painel administrativo.
               </CardDescription>
             </CardHeader>
             
             <CardContent>
               <Form {...auth.form}>
-                <form onSubmit={auth.form.handleSubmit(handleSubmitWithRemember)} className="space-y-4">
+                <form onSubmit={auth.form.handleSubmit(handleSubmit)} className="space-y-4">
                   <FormField
                     control={auth.form.control}
                     name="email"
+                    rules={{ required: "Email é obrigatório" }}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="email@exemplo.com" {...field} />
+                          <Input type="email" placeholder="admin@koga.com" {...field} />
                         </FormControl>
                       </FormItem>
                     )}
@@ -99,6 +75,7 @@ const Login: React.FC = () => {
                   <FormField
                     control={auth.form.control}
                     name="password"
+                    rules={{ required: "Senha é obrigatória" }}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Senha</FormLabel>
@@ -106,6 +83,7 @@ const Login: React.FC = () => {
                           <div className="relative">
                             <Input 
                               type={showPassword ? "text" : "password"} 
+                              placeholder="••••••••"
                               {...field} 
                             />
                             <div 
@@ -157,7 +135,7 @@ const Login: React.FC = () => {
             
             <CardFooter className="flex justify-between">
               <Button variant="outline" onClick={() => navigate("/")} disabled={auth.isLoggingIn}>
-                Voltar para o Dashboard
+                Voltar para o Início
               </Button>
             </CardFooter>
           </Card>

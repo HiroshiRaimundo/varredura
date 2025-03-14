@@ -1,18 +1,15 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { 
-  BookOpen, 
   Users, 
-  Building, 
-  User, 
-  FileText, 
-  UserCircle, 
-  Newspaper, 
-  ChevronRight,
+  FileText,
   Home,
   Settings,
   LogOut,
-  UserPlus
+  UserPlus,
+  BarChart2,
+  Eye,
+  Activity
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -22,41 +19,6 @@ const AdminSidebar: React.FC = () => {
   const location = useLocation();
   const { handleLogout } = useAuth();
   
-  const clientPages = [
-    { 
-      path: "/admin/client/observatory", 
-      title: "Observatório",
-      icon: <BookOpen className="h-4 w-4" />
-    },
-    { 
-      path: "/admin/client/researcher", 
-      title: "Pesquisador",
-      icon: <UserCircle className="h-4 w-4" />
-    },
-    { 
-      path: "/admin/client/politician", 
-      title: "Político",
-      icon: <User className="h-4 w-4" />
-    },
-    { 
-      path: "/admin/client/institution", 
-      title: "Instituição",
-      icon: <Building className="h-4 w-4" />
-    },
-    { 
-      path: "/admin/client/journalist", 
-      title: "Jornalista",
-      icon: <FileText className="h-4 w-4" />
-    },
-    { 
-      path: "/admin/client/press", 
-      title: "Assessoria de Imprensa",
-      icon: <Newspaper className="h-4 w-4" />
-    },
-  ];
-  
-  const isActive = (path: string) => location.pathname === path;
-  
   const menuItems = [
     {
       title: "Dashboard",
@@ -64,9 +26,21 @@ const AdminSidebar: React.FC = () => {
       path: "/admin"
     },
     {
+      title: "Monitoramento",
+      icon: <Activity className="h-4 w-4" />,
+      path: "/admin/monitoring",
+      description: "Central de monitoramento do sistema"
+    },
+    {
       title: "Gerenciar Clientes",
       icon: <UserPlus className="h-4 w-4" />,
       path: "/admin/clients"
+    },
+    {
+      title: "Visualizar Clientes",
+      icon: <Eye className="h-4 w-4" />,
+      path: "/example-client",
+      description: "Visualizar a interface dos clientes para suporte"
     },
     {
       title: "Contatos de Mídia",
@@ -77,6 +51,11 @@ const AdminSidebar: React.FC = () => {
       title: "Releases e Reportagens",
       icon: <FileText className="h-4 w-4" />,
       path: "/admin/content"
+    },
+    {
+      title: "Análise e Relatórios",
+      icon: <BarChart2 className="h-4 w-4" />,
+      path: "/admin/analytics"
     },
     {
       title: "Configurações",
@@ -91,16 +70,21 @@ const AdminSidebar: React.FC = () => {
         <h2 className="text-xl font-bold">Admin</h2>
       </div>
 
-      <nav className="flex-1 py-4 space-y-2">
+      <nav className="flex-1 py-4">
         {menuItems.map((item) => (
           <Button
             key={item.path}
             variant={location.pathname === item.path ? "secondary" : "ghost"}
-            className="w-full justify-start"
+            className="w-full justify-start mb-2 relative group"
             onClick={() => navigate(item.path)}
           >
             {item.icon}
             <span className="ml-2">{item.title}</span>
+            {item.description && (
+              <div className="absolute left-full ml-2 p-2 bg-black text-white text-xs rounded hidden group-hover:block w-48">
+                {item.description}
+              </div>
+            )}
           </Button>
         ))}
       </nav>

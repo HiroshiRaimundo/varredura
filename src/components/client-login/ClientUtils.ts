@@ -1,16 +1,8 @@
-
 import { ClientInfo, ClientLoginFormValues } from "./types";
 import { ClientType } from "@/types/clientTypes";
 
-// Mock client credentials - in a real app this would be fetched from an API
-export const validClients = [
-  { email: "observatory@example.com", password: "password123", type: "observatory" },
-  { email: "researcher@example.com", password: "password123", type: "researcher" },
-  { email: "politician@example.com", password: "password123", type: "politician" },
-  { email: "institution@example.com", password: "password123", type: "institution" },
-  { email: "journalist@example.com", password: "password123", type: "journalist" },
-  { email: "press@example.com", password: "password123", type: "press" }
-];
+// Lista de clientes válidos - em uma aplicação real isso seria buscado de uma API
+export const validClients: { email: string; password: string; type: string; }[] = [];
 
 /**
  * Type assertion helper for ClientType

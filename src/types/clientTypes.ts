@@ -1,18 +1,69 @@
+export type ClientType = 
+  | "observatory"
+  | "researcher"
+  | "politician"
+  | "institution"
+  | "journalist"
+  | "press";
 
-export type ClientType = 'observatory' | 'institution' | 'researcher' | 'journalist' | 'politician' | 'press';
-
-export interface CaseStudy {
-  title: string;
-  description: string;
+export interface ClientPermissions {
+  canViewReports: boolean;
+  canExportData: boolean;
+  canManageAlerts: boolean;
+  canAccessAnalytics: boolean;
+  canInviteUsers: boolean;
 }
 
-export interface ClientTypeDetail {
-  id: ClientType;
-  title: string;
-  shortDescription: string;
-  description: string;
-  details: string;
-  features: string[];
-  benefits: string[];
-  caseStudy?: CaseStudy;
+export interface ClientProfile {
+  id: string;
+  name: string;
+  email: string;
+  type: ClientType;
+  organization?: string;
+  permissions: ClientPermissions;
 }
+
+export const DEFAULT_PERMISSIONS: Record<ClientType, ClientPermissions> = {
+  observatory: {
+    canViewReports: true,
+    canExportData: true,
+    canManageAlerts: true,
+    canAccessAnalytics: true,
+    canInviteUsers: true
+  },
+  researcher: {
+    canViewReports: true,
+    canExportData: true,
+    canManageAlerts: true,
+    canAccessAnalytics: true,
+    canInviteUsers: false
+  },
+  politician: {
+    canViewReports: true,
+    canExportData: false,
+    canManageAlerts: true,
+    canAccessAnalytics: true,
+    canInviteUsers: true
+  },
+  institution: {
+    canViewReports: true,
+    canExportData: true,
+    canManageAlerts: true,
+    canAccessAnalytics: true,
+    canInviteUsers: true
+  },
+  journalist: {
+    canViewReports: true,
+    canExportData: false,
+    canManageAlerts: true,
+    canAccessAnalytics: false,
+    canInviteUsers: false
+  },
+  press: {
+    canViewReports: true,
+    canExportData: false,
+    canManageAlerts: true,
+    canAccessAnalytics: true,
+    canInviteUsers: true
+  }
+};

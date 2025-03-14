@@ -1,59 +1,44 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/hooks/useAuth";
 import { clientTypeDetails } from "@/components/client/ClientTypes";
 import { getColorClasses } from "@/components/service/utils/colorUtils";
-import { ClientType } from "@/types/clientTypes";
-import ClientTabs from "@/components/example-client/ClientTabs";
-import DefaultContent from "@/components/example-client/DefaultContent";
-import { useForm } from "react-hook-form";
-import MonitoringForm, { MonitoringItem } from "@/components/monitoring/MonitoringForm";
-import { useToast } from "@/hooks/use-toast";
-import PressContent from "@/components/example-client/press/PressContent";
-import generateMockData from "@/components/example-client/utils/mockDataGenerator";
-
-// Include this press client type in the ClientType type definition
-const clientType = "press" as ClientType;
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import BackToAdminButton from "@/components/admin/BackToAdminButton";
+import ClientList from "@/components/admin/clients/ClientList";
+import { useClientManagement } from "@/components/admin/clients/hooks/useClientManagement";
 
 const PressClient: React.FC = () => {
   const auth = useAuth();
+  const clientType = "press";
   const colorClasses = getColorClasses(clientType);
   const details = clientTypeDetails[clientType];
-  const { toast } = useToast();
-  const mockData = generateMockData();
+  const { clients, isLoading, loadClients } = useClientManagement(clientType);
+  const [activeTab, setActiveTab] = useState("dashboard");
   
-  // Estado para controlar a aba ativa
-  const [activeTab, setActiveTab] = useState<"dashboard" | "monitoring" | "analysis" | "releases">("dashboard");
-  
-  // Form para monitoramento
-  const monitoringForm = useForm<MonitoringItem>({
-    defaultValues: {
-      name: "",
-      url: "",
-      frequency: "",
-      category: "",
-    }
-  });
-  
-  // Função para lidar com a submissão do formulário de monitoramento
-  const handleMonitoringSubmit = (data: MonitoringItem) => {
-    console.log("Dados de monitoramento submetidos:", data);
-    toast({
-      title: "Monitoramento adicionado",
-      description: `O monitoramento "${data.name}" foi adicionado com sucesso.`,
-    });
-    
-    // Resetar o formulário após submissão
-    monitoringForm.reset();
+  useEffect(() => {
+    loadClients();
+  }, [loadClients]);
+
+  const handleAddClient = () => {
+    // Implementar lógica de adicionar cliente
+  };
+
+  const handleEditClient = (client: any) => {
+    // Implementar lógica de editar cliente
+  };
+
+  const handleDeleteClient = (clientId: string) => {
+    // Implementar lógica de deletar cliente
   };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <div className="p-6 flex-grow">
         <div className="max-w-7xl mx-auto">
+          <BackToAdminButton />
           <Header 
             isAuthenticated={auth.isAuthenticated} 
             onLoginClick={() => auth.setIsLoginDialogOpen(true)} 
@@ -63,12 +48,10 @@ const PressClient: React.FC = () => {
           />
           
           <div className="mb-6">
-            <div>
-              <h1 className="text-3xl font-bold">{details.title} - Área do Cliente</h1>
-              <p className="text-muted-foreground">
-                Gerencie seus releases, contatos e monitore a cobertura de mídia
-              </p>
-            </div>
+            <h1 className="text-3xl font-bold">{details.title} - Área do Cliente</h1>
+            <p className="text-muted-foreground">
+              Gerencie seus releases, contatos e monitore a cobertura de mídia
+            </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -76,7 +59,9 @@ const PressClient: React.FC = () => {
               <CardHeader className={`${colorClasses.light} rounded-t-lg`}>
                 <CardTitle className="flex justify-between items-center">
                   <span>Releases Publicados</span>
-                  <span className={`${colorClasses.text} font-bold text-2xl`}>{mockData.releaseStats.published}</span>
+                  <span className={`${colorClasses.text} font-bold text-2xl`}>
+                    {clients.filter(c => c.status === 'active').length}
+                  </span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
@@ -109,45 +94,49 @@ const PressClient: React.FC = () => {
             </Card>
           </div>
           
-          <ClientTabs 
-            activeTab={activeTab} 
-            setActiveTab={setActiveTab} 
-            clientType={clientType} 
-          />
-          
-          <div className="mt-6">
-            {activeTab === "dashboard" && (
-              <PressContent activeTab="dashboard" clientType={clientType} mockData={mockData} />
-            )}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+            <TabsList className="mb-4">
+              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+              <TabsTrigger value="clients">Clientes</TabsTrigger>
+              <TabsTrigger value="publications">Publicações</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            </TabsList>
             
-            {activeTab === "monitoring" && (
+            <TabsContent value="dashboard">
               <Card>
                 <CardHeader>
-                  <CardTitle className={colorClasses.text}>Monitoramento de Publicações</CardTitle>
+                  <CardTitle>Visão Geral</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="mb-6">Configure o monitoramento de publicações relacionadas aos seus releases ou à sua organização.</p>
-                  
-                  <MonitoringForm 
-                    form={monitoringForm} 
-                    onSubmit={handleMonitoringSubmit} 
-                    clientType={clientType}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Resumo de Atividades</h3>
+                    <p>Visualize as principais métricas e atividades dos veículos de imprensa.</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="clients">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Clientes Imprensa</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ClientList
+                    clients={clients}
+                    onAddClient={handleAddClient}
+                    onEditClient={handleEditClient}
+                    onDeleteClient={handleDeleteClient}
+                    currentClientType={clientType}
                   />
                 </CardContent>
               </Card>
-            )}
+            </TabsContent>
             
-            {activeTab === "analysis" && (
-              <DefaultContent activeTab="analysis" clientType={clientType} />
-            )}
-            
-            {activeTab === "releases" && (
-              <PressContent activeTab="releases" clientType={clientType} mockData={mockData} />
-            )}
-          </div>
+            {/* Outras tabs... */}
+          </Tabs>
         </div>
       </div>
-      
       <Footer />
     </div>
   );

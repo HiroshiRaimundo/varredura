@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -121,6 +120,7 @@ const ServicesSection: React.FC = () => {
   const navigate = useNavigate();
 
   const handleServiceClick = (serviceId: ClientType) => {
+    // Redirecionar para a página de detalhes do serviço
     navigate(`/service/${serviceId}`);
   };
 

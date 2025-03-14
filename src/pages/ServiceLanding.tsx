@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "@/components/layout/Header";
@@ -32,8 +31,8 @@ const ServiceLanding: React.FC = () => {
   };
 
   const handleContractServiceClick = () => {
-    // Navigate directly to client page with the specific service type
-    navigate(`/client/${validServiceId}`);
+    // Navigate to client page that shows all services
+    navigate(`/client`);
   };
 
   const handleExampleClientClick = () => {

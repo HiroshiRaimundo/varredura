@@ -1,168 +1,159 @@
-import React from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Image from "@tiptap/extension-image";
-import Link from "@tiptap/extension-link";
-import Youtube from "@tiptap/extension-youtube";
-import { Button } from "@/components/ui/button";
-import {
-  Bold,
-  Italic,
-  List,
+import React, { useState } from 'react';
+import { 
+  Bold, 
+  Italic, 
+  Underline, 
+  Link2, 
+  Image, 
+  List, 
   ListOrdered,
-  Quote,
-  Undo,
-  Redo,
-  Link as LinkIcon,
-  Image as ImageIcon,
-  Video
-} from "lucide-react";
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Heading1,
+  Heading2,
+  Quote
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
-interface RichTextEditorProps {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
+export interface RichTextEditorProps {
+  initialContent?: string;
+  onContentChange: (content: string) => void;
+}
+
+interface EditorCommand {
+  icon: React.ReactNode;
+  command: string;
+  title: string;
 }
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({
-  value,
-  onChange,
-  placeholder
+  initialContent = '',
+  onContentChange
 }) => {
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Image.configure({
-        inline: true,
-        allowBase64: true,
-      }),
-      Link.configure({
-        openOnClick: false,
-      }),
-      Youtube.configure({
-        controls: true,
-        nocookie: true,
-      }),
-    ],
-    content: value,
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
-    },
-    editorProps: {
-      attributes: {
-        class: "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[200px] p-4",
-      },
-    },
-  });
+  const [showLinkDialog, setShowLinkDialog] = useState(false);
+  const [showImageDialog, setShowImageDialog] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
 
-  if (!editor) {
-    return null;
-  }
+  const editorRef = React.useRef<HTMLDivElement>(null);
 
-  const addImage = () => {
-    const url = window.prompt("URL da imagem:");
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
+  const commands: EditorCommand[] = [
+    { icon: <Bold className="h-4 w-4" />, command: 'bold', title: 'Negrito' },
+    { icon: <Italic className="h-4 w-4" />, command: 'italic', title: 'Itálico' },
+    { icon: <Underline className="h-4 w-4" />, command: 'underline', title: 'Sublinhado' },
+    { icon: <Heading1 className="h-4 w-4" />, command: 'formatBlock', title: 'Título 1' },
+    { icon: <Heading2 className="h-4 w-4" />, command: 'formatBlock', title: 'Título 2' },
+    { icon: <List className="h-4 w-4" />, command: 'insertUnorderedList', title: 'Lista' },
+    { icon: <ListOrdered className="h-4 w-4" />, command: 'insertOrderedList', title: 'Lista Numerada' },
+    { icon: <Quote className="h-4 w-4" />, command: 'formatBlock', title: 'Citação' },
+    { icon: <AlignLeft className="h-4 w-4" />, command: 'justifyLeft', title: 'Alinhar à Esquerda' },
+    { icon: <AlignCenter className="h-4 w-4" />, command: 'justifyCenter', title: 'Centralizar' },
+    { icon: <AlignRight className="h-4 w-4" />, command: 'justifyRight', title: 'Alinhar à Direita' },
+  ];
+
+  const execCommand = (command: string, value?: string) => {
+    document.execCommand(command, false, value);
+    if (editorRef.current) {
+      onContentChange(editorRef.current.innerHTML);
     }
   };
 
-  const addLink = () => {
-    const url = window.prompt("URL do link:");
-    if (url) {
-      editor.chain().focus().setLink({ href: url }).run();
+  const handleInsertLink = () => {
+    if (linkUrl) {
+      execCommand('createLink', linkUrl);
+      setLinkUrl('');
+      setShowLinkDialog(false);
     }
   };
 
-  const addVideo = () => {
-    const url = window.prompt("URL do vídeo do YouTube:");
-    if (url) {
-      editor.chain().focus().setYoutubeVideo({ src: url }).run();
+  const handleInsertImage = () => {
+    if (imageUrl) {
+      execCommand('insertImage', imageUrl);
+      setImageUrl('');
+      setShowImageDialog(false);
     }
   };
 
   return (
     <div className="border rounded-md">
-      <div className="border-b p-2 flex flex-wrap gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          className={editor.isActive("bold") ? "bg-muted" : ""}
-        >
-          <Bold className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={editor.isActive("italic") ? "bg-muted" : ""}
-        >
-          <Italic className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={editor.isActive("bulletList") ? "bg-muted" : ""}
-        >
-          <List className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={editor.isActive("orderedList") ? "bg-muted" : ""}
-        >
-          <ListOrdered className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          className={editor.isActive("blockquote") ? "bg-muted" : ""}
-        >
-          <Quote className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => editor.chain().focus().undo().run()}
-        >
-          <Undo className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => editor.chain().focus().redo().run()}
-        >
-          <Redo className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={addLink}
-          className={editor.isActive("link") ? "bg-muted" : ""}
-        >
-          <LinkIcon className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={addImage}
-        >
-          <ImageIcon className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={addVideo}
-        >
-          <Video className="h-4 w-4" />
-        </Button>
+      <div className="border-b p-2 flex flex-wrap gap-1 bg-muted/20">
+        {commands.map((cmd) => (
+          <Button
+            key={cmd.command}
+            variant="ghost"
+            size="sm"
+            title={cmd.title}
+            onClick={() => execCommand(cmd.command, cmd.command === 'formatBlock' ? `<${cmd.title.toLowerCase()}>` : undefined)}
+          >
+            {cmd.icon}
+          </Button>
+        ))}
+
+        <Dialog open={showLinkDialog} onOpenChange={setShowLinkDialog}>
+          <DialogTrigger asChild>
+            <Button variant="ghost" size="sm" title="Inserir Link">
+              <Link2 className="h-4 w-4" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Inserir Link</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <Input
+                placeholder="https://exemplo.com"
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+              />
+              <Button onClick={handleInsertLink} className="w-full">
+                Inserir
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showImageDialog} onOpenChange={setShowImageDialog}>
+          <DialogTrigger asChild>
+            <Button variant="ghost" size="sm" title="Inserir Imagem">
+              <Image className="h-4 w-4" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Inserir Imagem</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <Input
+                placeholder="URL da imagem"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+              />
+              <Button onClick={handleInsertImage} className="w-full">
+                Inserir
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
-      <EditorContent editor={editor} placeholder={placeholder} />
+
+      <div
+        ref={editorRef}
+        className="min-h-[400px] p-4 focus:outline-none"
+        contentEditable
+        dangerouslySetInnerHTML={{ __html: initialContent }}
+        onInput={(e) => onContentChange(e.currentTarget.innerHTML)}
+      />
     </div>
   );
 };
 
-export default RichTextEditor; 
+export default RichTextEditor;

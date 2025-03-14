@@ -1,11 +1,53 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { MonitoringItem, LegislationAlert, ReleaseMonitoringItem } from "./types";
+import { API_CONFIG, simulateNetworkDelay } from "@/config/api-config";
 
-// Fetch monitoring items from Supabase
+// Dados mockados para uso local quando o Supabase não estiver disponível
+const mockMonitoringItems: MonitoringItem[] = [
+  {
+    id: "1",
+    name: "Portal de Notícias",
+    url: "https://exemplo.com/noticias",
+    frequency: "diária",
+    category: "Notícias",
+    keywords: "governo, política, economia",
+    responsible: "João Silva",
+    notes: "Monitorar artigos sobre política econômica"
+  },
+  {
+    id: "2",
+    name: "Blog Corporativo",
+    url: "https://exemplo.com/blog",
+    frequency: "semanal",
+    category: "Corporativo",
+    keywords: "empresa, negócios, mercado",
+    responsible: "Maria Oliveira",
+    notes: "Verificar publicações sobre o mercado financeiro"
+  },
+  {
+    id: "3",
+    name: "Redes Sociais",
+    url: "https://exemplo.com/social",
+    frequency: "diária",
+    category: "Social Media",
+    keywords: "trending, viral, hashtag",
+    responsible: "Pedro Santos",
+    notes: "Monitorar tendências e menções à marca"
+  }
+];
+
+// Fetch monitoring items from Supabase or use mock data
 export const fetchMonitoringItemsFromDB = async () => {
   try {
+    // Se configurado para usar dados mockados, retorna os dados locais
+    if (API_CONFIG.USE_MOCK_DATA) {
+      await simulateNetworkDelay();
+      console.log("Usando dados mockados para monitoramentos");
+      return mockMonitoringItems;
+    }
+
+    // Caso contrário, tenta buscar do Supabase
     const { data, error } = await supabase
       .from('monitoring_items')
       .select('*')
@@ -30,16 +72,32 @@ export const fetchMonitoringItemsFromDB = async () => {
     console.error('Erro ao buscar itens de monitoramento:', error);
     toast({
       title: "Erro ao carregar dados",
-      description: "Não foi possível carregar os monitoramentos.",
+      description: "Usando dados locais como fallback.",
       variant: "destructive"
     });
-    return [];
+    return mockMonitoringItems; // Fallback para dados mockados em caso de erro
   }
 };
 
-// Add a new monitoring item to Supabase
+// Add a new monitoring item to Supabase or mock data
 export const addMonitoringItemToDB = async (data: Omit<MonitoringItem, "id">) => {
   try {
+    // Se configurado para usar dados mockados, simula adição local
+    if (API_CONFIG.USE_MOCK_DATA) {
+      await simulateNetworkDelay();
+      console.log("Simulando adição de item de monitoramento:", data);
+      
+      // Não faz nada real, apenas simula sucesso
+      return {
+        success: true,
+        data: {
+          ...data,
+          id: `mock-${Date.now()}`
+        }
+      };
+    }
+
+    // Caso contrário, tenta adicionar ao Supabase
     const { data: newItem, error } = await supabase
       .from('monitoring_items')
       .insert({
@@ -57,33 +115,39 @@ export const addMonitoringItemToDB = async (data: Omit<MonitoringItem, "id">) =>
     
     if (error) throw error;
     
-    const formattedItem: MonitoringItem = {
-      id: newItem.id,
-      name: newItem.name,
-      url: newItem.url,
-      api_url: newItem.api_url,
-      frequency: newItem.frequency,
-      category: newItem.category,
-      keywords: newItem.keywords,
-      responsible: (newItem as any).responsible || null,
-      notes: (newItem as any).notes || null
+    return {
+      success: true,
+      data: newItem
     };
-    
-    return formattedItem;
   } catch (error) {
-    console.error('Erro ao adicionar monitoramento:', error);
+    console.error('Erro ao adicionar item de monitoramento:', error);
     toast({
-      title: "Erro ao adicionar item",
-      description: "Não foi possível adicionar o monitoramento.",
+      title: "Erro ao salvar",
+      description: "Não foi possível salvar o monitoramento.",
       variant: "destructive"
     });
-    throw error;
+    return {
+      success: false,
+      error
+    };
   }
 };
 
-// Delete a monitoring item from Supabase
+// Delete a monitoring item from Supabase or mock data
 export const deleteMonitoringItemFromDB = async (id: string) => {
   try {
+    // Se configurado para usar dados mockados, simula deleção local
+    if (API_CONFIG.USE_MOCK_DATA) {
+      await simulateNetworkDelay();
+      console.log("Simulando deleção de item de monitoramento:", id);
+      
+      // Não faz nada real, apenas simula sucesso
+      return {
+        success: true
+      };
+    }
+
+    // Caso contrário, tenta deletar do Supabase
     const { error } = await supabase
       .from('monitoring_items')
       .delete()
@@ -91,84 +155,96 @@ export const deleteMonitoringItemFromDB = async (id: string) => {
     
     if (error) throw error;
     
-    return true;
+    return {
+      success: true
+    };
   } catch (error) {
-    console.error('Erro ao remover monitoramento:', error);
+    console.error('Erro ao deletar item de monitoramento:', error);
     toast({
-      title: "Erro ao remover item",
+      title: "Erro ao deletar",
       description: "Não foi possível remover o monitoramento.",
       variant: "destructive"
     });
-    throw error;
+    return {
+      success: false,
+      error
+    };
   }
 };
 
 // Simulate fetching legislation alerts (mock data for now)
 export const fetchLegislationAlertsFromDB = (): LegislationAlert[] => {
-  // In a real app, this would come from an API
-  const mockAlerts: LegislationAlert[] = [
+  // Dados mockados para exemplo
+  return [
     {
       id: "1",
-      title: "Nova Lei de Proteção Ambiental",
-      description: "Lei Nº 14.522/2023 sobre medidas de proteção a áreas ambientais",
-      date: "2023-06-10",
-      url: "https://www.gov.br/exemplo",
-      isRead: false
+      title: "Nova Lei de Proteção de Dados",
+      description: "Alterações na legislação de proteção de dados pessoais",
+      date: "2023-06-15",
+      source: "Diário Oficial",
+      impact: "alto",
+      status: "pendente"
     },
     {
       id: "2",
-      title: "Atualização do Código Florestal",
-      description: "Alteração nos artigos 23 e 24 relacionados a reservas legais",
-      date: "2023-05-15",
-      url: "https://www.gov.br/exemplo2",
-      isRead: true
+      title: "Regulamentação do Setor Financeiro",
+      description: "Novas regras para instituições financeiras",
+      date: "2023-05-22",
+      source: "Banco Central",
+      impact: "médio",
+      status: "analisado"
     },
     {
       id: "3",
-      title: "Resolução sobre Qualidade do Ar",
-      description: "Novas métricas para monitoramento da qualidade do ar em centros urbanos",
-      date: "2023-04-22",
-      url: "https://www.gov.br/exemplo3",
-      isRead: false
+      title: "Mudanças na Tributação",
+      description: "Alterações nas alíquotas de impostos para 2023",
+      date: "2023-04-10",
+      source: "Receita Federal",
+      impact: "alto",
+      status: "implementado"
     }
   ];
-  
-  return mockAlerts;
 };
 
 // Fetch release monitoring results (mock data for now)
 export const fetchReleaseMonitoringFromDB = (): ReleaseMonitoringItem[] => {
-  // In a real app, this would come from an API
-  // Mock data for release monitoring
-  const mockReleaseMonitoring: ReleaseMonitoringItem[] = [
+  // Dados mockados para exemplo
+  return [
     {
       id: "1",
-      releaseTitle: "Nova tecnologia ambiental lançada no mercado",
-      websiteName: "Folha de São Paulo",
-      publishedDate: "2023-06-12",
-      publishedTime: "14:30",
-      url: "https://folha.com/tecnologia-ambiental",
-      isVerified: true
+      title: "Lançamento do Novo Produto",
+      date: "2023-06-01",
+      coverage: 85,
+      sentiment: "positivo",
+      sources: ["Portal de Notícias", "Blog Especializado", "Redes Sociais"],
+      highlights: [
+        "Inovação destacada por especialistas",
+        "Recepção positiva do público"
+      ]
     },
     {
       id: "2",
-      releaseTitle: "Resultados do estudo sobre qualidade do ar divulgados",
-      websiteName: "G1",
-      publishedDate: "2023-05-18",
-      publishedTime: "10:15",
-      url: "https://g1.com/qualidade-ar-estudo",
-      isVerified: true
+      title: "Expansão Internacional",
+      date: "2023-05-15",
+      coverage: 92,
+      sentiment: "muito positivo",
+      sources: ["Mídia Internacional", "Portais de Negócios", "Imprensa Local"],
+      highlights: [
+        "Destaque para o potencial de crescimento",
+        "Análise favorável do mercado"
+      ]
     },
     {
       id: "3",
-      releaseTitle: "Novo programa de monitoramento ambiental",
-      websiteName: "Estadão",
-      publishedDate: "2023-06-22",
-      publishedTime: "09:45",
-      url: "https://estadao.com/programa-monitoramento",
-      isVerified: false
+      title: "Parceria Estratégica",
+      date: "2023-04-22",
+      coverage: 78,
+      sentiment: "neutro",
+      sources: ["Portais de Negócios", "Blogs Especializados"],
+      highlights: [
+        "Análise dos potenciais benefícios",
+        "Questionamentos sobre impacto no mercado"
+      ]
     }
   ];
-  
-  return mockReleaseMonitoring;
 };

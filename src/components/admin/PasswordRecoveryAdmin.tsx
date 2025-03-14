@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,9 +13,9 @@ const PasswordRecoveryAdmin: React.FC = () => {
   const [newPassword, setNewPassword] = useState("");
   const [isResetting, setIsResetting] = useState(false);
   const [recoveryRequests, setRecoveryRequests] = useState([
-    { id: "1", email: "observatory@example.com", requestDate: "2023-05-15", status: "completed" },
-    { id: "2", email: "researcher@example.com", requestDate: "2023-05-18", status: "pending" },
-    { id: "3", email: "journalist@example.com", requestDate: "2023-05-20", status: "pending" }
+    { id: "1", email: "usuario1@exemplo.com", requestDate: "2023-05-15", status: "completed" },
+    { id: "2", email: "usuario2@exemplo.com", requestDate: "2023-05-18", status: "pending" },
+    { id: "3", email: "usuario3@exemplo.com", requestDate: "2023-05-20", status: "pending" }
   ]);
 
   // Filter clients based on search term

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, lazy, Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,89 +10,53 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Image, Video, Link, Send } from "lucide-react";
+=======
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+>>>>>>> 54be6b730f411e573541269183579cf9f15b17b5
 import BackToAdminButton from "@/components/admin/BackToAdminButton";
+import RichTextEditor from "@/components/editor/RichTextEditor";
 
+<<<<<<< HEAD
 // Importação lazy do editor
 const RichTextEditor = lazy(() => import("@/components/editor/RichTextEditor"));
+=======
+const ContentManagement = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [content, setContent] = useState("");
+>>>>>>> 54be6b730f411e573541269183579cf9f15b17b5
 
-interface Content {
-  id: string;
-  title: string;
-  content: string;
-  type: "release" | "reportagem";
-  status: "rascunho" | "revisão" | "aprovado" | "publicado";
-  segment: string;
-  targetOutlets: string[];
-  mediaFiles: {
-    type: "image" | "video";
-    url: string;
-    caption: string;
-  }[];
-  createdAt: Date;
-  publishedAt?: Date;
-}
-
-const ContentManagement: React.FC = () => {
-  const [contents, setContents] = useState<Content[]>([]);
-  const [isNewContentOpen, setIsNewContentOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"releases" | "reportagens">("releases");
-  const [editorContent, setEditorContent] = useState("");
-  const [selectedSegment, setSelectedSegment] = useState<string>("");
-  const [selectedOutlets, setSelectedOutlets] = useState<string[]>([]);
-
-  const segmentos = [
-    "Política",
-    "Economia",
-    "Tecnologia",
-    "Saúde",
-    "Educação",
-    "Meio Ambiente",
-    "Cultura",
-    "Esportes",
-    "Negócios",
-    "Ciência"
-  ];
-
-  const handleAddContent = (data: Partial<Content>) => {
-    const newContent: Content = {
-      id: Date.now().toString(),
-      title: data.title || "",
-      content: editorContent,
-      type: activeTab === "releases" ? "release" : "reportagem",
-      status: "rascunho",
-      segment: selectedSegment,
-      targetOutlets: selectedOutlets,
-      mediaFiles: [],
-      createdAt: new Date()
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        setIsLoading(true);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setContent("<p>Conteúdo de exemplo para edição.</p>");
+      } catch (error) {
+        console.error("Error fetching content:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    setContents([...contents, newContent]);
-    setIsNewContentOpen(false);
-    setEditorContent("");
-    setSelectedSegment("");
-    setSelectedOutlets([]);
+    fetchContent();
+  }, []);
 
-    toast({
-      title: `${activeTab === "releases" ? "Release" : "Reportagem"} criado`,
-      description: "O conteúdo foi salvo como rascunho."
-    });
-  };
-
-  const handleStatusChange = (contentId: string, newStatus: Content["status"]) => {
-    setContents(contents.map(content => 
-      content.id === contentId 
-        ? { 
-            ...content, 
-            status: newStatus,
-            publishedAt: newStatus === "publicado" ? new Date() : content.publishedAt 
-          }
-        : content
-    ));
-
-    toast({
-      title: "Status atualizado",
-      description: `O conteúdo foi marcado como "${newStatus}".`
-    });
+  const handleSaveContent = async () => {
+    try {
+      setIsLoading(true);
+      console.log("Saving content:", content);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      alert("Conteúdo salvo com sucesso!");
+    } catch (error) {
+      console.error("Error saving content:", error);
+      alert("Erro ao salvar conteúdo.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -101,15 +66,17 @@ const ContentManagement: React.FC = () => {
         <CardHeader>
           <CardTitle>Gerenciamento de Conteúdo</CardTitle>
           <CardDescription>
-            Crie e gerencie releases e reportagens para distribuição.
+            Gerencie os conteúdos exibidos na plataforma.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs value={activeTab} onValueChange={(value: "releases" | "reportagens") => setActiveTab(value)}>
+          <Tabs defaultValue="pages">
             <TabsList>
-              <TabsTrigger value="releases">Releases</TabsTrigger>
-              <TabsTrigger value="reportagens">Reportagens</TabsTrigger>
+              <TabsTrigger value="pages">Páginas</TabsTrigger>
+              <TabsTrigger value="articles">Artigos</TabsTrigger>
+              <TabsTrigger value="faq">Perguntas Frequentes</TabsTrigger>
             </TabsList>
+<<<<<<< HEAD
 
             <TabsContent value="releases">
               <div className="space-y-4">
@@ -194,69 +161,37 @@ const ContentManagement: React.FC = () => {
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
+=======
+            <TabsContent value="pages" className="pt-4">
+              {isLoading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+>>>>>>> 54be6b730f411e573541269183579cf9f15b17b5
                 </div>
-
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Título</TableHead>
-                      <TableHead>Segmento</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Criado em</TableHead>
-                      <TableHead>Publicado em</TableHead>
-                      <TableHead className="text-right">Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {contents
-                      .filter(content => content.type === "release")
-                      .map((content) => (
-                        <TableRow key={content.id}>
-                          <TableCell>{content.title}</TableCell>
-                          <TableCell>{content.segment}</TableCell>
-                          <TableCell>
-                            <Select
-                              value={content.status}
-                              onValueChange={(value: Content["status"]) => 
-                                handleStatusChange(content.id, value)
-                              }
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="rascunho">Rascunho</SelectItem>
-                                <SelectItem value="revisão">Em Revisão</SelectItem>
-                                <SelectItem value="aprovado">Aprovado</SelectItem>
-                                <SelectItem value="publicado">Publicado</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                          <TableCell>
-                            {content.createdAt.toLocaleDateString()}
-                          </TableCell>
-                          <TableCell>
-                            {content.publishedAt?.toLocaleDateString() || "-"}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end space-x-2">
-                              <Button variant="ghost" size="sm">
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="sm">
-                                <Send className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="sm">
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+              ) : (
+                <React.Suspense fallback={<div className="flex justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+                </div>}>
+                  <RichTextEditor
+                    initialContent={content}
+                    onContentChange={setContent}
+                  />
+                </React.Suspense>
+              )}
+              <div className="flex justify-end mt-4">
+                <Button onClick={handleSaveContent} disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Salvando...
+                    </>
+                  ) : (
+                    "Salvar Alterações"
+                  )}
+                </Button>
               </div>
             </TabsContent>
+<<<<<<< HEAD
 
             <TabsContent value="reportagens">
               <div className="space-y-4">
@@ -402,6 +337,26 @@ const ContentManagement: React.FC = () => {
                     ))}
                   </TableBody>
                 </Table>
+=======
+            <TabsContent value="articles" className="pt-4">
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <p className="text-muted-foreground">
+                  Gerenciamento de artigos em desenvolvimento.
+                </p>
+                <Button variant="outline" className="mt-4">
+                  Adicionar Novo Artigo
+                </Button>
+              </div>
+            </TabsContent>
+            <TabsContent value="faq" className="pt-4">
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <p className="text-muted-foreground">
+                  Gerenciamento de perguntas frequentes em desenvolvimento.
+                </p>
+                <Button variant="outline" className="mt-4">
+                  Adicionar Nova Pergunta
+                </Button>
+>>>>>>> 54be6b730f411e573541269183579cf9f15b17b5
               </div>
             </TabsContent>
           </Tabs>
@@ -411,4 +366,4 @@ const ContentManagement: React.FC = () => {
   );
 };
 
-export default ContentManagement; 
+export default ContentManagement;

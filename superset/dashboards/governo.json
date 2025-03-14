@@ -1,0 +1,39 @@
+{
+  "dashboard_title": "Monitoramento Governamental",
+  "description": "Análise de dados coletados de portais governamentais",
+  "css": "",
+  "slug": "governo",
+  "uuid": "c23c32a8-9e57-4bdc-9084-d0657f1a7c2b",
+  "position": {
+    "CHART-explore-1": {
+      "type": "CHART",
+      "id": "CHART-explore-1",
+      "children": [],
+      "meta": {
+        "width": 4,
+        "height": 50,
+        "chartId": 1
+      }
+    },
+    "CHART-explore-2": {
+      "type": "CHART",
+      "id": "CHART-explore-2",
+      "children": [],
+      "meta": {
+        "width": 4,
+        "height": 50,
+        "chartId": 2
+      }
+    }
+  },
+  "metadata": {
+    "timed_refresh_immune_slices": [],
+    "expanded_slices": {},
+    "refresh_frequency": 0,
+    "default_filters": "{}",
+    "color_scheme": "supersetColors",
+    "label_colors": {},
+    "show_native_filters": true
+  },
+  "version": "1.0.0"
+}
