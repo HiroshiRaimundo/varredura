@@ -1,83 +1,86 @@
 
-import { useState, useEffect, useRef } from 'react';
+// Serviço para monitoramento de imprensa
 
-interface PressItem {
-  id: string;
-  title: string;
-  outlet: string;
-  date: string;
-  url: string;
-  verified: boolean;
-}
+import { ReleaseMonitoringItem } from "@/hooks/monitoring/types";
 
-export const usePressMonitoring = () => {
-  const [pressItems, setPressItems] = useState<PressItem[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+// Dados simulados para o monitoramento de imprensa
+const mockReleases: ReleaseMonitoringItem[] = [
+  {
+    id: "1",
+    releaseTitle: "Nova política ambiental para a Amazônia",
+    title: "Nova política ambiental para a Amazônia", // Mantendo compatibilidade com o campo title
+    websiteName: "Portal Ambiental",
+    publishedDate: "2023-04-15",
+    publishedTime: "14:30",
+    url: "https://example.com/release1",
+    isVerified: true,
+    status: "publicado"
+  },
+  {
+    id: "2",
+    releaseTitle: "Relatório sobre desmatamento na região Norte",
+    title: "Relatório sobre desmatamento na região Norte", // Mantendo compatibilidade com o campo title
+    websiteName: "Jornal do Meio Ambiente",
+    publishedDate: "2023-04-12",
+    publishedTime: "09:45",
+    url: "https://example.com/release2",
+    isVerified: true,
+    status: "publicado"
+  },
+  {
+    id: "3",
+    releaseTitle: "Novas diretrizes para preservação da floresta",
+    title: "Novas diretrizes para preservação da floresta", // Mantendo compatibilidade com o campo title
+    websiteName: "Blog Amazônia Sustentável",
+    publishedDate: "2023-04-10",
+    publishedTime: "16:20",
+    url: "https://example.com/release3",
+    isVerified: false,
+    status: "pendente"
+  }
+];
+
+// Serviço para gerenciar o monitoramento de releases de imprensa
+export const pressMonitoringService = {
+  // Obter todos os releases monitorados
+  getReleases: async (): Promise<ReleaseMonitoringItem[]> => {
+    // Simulando uma chamada de API
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(mockReleases);
+      }, 500);
+    });
+  },
   
-  // Usar useRef para evitar o erro de tipagem com clearInterval
-  const intervalRef = useRef<number | null>(null);
+  // Adicionar um novo release para monitoramento
+  addRelease: async (release: Omit<ReleaseMonitoringItem, "id">): Promise<ReleaseMonitoringItem> => {
+    // Simulando uma chamada de API para adicionar
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const newRelease = {
+          ...release,
+          id: Math.random().toString(36).substr(2, 9),
+        };
+        mockReleases.push(newRelease);
+        resolve(newRelease);
+      }, 500);
+    });
+  },
   
-  const mockPressItems: PressItem[] = [
-    {
-      id: '1',
-      title: 'Empresa lança iniciativa sustentável',
-      outlet: 'Jornal Econômico',
-      date: new Date().toISOString(),
-      url: 'https://example.com/noticia1',
-      verified: true
-    },
-    {
-      id: '2',
-      title: 'Novo programa ambiental é anunciado',
-      outlet: 'Portal Verde',
-      date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      url: 'https://example.com/noticia2',
-      verified: false
-    },
-    {
-      id: '3',
-      title: 'Relatório aponta melhorias na qualidade do ar',
-      outlet: 'Ciência Diária',
-      date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-      url: 'https://example.com/noticia3',
-      verified: true
-    }
-  ];
-  
-  // Função para carregar dados da API
-  const fetchPressItems = async () => {
-    try {
-      // Simulando chamada de API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setPressItems(mockPressItems);
-      setIsLoading(false);
-    } catch (err) {
-      setError('Erro ao carregar dados de monitoramento');
-      setIsLoading(false);
-    }
-  };
-  
-  // Iniciar monitoramento
-  useEffect(() => {
-    fetchPressItems();
-    
-    // Atualizar dados periodicamente
-    intervalRef.current = window.setInterval(() => {
-      fetchPressItems();
-    }, 60000); // a cada minuto
-    
-    return () => {
-      if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, []);
-  
-  return {
-    pressItems,
-    isLoading,
-    error,
-    refreshData: fetchPressItems
-  };
+  // Verificar um release (marcar como verificado)
+  verifyRelease: async (id: string): Promise<ReleaseMonitoringItem> => {
+    // Simulando uma chamada de API para atualizar
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const index = mockReleases.findIndex(r => r.id === id);
+        if (index !== -1) {
+          mockReleases[index].isVerified = true;
+          mockReleases[index].status = "publicado";
+          resolve(mockReleases[index]);
+        } else {
+          reject(new Error("Release não encontrado"));
+        }
+      }, 500);
+    });
+  }
 };

@@ -1,94 +1,105 @@
-import React from "react";
+
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import { useAuth } from "@/hooks/useAuth";
-import { ClientType, clientTypeDetails } from "@/components/client/ClientTypes";
 import ServiceHero from "@/components/service/ServiceHero";
-import ServiceDetails from "@/components/service/ServiceDetails";
 import ServiceFeatures from "@/components/service/ServiceFeatures";
 import ServiceBenefits from "@/components/service/ServiceBenefits";
+import ServiceDetails from "@/components/service/ServiceDetails";
 import ServiceCTA from "@/components/service/ServiceCTA";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import { ClientType } from "@/types/clientTypes";
+import { clientTypeDetails } from "@/data/clientDetails";
 import { getColorClasses } from "@/components/service/utils/colorUtils";
+import { useAuth } from "@/hooks/useAuth";
 
 const ServiceLanding: React.FC = () => {
   const { serviceId } = useParams<{ serviceId: string }>();
   const navigate = useNavigate();
-  const auth = useAuth();
+  const { isAuthenticated } = useAuth();
+  const [serviceDetails, setServiceDetails] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Ensure serviceId is a valid ClientType
-  const validServiceId = (serviceId as ClientType) || "observatory";
-  
-  // Get service details based on the URL parameter
-  const serviceDetails = clientTypeDetails[validServiceId];
+  useEffect(() => {
+    // Validar se o serviço existe
+    if (serviceId && Object.prototype.hasOwnProperty.call(clientTypeDetails, serviceId)) {
+      setServiceDetails(clientTypeDetails[serviceId as ClientType]);
+    } else {
+      navigate("/");
+    }
+    setLoading(false);
+  }, [serviceId, navigate]);
 
-  if (!serviceDetails) {
-    return <div>Serviço não encontrado</div>;
+  if (loading || !serviceDetails) {
+    return <div>Carregando...</div>;
   }
+
+  const colorClasses = getColorClasses(serviceId as ClientType);
 
   const handleBackClick = () => {
     navigate("/");
   };
 
   const handleContractServiceClick = () => {
-    // Navigate to client page that shows all services
-    navigate(`/client`);
+    navigate("/payment");
   };
 
   const handleExampleClientClick = () => {
-    // Navigate to the example client page
-    navigate("/example-client");
+    navigate("/example-client", { state: { clientType: serviceId } });
   };
 
-  // Get color classes based on service type
-  const colorClasses = getColorClasses(validServiceId);
+  // Criando um objeto caseStudy a partir das propriedades do serviceDetails
+  // para compatibilidade com a interface esperada
+  const caseStudy = {
+    title: serviceDetails.title || "Caso de estudo",
+    description: serviceDetails.description || "Descrição do caso de estudo"
+  };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <Header 
-        isAuthenticated={auth.isAuthenticated}
-        onLoginClick={() => navigate('/login')}
-        onLogoutClick={auth.handleLogout}
+        isAuthenticated={isAuthenticated} 
+        onLoginClick={() => navigate("/login")} 
+        onLogoutClick={() => {}} 
       />
-
-      <ServiceHero 
-        serviceId={validServiceId}
-        title={serviceDetails.title}
-        description={serviceDetails.description}
-        colorClasses={colorClasses}
-        onBackClick={handleBackClick}
-        onContractServiceClick={handleContractServiceClick}
-        onExampleClientClick={handleExampleClientClick}
-      />
-
+      
       <main className="flex-grow">
-        <ServiceDetails 
-          serviceId={validServiceId}
-          details={serviceDetails.details}
-          caseStudy={serviceDetails.caseStudy}
+        <ServiceHero 
+          serviceId={serviceId as ClientType}
+          title={serviceDetails.title}
+          description={serviceDetails.shortDescription}
           colorClasses={colorClasses}
+          onBackClick={handleBackClick}
           onContractServiceClick={handleContractServiceClick}
+          onExampleClientClick={handleExampleClientClick}
         />
 
-        <ServiceFeatures 
-          serviceId={validServiceId}
+        <ServiceFeatures
+          serviceId={serviceId as ClientType}
           features={serviceDetails.features}
           colorClasses={colorClasses}
         />
 
         <ServiceBenefits 
-          serviceId={validServiceId}
+          serviceId={serviceId as ClientType}
           benefits={serviceDetails.benefits}
           colorClasses={colorClasses}
         />
 
+        <ServiceDetails
+          serviceId={serviceId as ClientType}
+          details={serviceDetails.details}
+          caseStudy={caseStudy}
+          colorClasses={colorClasses}
+        />
+
         <ServiceCTA 
-          serviceId={validServiceId}
+          serviceId={serviceId as ClientType}
           colorClasses={colorClasses}
           onContractServiceClick={handleContractServiceClick}
         />
       </main>
-
+      
       <Footer />
     </div>
   );

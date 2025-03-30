@@ -22,16 +22,16 @@ const HeroSection: React.FC = () => {
               </h1>
             </div>
             
-            <div className="md:w-1/2 space-y-4">
+            <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight">
-                Plataforma Integrada de Comunicação e Monitoramento
+                Plataforma Integrada de Monitoramento e Comunicação
               </h1>
               <p className="text-xl text-muted-foreground">
-                Uma solução completa para gerenciar comunicação, monitorar dados e transformar informações em resultados para qualquer setor ou nicho de mercado.
+                Uma única solução adaptável que centraliza dados, monitora informações e otimiza a comunicação para diferentes perfis profissionais e organizacionais.
               </p>
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 mt-6">
               <Button 
                 variant="outline" 
                 size="lg"
@@ -63,7 +63,7 @@ const HeroSection: React.FC = () => {
                   <div className="bg-gray-50 p-4 rounded-lg flex items-center justify-center">
                     <div className="text-center">
                       <p className="text-2xl font-bold text-blue-600">Uma Solução</p>
-                      <p className="text-xs text-gray-600">Múltiplos Usos</p>
+                      <p className="text-xs text-gray-600">Múltiplos Perfis</p>
                     </div>
                   </div>
                 </div>

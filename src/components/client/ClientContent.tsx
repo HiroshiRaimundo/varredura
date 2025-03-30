@@ -1,84 +1,96 @@
 
-import React from "react";
-import { ClientType } from "./ClientTypes";
-import ClientDashboardTab from "./dashboard/ClientDashboardTab";
-import LegislationAlerts from "./LegislationAlerts";
-import AnalysisToolsSection from "./tools/AnalysisToolsSection";
-import MonitoringTab from "./monitoring/MonitoringTab";
-import PressTab from "./PressTab";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
+// Corrigindo os dados simulados para incluir a propriedade source
+import React, { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ClientType } from "@/types/clientTypes";
 import { LegislationAlert } from "@/hooks/monitoring/types";
+import ClientDashboardTab from "@/components/client/dashboard/ClientDashboardTab";
+import MonitoringTab from "@/components/client/monitoring/MonitoringTab";
+import ClientAlerts from "@/components/client/alerts/ClientAlerts";
+import PressTab from "@/components/client/press/PressTab";
+import AnalysisToolsSection from "@/components/client/tools/AnalysisToolsSection";
+import { getColorClasses } from "@/components/service/utils/colorUtils";
+
+// Dados simulados para alertas de legislação
+const mockAlerts: LegislationAlert[] = [
+  {
+    id: "1",
+    title: "Nova Lei Florestal",
+    description: "Nova legislação sobre preservação de áreas protegidas",
+    date: "2023-04-15",
+    isRead: false,
+    url: "https://example.com/lei1",
+    source: "Diário Oficial da União"
+  },
+  {
+    id: "2",
+    title: "Decreto sobre Fiscalização Ambiental",
+    description: "Novas diretrizes para fiscalização de áreas protegidas",
+    date: "2023-04-12",
+    isRead: true,
+    url: "https://example.com/decreto1",
+    source: "Ministério do Meio Ambiente"
+  }
+];
 
 interface ClientContentProps {
-  activeTab: string;
   clientType: ClientType;
 }
 
-const ClientContent: React.FC<ClientContentProps> = ({ activeTab, clientType }) => {
-  const handleDatasetDownload = () => {
-    console.log("Download dataset");
-  };
-
-  const handleComparisonView = () => {
-    console.log("View comparison");
-  };
-
-  // Dummy alerts data that matches the LegislationAlert type
-  const alerts: LegislationAlert[] = [
-    { 
-      id: "1", 
-      title: "Nova legislação", 
-      description: "Detalhes da legislação", 
-      date: "2024-05-01", 
-      isRead: false,
-      url: "https://example.com/legislation/1"
-    },
-    { 
-      id: "2", 
-      title: "Atualização legal", 
-      description: "Detalhes da atualização", 
-      date: "2024-05-02", 
-      isRead: true,
-      url: "https://example.com/legislation/2"
-    },
-  ];
-
-  const handleMarkAsRead = (id: string) => {
-    console.log("Mark as read:", id);
-  };
-
+const ClientContent: React.FC<ClientContentProps> = ({ clientType }) => {
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const colorClasses = getColorClasses(clientType);
+  
   return (
-    <Tabs defaultValue={activeTab} className="w-full">
-      <TabsContent value="dashboard">
-        <ClientDashboardTab clientType={clientType} />
-      </TabsContent>
-      
-      <TabsContent value="alerts">
-        <LegislationAlerts 
-          alerts={alerts}
-          onMarkAsRead={handleMarkAsRead}
-          showAlerts={true}
-        />
-      </TabsContent>
-      
-      <TabsContent value="analysis">
-        <AnalysisToolsSection 
-          clientType={clientType} 
-          onDatasetDownload={handleDatasetDownload}
-          onComparisonView={handleComparisonView}
-        />
-      </TabsContent>
-      
-      <TabsContent value="monitoring">
-        <MonitoringTab clientType={clientType} />
-      </TabsContent>
-      
-      {clientType === "press" && (
-        <TabsContent value="press">
-          <PressTab clientType={clientType} />
+    <div className="space-y-6">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="w-full"
+      >
+        <TabsList className="mb-6 bg-transparent border-b w-full justify-start rounded-none">
+          <TabsTrigger value="dashboard" className={`${activeTab === "dashboard" ? colorClasses.text + " border-b-2 " + colorClasses.border : ""}`}>
+            Dashboard
+          </TabsTrigger>
+          <TabsTrigger value="monitoring" className={`${activeTab === "monitoring" ? colorClasses.text + " border-b-2 " + colorClasses.border : ""}`}>
+            Monitoramento
+          </TabsTrigger>
+          <TabsTrigger value="alerts" className={`${activeTab === "alerts" ? colorClasses.text + " border-b-2 " + colorClasses.border : ""}`}>
+            Alertas
+          </TabsTrigger>
+          {clientType === "press" && (
+            <TabsTrigger value="releases" className={`${activeTab === "releases" ? colorClasses.text + " border-b-2 " + colorClasses.border : ""}`}>
+              Releases
+            </TabsTrigger>
+          )}
+          <TabsTrigger value="tools" className={`${activeTab === "tools" ? colorClasses.text + " border-b-2 " + colorClasses.border : ""}`}>
+            Ferramentas
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="dashboard" className="mt-0">
+          <ClientDashboardTab clientType={clientType} />
         </TabsContent>
-      )}
-    </Tabs>
+        
+        <TabsContent value="monitoring" className="mt-0">
+          <MonitoringTab clientType={clientType} />
+        </TabsContent>
+        
+        <TabsContent value="alerts" className="mt-0">
+          <ClientAlerts alerts={mockAlerts} clientType={clientType} />
+        </TabsContent>
+        
+        {clientType === "press" && (
+          <TabsContent value="releases" className="mt-0">
+            <PressTab />
+          </TabsContent>
+        )}
+        
+        <TabsContent value="tools" className="mt-0">
+          <AnalysisToolsSection clientType={clientType} />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 

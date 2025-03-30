@@ -10,11 +10,11 @@ const CTASection: React.FC = () => {
     <section className="py-16 px-6 bg-gradient-to-r from-blue-600 to-green-600 text-white">
       <div className="max-w-6xl mx-auto text-center">
         <h2 className="text-3xl md:text-4xl font-bold mb-4">
-          Uma Única Plataforma. Infinitas Possibilidades.
+          Uma Plataforma Adaptável. Uma Experiência Unificada.
         </h2>
         <p className="text-xl max-w-3xl mx-auto mb-8">
-          Simplifique sua estratégia de comunicação e monitoramento com nossa solução integrada 
-          que se adapta às necessidades do seu negócio, independente do setor.
+          Simplifique seus processos de monitoramento e comunicação com nossa solução integrada 
+          que se ajusta automaticamente às necessidades do seu perfil profissional.
         </p>
         
         <div className="flex flex-col sm:flex-row justify-center gap-4">

@@ -38,3 +38,6 @@ export interface MonitoringItem {
 
 // Interface para o objeto de monitoramento
 export type Monitoring = MonitoringItem;
+
+// Exportando a interface MonitoringItem para uso em outros componentes
+export { MonitoringItem };

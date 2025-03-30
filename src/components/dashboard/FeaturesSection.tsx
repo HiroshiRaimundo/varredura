@@ -27,22 +27,22 @@ const features = [
   {
     icon: <BarChart2 className="h-8 w-8 text-blue-600" />,
     title: "Plataforma Unificada",
-    description: "Uma única solução que integra monitoramento, comunicação e análise de dados para todos os tipos de usuários."
+    description: "Uma única solução que integra monitoramento e comunicação, adaptável para diferentes perfis de usuários."
   },
   {
     icon: <Clock className="h-8 w-8 text-green-600" />,
-    title: "Monitoramento em Tempo Real",
-    description: "Acompanhe dados, notícias e indicadores em tempo real com alertas personalizados para qualquer setor."
+    title: "Monitoramento Personalizado",
+    description: "Acompanhe dados, notícias e indicadores relevantes com alertas e dashboards personalizados para seu perfil."
   },
   {
     icon: <Database className="h-8 w-8 text-purple-600" />,
     title: "Gestão de Comunicação",
-    description: "Ferramentas integradas para gerenciar releases, contatos com a imprensa e monitorar cobertura de mídia."
+    description: "Ferramentas integradas para gestão completa do ciclo comunicacional, com métricas e relatórios automáticos."
   },
   {
     icon: <Users className="h-8 w-8 text-red-600" />,
-    title: "Adaptável a Qualquer Perfil",
-    description: "Interface personalizável que se adapta às necessidades específicas de diferentes tipos de usuários e setores."
+    title: "Interface Adaptativa",
+    description: "O mesmo sistema se adapta automaticamente às necessidades do seu perfil, oferecendo ferramentas específicas."
   }
 ];
 
@@ -51,10 +51,10 @@ const FeaturesSection: React.FC = () => {
     <section className="bg-gray-50 py-16 px-6">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Uma Solução para Todos os Perfis</h2>
+          <h2 className="text-3xl font-bold mb-4">Uma Plataforma para Todos</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Nossa plataforma integrada oferece recursos completos de monitoramento e comunicação, 
-            adaptáveis para diferentes necessidades em um único sistema.
+            Nossa solução única se adapta a diferentes perfis profissionais, 
+            oferecendo recursos personalizados de monitoramento e comunicação dentro do mesmo sistema.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

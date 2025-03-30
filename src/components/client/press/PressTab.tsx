@@ -1,52 +1,59 @@
 
 import React from "react";
-import { ClientType } from "../ClientTypes";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import PressDashboard from "./PressDashboard";
+import PressReleaseDashboard from "./PressReleaseDashboard";
 import ReleaseMonitoringDashboard from "./ReleaseMonitoringDashboard";
+import PressReleaseForm from "./PressReleaseForm";
 import { ReleaseMonitoringItem } from "@/hooks/monitoring/types";
 
-// Sample data for demonstration
-const sampleMonitoringResults: ReleaseMonitoringItem[] = [
+// Dados simulados para monitoramento de releases
+const mockReleases: ReleaseMonitoringItem[] = [
   {
     id: "1",
-    releaseTitle: "Novo Estudo Ambiental",
+    releaseTitle: "Nova política ambiental para a Amazônia",
+    title: "Nova política ambiental para a Amazônia",
     websiteName: "Portal Ambiental",
-    publishedDate: "2023-05-15",
+    publishedDate: "2023-04-15",
     publishedTime: "14:30",
     url: "https://example.com/release1",
-    isVerified: true
+    isVerified: true,
+    status: "publicado"
   },
   {
     id: "2",
-    releaseTitle: "Relatório de Sustentabilidade",
-    websiteName: "Jornal Verde",
-    publishedDate: "2023-05-10",
-    publishedTime: "09:15",
+    releaseTitle: "Relatório sobre desmatamento na região Norte",
+    title: "Relatório sobre desmatamento na região Norte",
+    websiteName: "Jornal do Meio Ambiente",
+    publishedDate: "2023-04-12",
+    publishedTime: "09:45",
     url: "https://example.com/release2",
-    isVerified: false
+    isVerified: false,
+    status: "pendente"
   }
 ];
 
-interface PressTabProps {
-  clientType: ClientType;
-}
-
-const PressTab: React.FC<PressTabProps> = ({ clientType }) => {
+const PressTab: React.FC = () => {
+  const [activeTab, setActiveTab] = React.useState("dashboard");
+  
   return (
-    <div className="space-y-4">
-      <Tabs defaultValue="dashboard" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+    <div>
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid grid-cols-3 mb-8">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-          <TabsTrigger value="media">Mídia</TabsTrigger>
+          <TabsTrigger value="new">Novo Release</TabsTrigger>
+          <TabsTrigger value="monitoring">Monitoramento</TabsTrigger>
         </TabsList>
         
         <TabsContent value="dashboard">
-          <PressDashboard clientType={clientType} />
+          <PressReleaseDashboard />
         </TabsContent>
         
-        <TabsContent value="media">
-          <ReleaseMonitoringDashboard monitoringResults={sampleMonitoringResults} />
+        <TabsContent value="new">
+          <PressReleaseForm />
+        </TabsContent>
+        
+        <TabsContent value="monitoring">
+          <ReleaseMonitoringDashboard releases={mockReleases} />
         </TabsContent>
       </Tabs>
     </div>
