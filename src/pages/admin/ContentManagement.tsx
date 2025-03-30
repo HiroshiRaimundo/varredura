@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -5,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import BackToAdminButton from "@/components/admin/BackToAdminButton";
 import RichTextEditor from "@/components/editor/RichTextEditor";
+import { toast } from "sonner";
 
 const ContentManagement = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -31,10 +33,10 @@ const ContentManagement = () => {
       setIsLoading(true);
       console.log("Saving content:", content);
       await new Promise(resolve => setTimeout(resolve, 1000));
-      alert("Conteúdo salvo com sucesso!");
+      toast.success("Conteúdo salvo com sucesso!");
     } catch (error) {
       console.error("Error saving content:", error);
-      alert("Erro ao salvar conteúdo.");
+      toast.error("Erro ao salvar conteúdo.");
     } finally {
       setIsLoading(false);
     }
@@ -63,9 +65,11 @@ const ContentManagement = () => {
                   <Loader2 className="h-8 w-8 animate-spin" />
                 </div>
               ) : (
-                <React.Suspense fallback={<div className="flex justify-center py-8">
-                  <Loader2 className="h-8 w-8 animate-spin" />
-                </div>}>
+                <React.Suspense fallback={
+                  <div className="flex justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                  </div>
+                }>
                   <RichTextEditor
                     initialContent={content}
                     onContentChange={setContent}
