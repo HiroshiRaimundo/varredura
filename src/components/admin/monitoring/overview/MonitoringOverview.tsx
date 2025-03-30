@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Filter, Pause, Play, Trash2, Settings } from "lucide-react";
+import { ArrowLeft, Filter, Pause, Play, Trash2, Settings } from "lucide-react";
 import { toast } from "sonner";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 
@@ -37,6 +38,7 @@ interface Filter {
 }
 
 export const MonitoringOverview: React.FC = () => {
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState<Filter>({
     search: "",
@@ -66,10 +68,8 @@ export const MonitoringOverview: React.FC = () => {
       responseTime: 300,
       url: "https://blog.exemplo.com"
     },
-    // Adicione mais itens mockados aqui para testar a paginação
   ]);
 
-  // Dados mockados para os gráficos
   const analysisData = [
     { name: 'Jan', sentiment: 75, relevance: 65, accuracy: 80 },
     { name: 'Fev', sentiment: 82, relevance: 70, accuracy: 85 },
@@ -149,6 +149,17 @@ export const MonitoringOverview: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center mb-4">
+        <Button
+          variant="outline"
+          className="flex items-center gap-2"
+          onClick={() => navigate("/admin")}
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Voltar para Administração
+        </Button>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <Card>
           <CardHeader>

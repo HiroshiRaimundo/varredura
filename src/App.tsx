@@ -76,6 +76,16 @@ function App() {
             }
           />
 
+          {/* Rota para análise e relatórios */}
+          <Route
+            path="/admin/analytics"
+            element={
+              <ProtectedRoute allowedTypes={['admin']}>
+                <Admin />
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="/admin/clients"
             element={
