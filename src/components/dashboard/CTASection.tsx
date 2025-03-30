@@ -26,12 +26,12 @@ const CTASection: React.FC = () => {
             Começar Agora
           </Button>
           <Button 
-            onClick={() => navigate("/help")}
+            onClick={() => navigate("/example-client")}
             variant="outline"
             size="lg"
             className="border-white text-white hover:bg-white/20"
           >
-            Solicitar Demonstração
+            Demonstração
           </Button>
         </div>
       </div>
