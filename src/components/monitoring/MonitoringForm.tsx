@@ -44,15 +44,7 @@ const MonitoringForm: React.FC<MonitoringFormProps> = ({ form, onSubmit, clientT
   }
   
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{getMonitoringFormTitle(clientType)}</CardTitle>
-        <CardDescription>{getMonitoringFormDescription(clientType)}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <MonitoringFormInputs form={form} onSubmit={onSubmit} clientType={clientType} />
-      </CardContent>
-    </Card>
+    <MonitoringFormInputs form={form} onSubmit={onSubmit} clientType={clientType} />
   );
 };
 

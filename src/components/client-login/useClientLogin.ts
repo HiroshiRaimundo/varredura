@@ -1,35 +1,53 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ClientLoginFormValues } from "./types";
 import { toast } from "@/hooks/use-toast";
+import { ClientLoginFormValues } from "./types";
+import { validateClient, createClientInfo, saveClientInfo } from "./ClientUtils";
 
 export const useClientLogin = () => {
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const navigate = useNavigate();
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const handleLogin = async (data: ClientLoginFormValues) => {
     setIsLoggingIn(true);
-
+    console.log("Attempting client login with:", data.email);
+    
     try {
-      // Simulando uma chamada de API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Para fins de demonstração, quaisquer credenciais são aceitas
-      // Em produção, isso seria validado pelo backend
-      toast({
-        title: "Login bem-sucedido",
-        description: "Você foi autenticado com sucesso.",
-      });
-
-      // Redirecionar para página do cliente (não para área administrativa)
-      navigate("/client");
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      const client = validateClient(data);
+      
+      if (client) {
+        console.log("Client validated successfully:", client);
+        
+        // Store client info in localStorage
+        const clientInfo = createClientInfo(data.email, client.type);
+        saveClientInfo(clientInfo);
+        
+        toast({
+          title: "Login realizado com sucesso",
+          description: `Bem-vindo ao portal do cliente.`
+        });
+        
+        // Navigate directly to the client dashboard with the correct client type
+        navigate(`/client/${client.type}`);
+        console.log(`Redirecting to client/${client.type}`);
+      } else {
+        console.error("Client validation failed for:", data.email);
+        toast({
+          title: "Erro de autenticação",
+          description: "Email ou senha incorretos.",
+          variant: "destructive"
+        });
+      }
     } catch (error) {
-      console.error("Erro ao fazer login:", error);
+      console.error("Login error:", error);
       toast({
-        title: "Erro ao fazer login",
-        description: "Verifique suas credenciais e tente novamente.",
-        variant: "destructive",
+        title: "Erro no login",
+        description: "Ocorreu um erro durante o login. Tente novamente.",
+        variant: "destructive"
       });
     } finally {
       setIsLoggingIn(false);
@@ -38,6 +56,6 @@ export const useClientLogin = () => {
 
   return {
     isLoggingIn,
-    handleLogin,
+    handleLogin
   };
 };

@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { UseFormReturn } from "react-hook-form";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
 
 interface LoginFormData {
   email: string;
@@ -122,12 +121,6 @@ const LoginDialog: React.FC<LoginDialogProps> = ({
               >
                 Lembrar meu email
               </label>
-            </div>
-            
-            <div className="text-center text-sm">
-              <Link to="/client-login" className="text-primary hover:underline">
-                Acesso para clientes
-              </Link>
             </div>
 
             <DialogFooter>

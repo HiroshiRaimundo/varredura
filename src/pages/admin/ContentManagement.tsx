@@ -1,65 +1,33 @@
-
-import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+<<<<<<< HEAD
+import React, { useState, lazy, Suspense } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus, Edit, Trash2, Image, Video, Link, Send } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
+import { Plus, Edit, Trash2, Image, Video, Link, Send } from "lucide-react";
+=======
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+>>>>>>> 54be6b730f411e573541269183579cf9f15b17b5
 import BackToAdminButton from "@/components/admin/BackToAdminButton";
 import RichTextEditor from "@/components/editor/RichTextEditor";
 
+<<<<<<< HEAD
+// Importação lazy do editor
+const RichTextEditor = lazy(() => import("@/components/editor/RichTextEditor"));
+=======
 const ContentManagement = () => {
-  // Estado para diferentes funcionalidades
   const [isLoading, setIsLoading] = useState(false);
   const [content, setContent] = useState("");
-  const [selectedSegment, setSelectedSegment] = useState("");
-  const [isNewContentOpen, setIsNewContentOpen] = useState(false);
-  const [editorContent, setEditorContent] = useState("");
-
-  // Dados de exemplo
-  const segmentos = [
-    "Política", 
-    "Economia", 
-    "Saúde", 
-    "Educação", 
-    "Tecnologia", 
-    "Meio Ambiente"
-  ];
-
-  type Content = {
-    id: string;
-    title: string;
-    segment: string;
-    type: "release" | "reportagem";
-    status: "rascunho" | "revisão" | "aprovado" | "publicado";
-    createdAt: Date;
-    publishedAt?: Date;
-  };
-
-  const [contents, setContents] = useState<Content[]>([
-    {
-      id: "1",
-      title: "Novo programa de sustentabilidade",
-      segment: "Meio Ambiente",
-      type: "release",
-      status: "publicado",
-      createdAt: new Date(2023, 5, 10),
-      publishedAt: new Date(2023, 5, 15)
-    },
-    {
-      id: "2",
-      title: "Análise do mercado financeiro",
-      segment: "Economia",
-      type: "reportagem",
-      status: "rascunho",
-      createdAt: new Date(2023, 6, 5)
-    }
-  ]);
+>>>>>>> 54be6b730f411e573541269183579cf9f15b17b5
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -82,52 +50,13 @@ const ContentManagement = () => {
       setIsLoading(true);
       console.log("Saving content:", content);
       await new Promise(resolve => setTimeout(resolve, 1000));
-      toast({
-        title: "Conteúdo salvo",
-        description: "O conteúdo foi salvo com sucesso.",
-      });
+      alert("Conteúdo salvo com sucesso!");
     } catch (error) {
       console.error("Error saving content:", error);
-      toast({
-        title: "Erro",
-        description: "Erro ao salvar conteúdo.",
-        variant: "destructive",
-      });
+      alert("Erro ao salvar conteúdo.");
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleAddContent = (newContent: Partial<Content>) => {
-    const content = {
-      id: Date.now().toString(),
-      title: newContent.title || "Sem título",
-      segment: newContent.segment || selectedSegment,
-      type: newContent.type || "release",
-      status: "rascunho",
-      createdAt: new Date(),
-    } as Content;
-
-    setContents([content, ...contents]);
-    setIsNewContentOpen(false);
-    toast({
-      title: "Conteúdo criado",
-      description: "O conteúdo foi criado como rascunho.",
-    });
-  };
-
-  const handleStatusChange = (id: string, status: Content["status"]) => {
-    setContents(
-      contents.map(content => 
-        content.id === id 
-          ? { 
-              ...content, 
-              status,
-              publishedAt: status === "publicado" ? new Date() : content.publishedAt
-            } 
-          : content
-      )
-    );
   };
 
   return (
@@ -146,60 +75,8 @@ const ContentManagement = () => {
               <TabsTrigger value="pages">Páginas</TabsTrigger>
               <TabsTrigger value="articles">Artigos</TabsTrigger>
               <TabsTrigger value="faq">Perguntas Frequentes</TabsTrigger>
-              <TabsTrigger value="releases">Releases</TabsTrigger>
-              <TabsTrigger value="reportagens">Reportagens</TabsTrigger>
             </TabsList>
-
-            <TabsContent value="pages" className="pt-4">
-              {isLoading ? (
-                <div className="flex justify-center py-8">
-                  <Loader2 className="h-8 w-8 animate-spin" />
-                </div>
-              ) : (
-                <React.Suspense fallback={<div className="flex justify-center py-8">
-                  <Loader2 className="h-8 w-8 animate-spin" />
-                </div>}>
-                  <RichTextEditor
-                    initialContent={content}
-                    onContentChange={setContent}
-                  />
-                </React.Suspense>
-              )}
-              <div className="flex justify-end mt-4">
-                <Button onClick={handleSaveContent} disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Salvando...
-                    </>
-                  ) : (
-                    "Salvar Alterações"
-                  )}
-                </Button>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="articles" className="pt-4">
-              <div className="flex flex-col items-center justify-center py-8 text-center">
-                <p className="text-muted-foreground">
-                  Gerenciamento de artigos em desenvolvimento.
-                </p>
-                <Button variant="outline" className="mt-4">
-                  Adicionar Novo Artigo
-                </Button>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="faq" className="pt-4">
-              <div className="flex flex-col items-center justify-center py-8 text-center">
-                <p className="text-muted-foreground">
-                  Gerenciamento de perguntas frequentes em desenvolvimento.
-                </p>
-                <Button variant="outline" className="mt-4">
-                  Adicionar Nova Pergunta
-                </Button>
-              </div>
-            </TabsContent>
+<<<<<<< HEAD
 
             <TabsContent value="releases">
               <div className="space-y-4">
@@ -248,11 +125,13 @@ const ContentManagement = () => {
                         </div>
                         <div className="space-y-2">
                           <Label>Conteúdo</Label>
-                          <RichTextEditor 
-                            initialContent={editorContent}
-                            onContentChange={setEditorContent}
-                            placeholder="Digite o conteúdo do release..."
-                          />
+                          <Suspense fallback={<div>Carregando editor...</div>}>
+                            <RichTextEditor 
+                              value={editorContent}
+                              onChange={setEditorContent}
+                              placeholder="Digite o conteúdo do release..."
+                            />
+                          </Suspense>
                         </div>
                         <div className="space-y-2">
                           <Label>Mídia</Label>
@@ -276,75 +155,43 @@ const ContentManagement = () => {
                         <Button variant="outline" onClick={() => setIsNewContentOpen(false)}>
                           Cancelar
                         </Button>
-                        <Button onClick={() => handleAddContent({ type: "release" })}>
+                        <Button onClick={() => handleAddContent({})}>
                           Salvar como Rascunho
                         </Button>
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
+=======
+            <TabsContent value="pages" className="pt-4">
+              {isLoading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+>>>>>>> 54be6b730f411e573541269183579cf9f15b17b5
                 </div>
-
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Título</TableHead>
-                      <TableHead>Segmento</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Criado em</TableHead>
-                      <TableHead>Publicado em</TableHead>
-                      <TableHead className="text-right">Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {contents
-                      .filter(content => content.type === "release")
-                      .map((content) => (
-                        <TableRow key={content.id}>
-                          <TableCell>{content.title}</TableCell>
-                          <TableCell>{content.segment}</TableCell>
-                          <TableCell>
-                            <Select
-                              value={content.status}
-                              onValueChange={(value: Content["status"]) => 
-                                handleStatusChange(content.id, value)
-                              }
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="rascunho">Rascunho</SelectItem>
-                                <SelectItem value="revisão">Em Revisão</SelectItem>
-                                <SelectItem value="aprovado">Aprovado</SelectItem>
-                                <SelectItem value="publicado">Publicado</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                          <TableCell>
-                            {content.createdAt.toLocaleDateString()}
-                          </TableCell>
-                          <TableCell>
-                            {content.publishedAt?.toLocaleDateString() || "-"}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end space-x-2">
-                              <Button variant="ghost" size="sm">
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="sm">
-                                <Send className="h-4 h-4" />
-                              </Button>
-                              <Button variant="ghost" size="sm">
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+              ) : (
+                <React.Suspense fallback={<div className="flex justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+                </div>}>
+                  <RichTextEditor
+                    initialContent={content}
+                    onContentChange={setContent}
+                  />
+                </React.Suspense>
+              )}
+              <div className="flex justify-end mt-4">
+                <Button onClick={handleSaveContent} disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Salvando...
+                    </>
+                  ) : (
+                    "Salvar Alterações"
+                  )}
+                </Button>
               </div>
             </TabsContent>
+<<<<<<< HEAD
 
             <TabsContent value="reportagens">
               <div className="space-y-4">
@@ -393,11 +240,13 @@ const ContentManagement = () => {
                         </div>
                         <div className="space-y-2">
                           <Label>Conteúdo</Label>
-                          <RichTextEditor 
-                            initialContent={editorContent}
-                            onContentChange={setEditorContent}
-                            placeholder="Digite o conteúdo da reportagem..."
-                          />
+                          <Suspense fallback={<div>Carregando editor...</div>}>
+                            <RichTextEditor 
+                              value={editorContent}
+                              onChange={setEditorContent}
+                              placeholder="Digite o conteúdo da reportagem..."
+                            />
+                          </Suspense>
                         </div>
                         <div className="space-y-2">
                           <Label>Mídia</Label>
@@ -421,7 +270,7 @@ const ContentManagement = () => {
                         <Button variant="outline" onClick={() => setIsNewContentOpen(false)}>
                           Cancelar
                         </Button>
-                        <Button onClick={() => handleAddContent({ type: "reportagem" })}>
+                        <Button onClick={() => handleAddContent({})}>
                           Salvar como Rascunho
                         </Button>
                       </DialogFooter>
@@ -488,6 +337,26 @@ const ContentManagement = () => {
                     ))}
                   </TableBody>
                 </Table>
+=======
+            <TabsContent value="articles" className="pt-4">
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <p className="text-muted-foreground">
+                  Gerenciamento de artigos em desenvolvimento.
+                </p>
+                <Button variant="outline" className="mt-4">
+                  Adicionar Novo Artigo
+                </Button>
+              </div>
+            </TabsContent>
+            <TabsContent value="faq" className="pt-4">
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <p className="text-muted-foreground">
+                  Gerenciamento de perguntas frequentes em desenvolvimento.
+                </p>
+                <Button variant="outline" className="mt-4">
+                  Adicionar Nova Pergunta
+                </Button>
+>>>>>>> 54be6b730f411e573541269183579cf9f15b17b5
               </div>
             </TabsContent>
           </Tabs>
