@@ -47,7 +47,7 @@ const LoginCard: React.FC<LoginCardProps> = ({ onLogin, isLoggingIn }) => {
         <Button 
           variant="outline" 
           className="w-full" 
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/")}
         >
           Voltar
         </Button>

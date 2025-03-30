@@ -1,15 +1,23 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BarChart2, Users, FileText, Search, Calendar, AlertCircle, Eye } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 
 const Index: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+      {/* Header */}
+      <Header 
+        isAuthenticated={isAuthenticated}
+        onLoginClick={() => {}}
+        onLogoutClick={() => {}}
+      />
+      
       {/* Hero Section */}
       <section className="pt-20 pb-16 px-4 md:px-6">
         <div className="container mx-auto max-w-6xl">
@@ -26,7 +34,7 @@ const Index: React.FC = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-6 text-lg">
-                <Link to={isAuthenticated ? "/admin" : "/login"}>
+                <Link to={isAuthenticated ? "/admin" : "/client-login"}>
                   {isAuthenticated ? "Acessar Dashboard" : "Começar Agora"}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
@@ -238,34 +246,7 @@ const Index: React.FC = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <h3 className="text-xl font-semibold mb-4">Varredura</h3>
-              <p className="text-gray-400">
-                Plataforma integrada de gestão de comunicação e monitoramento inteligente para diversos setores.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold mb-4">Links Rápidos</h3>
-              <ul className="space-y-2">
-                <li><Link to="/login" className="text-gray-400 hover:text-white">Login</Link></li>
-                <li><Link to="/example-client" className="text-gray-400 hover:text-white">Demonstração</Link></li>
-                <li><Link to="/client" className="text-gray-400 hover:text-white">Área do Cliente</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold mb-4">Contato</h3>
-              <p className="text-gray-400">contato@varredura.com.br</p>
-              <p className="text-gray-400">+55 (XX) XXXX-XXXX</p>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500">
-            <p>&copy; {new Date().getFullYear()} Varredura. Todos os direitos reservados.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
