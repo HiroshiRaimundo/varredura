@@ -24,7 +24,12 @@ interface MockData {
     published: number;
     pending: number;
   };
-  releaseStats: any[];
+  releaseStats: {
+    published: number;
+    pending: number;
+    approved: number;
+    rejected: number;
+  };
   monthlyData: any[];
   mediaOutlets: any[];
   recentReleases: any[];
@@ -44,7 +49,12 @@ const PressContent: React.FC<PressContentProps> = ({ clientType }) => {
       published: 18,
       pending: 6
     },
-    releaseStats: [],
+    releaseStats: {
+      published: 18,
+      pending: 6,
+      approved: 22,
+      rejected: 2
+    },
     monthlyData: [],
     mediaOutlets: [],
     recentReleases: []

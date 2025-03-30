@@ -31,6 +31,9 @@ export interface MonitoringFormProps {
   clientType?: string;
 }
 
+// Alias for API interface compatibility
+export type Monitoring = MonitoringItem;
+
 // Tipos para alertas de legislação
 export interface LegislationAlert {
   id: string;

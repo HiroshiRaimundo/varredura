@@ -6,7 +6,7 @@ import PressReleaseDashboard from './PressReleaseDashboard';
 import ReleaseMonitoringDashboard from './ReleaseMonitoringDashboard';
 import PressReleaseHelp from './PressReleaseHelp';
 
-interface PressTabProps {
+export interface PressTabProps {
   clientType: string;
 }
 

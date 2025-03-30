@@ -5,7 +5,9 @@ import { toast } from '@/hooks/use-toast';
 import { 
   getClientMonitorings, 
   getLegislationAlerts, 
-  getReleaseMonitoring 
+  getReleaseMonitoring,
+  createMonitoring,
+  deleteMonitoring as apiDeleteMonitoring
 } from './monitoring/api';
 
 // Re-export MonitoringItem for other files to import
@@ -60,16 +62,9 @@ export function useMonitoring(clientId: string = 'default') {
     }
   };
 
-  const addMonitoring = async (monitoring: Omit<MonitoringItem, 'id'>) => {
+  const addMonitoring = async (monitoring: Omit<MonitoringItem, 'id' | 'status' | 'lastUpdate' | 'createdAt'>) => {
     try {
-      // Em uma aplicação real, aqui faria uma chamada à API
-      const newMonitoring: MonitoringItem = {
-        id: `monitoring-${Date.now()}`,
-        ...monitoring,
-        lastUpdate: new Date().toISOString(),
-        createdAt: new Date().toISOString()
-      };
-      
+      const newMonitoring = await createMonitoring(monitoring);
       setMonitoringItems(prev => [newMonitoring, ...prev]);
       
       toast({
@@ -91,15 +86,18 @@ export function useMonitoring(clientId: string = 'default') {
 
   const deleteMonitoring = async (id: string) => {
     try {
-      // Em uma aplicação real, aqui faria uma chamada à API
-      setMonitoringItems(prev => prev.filter(item => item.id !== id));
+      const success = await apiDeleteMonitoring(id);
       
-      toast({
-        title: 'Monitoramento removido',
-        description: 'O monitoramento foi excluído com sucesso.',
-      });
+      if (success) {
+        setMonitoringItems(prev => prev.filter(item => item.id !== id));
+        
+        toast({
+          title: 'Monitoramento removido',
+          description: 'O monitoramento foi excluído com sucesso.',
+        });
+      }
       
-      return true;
+      return success;
     } catch (error) {
       console.error('Erro ao excluir monitoramento:', error);
       toast({

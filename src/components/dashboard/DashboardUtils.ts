@@ -1,6 +1,9 @@
 
 import { MonitoringItem } from "@/hooks/monitoring/types";
 
+// Color constants for charts
+export const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658'];
+
 // Converter tipo de frequência para formato legível em português
 export const formatFrequency = (frequency: string): string => {
   switch (frequency) {
@@ -24,12 +27,10 @@ export const parseFrequency = (frequency: string): "hourly" | "daily" | "weekly"
       return "hourly";
     case "diária":
     case "diario":
-    case "diária":
+    case "diaria":
       return "daily";
     case "semanal":
-    case "semanal":
       return "weekly";
-    case "mensal":
     case "mensal":
       return "monthly";
     default:
@@ -115,70 +116,115 @@ export const formatUrl = (url: string): string => {
   }
 };
 
-// Função auxiliar para comparar nomes de categorias
-export const compareCategoryNames = (a: string, b: string): number => {
-  return a.localeCompare(b, 'pt-BR');
-};
-
-// Agrupar itens por categoria
-export const groupByCategory = (items: MonitoringItem[]): Record<string, MonitoringItem[]> => {
-  const grouped: Record<string, MonitoringItem[]> = {};
+// Data transformation utilities for Dashboard components
+export const getCategoryData = (monitoringItems: MonitoringItem[]) => {
+  const categories: Record<string, number> = {};
   
-  items.forEach(item => {
+  monitoringItems.forEach(item => {
     const category = item.category || "Sem categoria";
-    if (!grouped[category]) {
-      grouped[category] = [];
-    }
-    grouped[category].push(item);
+    categories[category] = (categories[category] || 0) + 1;
   });
   
-  return grouped;
+  return Object.entries(categories).map(([name, value]) => ({ name, value }));
 };
 
-// Construir URL para API a partir do URL base
-export const buildApiUrl = (item: MonitoringItem): string => {
-  if (!item.url) return "";
+export const getFrequencyData = (monitoringItems: MonitoringItem[]) => {
+  const frequencies: Record<string, number> = {
+    "Diária": 0,
+    "Semanal": 0,
+    "Mensal": 0,
+    "A cada hora": 0
+  };
   
-  try {
-    // Aqui vamos adaptar para usar propriedades disponíveis no tipo MonitoringItem
-    // Assumindo que o item.url contém a URL base
-    return item.url;
-  } catch (err) {
-    console.error("Erro ao construir URL da API:", err);
-    return "";
-  }
+  monitoringItems.forEach(item => {
+    const freq = formatFrequency(item.frequency);
+    frequencies[freq] = (frequencies[freq] || 0) + 1;
+  });
+  
+  return Object.entries(frequencies).map(([frequency, quantidade]) => ({ frequency, quantidade }));
 };
 
-// Gerar data de próxima atualização
-export const getNextUpdateDate = (item: MonitoringItem): Date => {
-  if (!item.lastUpdate) return new Date();
+export const getResponsibleData = (monitoringItems: MonitoringItem[]) => {
+  const responsibles: Record<string, number> = {};
   
-  const lastUpdate = new Date(item.lastUpdate);
-  const nextUpdate = new Date(lastUpdate);
+  monitoringItems.forEach(item => {
+    const responsible = item.responsible || "Não atribuído";
+    responsibles[responsible] = (responsibles[responsible] || 0) + 1;
+  });
   
-  switch (item.frequency) {
-    case "hourly":
-      nextUpdate.setHours(nextUpdate.getHours() + 1);
-      break;
-    case "daily":
-      nextUpdate.setDate(nextUpdate.getDate() + 1);
-      break;
-    case "weekly":
-      nextUpdate.setDate(nextUpdate.getDate() + 7);
-      break;
-    case "monthly":
-      nextUpdate.setMonth(nextUpdate.getMonth() + 1);
-      break;
-    default:
-      nextUpdate.setDate(nextUpdate.getDate() + 1);
-  }
-  
-  return nextUpdate;
+  return Object.entries(responsibles)
+    .map(([responsible, monitoramentos]) => ({ responsible, monitoramentos }))
+    .sort((a, b) => b.monitoramentos - a.monitoramentos)
+    .slice(0, 5); // Limit to top 5
 };
 
-// Verificar se o monitoramento precisa ser atualizado
-export const needsUpdate = (item: MonitoringItem): boolean => {
-  const nextUpdateDate = getNextUpdateDate(item);
+export const getRadarData = (monitoringItems: MonitoringItem[]) => {
+  // Group items by category for radar chart
+  const categories: Record<string, number> = {};
+  
+  monitoringItems.forEach(item => {
+    const category = item.category || "Sem categoria";
+    categories[category] = (categories[category] || 0) + 1;
+  });
+  
+  return Object.entries(categories).map(([subject, A]) => ({
+    subject,
+    A,
+    fullMark: Math.max(...Object.values(categories)) * 1.2
+  }));
+};
+
+export const generateTrendData = (monitoringItems: MonitoringItem[], timeRange: string) => {
+  // Get dates for time range
   const now = new Date();
-  return now > nextUpdateDate;
+  const dates: string[] = [];
+  let daysToShow = 30; // Default for monthly
+  
+  if (timeRange === "semanal") {
+    daysToShow = 7;
+  } else if (timeRange === "diário") {
+    daysToShow = 1;
+  } else if (timeRange === "trimestral") {
+    daysToShow = 90;
+  }
+  
+  for (let i = 0; i < daysToShow; i++) {
+    const date = new Date(now);
+    date.setDate(now.getDate() - i);
+    const dateStr = date.toISOString().split('T')[0];
+    dates.unshift(dateStr);
+  }
+  
+  // Generate random data for demonstration
+  return dates.map(date => {
+    const monthDay = date.slice(5);
+    return {
+      name: monthDay,
+      estudos: Math.floor(Math.random() * 10) + 5,
+      monitoramentos: Math.floor(Math.random() * 15) + 10,
+      atualizacoes: Math.floor(Math.random() * 8) + 2
+    };
+  });
+};
+
+// CSV conversion utility
+export const convertToCSV = (data: any[]): string => {
+  if (!data || data.length === 0) return '';
+  
+  const headers = Object.keys(data[0]);
+  const csvRows = [];
+  
+  // Add headers
+  csvRows.push(headers.join(','));
+  
+  // Add rows
+  for (const row of data) {
+    const values = headers.map(header => {
+      const value = row[header];
+      return typeof value === 'string' ? `"${value.replace(/"/g, '""')}"` : value;
+    });
+    csvRows.push(values.join(','));
+  }
+  
+  return csvRows.join('\n');
 };

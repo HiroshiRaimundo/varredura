@@ -7,36 +7,42 @@ import { ReleaseMonitoringItem } from "@/hooks/monitoring/types";
 const mockReleases: ReleaseMonitoringItem[] = [
   {
     id: "1",
+    title: "Nova política ambiental para a Amazônia",
+    date: "2023-04-15",
+    media: ["Portal Ambiental"],
+    status: "publicado",
     releaseTitle: "Nova política ambiental para a Amazônia",
-    title: "Nova política ambiental para a Amazônia", // Mantendo compatibilidade com o campo title
     websiteName: "Portal Ambiental",
     publishedDate: "2023-04-15",
     publishedTime: "14:30",
     url: "https://example.com/release1",
-    isVerified: true,
-    status: "publicado"
+    isVerified: true
   },
   {
     id: "2",
+    title: "Relatório sobre desmatamento na região Norte",
+    date: "2023-04-12",
+    media: ["Jornal do Meio Ambiente"],
+    status: "publicado",
     releaseTitle: "Relatório sobre desmatamento na região Norte",
-    title: "Relatório sobre desmatamento na região Norte", // Mantendo compatibilidade com o campo title
     websiteName: "Jornal do Meio Ambiente",
     publishedDate: "2023-04-12",
     publishedTime: "09:45",
     url: "https://example.com/release2",
-    isVerified: true,
-    status: "publicado"
+    isVerified: true
   },
   {
     id: "3",
+    title: "Novas diretrizes para preservação da floresta",
+    date: "2023-04-10",
+    media: ["Blog Amazônia Sustentável"],
+    status: "pendente",
     releaseTitle: "Novas diretrizes para preservação da floresta",
-    title: "Novas diretrizes para preservação da floresta", // Mantendo compatibilidade com o campo title
     websiteName: "Blog Amazônia Sustentável",
     publishedDate: "2023-04-10",
     publishedTime: "16:20",
     url: "https://example.com/release3",
-    isVerified: false,
-    status: "pendente"
+    isVerified: false
   }
 ];
 

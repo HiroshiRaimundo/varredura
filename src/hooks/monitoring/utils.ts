@@ -1,53 +1,31 @@
 
 import { MonitoringItem } from "./types";
 import { convertToCSV } from "@/components/dashboard/DashboardUtils";
-import { toast } from "@/hooks/use-toast";
 
-// Export monitoring items as JSON or CSV
-export const exportMonitoringItems = (monitoringItems: MonitoringItem[]) => {
-  const exportFormat = window.confirm(
-    "Clique em OK para exportar como JSON ou Cancelar para exportar como CSV"
-  ) ? "json" : "csv";
-  
-  if (exportFormat === "json") {
-    const dataStr = JSON.stringify(monitoringItems, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    downloadFile(dataUri, 'monitoramento-dados.json');
-  } else {
-    const csvData = convertToCSV(monitoringItems);
-    const dataUri = 'data:text/csv;charset=utf-8,'+ encodeURIComponent(csvData);
-    downloadFile(dataUri, 'monitoramento-dados.csv');
+export const exportMonitoringData = (items: MonitoringItem[], format: 'csv' | 'json' = 'csv'): string => {
+  if (format === 'json') {
+    return JSON.stringify(items, null, 2);
   }
   
-  toast({
-    title: "Dados exportados",
-    description: `Seus dados foram exportados com sucesso no formato ${exportFormat.toUpperCase()}.`
-  });
+  return convertToCSV(items);
 };
 
-// Helper function to download files
-const downloadFile = (dataUri: string, fileName: string) => {
-  const linkElement = document.createElement('a');
-  linkElement.setAttribute('href', dataUri);
-  linkElement.setAttribute('download', fileName);
-  linkElement.click();
+export const downloadFile = (data: string, filename: string, mimeType: string): void => {
+  const blob = new Blob([data], { type: mimeType });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(a);
 };
 
-// Extract unique responsible persons from monitoring items
-export const getUniqueResponsibles = (monitoringItems: MonitoringItem[]) => {
-  const responsibles = monitoringItems
-    .map(item => item.responsible)
-    .filter(responsible => responsible !== undefined && responsible !== null) as string[];
+export const exportMonitoringToFile = (items: MonitoringItem[], format: 'csv' | 'json' = 'csv'): void => {
+  const data = exportMonitoringData(items, format);
+  const mimeType = format === 'csv' ? 'text/csv;charset=utf-8;' : 'application/json';
+  const filename = `monitoramentos.${format}`;
   
-  return [...new Set(responsibles)];
-};
-
-// Filter monitoring items by responsible person
-export const filterMonitoringItemsByResponsible = (
-  monitoringItems: MonitoringItem[], 
-  responsibleFilter: string
-) => {
-  return responsibleFilter
-    ? monitoringItems.filter(item => item.responsible === responsibleFilter)
-    : monitoringItems;
+  downloadFile(data, filename, mimeType);
 };

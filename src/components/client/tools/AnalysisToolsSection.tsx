@@ -1,104 +1,80 @@
 
-import React from "react";
-import { ClientType } from "@/components/client/ClientTypes";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { FileText, Newspaper, Mic, BarChart2 } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { FileText, Newspaper, BarChart2, Mic } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
-export interface AnalysisToolsSectionProps {
-  clientType: ClientType;
-  onDatasetDownload?: () => void;
-  onComparisonView?: () => void;
+interface AnalysisToolsSectionProps {
+  clientType: string;
+  onDatasetDownload: () => void;
+  onComparisonView: () => void;
 }
 
-// Create a stub for AnalysisToolsCard that we reference but seems to be missing
-const AnalysisToolsCard: React.FC<AnalysisToolsSectionProps> = ({ 
+const AnalysisToolsSection: React.FC<AnalysisToolsSectionProps> = ({ 
   clientType, 
   onDatasetDownload, 
   onComparisonView 
 }) => {
+  const handleDocumentAnalysis = () => {
+    toast({
+      title: "Análise de Documentos",
+      description: "A funcionalidade de análise de documentos será disponibilizada em breve."
+    });
+  };
+  
+  const handleNewsAnalysis = () => {
+    toast({
+      title: "Análise de Notícias",
+      description: "A análise de notícias está sendo preparada e estará disponível na próxima atualização."
+    });
+  };
+  
+  const handleMediaAnalysis = () => {
+    toast({
+      title: "Análise de Mídia",
+      description: "O módulo de análise de mídia está em desenvolvimento."
+    });
+  };
+  
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Ferramentas de Análise</CardTitle>
+        <CardTitle className="text-lg">Ferramentas de Análise</CardTitle>
       </CardHeader>
       <CardContent>
-        <p>Ferramentas para {clientType}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Button onClick={handleDocumentAnalysis} variant="outline" className="justify-start h-auto py-4">
+            <FileText className="h-5 w-5 mr-2" />
+            <div className="text-left">
+              <span className="font-medium block">Análise de Documentos</span>
+              <span className="text-xs text-muted-foreground">Extraia insights de documentos</span>
+            </div>
+          </Button>
+          <Button onClick={handleNewsAnalysis} variant="outline" className="justify-start h-auto py-4">
+            <Newspaper className="h-5 w-5 mr-2" />
+            <div className="text-left">
+              <span className="font-medium block">Análise de Notícias</span>
+              <span className="text-xs text-muted-foreground">Identifique tendências em notícias</span>
+            </div>
+          </Button>
+          <Button onClick={handleMediaAnalysis} variant="outline" className="justify-start h-auto py-4">
+            <Mic className="h-5 w-5 mr-2" />
+            <div className="text-left">
+              <span className="font-medium block">Análise de Mídia</span>
+              <span className="text-xs text-muted-foreground">Analise menções em podcasts e vídeos</span>
+            </div>
+          </Button>
+          <Button onClick={onDatasetDownload} variant="outline" className="justify-start h-auto py-4">
+            <BarChart2 className="h-5 w-5 mr-2" />
+            <div className="text-left">
+              <span className="font-medium block">Exportar Dados</span>
+              <span className="text-xs text-muted-foreground">Baixe dados para análise própria</span>
+            </div>
+          </Button>
+        </div>
       </CardContent>
     </Card>
-  );
-};
-
-const AnalysisToolsSection: React.FC<AnalysisToolsSectionProps> = ({ 
-  clientType, 
-  onDatasetDownload = () => {}, 
-  onComparisonView = () => {} 
-}) => {
-  // Renderer for press-specific tools
-  const renderPressTools = () => {
-    const handlePressRelease = () => {
-      toast({
-        title: "Criação de Release",
-        description: "Redirecionando para o editor de releases."
-      });
-    };
-
-    const handleMediaMonitoring = () => {
-      toast({
-        title: "Monitoramento de Mídia",
-        description: "Iniciando análise de presença na mídia."
-      });
-    };
-
-    const handleJournalistContact = () => {
-      toast({
-        title: "Contatos da Imprensa",
-        description: "Acessando banco de dados de jornalistas."
-      });
-    };
-
-    return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Ferramentas de Assessoria de Imprensa</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Button variant="outline" className="h-auto py-4 px-2 flex flex-col items-center justify-center" onClick={handlePressRelease}>
-              <FileText className="h-6 w-6 mb-2" />
-              <span className="text-sm font-medium">Criação de Release</span>
-            </Button>
-            <Button variant="outline" className="h-auto py-4 px-2 flex flex-col items-center justify-center" onClick={handleMediaMonitoring}>
-              <Newspaper className="h-6 w-6 mb-2" />
-              <span className="text-sm font-medium">Monitoramento de Mídia</span>
-            </Button>
-            <Button variant="outline" className="h-auto py-4 px-2 flex flex-col items-center justify-center" onClick={handleJournalistContact}>
-              <Mic className="h-6 w-6 mb-2" />
-              <span className="text-sm font-medium">Contatos da Imprensa</span>
-            </Button>
-            <Button variant="outline" className="h-auto py-4 px-2 flex flex-col items-center justify-center" onClick={onComparisonView}>
-              <BarChart2 className="h-6 w-6 mb-2" />
-              <span className="text-sm font-medium">Análise de Impacto</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  };
-
-  // For press client type, render press-specific tools, otherwise use the default AnalysisToolsCard
-  if (clientType === "press") {
-    return renderPressTools();
-  }
-
-  // For other client types, use the standard analysis tools
-  return (
-    <AnalysisToolsCard 
-      clientType={clientType} 
-      onDatasetDownload={onDatasetDownload} 
-      onComparisonView={onComparisonView} 
-    />
   );
 };
 

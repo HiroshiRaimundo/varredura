@@ -1,13 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
-import { Monitoring } from '@/hooks/monitoring/types';
+import { MonitoringItem } from '@/hooks/monitoring/types';
 
 // Este arquivo contém código para a tela de configuração de monitoramentos
 // Vamos criar um componente completo para monitoramentos
 
 const MonitoringContent: React.FC<{
-  monitoringToEdit?: Monitoring | null;
-  setMonitoringData: React.Dispatch<React.SetStateAction<Partial<Monitoring>>>;
+  monitoringToEdit?: MonitoringItem | null;
+  setMonitoringData: React.Dispatch<React.SetStateAction<Partial<MonitoringItem>>>;
 }> = ({ monitoringToEdit, setMonitoringData }) => {
   
   // Função para lidar com a mudança nas palavras-chave
