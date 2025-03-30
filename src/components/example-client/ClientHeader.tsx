@@ -13,6 +13,8 @@ interface ClientHeaderProps {
 const ClientHeader: React.FC<ClientHeaderProps> = ({ clientType, getClientIcon }) => {
   const navigate = useNavigate();
   const colorClasses = getColorClasses(clientType);
+  // Nome do cliente em vez de tipo de cliente
+  const clientName = "Nome do Cliente"; // Isso seria dinâmico em uma implementação real
 
   return (
     <div className="flex items-center justify-between">
@@ -21,8 +23,10 @@ const ClientHeader: React.FC<ClientHeaderProps> = ({ clientType, getClientIcon }
           {getClientIcon(clientType)}
         </div>
         <div>
-          <h1 className="text-2xl font-bold">Área do Cliente: {clientTypeDetails[clientType].title}</h1>
-          <p className="text-muted-foreground">Modelo de exemplo para demonstração</p>
+          <h1 className="text-2xl font-bold">{clientName}</h1>
+          <p className="text-muted-foreground">
+            {clientTypeDetails[clientType].title} - Modelo de exemplo para demonstração
+          </p>
         </div>
       </div>
       <Button 

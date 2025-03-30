@@ -12,29 +12,40 @@ interface DefaultContentProps {
 
 const DefaultContent: React.FC<DefaultContentProps> = ({ activeTab, clientType }) => {
   const colorClasses = getColorClasses(clientType);
+  
+  const getTitle = () => {
+    switch (activeTab) {
+      case "dashboard": return "Dashboard de Visão Geral";
+      case "monitoring": return "Monitoramento de Dados";
+      case "analysis": return "Ferramentas de Análise";
+      case "releases": return "Gestão de Releases";
+    }
+  };
+  
+  const getIcon = () => {
+    switch (activeTab) {
+      case "dashboard": return <BarChart2 className={`h-8 w-8 ${colorClasses.text}`} />;
+      case "monitoring": return <Leaf className={`h-8 w-8 ${colorClasses.text}`} />;
+      case "analysis": return <ArrowRightCircle className={`h-8 w-8 ${colorClasses.text}`} />;
+      case "releases": return <FileText className={`h-8 w-8 ${colorClasses.text}`} />;
+    }
+  };
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="border-none shadow-sm">
+      <CardHeader className="pb-2">
         <CardTitle className={colorClasses.text}>
-          {activeTab === "dashboard" && "Dashboard de Visão Geral"}
-          {activeTab === "monitoring" && "Monitoramento de Dados"}
-          {activeTab === "analysis" && "Ferramentas de Análise"}
-          {activeTab === "releases" && "Gestão de Releases"}
+          {getTitle()}
         </CardTitle>
       </CardHeader>
-      <CardContent className="h-[400px] flex items-center justify-center border-2 border-dashed border-gray-200 rounded-lg">
+      <CardContent className="h-[300px] flex items-center justify-center bg-muted/10 rounded-lg">
         <div className="text-center">
           <div className={`mx-auto w-16 h-16 ${colorClasses.light} rounded-full flex items-center justify-center mb-4`}>
-            {activeTab === "dashboard" && <BarChart2 className={`h-8 w-8 ${colorClasses.text}`} />}
-            {activeTab === "monitoring" && <Leaf className={`h-8 w-8 ${colorClasses.text}`} />}
-            {activeTab === "analysis" && <ArrowRightCircle className={`h-8 w-8 ${colorClasses.text}`} />}
-            {activeTab === "releases" && <FileText className={`h-8 w-8 ${colorClasses.text}`} />}
+            {getIcon()}
           </div>
-          <h3 className="text-lg font-semibold mb-2">Conteúdo do {clientTypeDetails[clientType].title}</h3>
-          <p className="text-muted-foreground">
-            Esta é uma visualização de demonstração da área do cliente. <br />
-            Em um ambiente real, você veria os dados de {clientTypeDetails[clientType].shortDescription}.
+          <h3 className="text-lg font-medium mb-2">Conteúdo simplificado</h3>
+          <p className="text-muted-foreground max-w-md">
+            Esta é uma visualização de demonstração. Em um ambiente real, você veria os dados relevantes para {clientTypeDetails[clientType].shortDescription}.
           </p>
         </div>
       </CardContent>

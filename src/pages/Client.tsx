@@ -100,7 +100,7 @@ const ServicePricing: React.FC = () => {
           <div className="mb-12 text-center">
             <h1 className="text-4xl font-bold mb-3">Nossos Planos</h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Escolha o plano ideal para suas necessidades e comece a utilizar nossa plataforma integrada de gestão de comunicação e monitoramento.
+              Escolha o plano ideal para suas necessidades e comece a utilizar nossa plataforma integrada.
             </p>
             <div className="mt-4">
               <Button 
@@ -119,7 +119,7 @@ const ServicePricing: React.FC = () => {
               return (
                 <Card 
                   key={plan.id} 
-                  className={`${plan.popular ? 'border-primary shadow-lg' : 'border-border'} relative`}
+                  className={`${plan.popular ? 'border-primary shadow-lg' : 'border-border'} relative transition-all hover:shadow-md`}
                 >
                   {plan.popular && (
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-primary text-white text-sm rounded-full">
@@ -132,9 +132,9 @@ const ServicePricing: React.FC = () => {
                       <span className={colors.text}>{plan.name}</span>
                     </CardTitle>
                     <CardDescription>
-                      Plano {plan.id === "enterprise" ? "personalizado para grandes empresas" : 
-                             plan.id === "standard" ? "completo para equipes" : 
-                             "ideal para iniciantes"}
+                      {plan.id === "enterprise" ? "Plano personalizado para grandes empresas" : 
+                       plan.id === "standard" ? "Plano completo para equipes" : 
+                       "Ideal para iniciantes"}
                     </CardDescription>
                   </CardHeader>
                   
@@ -147,7 +147,7 @@ const ServicePricing: React.FC = () => {
                     <ul className="space-y-2">
                       {plan.features.map((feature, i) => (
                         <li key={i} className="flex items-start">
-                          <div className={`rounded-full p-1 ${colors.light} mr-3 mt-1`}>
+                          <div className={`rounded-full p-1 ${colors.light} mr-3 mt-1 flex-shrink-0`}>
                             <Check className={`h-4 w-4 ${colors.text}`} />
                           </div>
                           <span className="text-sm">{feature}</span>

@@ -13,33 +13,33 @@ const ClientTabs: React.FC<ClientTabsProps> = ({ activeTab, setActiveTab, client
   const colorClasses = getColorClasses(clientType);
 
   return (
-    <div className="flex border-b border-border overflow-x-auto">
+    <div className="flex space-x-1 p-1 bg-muted/30 rounded-lg mb-4">
       <button
         onClick={() => setActiveTab("dashboard")}
-        className={`px-4 py-2 font-medium ${
+        className={`px-4 py-2 rounded-md font-medium transition-colors ${
           activeTab === "dashboard"
-            ? `border-b-2 ${colorClasses.text} border-${colorClasses.text}`
-            : "text-muted-foreground"
+            ? `bg-white shadow-sm ${colorClasses.text}`
+            : "text-muted-foreground hover:bg-muted"
         }`}
       >
         Dashboard
       </button>
       <button
         onClick={() => setActiveTab("monitoring")}
-        className={`px-4 py-2 font-medium ${
+        className={`px-4 py-2 rounded-md font-medium transition-colors ${
           activeTab === "monitoring"
-            ? `border-b-2 ${colorClasses.text} border-${colorClasses.text}`
-            : "text-muted-foreground"
+            ? `bg-white shadow-sm ${colorClasses.text}`
+            : "text-muted-foreground hover:bg-muted"
         }`}
       >
         Monitoramento
       </button>
       <button
         onClick={() => setActiveTab("analysis")}
-        className={`px-4 py-2 font-medium ${
+        className={`px-4 py-2 rounded-md font-medium transition-colors ${
           activeTab === "analysis"
-            ? `border-b-2 ${colorClasses.text} border-${colorClasses.text}`
-            : "text-muted-foreground"
+            ? `bg-white shadow-sm ${colorClasses.text}`
+            : "text-muted-foreground hover:bg-muted"
         }`}
       >
         Análise
@@ -47,10 +47,10 @@ const ClientTabs: React.FC<ClientTabsProps> = ({ activeTab, setActiveTab, client
       {clientType === "press" && (
         <button
           onClick={() => setActiveTab("releases")}
-          className={`px-4 py-2 font-medium ${
+          className={`px-4 py-2 rounded-md font-medium transition-colors ${
             activeTab === "releases"
-              ? `border-b-2 ${colorClasses.text} border-${colorClasses.text}`
-              : "text-muted-foreground"
+              ? `bg-white shadow-sm ${colorClasses.text}`
+              : "text-muted-foreground hover:bg-muted"
           }`}
         >
           Releases
