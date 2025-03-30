@@ -1,71 +1,36 @@
 
 import React from "react";
-import { BarChart2, Clock, Users } from "lucide-react";
-import { FeatureCard } from "@/components/ui/card";
-
-interface FeatureItemProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}
-
-const FeatureItem: React.FC<FeatureItemProps> = ({ icon, title, description }) => {
-  return (
-    <FeatureCard>
-      <div className="rounded-full bg-blue-100 h-16 w-16 flex items-center justify-center mb-4 mx-auto">
-        {icon}
-      </div>
-      <h3 className="text-xl font-semibold text-center mb-2">{title}</h3>
-      <p className="text-gray-600 text-center">
-        {description}
-      </p>
-    </FeatureCard>
-  );
-};
-
-const features = [
-  {
-    icon: <BarChart2 className="h-8 w-8 text-blue-600" />,
-    title: "Dados Confiáveis",
-    description: "Informações atualizadas e verificadas para fundamentar suas análises e decisões."
-  },
-  {
-    icon: <Clock className="h-8 w-8 text-green-600" />,
-    title: "Atualizações em Tempo Real",
-    description: "Monitore dados e indicadores com atualizações em tempo real e alertas personalizados."
-  },
-  {
-    icon: <BarChart2 className="h-8 w-8 text-purple-600" />,
-    title: "Visualizações Avançadas",
-    description: "Gráficos e visualizações interativas que facilitam a compreensão e apresentação dos dados."
-  },
-  {
-    icon: <Users className="h-8 w-8 text-red-600" />,
-    title: "Suporte Especializado",
-    description: "Equipe de especialistas disponível para auxiliar na interpretação e uso das ferramentas."
-  }
-];
+import { Search, BarChart2, FileText } from "lucide-react";
 
 const FeaturesSection: React.FC = () => {
   return (
-    <section className="bg-gray-50 py-16 px-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Por que escolher nossos serviços?</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Nossa plataforma oferece soluções completas e personalizadas para diferentes perfis,
-            garantindo acesso a dados confiáveis e análises precisas.
-          </p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {features.map((feature, index) => (
-            <FeatureItem 
-              key={index}
-              icon={feature.icon}
-              title={feature.title}
-              description={feature.description}
-            />
-          ))}
+    <section className="py-16 px-4">
+      <div className="container mx-auto max-w-6xl">
+        <div className="bg-white shadow-xl rounded-xl p-6 md:p-8 mx-2 md:mx-8 border border-gray-100">
+          <h2 className="text-2xl md:text-3xl font-semibold text-center mb-8">Uma solução integrada para todos os nichos</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
+            <div className="text-center p-4">
+              <div className="bg-purple-50 inline-flex p-4 rounded-full mb-4">
+                <Search className="h-8 w-8 text-purple-500" />
+              </div>
+              <h3 className="text-xl font-medium mb-2">Monitore</h3>
+              <p className="text-gray-600">Acompanhamento em tempo real de notícias, mídias sociais e indicadores relevantes para sua área de atuação.</p>
+            </div>
+            <div className="text-center p-4">
+              <div className="bg-purple-50 inline-flex p-4 rounded-full mb-4">
+                <BarChart2 className="h-8 w-8 text-purple-500" />
+              </div>
+              <h3 className="text-xl font-medium mb-2">Analise</h3>
+              <p className="text-gray-600">Transforme dados em insights valiosos com análises avançadas e relatórios personalizados.</p>
+            </div>
+            <div className="text-center p-4">
+              <div className="bg-purple-50 inline-flex p-4 rounded-full mb-4">
+                <FileText className="h-8 w-8 text-purple-500" />
+              </div>
+              <h3 className="text-xl font-medium mb-2">Gerencie</h3>
+              <p className="text-gray-600">Centralize e automatize todas as rotinas de comunicação em um único lugar.</p>
+            </div>
+          </div>
         </div>
       </div>
     </section>

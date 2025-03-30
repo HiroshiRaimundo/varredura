@@ -1,73 +1,39 @@
+
 import React from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Search, BarChart2, Leaf } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const HeroSection: React.FC = () => {
-  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   return (
-    <section className="py-12 px-6 bg-gradient-to-r from-green-50 to-blue-50">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row items-center gap-12">
-          <div className="md:w-1/2">
-            <div className="flex items-center mb-6">
-              <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white p-3 rounded-lg mr-3 flex items-center">
-                <Search className="h-8 w-8 mr-2" />
-                <Leaf className="h-8 w-8" />
-              </div>
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-                Varredura
-              </h1>
-            </div>
-            
-            <div className="md:w-1/2 space-y-4">
-              <h1 className="text-4xl font-bold tracking-tight">
-                Análise Inteligente de Dados
-              </h1>
-              <p className="text-xl text-muted-foreground">
-                Transformando dados em soluções sustentáveis para pesquisadores, instituições e gestores públicos.
-              </p>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
-                variant="outline" 
-                size="lg"
-                onClick={() => navigate("/help")}
-              >
-                Saiba Mais
-              </Button>
-            </div>
-          </div>
-          
-          <div className="md:w-1/2 flex justify-center">
-            <div className="relative">
-              <div className="absolute -top-6 -left-6 w-24 h-24 bg-blue-400 rounded-full opacity-20"></div>
-              <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-green-400 rounded-full opacity-20"></div>
-              <div className="bg-white p-4 rounded-xl shadow-xl relative z-10">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <BarChart2 className="h-6 w-6 text-green-600 mb-2" />
-                    <h3 className="font-semibold text-gray-800">Análise de Dados</h3>
-                  </div>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <Search className="h-6 w-6 text-blue-600 mb-2" />
-                    <h3 className="font-semibold text-gray-800">Análise de Dados</h3>
-                  </div>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <Leaf className="h-6 w-6 text-green-600 mb-2" />
-                    <h3 className="font-semibold text-gray-800">Sustentabilidade</h3>
-                  </div>
-                  <div className="bg-gray-50 p-4 rounded-lg flex items-center justify-center">
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-blue-600">Análise</p>
-                      <p className="text-xs text-gray-600">Dados</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+    <section className="pt-24 pb-16 px-4 md:px-6">
+      <div className="container mx-auto max-w-6xl">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+            <span className="inline-block relative">
+              Varredura
+              <span className="absolute -bottom-2 left-0 w-full h-1 bg-purple-500 rounded-full"></span>
+            </span>
+            <span className="block text-2xl md:text-3xl mt-4 text-gray-700">Gestão de Comunicação & Monitoramento Inteligente</span>
+          </h1>
+          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+            Plataforma integrada que automatiza rotinas de comunicação, monitora indicadores relevantes e transforma dados em insights valiosos para sua estratégia.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-6 text-lg">
+              <Link to={isAuthenticated ? "/admin" : "/login"}>
+                {isAuthenticated ? "Acessar Dashboard" : "Começar Agora"}
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="border-purple-400 text-purple-600 hover:text-purple-700 px-6 py-6 text-lg">
+              <Link to="/service/demo">
+                Ver Demonstração
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
