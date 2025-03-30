@@ -1,4 +1,3 @@
-
 // Types for monitoring functionality
 export interface MonitoringItem {
   id: string;
@@ -19,6 +18,7 @@ export interface LegislationAlert {
   date: string;
   url: string;
   isRead: boolean;
+  source?: string; // Adicionando campo source
 }
 
 export interface ReleaseMonitoringItem {
@@ -36,6 +36,7 @@ export interface ReleaseMonitoringItem {
   submittedDate?: string;
   approvedDate?: string;
   notes?: string;
+  title?: string; // Adicionando o campo title
 }
 
 export interface ClientCredentials {

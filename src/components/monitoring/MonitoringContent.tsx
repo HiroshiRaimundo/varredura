@@ -26,7 +26,6 @@ interface Monitoring {
   createdAt: string;
 }
 
-// Dados de exemplo para monitoramentos
 const exampleMonitorings: Monitoring[] = [
   {
     id: '1',
@@ -74,7 +73,8 @@ const MonitoringContent: React.FC = () => {
   const [newCategory, setNewCategory] = useState('');
   const [newMonitoring, setNewMonitoring] = useState<Partial<Monitoring>>({
     frequency: 'daily',
-    status: 'active'
+    status: 'active',
+    keywords: []
   });
 
   const handleAddCategory = () => {
@@ -98,12 +98,19 @@ const MonitoringContent: React.FC = () => {
       return;
     }
 
+    let keywordsArray: string[] = [];
+    if (typeof newMonitoring.keywords === 'string') {
+      keywordsArray = newMonitoring.keywords.split(',').map(k => k.trim());
+    } else if (Array.isArray(newMonitoring.keywords)) {
+      keywordsArray = newMonitoring.keywords;
+    }
+
     const monitoring: Monitoring = {
       id: Date.now().toString(),
       name: newMonitoring.name!,
       url: newMonitoring.url!,
       apiUrl: newMonitoring.apiUrl,
-      keywords: newMonitoring.keywords?.split(',').map(k => k.trim()) || [],
+      keywords: keywordsArray,
       category: newMonitoring.category!,
       frequency: newMonitoring.frequency!,
       responsible: newMonitoring.responsible!,
@@ -115,7 +122,8 @@ const MonitoringContent: React.FC = () => {
     setMonitorings(prev => [...prev, monitoring]);
     setNewMonitoring({
       frequency: 'daily',
-      status: 'active'
+      status: 'active',
+      keywords: []
     });
 
     toast({
@@ -199,7 +207,7 @@ const MonitoringContent: React.FC = () => {
                   <Textarea
                     id="keywords"
                     placeholder="licitação, contrato, edital..."
-                    value={newMonitoring.keywords || ''}
+                    value={Array.isArray(newMonitoring.keywords) ? newMonitoring.keywords.join(', ') : newMonitoring.keywords || ''}
                     onChange={e => setNewMonitoring(prev => ({ ...prev, keywords: e.target.value }))}
                   />
                 </div>

@@ -1,84 +1,83 @@
-// Serviço de monitoramento específico para releases e reportagens
-export interface PressPublication {
+
+import { useState, useEffect, useRef } from 'react';
+
+interface PressItem {
   id: string;
-  url: string;
-  website: string;
   title: string;
-  publishedAt: string;
-  excerpt: string;
+  outlet: string;
+  date: string;
+  url: string;
+  verified: boolean;
 }
 
-export interface PressMonitoringResult {
-  contentId: string;
-  publications: PressPublication[];
-  lastCheck: Date;
-}
-
-class PressMonitoringService {
-  private monitoringJobs: Map<string, NodeJS.Timer> = new Map();
-  private results: Map<string, PressMonitoringResult> = new Map();
-
-  // Inicia o monitoramento de um release/reportagem
-  startMonitoring(contentId: string, title: string, distributedTo: string[]) {
-    // Evita duplicar o monitoramento
-    if (this.monitoringJobs.has(contentId)) {
-      return;
+export const usePressMonitoring = () => {
+  const [pressItems, setPressItems] = useState<PressItem[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Usar useRef para evitar o erro de tipagem com clearInterval
+  const intervalRef = useRef<number | null>(null);
+  
+  const mockPressItems: PressItem[] = [
+    {
+      id: '1',
+      title: 'Empresa lança iniciativa sustentável',
+      outlet: 'Jornal Econômico',
+      date: new Date().toISOString(),
+      url: 'https://example.com/noticia1',
+      verified: true
+    },
+    {
+      id: '2',
+      title: 'Novo programa ambiental é anunciado',
+      outlet: 'Portal Verde',
+      date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      url: 'https://example.com/noticia2',
+      verified: false
+    },
+    {
+      id: '3',
+      title: 'Relatório aponta melhorias na qualidade do ar',
+      outlet: 'Ciência Diária',
+      date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      url: 'https://example.com/noticia3',
+      verified: true
     }
-
-    // Cria resultado inicial
-    this.results.set(contentId, {
-      contentId,
-      publications: [],
-      lastCheck: new Date()
-    });
-
-    // Inicia job de monitoramento
-    const timer = setInterval(() => {
-      this.checkPublications(contentId, title, distributedTo);
-    }, 5 * 60 * 1000); // Checa a cada 5 minutos
-
-    this.monitoringJobs.set(contentId, timer);
-  }
-
-  // Para o monitoramento
-  stopMonitoring(contentId: string) {
-    const timer = this.monitoringJobs.get(contentId);
-    if (timer) {
-      clearInterval(timer);
-      this.monitoringJobs.delete(contentId);
-    }
-  }
-
-  // Busca publicações para um conteúdo específico
-  private async checkPublications(contentId: string, title: string, distributedTo: string[]) {
+  ];
+  
+  // Função para carregar dados da API
+  const fetchPressItems = async () => {
     try {
-      // Aqui você implementaria a lógica real de busca
-      // Por exemplo, usando APIs dos sites de notícias ou web scraping
-      
-      const result = this.results.get(contentId);
-      if (!result) return;
-
-      // Atualiza o resultado
-      result.lastCheck = new Date();
-      
-      // Se encontrar novas publicações, notifica os interessados
-      this.notifyNewPublications(contentId);
-    } catch (error) {
-      console.error('Erro ao verificar publicações:', error);
+      // Simulando chamada de API
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setPressItems(mockPressItems);
+      setIsLoading(false);
+    } catch (err) {
+      setError('Erro ao carregar dados de monitoramento');
+      setIsLoading(false);
     }
-  }
-
-  // Notifica sobre novas publicações
-  private notifyNewPublications(contentId: string) {
-    // Aqui você implementaria a lógica de notificação
-    // Por exemplo, usando websockets ou um sistema de eventos
-  }
-
-  // Obtém resultados do monitoramento
-  getResults(contentId: string): PressMonitoringResult | undefined {
-    return this.results.get(contentId);
-  }
-}
-
-// Singleton para ser usado em toda a aplicação
-export const pressMonitoringService = new PressMonitoringService();
+  };
+  
+  // Iniciar monitoramento
+  useEffect(() => {
+    fetchPressItems();
+    
+    // Atualizar dados periodicamente
+    intervalRef.current = window.setInterval(() => {
+      fetchPressItems();
+    }, 60000); // a cada minuto
+    
+    return () => {
+      if (intervalRef.current !== null) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
+  
+  return {
+    pressItems,
+    isLoading,
+    error,
+    refreshData: fetchPressItems
+  };
+};

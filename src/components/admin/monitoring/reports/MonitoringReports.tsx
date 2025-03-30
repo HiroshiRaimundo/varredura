@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -48,28 +49,34 @@ export const MonitoringReports: React.FC<MonitoringReportsProps> = () => {
 
   const handleExport = async () => {
     if (!date?.from || !date?.to) {
-      toast({
-        title: "Erro",
-        description: "Selecione um período para gerar o relatório",
-        variant: "destructive"
+      toast("Erro: Selecione um período para gerar o relatório", {
+        description: "É necessário definir um intervalo de datas.",
+        action: {
+          label: "OK",
+          onClick: () => console.log("Fechado")
+        }
       });
       return;
     }
 
     if (selectedSources.length === 0) {
-      toast({
-        title: "Erro",
-        description: "Selecione pelo menos uma fonte para o relatório",
-        variant: "destructive"
+      toast("Erro: Selecione ao menos uma fonte", {
+        description: "É necessário selecionar pelo menos uma fonte para o relatório.",
+        action: {
+          label: "OK",
+          onClick: () => console.log("Fechado")
+        }
       });
       return;
     }
 
     if (selectedMetrics.length === 0) {
-      toast({
-        title: "Erro",
-        description: "Selecione pelo menos uma métrica para o relatório",
-        variant: "destructive"
+      toast("Erro: Selecione ao menos uma métrica", {
+        description: "É necessário selecionar pelo menos uma métrica para o relatório.",
+        action: {
+          label: "OK",
+          onClick: () => console.log("Fechado")
+        }
       });
       return;
     }
@@ -83,15 +90,16 @@ export const MonitoringReports: React.FC<MonitoringReportsProps> = () => {
         format: exportFormat
       });
 
-      toast({
-        title: "Sucesso",
-        description: "Relatório gerado com sucesso!"
+      toast("Relatório gerado com sucesso!", {
+        description: "O relatório foi gerado e está disponível para download."
       });
     } catch (error) {
-      toast({
-        title: "Erro",
-        description: "Erro ao gerar relatório. Tente novamente.",
-        variant: "destructive"
+      toast("Erro ao gerar relatório", {
+        description: "Ocorreu um erro ao gerar o relatório. Tente novamente mais tarde.",
+        action: {
+          label: "OK",
+          onClick: () => console.log("Fechado")
+        }
       });
     }
   };

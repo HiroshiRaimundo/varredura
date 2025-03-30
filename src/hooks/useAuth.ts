@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -13,6 +14,7 @@ export function useAuth() {
   const auth = useAuthContext();
   const form = useForm<LoginFormData>();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
 
   const handleLogin = async (data: LoginFormData) => {
     try {
@@ -22,12 +24,14 @@ export function useAuth() {
 
       // Mock de autenticação - substituir por chamada real à API
       if (data.email === 'admin@koga.com' && data.password === 'admin123') {
-        auth.login({
-          id: '1',
-          name: 'Administrador',
-          email: data.email,
-          type: 'admin'
-        });
+        if (auth.login) {
+          auth.login({
+            id: '1',
+            name: 'Administrador',
+            email: data.email,
+            type: 'admin'
+          });
+        }
         navigate('/admin');
       } else {
         throw new Error('Credenciais inválidas');
@@ -41,7 +45,9 @@ export function useAuth() {
   };
 
   const handleLogout = () => {
-    auth.logout();
+    if (auth.logout) {
+      auth.logout();
+    }
     navigate('/login');
   };
 
@@ -51,6 +57,8 @@ export function useAuth() {
     form,
     isLoggingIn,
     handleLogin,
-    handleLogout
+    handleLogout,
+    setIsLoginDialogOpen,
+    isLoginDialogOpen
   };
 }
