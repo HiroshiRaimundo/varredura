@@ -36,8 +36,5 @@ export interface MonitoringItem {
   keywords: string[]; // Definido como array de strings
 }
 
-// Interface para o objeto de monitoramento
-export type Monitoring = MonitoringItem;
-
-// Exportando a interface MonitoringItem para uso em outros componentes
-export { MonitoringItem };
+// Usando export type para evitar conflitos com isolatedModules
+export type { MonitoringItem };

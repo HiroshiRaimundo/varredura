@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -24,10 +25,6 @@ const Login: React.FC = () => {
   const handleSubmit = async (data: { email: string; password: string }) => {
     try {
       await auth.handleLogin(data);
-      toast({
-        title: "Login realizado com sucesso!",
-        description: "Redirecionando para o painel administrativo..."
-      });
     } catch (error) {
       toast({
         title: "Erro ao fazer login",

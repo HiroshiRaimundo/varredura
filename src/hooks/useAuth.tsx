@@ -1,3 +1,4 @@
+
 import { useState, useEffect, createContext, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
@@ -17,6 +18,11 @@ interface AuthContextType {
   handleLogin: (data: LoginCredentials) => Promise<void>;
   handleLogout: () => void;
   navigate: (to: string) => void;
+  user?: {
+    name: string;
+    email: string;
+    role: string;
+  };
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -52,6 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState(validateSession);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [user, setUser] = useState<{name: string, email: string, role: string} | undefined>(undefined);
   
   const form = useForm<LoginCredentials>({
     defaultValues: {
@@ -83,17 +90,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => clearInterval(interval);
   }, [location, navigate, isAuthenticated]);
 
+  // Recupera dados do usuário do localStorage ao montar
+  useEffect(() => {
+    if (isAuthenticated) {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+    }
+  }, [isAuthenticated]);
+
   const handleLogin = async (data: LoginCredentials) => {
     setIsLoggingIn(true);
     
     try {
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      if (data.email === "Rosemary@Hiroshi2025" && data.password === "koga@2025") {
+      // Credenciais administrativas
+      if (data.email === "admin@koga.com" && data.password === "admin123") {
         const sessionId = Date.now().toString();
+        const userData = {
+          name: "Administrador",
+          email: data.email,
+          role: "admin"
+        };
+        
         localStorage.setItem("isAuthenticated", "true");
         localStorage.setItem("sessionId", sessionId);
         localStorage.setItem("lastActivity", Date.now().toString());
+        localStorage.setItem("user", JSON.stringify(userData));
+        
+        setUser(userData);
         setIsAuthenticated(true);
         setIsLoginDialogOpen(false);
         
@@ -104,13 +131,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           title: "Login realizado com sucesso",
           description: "Bem-vindo ao painel administrativo."
         });
-      } else {
-        toast({
-          title: "Erro de autenticação",
-          description: "Email ou senha incorretos.",
-          variant: "destructive"
-        });
+        
+        return;
       }
+      
+      toast({
+        title: "Erro de autenticação",
+        description: "Email ou senha incorretos.",
+        variant: "destructive"
+      });
     } catch (error) {
       console.error("Erro durante o login:", error);
       toast({
@@ -127,6 +156,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("sessionId");
     localStorage.removeItem("lastActivity");
+    localStorage.removeItem("user");
+    setUser(undefined);
     setIsAuthenticated(false);
     navigate("/", { replace: true });
     
@@ -138,6 +169,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const value = {
     isAuthenticated,
+    user,
     isLoginDialogOpen,
     setIsLoginDialogOpen,
     isLoggingIn,
