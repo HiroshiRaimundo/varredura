@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, LogIn, Loader2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ClientLoginFormValues } from "./types";
+import { Link } from "react-router-dom";
 
 interface ClientLoginFormProps {
   onSubmit: (data: ClientLoginFormValues) => void;
@@ -111,6 +112,13 @@ const ClientLoginForm: React.FC<ClientLoginFormProps> = ({ onSubmit, isLoggingIn
             </>
           )}
         </Button>
+        
+        <div className="text-center text-sm mt-4">
+          <span className="text-muted-foreground">É um administrador? </span>
+          <Link to="/login" className="text-primary hover:underline">
+            Acesso Administrativo
+          </Link>
+        </div>
       </form>
     </Form>
   );

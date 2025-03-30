@@ -2,7 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Eye } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const HeroSection: React.FC = () => {
@@ -30,7 +30,8 @@ const HeroSection: React.FC = () => {
               </Link>
             </Button>
             <Button asChild variant="outline" className="border-purple-400 text-purple-600 hover:text-purple-700 px-6 py-6 text-lg">
-              <Link to="/service/demo">
+              <Link to="/example-client">
+                <Eye className="mr-2 h-5 w-5" />
                 Ver Demonstração
               </Link>
             </Button>

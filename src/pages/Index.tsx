@@ -2,7 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BarChart2, Users, FileText, Search, Calendar, AlertCircle } from "lucide-react";
+import { ArrowRight, BarChart2, Users, FileText, Search, Calendar, AlertCircle, Eye } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const Index: React.FC = () => {
@@ -32,7 +32,8 @@ const Index: React.FC = () => {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="border-purple-400 text-purple-600 hover:text-purple-700 px-6 py-6 text-lg">
-                <Link to="/service/demo">
+                <Link to="/example-client">
+                  <Eye className="mr-2 h-5 w-5" />
                   Ver Demonstração
                 </Link>
               </Button>
@@ -227,9 +228,9 @@ const Index: React.FC = () => {
 
           <div className="text-center mt-12">
             <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-6 text-lg">
-              <Link to="/login">
-                Experimente a Plataforma
-                <ArrowRight className="ml-2 h-5 w-5" />
+              <Link to="/example-client">
+                Ver Demonstração
+                <Eye className="ml-2 h-5 w-5" />
               </Link>
             </Button>
           </div>
@@ -250,7 +251,7 @@ const Index: React.FC = () => {
               <h3 className="text-xl font-semibold mb-4">Links Rápidos</h3>
               <ul className="space-y-2">
                 <li><Link to="/login" className="text-gray-400 hover:text-white">Login</Link></li>
-                <li><Link to="/service/demo" className="text-gray-400 hover:text-white">Demonstração</Link></li>
+                <li><Link to="/example-client" className="text-gray-400 hover:text-white">Demonstração</Link></li>
                 <li><Link to="/client" className="text-gray-400 hover:text-white">Área do Cliente</Link></li>
               </ul>
             </div>
