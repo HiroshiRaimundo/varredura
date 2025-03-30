@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { MonitoredItem } from './monitoringService';
-import { AnalysisService } from './analysisService';
 
 interface SourceDistribution {
   name: string;
@@ -24,138 +23,50 @@ interface Analytics {
   qualitativeAnalysis: QualitativeAnalysis[];
 }
 
-interface MonitoringData {
-  name: string;
-  theme: string;
-  metrics: string[];
-  analysisTypes?: string[];
-}
-
-interface AnalysisMetric {
-  id: string;
-  name: string;
-  value: number;
-  trend: number;
-  status: 'success' | 'warning' | 'error' | 'info';
-  description: string;
-}
-
-interface KeywordAnalysis {
-  keyword: string;
-  mentions: number;
-  sentiment: number;
-  relevance: number;
-  trend: number;
-  sources: { name: string; count: number }[];
-}
-
-interface PerformanceMetrics {
-  responseTime: number;
-  statusCode: number;
-  uptime: number;
-  lastCheck: string;
-  sslStatus: {
-    valid: boolean;
-    expiryDate: string;
-  };
-}
-
-interface ContentMetrics {
-  totalSize: number;
-  htmlChanges: number;
-  cssChanges: number;
-  jsChanges: number;
-  imageChanges: number;
-  brokenLinks: number;
-}
-
-interface SentimentAnalysis {
-  overall: number;
-  positive: number;
-  negative: number;
-  neutral: number;
-  topics: {
-    name: string;
-    sentiment: number;
-    count: number;
-  }[];
-}
-
-interface PredictiveAnalysis {
-  prediction: number;
-  confidence: number;
-  factors: {
-    name: string;
-    impact: number;
-  }[];
-  historicalData: {
-    date: string;
-    value: number;
-  }[];
-}
-
-interface StructuredDataAnalysis {
-  schema: string;
-  coverage: number;
-  quality: number;
-  errors: {
-    type: string;
-    count: number;
-    severity: 'low' | 'medium' | 'high';
-  }[];
-}
-
-interface MetadataAnalysis {
-  tags: {
-    name: string;
-    value: string;
-    frequency: number;
-  }[];
-  headers: {
-    name: string;
-    value: string;
-    status: 'ok' | 'warning' | 'error';
-  }[];
-}
-
-interface ContentAnalysis {
-  type: string;
-  metrics: AnalysisMetric[];
-  keywords: KeywordAnalysis[];
-  trends: { date: string; value: number }[];
-  alerts: {
-    id: string;
-    type: 'error' | 'warning' | 'info' | 'success';
-    message: string;
-    details: string;
-    timestamp: string;
-  }[];
-  performance?: PerformanceMetrics;
-  content?: ContentMetrics;
-  sentiment?: SentimentAnalysis;
-  predictive?: PredictiveAnalysis;
-  structuredData?: StructuredDataAnalysis;
-  metadata?: MetadataAnalysis;
-}
-
 export const useAnalysisService = () => {
-  const [monitoringResults, setMonitoringResults] = useState<MonitoringData[]>([]);
-  const [contentAnalysis, setContentAnalysis] = useState<ContentAnalysis | null>(null);
+  const [monitoringResults, setMonitoringResults] = useState<any[]>([]);
 
-  const getAnalytics = async (results: MonitoringData[]) => {
-    const analysis = await AnalysisService.analyzeMonitoring(results[0]);
-    setContentAnalysis(analysis);
+  const getAnalytics = (results: any[]): Analytics => {
+    // Simulação de dados de análise
+    return {
+      sourceDistribution: [
+        { name: 'Portais de Notícias', value: 45 },
+        { name: 'Blogs', value: 25 },
+        { name: 'Redes Sociais', value: 20 },
+        { name: 'Outros', value: 10 }
+      ],
+      mentionsOverTime: Array.from({ length: 7 }, (_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        return {
+          date: date.toLocaleDateString(),
+          mentions: Math.floor(Math.random() * 50) + 10
+        };
+      }).reverse(),
+      qualitativeAnalysis: [
+        {
+          title: 'Principais Temas',
+          content: 'Os temas mais discutidos incluem inovação tecnológica, sustentabilidade e impacto social.',
+          keywords: ['inovação', 'tecnologia', 'sustentabilidade', 'impacto social']
+        },
+        {
+          title: 'Sentimento Geral',
+          content: 'A maioria das menções apresenta um sentimento positivo, com foco em resultados e benefícios.',
+          keywords: ['positivo', 'resultados', 'benefícios']
+        },
+        {
+          title: 'Alcance e Engajamento',
+          content: 'Alto engajamento em portais de notícias especializados e redes profissionais.',
+          keywords: ['engajamento', 'alcance', 'especializado']
+        }
+      ]
+    };
   };
 
   // Simula atualização periódica dos dados
   useEffect(() => {
     const interval = setInterval(() => {
-      setMonitoringResults(prev => [...prev, {
-        name: 'Exemplo',
-        theme: 'Tecnologia',
-        metrics: ['Inovação', 'Sustentabilidade', 'Impacto Social'],
-        analysisTypes: ['performance', 'content', 'sentiment', 'predictive', 'structured_data', 'metadata']
-      }]);
+      setMonitoringResults(prev => [...prev, {}]);
     }, 60000);
 
     return () => clearInterval(interval);
@@ -163,7 +74,6 @@ export const useAnalysisService = () => {
 
   return {
     monitoringResults,
-    contentAnalysis,
     getAnalytics
   };
 };

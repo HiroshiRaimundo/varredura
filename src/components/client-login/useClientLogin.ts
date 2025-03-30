@@ -31,9 +31,9 @@ export const useClientLogin = () => {
           description: `Bem-vindo ao portal do cliente.`
         });
         
-        // Navigate to the client page instead of a specific client type
-        navigate('/client');
-        console.log("Redirecting to client page");
+        // Navigate directly to the client dashboard with the correct client type
+        navigate(`/client/${client.type}`);
+        console.log(`Redirecting to client/${client.type}`);
       } else {
         console.error("Client validation failed for:", data.email);
         toast({

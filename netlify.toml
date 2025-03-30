@@ -1,3 +1,4 @@
+
 [build]
   command = "npm run build"
   publish = "dist"
@@ -6,10 +7,3 @@
   from = "/*"
   to = "/index.html"
   status = 200
-
-[[headers]]
-  for = "/*"
-    [headers.values]
-    Cache-Control = "no-cache, no-store, must-revalidate"
-    Pragma = "no-cache"
-    Expires = "0"

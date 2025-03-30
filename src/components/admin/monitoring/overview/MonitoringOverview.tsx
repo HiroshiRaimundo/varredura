@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -17,25 +17,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Filter, Pause, Play, Trash2, Settings } from "lucide-react";
 import { toast } from "sonner";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
-import { useMonitoring } from "@/contexts/MonitoringContext";
-import cn from 'clsx';
 
 interface Monitoring {
   id: string;
   name: string;
-  group?: string;
-  status?: "active" | "inactive" | "analyzing";
+  group: string;
+  status: "active" | "inactive" | "analyzing";
   responsible: string;
-  lastUpdate?: string;
-  uptime?: number;
-  responseTime?: number;
-  url?: string;
-  urls?: string[];
-  metrics?: string[];
-  analysisTypes?: string[];
-  frequency?: string;
-  description?: string;
-  theme?: string;
+  lastUpdate: string;
+  uptime: number;
+  responseTime: number;
+  url: string;
 }
 
 interface Filter {
@@ -44,263 +36,305 @@ interface Filter {
   status: string;
 }
 
-const frequencies = [
-  { value: '1m', label: '1 minuto' },
-  { value: '5m', label: '5 minutos' },
-  { value: '10m', label: '10 minutos' },
-  { value: '30m', label: '30 minutos' },
-  { value: '1h', label: '1 hora' },
-  { value: '2h', label: '2 horas' },
-  { value: '4h', label: '4 horas' },
-  { value: '8h', label: '8 horas' },
-  { value: '12h', label: '12 horas' },
-  { value: '1d', label: '1 dia' },
-  { value: '2d', label: '2 dias' },
-  { value: '3d', label: '3 dias' },
-  { value: '4d', label: '4 dias' },
-  { value: '5d', label: '5 dias' },
-  { value: '6d', label: '6 dias' },
-  { value: '7d', label: '7 dias' },
-];
-
 export const MonitoringOverview: React.FC = () => {
-  const { monitorings, removeMonitoring, updateMonitoring } = useMonitoring();
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
   const [filter, setFilter] = useState<Filter>({
     search: "",
     group: "all",
     status: "all"
   });
+  const [monitorings, setMonitorings] = useState<Monitoring[]>([
+    {
+      id: "1",
+      name: "Portal Principal",
+      group: "Portais",
+      status: "active",
+      responsible: "João Silva",
+      lastUpdate: "2025-03-07 21:45",
+      uptime: 99.9,
+      responseTime: 250,
+      url: "https://portal.exemplo.com"
+    },
+    {
+      id: "2",
+      name: "Blog Corporativo",
+      group: "Blogs",
+      status: "inactive",
+      responsible: "Maria Santos",
+      lastUpdate: "2025-03-07 21:30",
+      uptime: 98.5,
+      responseTime: 300,
+      url: "https://blog.exemplo.com"
+    },
+    // Adicione mais itens mockados aqui para testar a paginação
+  ]);
+
+  // Dados mockados para os gráficos
+  const analysisData = [
+    { name: 'Jan', sentiment: 75, relevance: 65, accuracy: 80 },
+    { name: 'Fev', sentiment: 82, relevance: 70, accuracy: 85 },
+    { name: 'Mar', sentiment: 78, relevance: 75, accuracy: 82 },
+    { name: 'Abr', sentiment: 85, relevance: 80, accuracy: 88 },
+    { name: 'Mai', sentiment: 90, relevance: 85, accuracy: 90 },
+  ];
+
+  const statusData = [
+    { name: 'Ativos', value: monitorings.filter(m => m.status === 'active').length },
+    { name: 'Inativos', value: monitorings.filter(m => m.status === 'inactive').length },
+    { name: 'Em Análise', value: monitorings.filter(m => m.status === 'analyzing').length },
+  ];
+
+  const COLORS = ['#10b981', '#6366f1', '#f59e0b'];
 
   const itemsPerPage = 10;
-
-  // Agrupar monitoramentos por tema
-  const groupedMonitorings = useMemo(() => {
-    const groups: { [key: string]: Monitoring[] } = {};
-    monitorings.forEach(monitoring => {
-      const theme = monitoring.theme || monitoring.description?.toLowerCase().split(' ').slice(0, 3).join(' ') || 'outros';
-      if (!groups[theme]) {
-        groups[theme] = [];
-      }
-      groups[theme].push(monitoring);
-    });
-    return groups;
-  }, [monitorings]);
-
-  // Paginação
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const totalMonitorings = monitorings.length;
-  const totalPages = Math.ceil(totalMonitorings / itemsPerPage);
-  const paginatedMonitorings = monitorings.slice(startIndex, endIndex);
-
-  const handleDelete = async (id: string) => {
-    try {
-      await removeMonitoring(id);
-      setDeleteConfirm(null);
-      toast.success("Monitoramento removido com sucesso!");
-    } catch (error) {
-      toast.error("Erro ao remover monitoramento");
-    }
-  };
-
-  const handleToggleStatus = async (id: string, currentStatus: string) => {
-    try {
-      const monitoring = monitorings.find(m => m.id === id);
-      if (monitoring) {
-        const updatedMonitoring = {
-          ...monitoring,
-          status: currentStatus === "active" ? "inactive" : "active"
-        };
-        await updateMonitoring(updatedMonitoring);
-        toast.success(`Monitoramento ${currentStatus === "active" ? "pausado" : "retomado"} com sucesso!`);
-      }
-    } catch (error) {
-      toast.error("Erro ao alterar status do monitoramento");
-    }
-  };
+  const totalPages = Math.ceil(monitorings.length / itemsPerPage);
 
   const filteredMonitorings = monitorings.filter(monitoring => {
     const matchesSearch = monitoring.name.toLowerCase().includes(filter.search.toLowerCase()) ||
                          monitoring.responsible.toLowerCase().includes(filter.search.toLowerCase());
-    const matchesGroup = filter.group === "all" || monitoring.group?.toLowerCase() === filter.group;
+    const matchesGroup = filter.group === "all" || monitoring.group.toLowerCase() === filter.group;
     const matchesStatus = filter.status === "all" || monitoring.status === filter.status;
     return matchesSearch && matchesGroup && matchesStatus;
   });
 
+  const paginatedMonitorings = filteredMonitorings.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
+
+  const handleRemoveMonitoring = (id: string) => {
+    if (window.confirm("Tem certeza que deseja remover este monitoramento?")) {
+      setTimeout(() => {
+        setMonitorings(prev => prev.filter(m => m.id !== id));
+        toast({
+          title: "Monitoramento Removido",
+          description: "O monitoramento foi removido com sucesso."
+        });
+      }, 500);
+    }
+  };
+
+  const handleToggleStatus = (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === "active" ? "inactive" : "active";
+    setTimeout(() => {
+      setMonitorings(prev => prev.map(m => 
+        m.id === id ? { ...m, status: newStatus } : m
+      ));
+      toast({
+        title: "Status Alterado",
+        description: `O monitoramento foi ${newStatus === "active" ? "ativado" : "desativado"}.`
+      });
+    }, 500);
+  };
+
+  const handleOpenSettings = (monitoring: Monitoring) => {
+    toast({
+      title: "Configurações",
+      description: `Abrindo configurações de ${monitoring.name}`,
+    });
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "active":
+        return "bg-green-500";
+      case "inactive":
+        return "bg-red-500";
+      case "analyzing":
+        return "bg-yellow-500";
+      default:
+        return "bg-gray-500";
+    }
+  };
+
   return (
     <div className="space-y-6">
-      {/* Filtros */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <Input
-                placeholder="Buscar por nome ou responsável..."
-                value={filter.search}
-                onChange={(e) => setFilter(prev => ({ ...prev, search: e.target.value }))}
-                className="w-full"
-              />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Tendências de Análise</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={analysisData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="sentiment" stroke="#10b981" name="Sentimento" />
+                  <Line type="monotone" dataKey="relevance" stroke="#6366f1" name="Relevância" />
+                  <Line type="monotone" dataKey="accuracy" stroke="#f59e0b" name="Precisão" />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
-            <div className="flex gap-4">
-              <Select
-                value={filter.status}
-                onValueChange={(value) => setFilter(prev => ({ ...prev, status: value }))}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="active">Ativos</SelectItem>
-                  <SelectItem value="inactive">Inativos</SelectItem>
-                  <SelectItem value="analyzing">Em Análise</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Lista de Monitoramentos */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Status dos Monitoramentos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={statusData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, value }) => `${name}: ${value}`}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {statusData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Monitoramentos Ativos</CardTitle>
+          <div className="flex items-center space-x-2">
+            <Input
+              placeholder="Buscar monitoramento..."
+              value={filter.search}
+              onChange={(e) => setFilter({ ...filter, search: e.target.value })}
+              className="w-64"
+            />
+            <Select
+              value={filter.group}
+              onValueChange={(value) => setFilter({ ...filter, group: value })}
+            >
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Grupo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os Grupos</SelectItem>
+                <SelectItem value="portais">Portais</SelectItem>
+                <SelectItem value="blogs">Blogs</SelectItem>
+                <SelectItem value="apis">APIs</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select
+              value={filter.status}
+              onValueChange={(value) => setFilter({ ...filter, status: value })}
+            >
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os Status</SelectItem>
+                <SelectItem value="active">Ativo</SelectItem>
+                <SelectItem value="inactive">Inativo</SelectItem>
+                <SelectItem value="analyzing">Em Análise</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline" size="icon">
+              <Filter className="h-4 w-4" />
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Tema</TableHead>
-                  <TableHead>Responsável</TableHead>
-                  <TableHead>Métricas</TableHead>
-                  <TableHead>Frequência</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nome</TableHead>
+                <TableHead>Grupo</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Responsável</TableHead>
+                <TableHead>Última Atualização</TableHead>
+                <TableHead>Uptime</TableHead>
+                <TableHead>Tempo de Resposta</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {paginatedMonitorings.map((monitoring) => (
+                <TableRow key={monitoring.id}>
+                  <TableCell>{monitoring.name}</TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">{monitoring.group}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={getStatusColor(monitoring.status)}>
+                      {monitoring.status === "active" ? "Ativo" : 
+                       monitoring.status === "inactive" ? "Inativo" : "Em Análise"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{monitoring.responsible}</TableCell>
+                  <TableCell>{monitoring.lastUpdate}</TableCell>
+                  <TableCell>{monitoring.uptime}%</TableCell>
+                  <TableCell>{monitoring.responseTime}ms</TableCell>
+                  <TableCell className="text-right space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleToggleStatus(monitoring.id, monitoring.status)}
+                      title={monitoring.status === "active" ? "Pausar" : "Ativar"}
+                    >
+                      {monitoring.status === "active" ? (
+                        <Pause className="h-4 w-4" />
+                      ) : (
+                        <Play className="h-4 w-4" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveMonitoring(monitoring.id)}
+                      title="Remover"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => handleOpenSettings(monitoring)}
+                      title="Configurações"
+                    >
+                      <Settings className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredMonitorings.map((monitoring) => (
-                  <TableRow key={monitoring.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <div className={cn(
-                          "h-2.5 w-2.5 rounded-full",
-                          monitoring.status === "active" && "bg-green-500",
-                          monitoring.status === "inactive" && "bg-red-500",
-                          monitoring.status === "analyzing" && "bg-yellow-500",
-                          !monitoring.status && "bg-gray-500"
-                        )} />
-                        <span className="capitalize">
-                          {monitoring.status || "Indefinido"}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-medium">{monitoring.name}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
-                        {monitoring.theme || monitoring.description?.toLowerCase().split(' ').slice(0, 3).join(' ') || 'outros'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{monitoring.responsible}</TableCell>
-                    <TableCell>
-                      {monitoring.metrics?.length ? (
-                        <Badge variant="secondary">
-                          {monitoring.metrics.length} métricas
-                        </Badge>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {monitoring.frequency ? (
-                        <Badge variant="outline">
-                          {frequencies.find(f => f.value === monitoring.frequency)?.label || monitoring.frequency}
-                        </Badge>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleToggleStatus(monitoring.id, monitoring.status || "")}
-                          className={cn(
-                            monitoring.status === "active" ? "text-yellow-500 hover:text-yellow-700" : "text-green-500 hover:text-green-700"
-                          )}
-                        >
-                          {monitoring.status === "active" ? (
-                            <Pause className="h-4 w-4" />
-                          ) : (
-                            <Play className="h-4 w-4" />
-                          )}
-                        </Button>
-                        {deleteConfirm === monitoring.id ? (
-                          <>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => handleDelete(monitoring.id)}
-                            >
-                              Confirmar
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setDeleteConfirm(null)}
-                            >
-                              Cancelar
-                            </Button>
-                          </>
-                        ) : (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setDeleteConfirm(monitoring.id)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+              ))}
+            </TableBody>
+          </Table>
 
-          {/* Paginação */}
           {totalPages > 1 && (
-            <div className="mt-4 flex justify-center">
+            <div className="mt-4">
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious 
-                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                      className={cn(currentPage === 1 && "pointer-events-none opacity-50")}
+                      onClick={() => setPage(p => Math.max(1, p - 1))}
+                      aria-disabled={page === 1}
                     />
                   </PaginationItem>
-                  {[...Array(totalPages)].map((_, i) => (
-                    <PaginationItem key={i + 1}>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                    <PaginationItem key={pageNum}>
                       <PaginationLink
-                        onClick={() => setCurrentPage(i + 1)}
-                        isActive={currentPage === i + 1}
+                        onClick={() => setPage(pageNum)}
+                        isActive={pageNum === page}
                       >
-                        {i + 1}
+                        {pageNum}
                       </PaginationLink>
                     </PaginationItem>
                   ))}
                   <PaginationItem>
-                    <PaginationNext 
-                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                      className={cn(currentPage === totalPages && "pointer-events-none opacity-50")}
+                    <PaginationNext
+                      onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                      aria-disabled={page === totalPages}
                     />
                   </PaginationItem>
                 </PaginationContent>

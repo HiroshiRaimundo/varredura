@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { useMonitoring } from "@/contexts/MonitoringContext";
-import { formatDistanceToNow } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 
 interface MonitoringItem {
   id: string;
@@ -27,9 +24,6 @@ interface MonitoringItem {
 }
 
 export const MonitoringList: React.FC = () => {
-  const { monitorings } = useMonitoring();
-  const activeMonitorings = monitorings.filter(m => m.active);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState<string>("todos");
   const [selectedStatus, setSelectedStatus] = useState<string>("todos");
@@ -75,17 +69,6 @@ export const MonitoringList: React.FC = () => {
     responseTime: item.metrics.responseTime,
     uptime: item.metrics.uptime
   }));
-
-  if (activeMonitorings.length === 0) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Monitoramentos Ativos</CardTitle>
-          <CardDescription>Nenhum monitoramento ativo no momento</CardDescription>
-        </CardHeader>
-      </Card>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -164,56 +147,6 @@ export const MonitoringList: React.FC = () => {
                 ))}
               </div>
             </ScrollArea>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Monitoramentos Ativos</CardTitle>
-            <CardDescription>Lista de todos os monitoramentos atualmente ativos</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {activeMonitorings.map((monitoring) => (
-              <Card key={monitoring.id}>
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <h4 className="text-lg font-semibold">{monitoring.name}</h4>
-                      <p className="text-sm text-muted-foreground">{monitoring.description}</p>
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {monitoring.analysisTypes.map((type) => (
-                          <Badge key={type} variant="secondary">{type}</Badge>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="text-right space-y-1">
-                      <Badge variant="outline">{monitoring.frequency}</Badge>
-                      <p className="text-sm text-muted-foreground">
-                        Criado {formatDistanceToNow(monitoring.createdAt, { locale: ptBR, addSuffix: true })}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="mt-4">
-                    <p className="text-sm font-medium">Responsável: {monitoring.responsible}</p>
-                    {monitoring.type === 'url' && monitoring.urls && monitoring.urls.length > 0 && (
-                      <div className="mt-2">
-                        <p className="text-sm font-medium">Endereços monitorados:</p>
-                        <ul className="list-disc list-inside text-sm text-muted-foreground">
-                          {monitoring.urls.map((url, index) => (
-                            <li key={index}>{url}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {monitoring.type === 'api' && monitoring.apiEndpoint && (
-                      <div className="mt-2">
-                        <p className="text-sm font-medium">API: {monitoring.apiEndpoint}</p>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
           </CardContent>
         </Card>
 
