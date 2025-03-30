@@ -1,98 +1,70 @@
 
-import { mockFrom, mockData } from "@/utils/mockSupabase";
+import { ResearchStudy, ResearchStudyFormData } from "@/types/research";
 
-export interface ResearchStudy {
-  id: string;
-  title: string;
-  author: string;
-  co_authors: string;
-  summary: string;
-  repository_url: string;
-  location: string;
-  coordinates: [number, number];
-  type: "artigo" | "dissertacao" | "tese" | "livros" | "ebooks" | "outro";
-}
-
-export const getResearchStudies = async (): Promise<ResearchStudy[]> => {
-  try {
-    // Versão mockada para evitar erros de tipagem
-    /* const { data, error } = await supabase
-      .from("research_studies")
-      .select(); */
-    
-    // Utilizando mock
-    return mockData.studies.map(study => ({
-      id: study.id,
-      title: study.title,
-      author: study.author,
-      co_authors: study.co_authors,
-      summary: study.summary,
-      repository_url: study.repository_url,
-      location: study.location,
-      coordinates: study.coordinates as [number, number],
-      type: study.type as any
-    }));
-  } catch (error) {
-    console.error("Erro ao carregar estudos:", error);
-    return [];
+// Mock de dados - substituir pela implementação real que usa Supabase
+const mockStudies: ResearchStudy[] = [
+  {
+    id: '1',
+    title: 'Impacto de Agrotóxicos em Recursos Hídricos',
+    author: 'Maria Silva',
+    co_authors: 'João Santos, Pedro Oliveira',
+    summary: 'Estudo sobre os efeitos de longo prazo de agrotóxicos em lençóis freáticos',
+    repository_url: 'https://repositorio.exemplo.com/estudo1',
+    location: 'Região Sul',
+    coordinates: [-25.4284, -49.2733],
+    type: 'artigo',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: '2',
+    title: 'Análise de Políticas Públicas para Conservação da Mata Atlântica',
+    author: 'Carlos Mendes',
+    co_authors: 'Ana Sousa',
+    summary: 'Avaliação da efetividade das políticas de conservação da Mata Atlântica nos últimos 10 anos',
+    repository_url: 'https://repositorio.exemplo.com/estudo2',
+    location: 'Sudeste e Nordeste',
+    coordinates: [-22.9068, -43.1729],
+    type: 'dissertacao',
+    created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
   }
+];
+
+// Renomeando para getResearchStudies para corresponder à importação em useResearch.ts
+export const getResearchStudies = async (): Promise<ResearchStudy[]> => {
+  // Simulando uma chamada de API
+  await new Promise(resolve => setTimeout(resolve, 500));
+  return [...mockStudies];
 };
 
-export const createResearchStudy = async (
-  studyData: Omit<ResearchStudy, "id">
-): Promise<ResearchStudy | null> => {
-  try {
-    /* const { data, error } = await supabase
-      .from("research_studies")
-      .insert({
-        title: studyData.title,
-        author: studyData.author,
-        co_authors: studyData.co_authors,
-        summary: studyData.summary,
-        repository_url: studyData.repository_url,
-        location: studyData.location,
-        coordinates: studyData.coordinates,
-        type: studyData.type
-      }); */
-    
-    // Utilizando mock
-    const newStudy = {
-      id: `study-${Date.now()}`,
-      ...studyData
-    };
-    
-    if (newStudy) {
-      return {
-        id: newStudy.id,
-        title: newStudy.title,
-        author: newStudy.author,
-        co_authors: newStudy.co_authors,
-        summary: newStudy.summary,
-        repository_url: newStudy.repository_url,
-        location: newStudy.location,
-        coordinates: newStudy.coordinates,
-        type: newStudy.type
-      };
-    }
-    return null;
-  } catch (error) {
-    console.error("Erro ao criar estudo:", error);
-    return null;
-  }
+// Renomeando para createResearchStudy para corresponder à importação em useResearch.ts
+export const createResearchStudy = async (data: ResearchStudyFormData): Promise<ResearchStudy> => {
+  // Simulando uma chamada de API
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  const newStudy: ResearchStudy = {
+    id: `study-${Date.now()}`,
+    title: data.title,
+    author: data.author,
+    co_authors: data.co_authors || '',
+    summary: data.summary,
+    repository_url: data.repository_url || '',
+    location: data.location,
+    coordinates: data.coordinates,
+    type: data.type,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  
+  return newStudy;
 };
 
 export const deleteResearchStudy = async (id: string): Promise<boolean> => {
-  try {
-    /* const { error } = await supabase
-      .from("research_studies")
-      .delete()
-      .eq("id", id); */
-    
-    // Utilizando mock
-    console.log(`Simulating deletion of study with ID: ${id}`);
-    return true;
-  } catch (error) {
-    console.error("Erro ao excluir estudo:", error);
-    return false;
-  }
+  // Simulando uma chamada de API
+  await new Promise(resolve => setTimeout(resolve, 500));
+  return true;
 };
+
+// Exportando o tipo para retrocompatibilidade
+export type { ResearchStudy };

@@ -1,87 +1,36 @@
 
+// Tipos para cliente
+
 export type ClientType = 
   | "observatory"
-  | "researcher"
-  | "politician"
+  | "researcher" 
+  | "politician" 
   | "institution"
   | "journalist"
   | "press";
 
-export interface ClientPermissions {
-  canViewReports: boolean;
-  canExportData: boolean;
-  canManageAlerts: boolean;
-  canAccessAnalytics: boolean;
-  canInviteUsers: boolean;
-}
-
-export interface ClientProfile {
-  id: string;
-  name: string;
-  email: string;
-  type: ClientType;
-  organization?: string;
-  permissions: ClientPermissions;
-}
-
-export interface ClientTypeDetail {
-  id: string;
-  name: string;
-  description: string;
-  features: string[];
-  caseStudies?: CaseStudy[];
-  alert?: string;
-}
-
 export interface CaseStudy {
-  id: string;
   title: string;
   description: string;
-  results: string;
-  clientName?: string;
 }
 
-export const DEFAULT_PERMISSIONS: Record<ClientType, ClientPermissions> = {
-  observatory: {
-    canViewReports: true,
-    canExportData: true,
-    canManageAlerts: true,
-    canAccessAnalytics: true,
-    canInviteUsers: true
-  },
-  researcher: {
-    canViewReports: true,
-    canExportData: true,
-    canManageAlerts: true,
-    canAccessAnalytics: true,
-    canInviteUsers: false
-  },
-  politician: {
-    canViewReports: true,
-    canExportData: false,
-    canManageAlerts: true,
-    canAccessAnalytics: true,
-    canInviteUsers: true
-  },
-  institution: {
-    canViewReports: true,
-    canExportData: true,
-    canManageAlerts: true,
-    canAccessAnalytics: true,
-    canInviteUsers: true
-  },
-  journalist: {
-    canViewReports: true,
-    canExportData: false,
-    canManageAlerts: true,
-    canAccessAnalytics: false,
-    canInviteUsers: false
-  },
-  press: {
-    canViewReports: true,
-    canExportData: false,
-    canManageAlerts: true,
-    canAccessAnalytics: true,
-    canInviteUsers: true
-  }
+// Interface para os detalhes de cada tipo de cliente
+export interface ClientTypeDetail {
+  id: ClientType;
+  title: string; // Adicionando propriedade title
+  shortDescription: string;
+  description: string;
+  details: string;
+  features: string[];
+  benefits: string[];
+  caseStudy: CaseStudy; // Adicionando propriedade caseStudy
+}
+
+// Mapa de tipos de cliente para seus detalhes
+export interface ClientTypeDetailsMap {
+  [key: string]: ClientTypeDetail;
+}
+
+export const clientTypeDetails: ClientTypeDetailsMap = {
+  // Os detalhes serão importados de arquivos separados
 };

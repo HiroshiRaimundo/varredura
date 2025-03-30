@@ -3,7 +3,11 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 import { ResearchStudy, ResearchStudyFormData } from "@/types/research";
-import { fetchResearchStudies as fetchStudies, addResearchStudy, deleteResearchStudy } from "@/services/researchService";
+import { 
+  getResearchStudies, 
+  createResearchStudy, 
+  deleteResearchStudy 
+} from "@/services/researchService";
 
 export const useResearch = () => {
   const [studies, setStudies] = useState<ResearchStudy[]>([]);
@@ -17,7 +21,7 @@ export const useResearch = () => {
   const fetchResearchStudies = async () => {
     setIsLoading(true);
     try {
-      const fetchedStudies = await fetchStudies();
+      const fetchedStudies = await getResearchStudies();
       setStudies(fetchedStudies);
     } catch (error) {
       console.error('Erro ao buscar estudos:', error);
@@ -29,7 +33,7 @@ export const useResearch = () => {
   const handleStudySubmit = async (data: ResearchStudyFormData) => {
     setIsLoading(true);
     try {
-      const newStudy = await addResearchStudy(data);
+      const newStudy = await createResearchStudy(data);
       
       if (newStudy) {
         // Atualizar estado

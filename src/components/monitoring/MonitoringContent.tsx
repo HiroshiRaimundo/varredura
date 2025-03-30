@@ -207,8 +207,15 @@ const MonitoringContent: React.FC = () => {
                   <Textarea
                     id="keywords"
                     placeholder="licitação, contrato, edital..."
-                    value={Array.isArray(newMonitoring.keywords) ? newMonitoring.keywords.join(', ') : newMonitoring.keywords || ''}
-                    onChange={e => setNewMonitoring(prev => ({ ...prev, keywords: e.target.value }))}
+                    value={Array.isArray(newMonitoring.keywords) ? newMonitoring.keywords.join(', ') : ''}
+                    onChange={e => {
+                      const keywordsString = e.target.value;
+                      const keywordsArray = keywordsString.split(',').map(k => k.trim());
+                      setNewMonitoring(prev => ({
+                        ...prev,
+                        keywords: keywordsArray
+                      }));
+                    }}
                   />
                 </div>
 

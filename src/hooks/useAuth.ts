@@ -24,7 +24,8 @@ export function useAuth() {
 
       // Mock de autenticação - substituir por chamada real à API
       if (data.email === 'admin@koga.com' && data.password === 'admin123') {
-        if (auth.login) {
+        // Corrigindo: verificar se auth tem o método login antes de usá-lo
+        if (auth && typeof auth.login === 'function') {
           auth.login({
             id: '1',
             name: 'Administrador',
@@ -45,15 +46,16 @@ export function useAuth() {
   };
 
   const handleLogout = () => {
-    if (auth.logout) {
+    // Corrigindo: verificar se auth tem o método logout antes de usá-lo
+    if (auth && typeof auth.logout === 'function') {
       auth.logout();
     }
     navigate('/login');
   };
 
   return {
-    isAuthenticated: auth.isAuthenticated,
-    user: auth.user,
+    isAuthenticated: auth?.isAuthenticated || false,
+    user: auth?.user,
     form,
     isLoggingIn,
     handleLogin,
