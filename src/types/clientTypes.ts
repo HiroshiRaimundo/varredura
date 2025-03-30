@@ -17,13 +17,13 @@ export interface CaseStudy {
 // Interface para os detalhes de cada tipo de cliente
 export interface ClientTypeDetail {
   id: ClientType;
-  title: string; // Adicionando propriedade title
+  title: string; // Propriedade adicionada
   shortDescription: string;
   description: string;
   details: string;
   features: string[];
   benefits: string[];
-  caseStudy: CaseStudy; // Adicionando propriedade caseStudy
+  caseStudy: CaseStudy; // Propriedade adicionada
 }
 
 // Mapa de tipos de cliente para seus detalhes

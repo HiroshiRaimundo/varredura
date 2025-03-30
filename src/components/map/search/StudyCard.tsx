@@ -18,12 +18,12 @@ const StudyCard: React.FC<StudyCardProps> = ({ study }) => {
     <div className="p-2 border rounded-md text-sm hover:bg-muted">
       <div className="flex justify-between items-start">
         <p className="font-medium">{study.title}</p>
-        {study.repositoryUrl && (
+        {study.repository_url && (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <a
-                  href={study.repositoryUrl}
+                  href={study.repository_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center ml-2 text-primary hover:text-primary/80"
@@ -42,9 +42,9 @@ const StudyCard: React.FC<StudyCardProps> = ({ study }) => {
         <p>Autor: {study.author}</p>
         <p>Local: {study.location}</p>
         <p>Tipo: {study.type}</p>
-        {study.repositoryUrl && (
+        {study.repository_url && (
           <a
-            href={study.repositoryUrl}
+            href={study.repository_url}
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary hover:underline inline-flex items-center mt-1"

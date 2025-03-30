@@ -9,6 +9,13 @@ interface LoginFormData {
   password: string;
 }
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  type: string;
+}
+
 export function useAuth() {
   const navigate = useNavigate();
   const auth = useAuthContext();
@@ -24,15 +31,11 @@ export function useAuth() {
 
       // Mock de autenticação - substituir por chamada real à API
       if (data.email === 'admin@koga.com' && data.password === 'admin123') {
-        // Corrigindo: verificar se auth tem o método login antes de usá-lo
-        if (auth && typeof auth.login === 'function') {
-          auth.login({
-            id: '1',
-            name: 'Administrador',
-            email: data.email,
-            type: 'admin'
-          });
-        }
+        // Autenticação bem-sucedida
+        auth.handleLogin({
+          email: data.email,
+          password: data.password
+        });
         navigate('/admin');
       } else {
         throw new Error('Credenciais inválidas');
@@ -46,10 +49,8 @@ export function useAuth() {
   };
 
   const handleLogout = () => {
-    // Corrigindo: verificar se auth tem o método logout antes de usá-lo
-    if (auth && typeof auth.logout === 'function') {
-      auth.logout();
-    }
+    // Efetua logout
+    auth.handleLogout();
     navigate('/login');
   };
 

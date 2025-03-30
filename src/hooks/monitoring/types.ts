@@ -1,16 +1,5 @@
-// Types for monitoring functionality
-export interface MonitoringItem {
-  id: string;
-  name: string;
-  url: string;
-  api_url?: string;
-  frequency: string;
-  category: string;
-  keywords?: string;
-  responsible?: string;
-  notes?: string;
-}
 
+// Adicionando a propriedade "source" ao tipo LegislationAlert
 export interface LegislationAlert {
   id: string;
   title: string;
@@ -18,48 +7,34 @@ export interface LegislationAlert {
   date: string;
   url: string;
   isRead: boolean;
-  source?: string; // Adicionando campo source
+  source: string; // Campo adicionado
 }
 
+// Adicionando a propriedade "title" ao tipo ReleaseMonitoringItem
 export interface ReleaseMonitoringItem {
   id: string;
   releaseTitle: string;
+  title: string; // Campo adicionado para manter compatibilidade
   websiteName: string;
   publishedDate: string;
   publishedTime: string;
   url: string;
   isVerified: boolean;
-  clientId?: string;
-  clientType?: string;
-  clientName?: string;
-  status?: string;
-  submittedDate?: string;
-  approvedDate?: string;
-  notes?: string;
-  title?: string; // Adicionando o campo title
+  status: "publicado" | "pendente";
 }
 
-export interface ClientCredentials {
+export interface MonitoringItem {
   id: string;
-  email: string;
   name: string;
-  clientType: string;
-  clientId: string;
-  lastLogin?: string;
+  url: string;
+  category: string;
+  frequency: "hourly" | "daily" | "weekly" | "monthly";
+  responsible: string;
+  status: "active" | "paused";
+  lastUpdate: string;
+  createdAt: string;
+  keywords: string[]; // Definido como array de strings
 }
 
-export interface PressReleaseMonitoring {
-  id: string;
-  releaseId: string;
-  title: string;
-  status: string;
-  targetOutlets: string[];
-  publishedOutlets: string[];
-  createdDate: string;
-  lastCheckedDate: string;
-  publishedUrls: {
-    outlet: string;
-    url: string;
-    date: string;
-  }[];
-}
+// Interface para o objeto de monitoramento
+export type Monitoring = MonitoringItem;

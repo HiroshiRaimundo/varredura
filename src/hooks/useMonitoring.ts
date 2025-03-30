@@ -1,148 +1,120 @@
 
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { useState, useEffect } from 'react';
+import { MonitoringItem, LegislationAlert, ReleaseMonitoringItem } from './monitoring/types';
+import { toast } from '@/hooks/use-toast';
 import { 
-  MonitoringItem, 
-  LegislationAlert, 
-  ReleaseMonitoringItem 
-} from "./monitoring/types";
-import { 
-  fetchMonitoringItemsFromDB, 
-  addMonitoringItemToDB, 
-  deleteMonitoringItemFromDB, 
-  fetchLegislationAlertsFromDB, 
-  fetchReleaseMonitoringFromDB 
-} from "./monitoring/api";
-import { 
-  exportMonitoringItems, 
-  getUniqueResponsibles, 
-  filterMonitoringItemsByResponsible 
-} from "./monitoring/utils";
+  getClientMonitorings, 
+  getLegislationAlerts, 
+  getReleaseMonitoring 
+} from './monitoring/api';
 
-export const useMonitoring = () => {
+export function useMonitoring(clientId: string = 'default') {
   const [monitoringItems, setMonitoringItems] = useState<MonitoringItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [responsibleFilter, setResponsibleFilter] = useState<string>("");
   const [legislationAlerts, setLegislationAlerts] = useState<LegislationAlert[]>([]);
   const [releaseMonitoring, setReleaseMonitoring] = useState<ReleaseMonitoringItem[]>([]);
-  const form = useForm<Omit<MonitoringItem, "id">>({
-    defaultValues: {
-      name: "",
-      url: "",
-      frequency: "diária",
-      category: "Legislação",
-      responsible: "",
-      keywords: "",
-      notes: ""
-    }
-  });
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch monitoring items
-  const fetchMonitoringItems = async () => {
+  useEffect(() => {
+    fetchMonitorings();
+    fetchLegislationAlerts();
+    fetchReleaseMonitoring();
+  }, []);
+
+  const fetchMonitorings = async () => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      console.log("Fetching monitoring items...");
-      const items = await fetchMonitoringItemsFromDB();
-      console.log("Monitoring items fetched:", items?.length || 0);
-      setMonitoringItems(items || []);
-      
-      // Fetch legislation alerts and release monitoring data
-      const alerts = fetchLegislationAlertsFromDB();
-      setLegislationAlerts(alerts);
-      
-      const releases = fetchReleaseMonitoringFromDB();
-      setReleaseMonitoring(releases);
+      const result = await getClientMonitorings(clientId);
+      if (result.data) {
+        setMonitoringItems(result.data);
+      }
     } catch (error) {
-      console.error('Error fetching monitoring items:', error);
+      console.error('Erro ao buscar monitoramentos:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível carregar os monitoramentos',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Mark a legislation alert as read
-  const markAlertAsRead = (id: string) => {
-    setLegislationAlerts(prev => 
-      prev.map(alert => 
-        alert.id === id ? { ...alert, isRead: true } : alert
-      )
-    );
-    
-    toast("Alerta marcado como lido", {
-      description: "O alerta foi marcado como lido e não aparecerá nas notificações."
-    });
-  };
-
-  // Add a new monitoring item
-  const handleAddMonitoring = async (data: Omit<MonitoringItem, "id">) => {
+  const fetchLegislationAlerts = () => {
     try {
-      console.log("Adding monitoring item:", data);
-      const newItem = await addMonitoringItemToDB(data);
-      setMonitoringItems(prev => [newItem, ...prev]);
-      form.reset();
-      
-      toast("Item adicionado", {
-        description: `Monitoramento de ${data.name} foi configurado.`
-      });
-      
-      return { success: true, data: newItem };
+      const alerts = getLegislationAlerts();
+      setLegislationAlerts(alerts);
     } catch (error) {
-      console.error('Error in handleAddMonitoring:', error);
-      toast("Erro ao adicionar item", {
-        description: "Ocorreu um erro ao adicionar o monitoramento."
-      });
-      return { success: false, error };
+      console.error('Erro ao buscar alertas de legislação:', error);
     }
   };
 
-  // Delete a monitoring item
-  const handleDeleteMonitoring = async (id: string) => {
+  const fetchReleaseMonitoring = () => {
     try {
-      await deleteMonitoringItemFromDB(id);
+      const releases = getReleaseMonitoring();
+      setReleaseMonitoring(releases);
+    } catch (error) {
+      console.error('Erro ao buscar monitoramento de releases:', error);
+    }
+  };
+
+  const addMonitoring = async (monitoring: Omit<MonitoringItem, 'id'>) => {
+    try {
+      // Em uma aplicação real, aqui faria uma chamada à API
+      const newMonitoring: MonitoringItem = {
+        id: `monitoring-${Date.now()}`,
+        ...monitoring,
+        lastUpdate: new Date().toISOString(),
+        createdAt: new Date().toISOString()
+      };
+      
+      setMonitoringItems(prev => [newMonitoring, ...prev]);
+      
+      toast({
+        title: 'Monitoramento adicionado',
+        description: `Monitoramento "${monitoring.name}" foi configurado com sucesso.`,
+      });
+      
+      return newMonitoring;
+    } catch (error) {
+      console.error('Erro ao adicionar monitoramento:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível adicionar o monitoramento',
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  };
+
+  const deleteMonitoring = async (id: string) => {
+    try {
+      // Em uma aplicação real, aqui faria uma chamada à API
       setMonitoringItems(prev => prev.filter(item => item.id !== id));
       
-      toast("Item removido", {
-        description: "O monitoramento foi removido com sucesso."
+      toast({
+        title: 'Monitoramento removido',
+        description: 'O monitoramento foi excluído com sucesso.',
       });
       
-      return { success: true };
+      return true;
     } catch (error) {
-      console.error('Error in handleDeleteMonitoring:', error);
-      toast("Erro ao remover item", {
-        description: "Ocorreu um erro ao remover o monitoramento."
+      console.error('Erro ao excluir monitoramento:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível excluir o monitoramento',
+        variant: 'destructive',
       });
-      return { success: false, error };
+      return false;
     }
   };
 
-  // Export monitoring items
-  const handleExport = () => {
-    exportMonitoringItems(monitoringItems);
-  };
-
-  // Get filtered monitoring items based on responsible filter
-  const filteredMonitoringItems = filterMonitoringItemsByResponsible(
-    monitoringItems, 
-    responsibleFilter
-  );
-
   return {
-    monitoringItems: filteredMonitoringItems,
-    allMonitoringItems: monitoringItems,
-    isLoading,
-    form,
-    responsibleFilter,
-    setResponsibleFilter,
-    getUniqueResponsibles: () => getUniqueResponsibles(monitoringItems),
-    fetchMonitoringItems,
-    handleAddMonitoring,
-    handleDeleteMonitoring,
-    handleExport,
+    monitoringItems,
     legislationAlerts,
     releaseMonitoring,
-    markAlertAsRead,
-    unreadAlertCount: legislationAlerts.filter(alert => !alert.isRead).length
+    isLoading,
+    addMonitoring,
+    deleteMonitoring,
+    refreshData: fetchMonitorings
   };
-};
-
-export type { MonitoringItem, LegislationAlert, ReleaseMonitoringItem };
+}

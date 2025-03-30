@@ -54,7 +54,7 @@ const ResearchForm: React.FC<ResearchFormProps> = ({ form, onSubmit }) => {
 
             <FormField
               control={form.control}
-              name="coAuthors"
+              name="co_authors"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Coautores</FormLabel>
@@ -92,7 +92,7 @@ const ResearchForm: React.FC<ResearchFormProps> = ({ form, onSubmit }) => {
 
             <FormField
               control={form.control}
-              name="repositoryUrl"
+              name="repository_url"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Link do Repositório</FormLabel>
