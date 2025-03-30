@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Search, BarChart2, Leaf } from "lucide-react";
@@ -23,10 +24,10 @@ const HeroSection: React.FC = () => {
             
             <div className="md:w-1/2 space-y-4">
               <h1 className="text-4xl font-bold tracking-tight">
-                Análise Inteligente de Dados
+                Plataforma Integrada de Comunicação e Monitoramento
               </h1>
               <p className="text-xl text-muted-foreground">
-                Transformando dados em soluções sustentáveis para pesquisadores, instituições e gestores públicos.
+                Uma solução completa para gerenciar comunicação, monitorar dados e transformar informações em resultados para qualquer setor ou nicho de mercado.
               </p>
             </div>
             
@@ -49,20 +50,20 @@ const HeroSection: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <BarChart2 className="h-6 w-6 text-green-600 mb-2" />
-                    <h3 className="font-semibold text-gray-800">Análise de Dados</h3>
+                    <h3 className="font-semibold text-gray-800">Dashboards Integrados</h3>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <Search className="h-6 w-6 text-blue-600 mb-2" />
-                    <h3 className="font-semibold text-gray-800">Análise de Dados</h3>
+                    <h3 className="font-semibold text-gray-800">Monitoramento Unificado</h3>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <Leaf className="h-6 w-6 text-green-600 mb-2" />
-                    <h3 className="font-semibold text-gray-800">Sustentabilidade</h3>
+                    <h3 className="font-semibold text-gray-800">Gestão Integrada</h3>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg flex items-center justify-center">
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-blue-600">Análise</p>
-                      <p className="text-xs text-gray-600">Dados</p>
+                      <p className="text-2xl font-bold text-blue-600">Uma Solução</p>
+                      <p className="text-xs text-gray-600">Múltiplos Usos</p>
                     </div>
                   </div>
                 </div>

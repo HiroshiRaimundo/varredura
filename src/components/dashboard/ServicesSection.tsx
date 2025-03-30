@@ -1,144 +1,116 @@
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { 
-  BookOpen, 
-  BarChart2, 
-  FileText, 
-  Users, 
-  MessageSquare 
-} from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Database, Search, Landmark, Building, Newspaper, Megaphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ServiceCard, ServiceIconWrapper } from "@/components/ui/card";
-import { ClientType } from "@/components/client/ClientTypes";
-
-interface ServiceItemProps {
-  id: ClientType;
-  title: string;
-  icon: React.ReactNode;
-  color: "blue" | "indigo" | "green" | "purple" | "red" | "amber";
-  description: string;
-  onServiceClick: (serviceId: ClientType) => void;
-}
-
-const ServiceItem: React.FC<ServiceItemProps> = ({
-  id,
-  title,
-  icon,
-  color,
-  description,
-  onServiceClick
-}) => {
-  const getButtonColorClass = (color: string) => {
-    const colorMap: Record<string, string> = {
-      blue: "bg-blue-600 hover:bg-blue-700",
-      indigo: "bg-indigo-600 hover:bg-indigo-700",
-      green: "bg-green-600 hover:bg-green-700",
-      purple: "bg-purple-600 hover:bg-purple-700",
-      red: "bg-red-600 hover:bg-red-700",
-      amber: "bg-amber-600 hover:bg-amber-700"
-    };
-    return colorMap[color] || "bg-blue-600 hover:bg-blue-700";
-  };
-
-  return (
-    <ServiceCard color={color}>
-      <ServiceIconWrapper color={color}>
-        {icon}
-      </ServiceIconWrapper>
-      <h3 className="text-xl font-bold mb-3">{title}</h3>
-      <p className="text-gray-600 mb-4">
-        {description}
-      </p>
-      <Button 
-        className={`mt-2 ${getButtonColorClass(color)} flex items-center`} 
-        onClick={() => onServiceClick(id)}
-      >
-        Saiba mais
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5 ml-2"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
-            clipRule="evenodd"
-          ></path>
-        </svg>
-      </Button>
-    </ServiceCard>
-  );
-};
-
-export const clientTypes = [
-  {
-    id: "observatory" as ClientType,
-    title: "Observatório",
-    icon: <BookOpen className="h-8 w-8 text-blue-600" />,
-    color: "blue" as const,
-    description: "Plataforma completa para observatórios de políticas públicas acompanharem indicadores, integrarem dados e gerarem relatórios automatizados com visualizações avançadas.",
-  },
-  {
-    id: "researcher" as ClientType,
-    title: "Pesquisador",
-    icon: <BarChart2 className="h-8 w-8 text-indigo-600" />,
-    color: "indigo" as const,
-    description: "Acesso a datasets completos, APIs para integração com ferramentas estatísticas, histórico de séries temporais e capacidade de compartilhamento de dados com outros pesquisadores.",
-  },
-  {
-    id: "politician" as ClientType,
-    title: "Político",
-    icon: <FileText className="h-8 w-8 text-green-600" />,
-    color: "green" as const,
-    description: "Alertas sobre novas legislações, análise de impacto de políticas públicas, resumos executivos de dados governamentais e comparativos de indicadores por região.",
-  },
-  {
-    id: "institution" as ClientType,
-    title: "Instituição",
-    icon: <Users className="h-8 w-8 text-purple-600" />,
-    color: "purple" as const,
-    description: "Ferramentas para gestão de dados institucionais, monitoramento de programas, dashboards personalizados e relatórios de acompanhamento para instituições de diversos setores.",
-  },
-  {
-    id: "journalist" as ClientType,
-    title: "Jornalista",
-    icon: <FileText className="h-8 w-8 text-red-600" />,
-    color: "red" as const,
-    description: "Acesso a indicadores atualizados, visualizações prontas para publicação, verificação de dados e comparativos históricos para embasar reportagens investigativas e especiais.",
-  },
-  {
-    id: "press" as ClientType,
-    title: "Assessoria de Imprensa",
-    icon: <MessageSquare className="h-8 w-8 text-amber-600" />,
-    color: "amber" as const,
-    description: "Sistema completo para criação, aprovação e monitoramento de releases, acompanhamento de publicações, métricas de desempenho e gestão de contatos com veículos de comunicação.",
-  }
-];
+import { clientTypes } from "@/components/client/ClientTypes";
 
 const ServicesSection: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleServiceClick = (serviceId: ClientType) => {
-    // Redirecionar para a página de detalhes do serviço
-    navigate(`/service/${serviceId}`);
-  };
-
   return (
-    <section className="py-12 px-6 max-w-6xl mx-auto w-full">
-      <h2 className="text-3xl font-bold text-center mb-12">Nossos Serviços</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {clientTypes.map((client) => (
-          <ServiceItem 
-            key={client.id}
-            id={client.id}
-            title={client.title}
-            icon={client.icon}
-            color={client.color}
-            description={client.description}
-            onServiceClick={handleServiceClick}
-          />
-        ))}
+    <section className="py-16 px-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold mb-4">
+            Uma Plataforma, Múltiplas Aplicações
+          </h2>
+          <p className="text-gray-600 max-w-3xl mx-auto">
+            Nossa solução integrada se adapta às necessidades de diferentes perfis de usuários, mantendo uma experiência 
+            consistente e todas as funcionalidades em um único local.
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          <Card>
+            <CardHeader>
+              <div className="rounded-full bg-blue-100 w-12 h-12 flex items-center justify-center mb-4">
+                <Database className="h-6 w-6 text-blue-600" />
+              </div>
+              <CardTitle>Gestão de Dados Centralizada</CardTitle>
+              <CardDescription>
+                Centralize seus dados e monitore informações em um único painel personalizado
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 mb-4">
+                Nossa plataforma integra fontes diversas em um único sistema, permitindo monitoramento
+                e análise em tempo real de dados relevantes para qualquer setor.
+              </p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <div className="rounded-full bg-green-100 w-12 h-12 flex items-center justify-center mb-4">
+                <Newspaper className="h-6 w-6 text-green-600" />
+              </div>
+              <CardTitle>Comunicação Integrada</CardTitle>
+              <CardDescription>
+                Gerencie toda sua comunicação de forma eficiente e mensurável
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 mb-4">
+                Do desenvolvimento à distribuição de conteúdo, nossa plataforma oferece ferramentas completas 
+                para gerenciar todo o ciclo de comunicação.
+              </p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <div className="rounded-full bg-purple-100 w-12 h-12 flex items-center justify-center mb-4">
+                <Search className="h-6 w-6 text-purple-600" />
+              </div>
+              <CardTitle>Análise Avançada</CardTitle>
+              <CardDescription>
+                Transforme dados em insights acionáveis com ferramentas analíticas poderosas
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 mb-4">
+                Visualizações personalizadas, relatórios automatizados e dashboards intuitivos que se adaptam 
+                às necessidades específicas de cada usuário.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div className="text-center mb-8">
+          <h3 className="text-2xl font-semibold mb-4">Adaptável a Diferentes Perfis de Usuários</h3>
+          <p className="text-gray-600 max-w-3xl mx-auto mb-8">
+            A mesma plataforma integrada se adapta para atender as necessidades específicas de cada tipo de usuário, 
+            mantendo uma experiência consistente e todas as funcionalidades em um único ambiente.
+          </p>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+            {clientTypes.map((type) => (
+              <div 
+                key={type.type}
+                className="bg-gray-50 p-4 rounded-lg border border-gray-100 text-center hover:shadow-md transition-shadow cursor-pointer"
+                onClick={() => navigate(`/service/${type.type}`)}
+              >
+                {type.type === "observatory" && <Database className="h-8 w-8 text-blue-500 mx-auto mb-2" />}
+                {type.type === "researcher" && <Search className="h-8 w-8 text-purple-500 mx-auto mb-2" />}
+                {type.type === "politician" && <Landmark className="h-8 w-8 text-green-500 mx-auto mb-2" />}
+                {type.type === "institution" && <Building className="h-8 w-8 text-amber-500 mx-auto mb-2" />}
+                {type.type === "journalist" && <Newspaper className="h-8 w-8 text-rose-500 mx-auto mb-2" />}
+                {type.type === "press" && <Megaphone className="h-8 w-8 text-indigo-500 mx-auto mb-2" />}
+                <p className="font-medium">{type.label}</p>
+              </div>
+            ))}
+          </div>
+          
+          <Button 
+            onClick={() => navigate("/client")}
+            size="lg"
+            className="bg-primary hover:bg-primary/90"
+          >
+            Conhecer a Plataforma
+          </Button>
+        </div>
       </div>
     </section>
   );
