@@ -33,6 +33,12 @@ const mockAlerts: LegislationAlert[] = [
   }
 ];
 
+// Adicionando interfaces para solucionar erros
+interface ClientAlertsProps {
+  clientType: ClientType;
+  alerts?: LegislationAlert[];
+}
+
 interface ClientContentProps {
   clientType: ClientType;
 }
@@ -82,12 +88,16 @@ const ClientContent: React.FC<ClientContentProps> = ({ clientType }) => {
         
         {clientType === "press" && (
           <TabsContent value="releases" className="mt-0">
-            <PressTab />
+            <PressTab clientType={clientType} />
           </TabsContent>
         )}
         
         <TabsContent value="tools" className="mt-0">
-          <AnalysisToolsSection clientType={clientType} />
+          <AnalysisToolsSection 
+            clientType={clientType} 
+            onDatasetDownload={() => {}} 
+            onComparisonView={() => {}}
+          />
         </TabsContent>
       </Tabs>
     </div>

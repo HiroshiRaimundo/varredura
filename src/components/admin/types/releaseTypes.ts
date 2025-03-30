@@ -6,9 +6,9 @@ export interface JournalistContact {
   phone: string;
   website: string;
   socialMedia: string;
-  mediaOutlet?: string; // Added for filtering by publication
-  category?: string;    // Type of journalism (environment, politics, etc.)
-  region?: string;      // Geographic region
+  mediaOutlet?: string;
+  category?: string;
+  region?: string;
 }
 
 export interface ReleaseData {
@@ -24,9 +24,9 @@ export interface ReleaseData {
   content?: string;
   subtitle?: string;
   author?: string;
-  monitoringActive?: boolean; // Added for tracking
-  lastMonitoringCheck?: string; // Date of last check
-  targetJournalists?: string[]; // IDs of journalists this was sent to
+  monitoringActive?: boolean;
+  lastMonitoringCheck?: string;
+  targetJournalists?: string[];
 }
 
 export interface JournalistFormValues {
@@ -40,7 +40,22 @@ export interface JournalistFormValues {
   region?: string;
 }
 
-// Pagination and filter interfaces
+// Para PressDashboard
+export interface PressReleaseData {
+  id: string;
+  title: string;
+  status: string;
+  date: string;
+  views: number;
+  published: boolean;
+  publications: number;
+  mediaOutlet: string;
+  publicationUrl: string;
+  publicationDate: string;
+  publicationTime: string;
+}
+
+// Paginação e filtros
 export interface PaginationState {
   currentPage: number;
   itemsPerPage: number;
@@ -54,7 +69,7 @@ export interface JournalistFilters {
   region?: string;
 }
 
-// Release monitoring interfaces
+// Interfaces de monitoramento de release
 export interface ReleaseMonitoring {
   id: string;
   releaseId: string;
@@ -75,4 +90,33 @@ export interface ReleaseMonitoringResult {
   websiteName: string;
   excerptFound: string;
   verified: boolean;
+}
+
+// Equivalente à ReleaseMonitoringItem em outros arquivos
+export interface ReleaseMonitoringItem {
+  id: string;
+  title: string;
+  date: string;
+  media: string[];
+  status: string;
+  releaseTitle?: string;
+  websiteName?: string;
+  publishedDate?: string;
+  publishedTime?: string;
+  url?: string;
+  isVerified?: boolean;
+}
+
+export interface ReleaseAlertsProps {
+  alerts: {
+    id: string;
+    title: string;
+    message: string;
+    type: string;
+  }[];
+}
+
+export interface DashboardTabsProps {
+  activeTab: string;
+  setActiveTab: React.Dispatch<React.SetStateAction<string>>;
 }

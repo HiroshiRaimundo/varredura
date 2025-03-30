@@ -1,51 +1,99 @@
 
-// Adicionando a propriedade "source" ao tipo LegislationAlert
+// Tipos para monitoramento
+export interface MonitoringItem {
+  id: string;
+  name: string;
+  url: string;
+  frequency: "hourly" | "daily" | "weekly" | "monthly";
+  category: string;
+  keywords: string;
+  responsible: string;
+  notes: string;
+  status: string;
+  lastUpdate: string;
+  createdAt: string;
+}
+
+export interface FormMonitoringItem {
+  name: string;
+  url: string;
+  frequency: string;
+  category: string;
+  keywords: string;
+  responsible: string;
+  notes: string;
+}
+
+export interface MonitoringFormProps {
+  onSubmit: (data: FormMonitoringItem) => void;
+  initialData?: FormMonitoringItem;
+  isEdit?: boolean;
+  clientType?: string;
+}
+
+// Tipos para alertas de legislação
 export interface LegislationAlert {
   id: string;
   title: string;
   description: string;
   date: string;
-  url: string;
   isRead: boolean;
-  source: string; // Campo adicionado
+  url: string;
+  source: string;
 }
 
-// Adicionando a propriedade "title" ao tipo ReleaseMonitoringItem
+// Tipos para monitoramento de release
 export interface ReleaseMonitoringItem {
   id: string;
-  releaseTitle: string;
-  title: string; // Campo adicionado para manter compatibilidade
-  websiteName: string;
-  publishedDate: string;
-  publishedTime: string;
-  url: string;
-  isVerified: boolean;
-  status: "publicado" | "pendente";
+  title: string;
+  date: string;
+  media: string[];
+  status: string;
+  releaseTitle?: string;
+  websiteName?: string;
+  publishedDate?: string;
+  publishedTime?: string;
+  url?: string;
+  isVerified?: boolean;
 }
 
-export interface MonitoringItem {
-  id: string;
-  name: string;
-  url: string;
-  category: string;
-  frequency: "hourly" | "daily" | "weekly" | "monthly";
-  responsible: string;
-  status: "active" | "paused";
-  lastUpdate: string;
-  createdAt: string;
-  keywords: string[]; // Definido como array de strings
+export interface MonitoringData {
+  totalItems: number;
+  alertCount: number;
+  recentAlerts: LegislationAlert[];
+  monitoringTypes: {
+    legislation: number;
+    news: number;
+    social: number;
+    other: number;
+  };
 }
 
-// Interface para tipo de monitoramento
-export interface Monitoring {
-  id?: string;
-  name: string;
-  url: string;
-  category: string;
-  frequency: "hourly" | "daily" | "weekly" | "monthly";
-  responsible: string;
-  status: "active" | "paused";
-  lastUpdate?: string;
-  createdAt?: string;
-  keywords: string[];
+// API Types
+export interface MonitoringFilters {
+  category?: string;
+  status?: string;
+  frequency?: string;
+  search?: string;
+}
+
+export interface PaginationParams {
+  page: number;
+  limit: number;
+}
+
+export interface ApiResponse<T> {
+  data: T;
+  meta?: {
+    pagination?: {
+      total: number;
+      currentPage: number;
+      totalPages: number;
+      perPage: number;
+    }
+  };
+  error?: {
+    message: string;
+    code: string;
+  };
 }

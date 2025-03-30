@@ -1,130 +1,153 @@
 
-import { MonitoringItem, LegislationAlert, ReleaseMonitoringItem } from "./types";
-import { mockData } from "@/utils/mockSupabase";
+import { ApiResponse, MonitoringFilters, MonitoringItem, PaginationParams } from "./types";
 
-// Renomeando funções para corresponder ao que está sendo importado em useMonitoring.ts
-export const fetchMonitoringItemsFromDB = async (): Promise<MonitoringItem[]> => {
-  try {
-    // Mock de dados
-    return mockData.monitoringItems || [];
-  } catch (error) {
-    console.error("Erro ao carregar monitoramentos:", error);
-    return [];
-  }
-};
-
-// Função para adicionar um novo monitoramento
-export const addMonitoringItemToDB = async (monitoring: Omit<MonitoringItem, "id">): Promise<MonitoringItem> => {
-  try {
-    // Mock de dados
-    return {
-      id: `monitoring-${Date.now()}`,
-      ...monitoring
-    };
-  } catch (error) {
-    console.error("Erro ao adicionar monitoramento:", error);
-    throw error;
-  }
-};
-
-// Função para excluir um monitoramento
-export const deleteMonitoringItemFromDB = async (id: string): Promise<boolean> => {
-  try {
-    console.log(`Monitoramento ${id} excluído`);
-    return true;
-  } catch (error) {
-    console.error("Erro ao excluir monitoramento:", error);
-    throw error;
-  }
-};
-
-// Renomeando para fetchLegislationAlertsFromDB
-export const fetchLegislationAlertsFromDB = (): LegislationAlert[] => {
-  // Mock de alertas de legislação
-  return [
+// Mock de dados para monitoramento
+export const fetchMonitoringData = async (
+  filters?: MonitoringFilters,
+  pagination?: PaginationParams
+): Promise<ApiResponse<MonitoringItem[]>> => {
+  // Dados de exemplo
+  const mockItems: Partial<MonitoringItem>[] = [
     {
       id: "1",
-      title: "Nova Lei Ambiental",
-      description: "Lei nº 12.345 que altera as diretrizes para licenciamento ambiental",
-      date: new Date().toISOString(),
-      url: "https://example.com/lei12345",
-      isRead: false,
-      source: "Diário Oficial" 
+      name: "Monitoramento de Legislação Ambiental",
+      url: "https://www.gov.br/meio-ambiente/legislacao",
+      frequency: "daily",
+      category: "Legislação",
+      keywords: "floresta, preservação, meio ambiente",
+      responsible: "Ana Silva",
+      notes: "Monitorar novas leis ambientais"
     },
     {
       id: "2",
-      title: "Portaria sobre Agrotóxicos",
-      description: "Portaria que estabelece novas regras para registro de agrotóxicos",
-      date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      url: "https://example.com/portaria-agrotoxicos",
-      isRead: true,
-      source: "Ministério da Agricultura"
+      name: "Monitoramento de Notícias sobre Sustentabilidade",
+      url: "https://g1.globo.com/natureza/",
+      frequency: "daily",
+      category: "Notícias",
+      keywords: "sustentabilidade, reciclagem, poluição",
+      responsible: "Carlos Souza",
+      notes: "Acompanhar principais portais de notícias"
     },
     {
       id: "3",
-      title: "Decreto sobre Proteção da Mata Atlântica",
-      description: "Decreto que reforça a proteção de áreas de Mata Atlântica",
-      date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-      url: "https://example.com/decreto-mata-atlantica",
-      isRead: false,
-      source: "Casa Civil"
+      name: "Publicações Científicas sobre Biodiversidade",
+      url: "https://scielo.org/biodiversidade",
+      frequency: "weekly",
+      category: "Pesquisa",
+      keywords: "biodiversidade, espécies, conservação",
+      responsible: "Juliana Mendes",
+      notes: "Revisar novas publicações científicas"
     }
-  ];
-};
+  ].map(item => ({
+    ...item,
+    status: "active",
+    lastUpdate: new Date(Date.now() - Math.random() * 1000000000).toISOString(),
+    createdAt: new Date(Date.now() - Math.random() * 10000000000).toISOString()
+  })) as MonitoringItem[];
 
-// Renomeando para fetchReleaseMonitoringFromDB
-export const fetchReleaseMonitoringFromDB = (): ReleaseMonitoringItem[] => {
-  // Mock de monitoramento de releases
-  return [
-    {
-      id: "1",
-      releaseTitle: "Empresa X lança novo produto sustentável",
-      title: "Empresa X lança novo produto sustentável",
-      websiteName: "Portal de Notícias Green",
-      publishedDate: new Date().toLocaleDateString(),
-      publishedTime: new Date().toLocaleTimeString(),
-      url: "https://example.com/noticia1",
-      isVerified: true,
-      status: "publicado"
-    },
-    {
-      id: "2",
-      releaseTitle: "Estudo revela impacto das mudanças climáticas",
-      title: "Estudo revela impacto das mudanças climáticas",
-      websiteName: "Ciência Hoje",
-      publishedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toLocaleDateString(),
-      publishedTime: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toLocaleTimeString(),
-      url: "https://example.com/noticia2",
-      isVerified: true,
-      status: "publicado"
-    },
-    {
-      id: "3",
-      releaseTitle: "Nova política de gestão de resíduos",
-      title: "Nova política de gestão de resíduos",
-      websiteName: "Jornal Ambiental",
-      publishedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toLocaleDateString(),
-      publishedTime: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toLocaleTimeString(),
-      url: "https://example.com/noticia3",
-      isVerified: false,
-      status: "pendente"
+  // Simula um pequeno delay de resposta do servidor
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  // Aplicar filtros se fornecidos
+  let filteredItems = [...mockItems];
+  if (filters) {
+    if (filters.category) {
+      filteredItems = filteredItems.filter(item => item.category === filters.category);
     }
-  ];
-};
-
-// Mantendo as funções originais para retrocompatibilidade
-export const getClientMonitorings = async (clientId: string) => {
-  try {
-    // Mock de dados
-    return {
-      data: mockData.monitoringItems,
-      error: null
-    };
-  } catch (error) {
-    console.error("Erro ao carregar monitoramentos:", error);
-    return { data: null, error };
+    if (filters.status) {
+      filteredItems = filteredItems.filter(item => item.status === filters.status);
+    }
+    if (filters.frequency) {
+      filteredItems = filteredItems.filter(item => item.frequency === filters.frequency);
+    }
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      filteredItems = filteredItems.filter(item =>
+        item.name.toLowerCase().includes(searchLower) ||
+        item.keywords.toLowerCase().includes(searchLower) ||
+        item.category.toLowerCase().includes(searchLower)
+      );
+    }
   }
+
+  // Aplicar paginação se fornecida
+  let paginatedItems = filteredItems;
+  let paginationMeta = undefined;
+  if (pagination) {
+    const { page, limit } = pagination;
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    paginatedItems = filteredItems.slice(startIndex, endIndex);
+
+    paginationMeta = {
+      pagination: {
+        total: filteredItems.length,
+        currentPage: page,
+        totalPages: Math.ceil(filteredItems.length / limit),
+        perPage: limit
+      }
+    };
+  }
+
+  // Retorna resposta formatada no padrão da API
+  return {
+    data: paginatedItems,
+    meta: paginationMeta
+  };
 };
 
-export const getLegislationAlerts = fetchLegislationAlertsFromDB;
-export const getReleaseMonitoring = fetchReleaseMonitoringFromDB;
+// Mock de função para criar novo monitoramento
+export const createMonitoring = async (item: Omit<MonitoringItem, 'id' | 'status' | 'lastUpdate' | 'createdAt'>): Promise<ApiResponse<MonitoringItem>> => {
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  const newItem: MonitoringItem = {
+    ...item,
+    id: crypto.randomUUID(),
+    status: "active",
+    lastUpdate: new Date().toISOString(),
+    createdAt: new Date().toISOString()
+  };
+
+  // Simulação de sucesso
+  return {
+    data: newItem
+  };
+};
+
+// Mock de função para atualizar monitoramento existente
+export const updateMonitoring = async (id: string, item: Partial<MonitoringItem>): Promise<ApiResponse<MonitoringItem>> => {
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  // Na implementação real, aqui teríamos uma chamada ao backend
+
+  // Simulação de sucesso - criando um objeto atualizado para retorno
+  const updatedItem: MonitoringItem = {
+    id,
+    name: item.name || "Monitoramento Atualizado",
+    url: item.url || "https://example.com",
+    frequency: item.frequency || "daily",
+    category: item.category || "Geral",
+    keywords: item.keywords || "",
+    responsible: item.responsible || "",
+    notes: item.notes || "",
+    status: item.status || "active",
+    lastUpdate: new Date().toISOString(),
+    createdAt: new Date(Date.now() - 1000000000).toISOString()
+  };
+
+  return {
+    data: updatedItem
+  };
+};
+
+// Mock de função para excluir monitoramento
+export const deleteMonitoring = async (id: string): Promise<ApiResponse<{ success: boolean }>> => {
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  // Na implementação real, aqui teríamos uma chamada ao backend
+
+  // Simulação de sucesso
+  return {
+    data: { success: true }
+  };
+};

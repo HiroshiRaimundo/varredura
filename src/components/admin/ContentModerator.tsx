@@ -1,26 +1,43 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { CheckCircle, XCircle, FileText, Calendar, Trash, Check, X, Bell, BellOff } from 'lucide-react';
-import { ReleaseData } from '../types/releaseTypes';
-import { getStatusLabel, getStatusColor } from '../utils/releaseUtils';
-import { pressMonitoringService } from '@/services/pressMonitoring';
+import { ReleaseData } from './types/releaseTypes';
+import { getStatusLabel, getStatusColor } from './utils/releaseUtils';
+import { Badge } from '@/components/ui/badge';
 
 interface ContentModeratorProps {
-  releases: ReleaseData[];
-  onApprove: (id: string) => void;
-  onReject: (id: string) => void;
-  onDelete: (id: string) => void;
-  onToggleMonitoring: (id: string) => void;
+  releases?: ReleaseData[];
+  onApprove?: (id: string) => void;
+  onReject?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onToggleMonitoring?: (id: string) => void;
+  contents?: any[];
+  onUpdateStatus?: (id: string, status: 'approved' | 'rejected', feedback?: string) => void;
 }
 
-const ContentModerator = () => {
+const ContentModerator: React.FC<ContentModeratorProps> = ({ 
+  contents, 
+  onUpdateStatus,
+  releases: propReleases,
+  onApprove: propOnApprove,
+  onReject: propOnReject,
+  onDelete: propOnDelete,
+  onToggleMonitoring: propOnToggleMonitoring
+}) => {
   const [releases, setReleases] = useState<ReleaseData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mock data loading
+    if (propReleases) {
+      setReleases(propReleases);
+      setLoading(false);
+      return;
+    }
+    
+    // Mock data loading quando não recebemos releases via props
     const mockReleases: ReleaseData[] = [
       {
         id: '1',
@@ -58,31 +75,55 @@ const ContentModerator = () => {
       setReleases(mockReleases);
       setLoading(false);
     }, 500);
-  }, []);
+  }, [propReleases]);
 
   const handleApprove = (id: string) => {
-    setReleases(releases.map(release =>
-      release.id === id ? { ...release, status: 'approved' } : release
-    ));
+    if (propOnApprove) {
+      propOnApprove(id);
+    } else {
+      setReleases(releases.map(release =>
+        release.id === id ? { ...release, status: 'approved' } : release
+      ));
+    }
+    
+    if (onUpdateStatus && contents) {
+      onUpdateStatus(id, 'approved');
+    }
   };
 
   const handleReject = (id: string) => {
-    setReleases(releases.map(release =>
-      release.id === id ? { ...release, status: 'rejected' } : release
-    ));
+    if (propOnReject) {
+      propOnReject(id);
+    } else {
+      setReleases(releases.map(release =>
+        release.id === id ? { ...release, status: 'rejected' } : release
+      ));
+    }
+    
+    if (onUpdateStatus && contents) {
+      onUpdateStatus(id, 'rejected');
+    }
   };
 
   const handleDelete = (id: string) => {
-    setReleases(releases.filter(release => release.id !== id));
+    if (propOnDelete) {
+      propOnDelete(id);
+    } else {
+      setReleases(releases.filter(release => release.id !== id));
+    }
   };
 
   const handleToggleMonitoring = async (id: string) => {
-    setReleases(releases.map(release => {
-      if (release.id === id) {
-        return { ...release, monitoringActive: !release.monitoringActive };
-      }
-      return release;
-    }));
+    if (propOnToggleMonitoring) {
+      propOnToggleMonitoring(id);
+    } else {
+      setReleases(releases.map(release => {
+        if (release.id === id) {
+          return { ...release, monitoringActive: !release.monitoringActive };
+        }
+        return release;
+      }));
+    }
   };
 
   const handleStartMonitoring = async (releaseId: string) => {

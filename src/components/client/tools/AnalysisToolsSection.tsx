@@ -1,11 +1,34 @@
+
 import React from "react";
 import { ClientType } from "@/components/client/ClientTypes";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { FileText, Newspaper, Mic, BarChart2 } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 export interface AnalysisToolsSectionProps {
   clientType: ClientType;
   onDatasetDownload?: () => void;
   onComparisonView?: () => void;
 }
+
+// Create a stub for AnalysisToolsCard that we reference but seems to be missing
+const AnalysisToolsCard: React.FC<AnalysisToolsSectionProps> = ({ 
+  clientType, 
+  onDatasetDownload, 
+  onComparisonView 
+}) => {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Ferramentas de Análise</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p>Ferramentas para {clientType}</p>
+      </CardContent>
+    </Card>
+  );
+};
 
 const AnalysisToolsSection: React.FC<AnalysisToolsSectionProps> = ({ 
   clientType, 

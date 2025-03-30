@@ -78,7 +78,7 @@ export const getClientTypeLabel = (type: string) => {
   }
 };
 
-// New functions for release monitoring
+// Funções para monitoramento de release
 export const createMonitoringFromRelease = (release: ReleaseData): ReleaseMonitoring => {
   return {
     id: crypto.randomUUID(),

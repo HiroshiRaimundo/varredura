@@ -11,11 +11,30 @@ interface PressContentProps {
   clientType: ClientType;
 }
 
+// Interface completa para MockData
+interface MockData {
+  releases: {
+    id: string;
+    title: string;
+    date: string;
+    status: string;
+  }[];
+  stats: {
+    total: number;
+    published: number;
+    pending: number;
+  };
+  releaseStats: any[];
+  monthlyData: any[];
+  mediaOutlets: any[];
+  recentReleases: any[];
+}
+
 const PressContent: React.FC<PressContentProps> = ({ clientType }) => {
   const [activeSubTab, setActiveSubTab] = useState("dashboard");
   
   // Dados mockados para exemplo
-  const mockData = {
+  const mockData: MockData = {
     releases: [
       { id: "1", title: "Lançamento de produto sustentável", date: "2023-05-15", status: "published" },
       { id: "2", title: "Nova iniciativa ambiental", date: "2023-05-10", status: "draft" }
@@ -24,7 +43,11 @@ const PressContent: React.FC<PressContentProps> = ({ clientType }) => {
       total: 24,
       published: 18,
       pending: 6
-    }
+    },
+    releaseStats: [],
+    monthlyData: [],
+    mediaOutlets: [],
+    recentReleases: []
   };
   
   return (
