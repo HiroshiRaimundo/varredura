@@ -1,10 +1,10 @@
+
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { 
   Users, 
   FileText,
   Home,
-  Settings,
   LogOut,
   UserPlus,
   BarChart2,
@@ -56,11 +56,6 @@ const AdminSidebar: React.FC = () => {
       title: "Análise e Relatórios",
       icon: <BarChart2 className="h-4 w-4" />,
       path: "/admin/analytics"
-    },
-    {
-      title: "Configurações",
-      icon: <Settings className="h-4 w-4" />,
-      path: "/admin/settings"
     }
   ];
   

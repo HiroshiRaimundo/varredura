@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -5,6 +6,7 @@ import { MonitoringForm } from "./MonitoringForm";
 import { MonitoringAnalytics } from "./MonitoringAnalytics";
 import { MonitoringReports } from "./reports/MonitoringReports";
 import { MonitoringOverview } from "./overview/MonitoringOverview";
+import BackToAdminButton from "../BackToAdminButton";
 
 interface MonitoringSummary {
   total: number;
@@ -27,6 +29,7 @@ export const AdminMonitoringDashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
+        <BackToAdminButton />
         <h2 className="text-2xl font-bold tracking-tight">Monitoramento</h2>
         <p className="text-muted-foreground">
           Gerencie e analise seus monitoramentos
