@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,7 @@ const Index: React.FC = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-6 text-lg">
-                <Link to={isAuthenticated ? "/admin" : "/client-login"}>
+                <Link to={isAuthenticated ? "/admin" : "/service/observatory"}>
                   {isAuthenticated ? "Acessar Dashboard" : "Começar Agora"}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
