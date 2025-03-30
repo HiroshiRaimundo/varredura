@@ -36,5 +36,16 @@ export interface MonitoringItem {
   keywords: string[]; // Definido como array de strings
 }
 
-// Usando export type para evitar conflitos com isolatedModules
-export type { MonitoringItem };
+// Interface para tipo de monitoramento
+export interface Monitoring {
+  id?: string;
+  name: string;
+  url: string;
+  category: string;
+  frequency: "hourly" | "daily" | "weekly" | "monthly";
+  responsible: string;
+  status: "active" | "paused";
+  lastUpdate?: string;
+  createdAt?: string;
+  keywords: string[];
+}

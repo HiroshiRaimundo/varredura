@@ -1,39 +1,68 @@
 
 import React from 'react';
-import { FileText, ExternalLink, AlertCircle, Clock } from "lucide-react";
-import DashboardCard from '../DashboardCard';
+import { Card, CardContent } from "@/components/ui/card";
+import { BarChart2, FileText, Eye, Clock } from 'lucide-react';
 
-const StatisticsCards: React.FC = () => {
+export interface StatisticsCardsProps {
+  stats: {
+    releases: number;
+    published: number;
+    views: number;
+    pending: number;
+  };
+}
+
+const StatisticsCards: React.FC<StatisticsCardsProps> = ({ stats }) => {
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <DashboardCard
-        title="Total de Releases"
-        value="21"
-        description="Total de releases enviados"
-        icon={<FileText className="h-4 w-4 text-muted-foreground" />}
-      />
-      <DashboardCard
-        title="Publicados"
-        value="12"
-        description="Releases veiculados na mídia"
-        icon={<ExternalLink className="h-4 w-4 text-green-500" />}
-        trend={{ value: 20, isPositive: true }}
-      />
-      <DashboardCard
-        title="Taxa de Aprovação"
-        value="85%"
-        description="Releases aprovados para envio"
-        icon={<AlertCircle className="h-4 w-4 text-blue-500" />}
-        trend={{ value: 5, isPositive: true }}
-      />
-      <DashboardCard
-        title="Tempo Médio"
-        value="1.5 dias"
-        description="Da aprovação à publicação"
-        icon={<Clock className="h-4 w-4 text-orange-500" />}
-        trend={{ value: 10, isPositive: false }}
-      />
-    </div>
+    <>
+      <Card>
+        <CardContent className="flex items-center py-4">
+          <div className="mr-4 bg-blue-100 p-2 rounded-full">
+            <FileText className="h-6 w-6 text-blue-600" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">Total de Releases</p>
+            <h3 className="text-2xl font-bold">{stats.releases}</h3>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardContent className="flex items-center py-4">
+          <div className="mr-4 bg-green-100 p-2 rounded-full">
+            <BarChart2 className="h-6 w-6 text-green-600" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">Publicados</p>
+            <h3 className="text-2xl font-bold">{stats.published}</h3>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardContent className="flex items-center py-4">
+          <div className="mr-4 bg-purple-100 p-2 rounded-full">
+            <Eye className="h-6 w-6 text-purple-600" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">Visualizações</p>
+            <h3 className="text-2xl font-bold">{stats.views}</h3>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardContent className="flex items-center py-4">
+          <div className="mr-4 bg-yellow-100 p-2 rounded-full">
+            <Clock className="h-6 w-6 text-yellow-600" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">Pendentes</p>
+            <h3 className="text-2xl font-bold">{stats.pending}</h3>
+          </div>
+        </CardContent>
+      </Card>
+    </>
   );
 };
 

@@ -32,7 +32,11 @@ const mockReleases: ReleaseMonitoringItem[] = [
   }
 ];
 
-const PressTab: React.FC = () => {
+interface PressTabProps {
+  clientType?: string;
+}
+
+const PressTab: React.FC<PressTabProps> = ({ clientType = "press" }) => {
   const [activeTab, setActiveTab] = React.useState("dashboard");
   
   return (
@@ -45,11 +49,11 @@ const PressTab: React.FC = () => {
         </TabsList>
         
         <TabsContent value="dashboard">
-          <PressReleaseDashboard />
+          <PressReleaseDashboard clientType={clientType} />
         </TabsContent>
         
         <TabsContent value="new">
-          <PressReleaseForm />
+          <PressReleaseForm clientType={clientType} />
         </TabsContent>
         
         <TabsContent value="monitoring">

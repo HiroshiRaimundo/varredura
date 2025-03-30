@@ -8,6 +8,9 @@ import {
   getReleaseMonitoring 
 } from './monitoring/api';
 
+// Re-export MonitoringItem for other files to import
+export type { MonitoringItem, LegislationAlert, ReleaseMonitoringItem };
+
 export function useMonitoring(clientId: string = 'default') {
   const [monitoringItems, setMonitoringItems] = useState<MonitoringItem[]>([]);
   const [legislationAlerts, setLegislationAlerts] = useState<LegislationAlert[]>([]);

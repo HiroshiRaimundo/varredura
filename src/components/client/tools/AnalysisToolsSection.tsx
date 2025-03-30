@@ -1,22 +1,16 @@
-
 import React from "react";
-import { ClientType } from "@/components/client/ClientUtils";
-import AnalysisToolsCard from "@/components/client/AnalysisToolsCard";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { FileText, Globe, MessageSquare, PieChart, SendHorizonal, Newspaper, Mic, BarChart2 } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { ClientType } from "@/components/client/ClientTypes";
 
-interface AnalysisToolsSectionProps {
+export interface AnalysisToolsSectionProps {
   clientType: ClientType;
-  onDatasetDownload: () => void;
-  onComparisonView: () => void;
+  onDatasetDownload?: () => void;
+  onComparisonView?: () => void;
 }
 
-const AnalysisToolsSection: React.FC<AnalysisToolsSectionProps> = ({
-  clientType,
-  onDatasetDownload,
-  onComparisonView
+const AnalysisToolsSection: React.FC<AnalysisToolsSectionProps> = ({ 
+  clientType, 
+  onDatasetDownload = () => {}, 
+  onComparisonView = () => {} 
 }) => {
   // Renderer for press-specific tools
   const renderPressTools = () => {

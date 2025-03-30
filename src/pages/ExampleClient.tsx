@@ -13,6 +13,7 @@ import AnalysisContent from "@/components/analysis/AnalysisContent";
 const ExampleClient: React.FC = () => {
   const [clientType] = useState<ClientType>("press");
   const [activeTab, setActiveTab] = useState("press");
+  const [monitoringData, setMonitoringData] = useState<any>({}); // Added missing state
 
   const getClientIcon = () => {
     return <Mail className="h-6 w-6 text-indigo-600" />;
@@ -60,7 +61,10 @@ const ExampleClient: React.FC = () => {
                 </TabsContent>
 
                 <TabsContent value="monitoring" className="p-6">
-                  <MonitoringContent />
+                  <MonitoringContent 
+                    monitoringToEdit={null} 
+                    setMonitoringData={setMonitoringData} // Added missing prop
+                  />
                 </TabsContent>
 
                 <TabsContent value="analysis" className="p-6">

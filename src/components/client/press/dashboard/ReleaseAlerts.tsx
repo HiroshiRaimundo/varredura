@@ -1,68 +1,53 @@
 
 import React from 'react';
-import { 
-  Alert, 
-  AlertTitle, 
-  AlertDescription 
-} from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { AlertTriangle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, CheckCircle } from "lucide-react";
 
-interface ReleaseAlertsProps {
-  showAlert: boolean;
-  setShowAlert: React.Dispatch<React.SetStateAction<boolean>>;
-  hasApprovedReleases: boolean;
-  hasRejectedReleases: boolean;
+export interface ReleaseAlertsProps {
+  alerts: Array<{
+    id: string;
+    title: string;
+    message: string;
+    type: string;
+  }>;
 }
 
-const ReleaseAlerts: React.FC<ReleaseAlertsProps> = ({ 
-  showAlert, 
-  setShowAlert, 
-  hasApprovedReleases, 
-  hasRejectedReleases 
-}) => {
-  if (!showAlert) return null;
-  
+const ReleaseAlerts: React.FC<ReleaseAlertsProps> = ({ alerts }) => {
   return (
-    <>
-      {hasApprovedReleases && (
-        <Alert className="mb-4 bg-emerald-50 border-emerald-200">
-          <AlertTriangle className="h-4 w-4 text-emerald-600" />
-          <AlertTitle className="text-emerald-700">Release aprovado!</AlertTitle>
-          <AlertDescription className="text-emerald-600">
-            Um ou mais releases foram aprovados e serão enviados para a imprensa. 
-            Acompanhe o status na tabela abaixo.
-          </AlertDescription>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="absolute top-2 right-2 h-6 w-6 p-0" 
-            onClick={() => setShowAlert(false)}
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg font-medium">Alertas</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {alerts.map((alert) => (
+          <Alert 
+            key={alert.id} 
+            className={
+              alert.type === 'warning' 
+                ? 'bg-yellow-50 border-yellow-300' 
+                : alert.type === 'success'
+                ? 'bg-green-50 border-green-300'
+                : 'bg-gray-50 border-gray-300'
+            }
           >
-            ×
-          </Button>
-        </Alert>
-      )}
+            {alert.type === 'warning' ? (
+              <AlertCircle className="h-4 w-4 text-yellow-600" />
+            ) : (
+              <CheckCircle className="h-4 w-4 text-green-600" />
+            )}
+            <AlertTitle>{alert.title}</AlertTitle>
+            <AlertDescription>{alert.message}</AlertDescription>
+          </Alert>
+        ))}
 
-      {hasRejectedReleases && (
-        <Alert className="mb-4 bg-red-50 border-red-200">
-          <AlertTriangle className="h-4 w-4 text-red-600" />
-          <AlertTitle className="text-red-700">Release rejeitado</AlertTitle>
-          <AlertDescription className="text-red-600">
-            Um ou mais releases foram rejeitados. Entre em contato com a equipe para 
-            fazer as alterações necessárias.
-          </AlertDescription>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="absolute top-2 right-2 h-6 w-6 p-0" 
-            onClick={() => setShowAlert(false)}
-          >
-            ×
-          </Button>
-        </Alert>
-      )}
-    </>
+        {alerts.length === 0 && (
+          <div className="text-center py-6 text-muted-foreground">
+            <p>Nenhum alerta no momento</p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

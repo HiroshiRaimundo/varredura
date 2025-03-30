@@ -1,30 +1,20 @@
 
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import PublishedReleasesTab from './PublishedReleasesTab';
-import ActivityTab from './ActivityTab';
-import { ReleaseMonitoringItem } from "@/hooks/monitoring/types";
 
-interface DashboardTabsProps {
-  releases: ReleaseMonitoringItem[];
-  recentActivity: any[];
+export interface DashboardTabsProps {
+  activeTab: string;
+  setActiveTab: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const DashboardTabs: React.FC<DashboardTabsProps> = ({ releases, recentActivity }) => {
+const DashboardTabs: React.FC<DashboardTabsProps> = ({ activeTab, setActiveTab }) => {
   return (
-    <Tabs defaultValue="published" className="w-full">
-      <TabsList className="mb-4">
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <TabsList className="w-full">
+        <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+        <TabsTrigger value="activity">Atividade</TabsTrigger>
         <TabsTrigger value="published">Publicados</TabsTrigger>
-        <TabsTrigger value="activity">Atividade Recente</TabsTrigger>
       </TabsList>
-
-      <TabsContent value="published">
-        <PublishedReleasesTab releases={releases} />
-      </TabsContent>
-
-      <TabsContent value="activity">
-        <ActivityTab activities={recentActivity} />
-      </TabsContent>
     </Tabs>
   );
 };
