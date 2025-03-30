@@ -22,7 +22,7 @@ export const useClientLogin = () => {
         description: "Você foi autenticado com sucesso.",
       });
 
-      // Redirecionar para página do cliente
+      // Redirecionar para página do cliente (não para área administrativa)
       navigate("/client");
     } catch (error) {
       console.error("Erro ao fazer login:", error);
