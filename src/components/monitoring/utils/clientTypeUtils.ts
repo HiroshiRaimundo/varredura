@@ -1,6 +1,8 @@
 
 import { ClientType } from "@/types/clientTypes";
 
+export type { ClientType };
+
 export const getMonitoringFormTitle = (clientType?: ClientType): string => {
   switch (clientType) {
     case "observatory":
