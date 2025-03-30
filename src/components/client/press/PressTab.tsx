@@ -66,7 +66,7 @@ const PressTab: React.FC<PressTabProps> = ({ clientType }) => {
       <TabsContent value="monitoring">
         <ReleaseMonitoringDashboard 
           title="Monitoramento de Publicações" 
-          description="Acompanhe a publicação dos seus releases na imprensa"
+          description="Acompanhe a publicação dos seus releases na imprensa e nas redes sociais"
           releases={releaseMonitoring}
         />
       </TabsContent>
