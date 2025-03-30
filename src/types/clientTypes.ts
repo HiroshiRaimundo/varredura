@@ -1,69 +1,31 @@
-export type ClientType = 
-  | "observatory"
-  | "researcher"
-  | "politician"
-  | "institution"
-  | "journalist"
-  | "press";
 
-export interface ClientPermissions {
-  canViewReports: boolean;
-  canExportData: boolean;
-  canManageAlerts: boolean;
-  canAccessAnalytics: boolean;
-  canInviteUsers: boolean;
+// Define ClientType for the application
+export type ClientType = "observatory" | "researcher" | "politician" | "institution" | "journalist" | "press";
+
+export interface ClientTypeDetail {
+  id: ClientType;
+  title: string;
+  description: string;
+  alert?: string | null;
+  features: string[];
+  benefits?: string[];
+  details?: string[];
+  caseStudy?: {
+    title: string;
+    content: string;
+  };
 }
 
-export interface ClientProfile {
-  id: string;
-  name: string;
-  email: string;
-  type: ClientType;
-  organization?: string;
-  permissions: ClientPermissions;
+export interface ClientTypeDetails {
+  id: ClientType;
+  title: string;
+  description: string;
+  alert?: string | null;
+  features: string[];
+  benefits?: string[];
+  details?: string[];
+  caseStudy?: {
+    title: string;
+    content: string;
+  };
 }
-
-export const DEFAULT_PERMISSIONS: Record<ClientType, ClientPermissions> = {
-  observatory: {
-    canViewReports: true,
-    canExportData: true,
-    canManageAlerts: true,
-    canAccessAnalytics: true,
-    canInviteUsers: true
-  },
-  researcher: {
-    canViewReports: true,
-    canExportData: true,
-    canManageAlerts: true,
-    canAccessAnalytics: true,
-    canInviteUsers: false
-  },
-  politician: {
-    canViewReports: true,
-    canExportData: false,
-    canManageAlerts: true,
-    canAccessAnalytics: true,
-    canInviteUsers: true
-  },
-  institution: {
-    canViewReports: true,
-    canExportData: true,
-    canManageAlerts: true,
-    canAccessAnalytics: true,
-    canInviteUsers: true
-  },
-  journalist: {
-    canViewReports: true,
-    canExportData: false,
-    canManageAlerts: true,
-    canAccessAnalytics: false,
-    canInviteUsers: false
-  },
-  press: {
-    canViewReports: true,
-    canExportData: false,
-    canManageAlerts: true,
-    canAccessAnalytics: true,
-    canInviteUsers: true
-  }
-};

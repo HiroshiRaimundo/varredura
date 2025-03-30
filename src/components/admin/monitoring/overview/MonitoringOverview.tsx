@@ -1,42 +1,16 @@
+
 import React, { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Filter, Pause, Play, Trash2, Settings } from "lucide-react";
 import { toast } from "sonner";
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
-import { useMonitoring } from "@/contexts/MonitoringContext";
+import { useMonitoring, Monitoring } from "@/contexts/MonitoringContext";
+import { CustomPagination } from "@/components/ui/custom-pagination";
 import cn from 'clsx';
-
-interface Monitoring {
-  id: string;
-  name: string;
-  group?: string;
-  status?: "active" | "inactive" | "analyzing";
-  responsible: string;
-  lastUpdate?: string;
-  uptime?: number;
-  responseTime?: number;
-  url?: string;
-  urls?: string[];
-  metrics?: string[];
-  analysisTypes?: string[];
-  frequency?: string;
-  description?: string;
-  theme?: string;
-}
 
 interface Filter {
   search: string;
@@ -64,7 +38,7 @@ const frequencies = [
 ];
 
 export const MonitoringOverview: React.FC = () => {
-  const { monitorings, removeMonitoring, updateMonitoring } = useMonitoring();
+  const { monitorings, updateMonitoring, removeMonitoring } = useMonitoring();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -98,7 +72,7 @@ export const MonitoringOverview: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      await removeMonitoring(id);
+      removeMonitoring(id);
       setDeleteConfirm(null);
       toast.success("Monitoramento removido com sucesso!");
     } catch (error) {
@@ -106,7 +80,7 @@ export const MonitoringOverview: React.FC = () => {
     }
   };
 
-  const handleToggleStatus = async (id: string, currentStatus: string) => {
+  const handleToggleStatus = async (id: string, currentStatus?: string) => {
     try {
       const monitoring = monitorings.find(m => m.id === id);
       if (monitoring) {
@@ -114,7 +88,7 @@ export const MonitoringOverview: React.FC = () => {
           ...monitoring,
           status: currentStatus === "active" ? "inactive" : "active"
         };
-        await updateMonitoring(updatedMonitoring);
+        updateMonitoring(updatedMonitoring);
         toast.success(`Monitoramento ${currentStatus === "active" ? "pausado" : "retomado"} com sucesso!`);
       }
     } catch (error) {
@@ -230,7 +204,7 @@ export const MonitoringOverview: React.FC = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handleToggleStatus(monitoring.id, monitoring.status || "")}
+                          onClick={() => handleToggleStatus(monitoring.id, monitoring.status)}
                           className={cn(
                             monitoring.status === "active" ? "text-yellow-500 hover:text-yellow-700" : "text-green-500 hover:text-green-700"
                           )}
@@ -279,32 +253,11 @@ export const MonitoringOverview: React.FC = () => {
           {/* Paginação */}
           {totalPages > 1 && (
             <div className="mt-4 flex justify-center">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious 
-                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                      className={cn(currentPage === 1 && "pointer-events-none opacity-50")}
-                    />
-                  </PaginationItem>
-                  {[...Array(totalPages)].map((_, i) => (
-                    <PaginationItem key={i + 1}>
-                      <PaginationLink
-                        onClick={() => setCurrentPage(i + 1)}
-                        isActive={currentPage === i + 1}
-                      >
-                        {i + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-                  <PaginationItem>
-                    <PaginationNext 
-                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                      className={cn(currentPage === totalPages && "pointer-events-none opacity-50")}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
+              <CustomPagination 
+                currentPage={currentPage} 
+                totalPages={totalPages} 
+                onPageChange={setCurrentPage} 
+              />
             </div>
           )}
         </CardContent>

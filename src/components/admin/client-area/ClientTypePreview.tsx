@@ -2,7 +2,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ClientType, clientTypeDetails } from "@/components/client/ClientTypes";
+import { ClientType, ClientTypeDetails } from "@/types/clientTypes";
 import { getColorClasses } from "@/components/service/utils/colorUtils";
 import { Eye, Edit, Settings, BarChart, FileText, Users, Link, ExternalLink } from "lucide-react";
 
@@ -46,7 +46,7 @@ const ClientTypePreview: React.FC<ClientTypePreviewProps> = ({
                 {details.title}
               </CardTitle>
               <CardDescription>
-                {details.shortDescription}
+                {details.description}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-4">
