@@ -1,3 +1,4 @@
+
 export type ClientType = 
   | "observatory"
   | "researcher"
@@ -21,6 +22,23 @@ export interface ClientProfile {
   type: ClientType;
   organization?: string;
   permissions: ClientPermissions;
+}
+
+export interface ClientTypeDetail {
+  id: string;
+  name: string;
+  description: string;
+  features: string[];
+  caseStudies?: CaseStudy[];
+  alert?: string;
+}
+
+export interface CaseStudy {
+  id: string;
+  title: string;
+  description: string;
+  results: string;
+  clientName?: string;
 }
 
 export const DEFAULT_PERMISSIONS: Record<ClientType, ClientPermissions> = {

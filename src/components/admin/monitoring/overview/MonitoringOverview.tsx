@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -106,8 +107,7 @@ export const MonitoringOverview: React.FC = () => {
     if (window.confirm("Tem certeza que deseja remover este monitoramento?")) {
       setTimeout(() => {
         setMonitorings(prev => prev.filter(m => m.id !== id));
-        toast({
-          title: "Monitoramento Removido",
+        toast("Monitoramento Removido", {
           description: "O monitoramento foi removido com sucesso."
         });
       }, 500);
@@ -120,16 +120,14 @@ export const MonitoringOverview: React.FC = () => {
       setMonitorings(prev => prev.map(m => 
         m.id === id ? { ...m, status: newStatus } : m
       ));
-      toast({
-        title: "Status Alterado",
+      toast("Status Alterado", {
         description: `O monitoramento foi ${newStatus === "active" ? "ativado" : "desativado"}.`
       });
     }, 500);
   };
 
   const handleOpenSettings = (monitoring: Monitoring) => {
-    toast({
-      title: "Configurações",
+    toast("Configurações", {
       description: `Abrindo configurações de ${monitoring.name}`,
     });
   };

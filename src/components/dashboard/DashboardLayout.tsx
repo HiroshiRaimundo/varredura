@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,11 +10,11 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title }) => {
-  const { client, logout } = useAuth();
+  const { user, handleLogout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogoutClick = () => {
+    handleLogout();
     navigate('/login');
   };
 
@@ -27,11 +28,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title }) =>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-500">
-                Olá, {client?.name}
+                Olá, {user?.name || "Usuário"}
               </span>
               <Button
                 variant="outline"
-                onClick={handleLogout}
+                onClick={handleLogoutClick}
               >
                 Sair
               </Button>

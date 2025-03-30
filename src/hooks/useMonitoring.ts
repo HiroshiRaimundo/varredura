@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { 
   MonitoringItem, 
   LegislationAlert, 
@@ -68,8 +68,7 @@ export const useMonitoring = () => {
       )
     );
     
-    toast({
-      title: "Alerta marcado como lido",
+    toast("Alerta marcado como lido", {
       description: "O alerta foi marcado como lido e não aparecerá nas notificações."
     });
   };
@@ -82,13 +81,17 @@ export const useMonitoring = () => {
       setMonitoringItems(prev => [newItem, ...prev]);
       form.reset();
       
-      toast({
-        title: "Item adicionado",
+      toast("Item adicionado", {
         description: `Monitoramento de ${data.name} foi configurado.`
       });
+      
+      return { success: true, data: newItem };
     } catch (error) {
-      // Error is already handled in the API function
       console.error('Error in handleAddMonitoring:', error);
+      toast("Erro ao adicionar item", {
+        description: "Ocorreu um erro ao adicionar o monitoramento."
+      });
+      return { success: false, error };
     }
   };
 
@@ -98,13 +101,17 @@ export const useMonitoring = () => {
       await deleteMonitoringItemFromDB(id);
       setMonitoringItems(prev => prev.filter(item => item.id !== id));
       
-      toast({
-        title: "Item removido",
+      toast("Item removido", {
         description: "O monitoramento foi removido com sucesso."
       });
+      
+      return { success: true };
     } catch (error) {
-      // Error is already handled in the API function
       console.error('Error in handleDeleteMonitoring:', error);
+      toast("Erro ao remover item", {
+        description: "Ocorreu um erro ao remover o monitoramento."
+      });
+      return { success: false, error };
     }
   };
 

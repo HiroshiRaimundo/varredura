@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -110,28 +111,22 @@ export const MonitoringForm: React.FC = () => {
 
     // Validação básica
     if (!formData.name || !formData.responsible) {
-      toast({
-        title: "Erro de Validação",
-        description: "Nome e Responsável são campos obrigatórios",
-        variant: "destructive"
+      toast("Erro de Validação", {
+        description: "Nome e Responsável são campos obrigatórios"
       });
       return;
     }
 
     if (formData.type === "url" && !formData.url) {
-      toast({
-        title: "Erro de Validação",
-        description: "A URL é obrigatória para monitoramento de URL",
-        variant: "destructive"
+      toast("Erro de Validação", {
+        description: "A URL é obrigatória para monitoramento de URL"
       });
       return;
     }
 
     if (formData.type === "api" && (!formData.apiEndpoint || !formData.apiKey)) {
-      toast({
-        title: "Erro de Validação",
-        description: "O endpoint e a chave da API são obrigatórios para monitoramento de API",
-        variant: "destructive"
+      toast("Erro de Validação", {
+        description: "O endpoint e a chave da API são obrigatórios para monitoramento de API"
       });
       return;
     }
@@ -139,8 +134,7 @@ export const MonitoringForm: React.FC = () => {
     // Aqui você faria a chamada para a API
     console.log("Dados do formulário:", formData);
     
-    toast({
-      title: "Sucesso",
+    toast("Sucesso", {
       description: "Monitoramento criado com sucesso!"
     });
 

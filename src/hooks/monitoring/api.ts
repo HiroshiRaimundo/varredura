@@ -1,250 +1,191 @@
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/hooks/use-toast";
-import { MonitoringItem, LegislationAlert, ReleaseMonitoringItem } from "./types";
-import { API_CONFIG, simulateNetworkDelay } from "@/config/api-config";
 
-// Dados mockados para uso local quando o Supabase não estiver disponível
+// Mock API para modo offline
+
+import { MonitoringItem, LegislationAlert, ReleaseMonitoringItem } from "./types";
+
+// Mock data para itens de monitoramento
 const mockMonitoringItems: MonitoringItem[] = [
   {
     id: "1",
-    name: "Portal de Notícias",
-    url: "https://exemplo.com/noticias",
+    name: "Monitoramento de Legislação Ambiental",
+    url: "https://www.legisweb.com.br/legislacao-ambiental",
     frequency: "diária",
-    category: "Notícias",
-    keywords: "governo, política, economia",
-    responsible: "João Silva",
-    notes: "Monitorar artigos sobre política econômica"
+    category: "Legislação",
+    keywords: "meio ambiente, sustentabilidade, poluição",
+    responsible: "Ana Silva",
+    notes: "Monitorar atualizações nas leis ambientais"
   },
   {
     id: "2",
-    name: "Blog Corporativo",
-    url: "https://exemplo.com/blog",
+    name: "Portal de Dados Abertos",
+    url: "https://dados.gov.br",
     frequency: "semanal",
-    category: "Corporativo",
-    keywords: "empresa, negócios, mercado",
-    responsible: "Maria Oliveira",
-    notes: "Verificar publicações sobre o mercado financeiro"
+    category: "Dados",
+    keywords: "open data, transparência, dados públicos",
+    responsible: "Carlos Oliveira",
+    notes: "Verificar novos conjuntos de dados disponibilizados"
   },
   {
     id: "3",
-    name: "Redes Sociais",
-    url: "https://exemplo.com/social",
+    name: "Diário Oficial da União",
+    url: "https://www.in.gov.br/web/dou",
     frequency: "diária",
-    category: "Social Media",
-    keywords: "trending, viral, hashtag",
-    responsible: "Pedro Santos",
-    notes: "Monitorar tendências e menções à marca"
+    category: "Governo",
+    keywords: "legislação, decretos, portarias",
+    responsible: "Maria Santos",
+    notes: "Monitoramento diário de publicações oficiais"
   }
 ];
 
-// Fetch monitoring items from Supabase or use mock data
-export const fetchMonitoringItemsFromDB = async () => {
-  try {
-    // Se configurado para usar dados mockados, retorna os dados locais
-    if (API_CONFIG.USE_MOCK_DATA) {
-      await simulateNetworkDelay();
-      console.log("Usando dados mockados para monitoramentos");
-      return mockMonitoringItems;
-    }
+// Mock data para alertas de legislação
+const mockLegislationAlerts: LegislationAlert[] = [
+  {
+    id: "1",
+    title: "Nova Lei sobre Proteção de Dados",
+    description: "Foi publicada hoje a Lei 14.XXX que estabelece novas diretrizes para proteção de dados pessoais em serviços públicos.",
+    date: "2025-03-15",
+    url: "https://www.in.gov.br/web/dou/-/lei-14.xxx",
+    isRead: false,
+    source: "Diário Oficial da União"
+  },
+  {
+    id: "2",
+    title: "Decreto sobre Transparência de Dados",
+    description: "Novo decreto estabelece diretrizes para a divulgação de dados governamentais em formatos abertos.",
+    date: "2025-03-12",
+    url: "https://www.in.gov.br/web/dou/-/decreto-xx.xxx",
+    isRead: true,
+    source: "Diário Oficial da União"
+  },
+  {
+    id: "3",
+    title: "Portaria sobre Pesquisas Científicas",
+    description: "Publicada portaria que regulamenta o financiamento de pesquisas científicas em universidades públicas.",
+    date: "2025-03-10",
+    url: "https://www.in.gov.br/web/dou/-/portaria-xxx",
+    isRead: false,
+    source: "Ministério da Ciência e Tecnologia"
+  }
+];
 
-    // Caso contrário, tenta buscar do Supabase
-    const { data, error } = await supabase
-      .from('monitoring_items')
-      .select('*')
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    
-    const formattedItems = data.map(item => ({
-      id: item.id,
-      name: item.name,
-      url: item.url,
-      api_url: item.api_url,
-      frequency: item.frequency,
-      category: item.category,
-      keywords: item.keywords,
-      responsible: (item as any).responsible || null,
-      notes: (item as any).notes || null
-    }));
-    
-    return formattedItems;
-  } catch (error) {
-    console.error('Erro ao buscar itens de monitoramento:', error);
-    toast({
-      title: "Erro ao carregar dados",
-      description: "Usando dados locais como fallback.",
-      variant: "destructive"
-    });
-    return mockMonitoringItems; // Fallback para dados mockados em caso de erro
+// Mock data para monitoramento de releases
+const mockReleaseMonitoring: ReleaseMonitoringItem[] = [
+  {
+    id: "1",
+    releaseTitle: "Lançamento da Nova Plataforma de Dados",
+    publishedDate: "2025-03-20",
+    publishedTime: "14:30",
+    websiteName: "Portal de Notícias Tech",
+    url: "https://tech-news.exemplo.com/nova-plataforma-dados",
+    isVerified: true,
+    title: "Nova Plataforma de Dados",
+    clientId: "client123",
+    clientType: "observatory",
+    clientName: "Observatório de Dados",
+    status: "published",
+    submittedDate: "2025-03-18",
+    approvedDate: "2025-03-19",
+    notes: "Release aprovado com destaque na homepage"
+  },
+  {
+    id: "2",
+    releaseTitle: "Resultados da Pesquisa sobre Clima",
+    publishedDate: "2025-03-15",
+    publishedTime: "09:45",
+    websiteName: "Jornal Ciência Hoje",
+    url: "https://ciencia-hoje.exemplo.com/pesquisa-clima",
+    isVerified: true,
+    title: "Pesquisa Climática",
+    clientId: "client456",
+    clientType: "researcher",
+    clientName: "Instituto de Pesquisas Climáticas",
+    status: "published",
+    submittedDate: "2025-03-12",
+    approvedDate: "2025-03-14",
+    notes: "Release publicado na editoria de meio ambiente"
+  },
+  {
+    id: "3",
+    releaseTitle: "Novo Relatório sobre Educação",
+    publishedDate: "2025-03-10",
+    publishedTime: "16:20",
+    websiteName: "Portal Educação",
+    url: "https://educacao.exemplo.com/relatorio-educacao",
+    isVerified: false,
+    title: "Relatório Educacional",
+    clientId: "client789",
+    clientType: "institution",
+    clientName: "Fundação Educacional",
+    status: "pending",
+    submittedDate: "2025-03-08",
+    notes: "Release enviado, aguardando publicação"
+  }
+];
+
+// Função mock para buscar itens de monitoramento
+export const fetchMonitoringItemsFromDB = async (): Promise<MonitoringItem[]> => {
+  // Simulando tempo de carregamento
+  await new Promise(resolve => setTimeout(resolve, 800));
+  return [...mockMonitoringItems];
+};
+
+// Função mock para adicionar um novo item de monitoramento
+export const addMonitoringItemToDB = async (data: Omit<MonitoringItem, "id">): Promise<MonitoringItem> => {
+  // Simulando tempo de carregamento
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  const newItem: MonitoringItem = {
+    id: `${Date.now()}`, // ID simulado
+    ...data
+  };
+  
+  mockMonitoringItems.push(newItem);
+  return newItem;
+};
+
+// Função mock para deletar um item de monitoramento
+export const deleteMonitoringItemFromDB = async (id: string): Promise<void> => {
+  // Simulando tempo de carregamento
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  const index = mockMonitoringItems.findIndex(item => item.id === id);
+  if (index !== -1) {
+    mockMonitoringItems.splice(index, 1);
   }
 };
 
-// Add a new monitoring item to Supabase or mock data
-export const addMonitoringItemToDB = async (data: Omit<MonitoringItem, "id">) => {
-  try {
-    // Se configurado para usar dados mockados, simula adição local
-    if (API_CONFIG.USE_MOCK_DATA) {
-      await simulateNetworkDelay();
-      console.log("Simulando adição de item de monitoramento:", data);
-      
-      // Não faz nada real, apenas simula sucesso
-      return {
-        success: true,
-        data: {
-          ...data,
-          id: `mock-${Date.now()}`
-        }
-      };
-    }
-
-    // Caso contrário, tenta adicionar ao Supabase
-    const { data: newItem, error } = await supabase
-      .from('monitoring_items')
-      .insert({
-        name: data.name,
-        url: data.url,
-        api_url: data.api_url || null,
-        frequency: data.frequency,
-        category: data.category,
-        keywords: data.keywords || null,
-        responsible: data.responsible || null,
-        notes: data.notes || null
-      })
-      .select()
-      .single();
-    
-    if (error) throw error;
-    
-    return {
-      success: true,
-      data: newItem
-    };
-  } catch (error) {
-    console.error('Erro ao adicionar item de monitoramento:', error);
-    toast({
-      title: "Erro ao salvar",
-      description: "Não foi possível salvar o monitoramento.",
-      variant: "destructive"
-    });
-    return {
-      success: false,
-      error
-    };
-  }
-};
-
-// Delete a monitoring item from Supabase or mock data
-export const deleteMonitoringItemFromDB = async (id: string) => {
-  try {
-    // Se configurado para usar dados mockados, simula deleção local
-    if (API_CONFIG.USE_MOCK_DATA) {
-      await simulateNetworkDelay();
-      console.log("Simulando deleção de item de monitoramento:", id);
-      
-      // Não faz nada real, apenas simula sucesso
-      return {
-        success: true
-      };
-    }
-
-    // Caso contrário, tenta deletar do Supabase
-    const { error } = await supabase
-      .from('monitoring_items')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
-    
-    return {
-      success: true
-    };
-  } catch (error) {
-    console.error('Erro ao deletar item de monitoramento:', error);
-    toast({
-      title: "Erro ao deletar",
-      description: "Não foi possível remover o monitoramento.",
-      variant: "destructive"
-    });
-    return {
-      success: false,
-      error
-    };
-  }
-};
-
-// Simulate fetching legislation alerts (mock data for now)
+// Função mock para buscar alertas de legislação
 export const fetchLegislationAlertsFromDB = (): LegislationAlert[] => {
-  // Dados mockados para exemplo
-  return [
-    {
-      id: "1",
-      title: "Nova Lei de Proteção de Dados",
-      description: "Alterações na legislação de proteção de dados pessoais",
-      date: "2023-06-15",
-      source: "Diário Oficial",
-      impact: "alto",
-      status: "pendente"
-    },
-    {
-      id: "2",
-      title: "Regulamentação do Setor Financeiro",
-      description: "Novas regras para instituições financeiras",
-      date: "2023-05-22",
-      source: "Banco Central",
-      impact: "médio",
-      status: "analisado"
-    },
-    {
-      id: "3",
-      title: "Mudanças na Tributação",
-      description: "Alterações nas alíquotas de impostos para 2023",
-      date: "2023-04-10",
-      source: "Receita Federal",
-      impact: "alto",
-      status: "implementado"
-    }
-  ];
+  return [...mockLegislationAlerts];
 };
 
-// Fetch release monitoring results (mock data for now)
+// Função mock para buscar monitoramento de releases
 export const fetchReleaseMonitoringFromDB = (): ReleaseMonitoringItem[] => {
-  // Dados mockados para exemplo
-  return [
-    {
-      id: "1",
-      title: "Lançamento do Novo Produto",
-      date: "2023-06-01",
-      coverage: 85,
-      sentiment: "positivo",
-      sources: ["Portal de Notícias", "Blog Especializado", "Redes Sociais"],
-      highlights: [
-        "Inovação destacada por especialistas",
-        "Recepção positiva do público"
-      ]
+  return [...mockReleaseMonitoring];
+};
+
+export const mockSupabaseClient = {
+  auth: {
+    getSession: () => ({ data: { session: null }, error: null }),
+    signInWithPassword: async ({ email, password }: { email: string, password: string }) => {
+      if (email === "admin@koga.com" && password === "admin123") {
+        return { data: { user: { id: "1", email: "admin@koga.com" } }, error: null };
+      }
+      return { data: { user: null }, error: { message: "Invalid login credentials" } };
     },
-    {
-      id: "2",
-      title: "Expansão Internacional",
-      date: "2023-05-15",
-      coverage: 92,
-      sentiment: "muito positivo",
-      sources: ["Mídia Internacional", "Portais de Negócios", "Imprensa Local"],
-      highlights: [
-        "Destaque para o potencial de crescimento",
-        "Análise favorável do mercado"
-      ]
-    },
-    {
-      id: "3",
-      title: "Parceria Estratégica",
-      date: "2023-04-22",
-      coverage: 78,
-      sentiment: "neutro",
-      sources: ["Portais de Negócios", "Blogs Especializados"],
-      highlights: [
-        "Análise dos potenciais benefícios",
-        "Questionamentos sobre impacto no mercado"
-      ]
-    }
-  ];
+    signOut: () => ({ error: null })
+  },
+  from: () => ({
+    select: () => ({
+      eq: () => ({
+        single: () => ({ data: null, error: null })
+      }),
+      order: () => ({
+        data: [],
+        error: null
+      })
+    }),
+    insert: () => ({ data: { id: "new-id" }, error: null }),
+    delete: () => ({ data: {}, error: null })
+  })
 };
