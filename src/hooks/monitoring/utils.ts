@@ -1,6 +1,34 @@
 
 import { MonitoringItem } from "./types";
-import { convertToCSV } from "@/components/dashboard/DashboardUtils";
+
+// Função para converter dados para CSV
+export const convertToCSV = <T extends Record<string, any>>(data: T[]): string => {
+  if (!data || data.length === 0) return '';
+  
+  // Extrair cabeçalhos (chaves do primeiro objeto)
+  const headers = Object.keys(data[0]);
+  
+  // Criar linha de cabeçalho
+  const headerLine = headers.join(',');
+  
+  // Criar linhas de dados
+  const dataLines = data.map(item => {
+    return headers.map(header => {
+      // Tratamento especial para arrays e objetos
+      const value = item[header];
+      if (Array.isArray(value)) {
+        return `"${value.join('; ')}"`;
+      } else if (typeof value === 'object' && value !== null) {
+        return `"${JSON.stringify(value).replace(/"/g, '""')}"`;
+      }
+      // Escape de strings com aspas
+      return typeof value === 'string' ? `"${value.replace(/"/g, '""')}"` : value;
+    }).join(',');
+  });
+  
+  // Combinar tudo
+  return [headerLine, ...dataLines].join('\n');
+};
 
 export const exportMonitoringData = (items: MonitoringItem[], format: 'csv' | 'json' = 'csv'): string => {
   if (format === 'json') {

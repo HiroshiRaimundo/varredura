@@ -6,7 +6,7 @@ export interface MonitoringItem {
   url: string;
   frequency: "hourly" | "daily" | "weekly" | "monthly";
   category: string;
-  keywords: string;
+  keywords: string; // Definido como string para manter consistência
   responsible: string;
   notes: string;
   status: string;

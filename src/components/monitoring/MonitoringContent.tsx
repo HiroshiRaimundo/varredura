@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { MonitoringItem } from '@/hooks/monitoring/types';
 
@@ -14,10 +15,10 @@ const MonitoringContent: React.FC<{
     // Convertendo uma string separada por vírgulas para um array de strings
     const keywordsArray = value.split(',').map(k => k.trim()).filter(k => k !== '');
     
-    // Atualizamos o estado monitoringData com o novo array de keywords
+    // Atualizamos o estado monitoringData com o novo valor de keywords como string
     setMonitoringData(prev => ({
       ...prev,
-      keywords: keywordsArray // Agora armazenamos como array, não como string
+      keywords: keywordsArray.join(', ') // Convertemos array para string
     }));
   };
 
@@ -25,27 +26,37 @@ const MonitoringContent: React.FC<{
   const addKeyword = (keyword: string) => {
     if (!keyword.trim()) return;
     
-    setMonitoringData(prev => ({
-      ...prev,
-      keywords: [...(Array.isArray(prev.keywords) ? prev.keywords : []), keyword.trim()]
-    }));
+    setMonitoringData(prev => {
+      // Garantimos que keywords é uma string, mesmo que venha como array
+      const currentKeywords = typeof prev.keywords === 'string' 
+        ? prev.keywords.split(',').map(k => k.trim()).filter(k => k !== '')
+        : Array.isArray(prev.keywords) ? prev.keywords : [];
+      
+      // Adicionamos a nova keyword e convertemos de volta para string
+      const updatedKeywords = [...currentKeywords, keyword.trim()].join(', ');
+      
+      return {
+        ...prev,
+        keywords: updatedKeywords
+      };
+    });
   };
 
   // Garantir que quando carregamos um monitoramento existente para editar,
   // tratamos as keywords corretamente:
   useEffect(() => {
     if (monitoringToEdit) {
-      // Garantindo que keywords seja sempre um array
-      let keywords = monitoringToEdit.keywords || [];
+      // Garantimos que keywords seja sempre uma string
+      let keywords = monitoringToEdit.keywords || '';
       
-      // Se por algum motivo vier uma string, convertemos para array
-      if (typeof keywords === 'string') {
-        keywords = (keywords as unknown as string).split(',').map(k => k.trim()).filter(k => k !== '');
+      // Se por algum motivo vier um array, convertemos para string
+      if (Array.isArray(keywords)) {
+        keywords = keywords.join(', ');
       }
       
       setMonitoringData({
         ...monitoringToEdit,
-        keywords: keywords
+        keywords
       });
     }
   }, [monitoringToEdit, setMonitoringData]);
