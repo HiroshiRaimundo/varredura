@@ -38,6 +38,7 @@ const mockReleases: Release[] = [
     title: "Parceria estratégica com fornecedores",
     date: "2025-03-25",
     status: "rejected",
+    category: "partnership",
     feedback: "Faltam informações sobre os termos da parceria. Por favor, revise e reenvie."
   },
   {

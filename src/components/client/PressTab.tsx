@@ -1,6 +1,6 @@
 
 import React from "react";
-import { ClientType } from "./ClientTypes";
+import { ClientType } from "@/types/clientTypes";
 
 interface PressTabProps {
   clientType: ClientType;
