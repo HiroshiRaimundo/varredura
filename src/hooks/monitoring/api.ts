@@ -1,4 +1,3 @@
-
 import { MonitoringItem, LegislationAlert, ReleaseMonitoringItem } from './types';
 
 // Dados mockados para monitoramento
@@ -70,17 +69,27 @@ const mockLegislationAlerts: LegislationAlert[] = [
 const mockReleaseMonitoring: ReleaseMonitoringItem[] = [
   {
     id: '1',
+    releaseId: 'rel-001',
+    releaseTitle: 'Comunicado sobre Novas Políticas Ambientais',
     title: 'Comunicado sobre Novas Políticas Ambientais',
     date: '2023-05-05',
     media: ['G1', 'Folha de São Paulo', 'O Globo'],
-    status: 'published'
+    status: 'published',
+    websiteName: 'G1',
+    publishedDate: '2023-05-05',
+    publishedTime: '10:30'
   },
   {
     id: '2',
+    releaseId: 'rel-002',
+    releaseTitle: 'Lançamento de Programa de Conservação',
     title: 'Lançamento de Programa de Conservação',
     date: '2023-05-02',
     media: ['Estadão', 'UOL'],
-    status: 'pending'
+    status: 'pending',
+    websiteName: 'Estadão',
+    publishedDate: '2023-05-02',
+    publishedTime: '14:45'
   }
 ];
 

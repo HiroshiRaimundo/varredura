@@ -7,6 +7,7 @@ import { ReleaseMonitoringItem } from "@/hooks/monitoring/types";
 const mockReleases: ReleaseMonitoringItem[] = [
   {
     id: "1",
+    releaseId: "rel-001",
     title: "Nova política ambiental para a Amazônia",
     date: "2023-04-15",
     media: ["Portal Ambiental"],
@@ -20,6 +21,7 @@ const mockReleases: ReleaseMonitoringItem[] = [
   },
   {
     id: "2",
+    releaseId: "rel-002",
     title: "Relatório sobre desmatamento na região Norte",
     date: "2023-04-12",
     media: ["Jornal do Meio Ambiente"],
@@ -33,6 +35,7 @@ const mockReleases: ReleaseMonitoringItem[] = [
   },
   {
     id: "3",
+    releaseId: "rel-003",
     title: "Novas diretrizes para preservação da floresta",
     date: "2023-04-10",
     media: ["Blog Amazônia Sustentável"],
