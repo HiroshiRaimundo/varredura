@@ -26,21 +26,15 @@ const AdminSidebar: React.FC = () => {
       path: "/admin"
     },
     {
-      title: "Monitoramento",
-      icon: <Activity className="h-4 w-4" />,
-      path: "/admin/monitoring",
-      description: "Central de monitoramento do sistema"
-    },
-    {
       title: "Gerenciar Clientes",
       icon: <UserPlus className="h-4 w-4" />,
       path: "/admin/clients"
     },
     {
-      title: "Visualizar Clientes",
+      title: "Visualizar Cliente",
       icon: <Eye className="h-4 w-4" />,
       path: "/example-client",
-      description: "Visualizar a interface dos clientes para suporte"
+      description: "Visualizar a interface padrão do cliente para suporte"
     },
     {
       title: "Contatos de Mídia",
