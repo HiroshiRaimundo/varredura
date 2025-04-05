@@ -88,7 +88,7 @@ const ClientContent: React.FC<ClientContentProps> = ({ clientType }) => {
         
         {clientType === "press" && (
           <TabsContent value="releases" className="mt-0">
-            <PressTab clientType={clientType} />
+            <PressTab clientType={clientType.toString()} />
           </TabsContent>
         )}
         
