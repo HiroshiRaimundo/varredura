@@ -1,10 +1,6 @@
 
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { FileText, ExternalLink } from "lucide-react";
-import { ReleaseMonitoringItem } from "@/hooks/monitoring/types";
+import { ReleaseMonitoringItem } from '@/hooks/monitoring/types';
 
 interface PublishedReleasesTabProps {
   releases: ReleaseMonitoringItem[];
@@ -12,61 +8,29 @@ interface PublishedReleasesTabProps {
 
 const PublishedReleasesTab: React.FC<PublishedReleasesTabProps> = ({ releases }) => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Releases Publicados</CardTitle>
-        <CardDescription>Todos os releases que foram publicados em veículos de mídia</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {releases.length > 0 ? (
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Título</TableHead>
-                  <TableHead>Veículo</TableHead>
-                  <TableHead>Data</TableHead>
-                  <TableHead>Hora</TableHead>
-                  <TableHead className="text-right">Link</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {releases.map((release) => (
-                  <TableRow key={release.id}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-muted-foreground" />
-                        {release.releaseTitle}
-                      </div>
-                    </TableCell>
-                    <TableCell>{release.websiteName}</TableCell>
-                    <TableCell>{release.publishedDate}</TableCell>
-                    <TableCell>{release.publishedTime}</TableCell>
-                    <TableCell className="text-right">
-                      {release.url && (
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => window.open(release.url, '_blank')}
-                          className="h-8 w-8 p-0"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                          <span className="sr-only">Abrir link</span>
-                        </Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+    <div>
+      <h3 className="text-lg font-medium mb-4">Releases Publicados</h3>
+      <div className="space-y-4">
+        {releases.length === 0 ? (
+          <p className="text-muted-foreground">Não há releases publicados para mostrar.</p>
         ) : (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">Nenhum release publicado encontrado.</p>
-          </div>
+          releases.map(release => (
+            <div key={release.id} className="bg-background rounded-md p-3 border">
+              <h3 className="font-medium">{release.releaseTitle}</h3>
+              <div className="text-sm text-muted-foreground mt-1">
+                <p>Publicado em: {release.websiteName}</p>
+                <p>Data: {release.publishedDate} às {release.publishedTime}</p>
+                {release.url && (
+                  <a href={release.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    Ver publicação
+                  </a>
+                )}
+              </div>
+            </div>
+          ))
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
