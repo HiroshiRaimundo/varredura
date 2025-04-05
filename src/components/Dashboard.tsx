@@ -1,6 +1,6 @@
 
 import React, { useMemo } from "react";
-import { MonitoringItem } from "@/hooks/useMonitoring";
+import { MonitoringItem } from "@/hooks/monitoring/types";
 import AnalysisTools from "./AnalysisTools";
 import DashboardControls from "./dashboard/DashboardControls";
 import { DashboardChartsGrid } from "./dashboard/DashboardChartsGrid";
@@ -45,6 +45,8 @@ const Dashboard: React.FC<DashboardProps> = ({
   
   // Preparar dados para gráficos adicionais baseados nos monitoringItems
   const categoryData = useMemo(() => getCategoryData(monitoringItems), [monitoringItems]);
+  
+  // Garantir que o formato de dados retornado corresponda ao esperado pelos componentes
   const frequencyData = useMemo(() => getFrequencyData(monitoringItems), [monitoringItems]);
   const responsibleData = useMemo(() => getResponsibleData(monitoringItems), [monitoringItems]);
   const radarData = useMemo(() => getRadarData(monitoringItems), [monitoringItems]);

@@ -85,9 +85,10 @@ export const getFrequencyData = (items: MonitoringItem[]) => {
     }
   });
   
+  // Retornar no formato esperado pelos componentes de frequência
   return Object.keys(frequencies).map(key => ({
-    name: getFrequencyLabel(key),
-    value: frequencies[key as keyof typeof frequencies]
+    frequency: getFrequencyLabel(key),
+    quantidade: frequencies[key as keyof typeof frequencies]
   }));
 };
 
@@ -102,9 +103,10 @@ export const getResponsibleData = (items: MonitoringItem[]) => {
     }
   });
   
+  // Retornar no formato esperado pelo componente ResponsibleData
   return Object.keys(responsibles).map(name => ({
-    name,
-    value: responsibles[name]
+    responsible: name,
+    monitoramentos: responsibles[name]
   }));
 };
 
@@ -123,31 +125,32 @@ export const getRadarData = (items: MonitoringItem[]) => {
     }
   });
   
+  // Criar dados de categoria para o gráfico radar
   const categoryData = Object.keys(categoryCount).map(category => ({
     subject: category,
     A: categoryCount[category],
     fullMark: Math.max(...Object.values(categoryCount)) + 2
   }));
   
-  const frequencyData = Object.keys(frequencyCount).map(frequency => ({
-    subject: frequency,
-    B: frequencyCount[frequency],
-    fullMark: Math.max(...Object.values(frequencyCount)) + 2
-  }));
-  
-  return [...categoryData, ...frequencyData];
+  // Removendo o tipo B para evitar conflitos de tipo
+  return categoryData;
 };
 
-export const generateTrendData = (days = 30) => {
+// Função para gerar dados de tendência, agora com argumento items opcional
+export const generateTrendData = (items?: MonitoringItem[], timeRange: string = "mensal") => {
   const data = [];
   const today = new Date();
+  const days = timeRange === "diario" ? 7 
+             : timeRange === "semanal" ? 14 
+             : timeRange === "mensal" ? 30 
+             : 365;
   
   for (let i = days; i >= 0; i--) {
     const date = new Date();
     date.setDate(today.getDate() - i);
     
     data.push({
-      date: date.toISOString().split('T')[0],
+      name: date.toISOString().split('T')[0],
       monitoramentos: Math.floor(Math.random() * 10) + 5,
       alertas: Math.floor(Math.random() * 5) + 1
     });

@@ -1,6 +1,6 @@
 
 import React, { useMemo } from "react";
-import { MonitoringItem } from "@/hooks/useMonitoring";
+import { MonitoringItem } from "@/hooks/monitoring/types";
 import { 
   getCategoryData, 
   getFrequencyData, 
