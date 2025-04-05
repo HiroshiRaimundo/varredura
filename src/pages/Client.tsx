@@ -22,8 +22,8 @@ const ServicePricing: React.FC = () => {
     navigate("/payment", { state: { planType } });
   };
 
-  const handleExampleClientClick = () => {
-    navigate("/example-client");
+  const handleClientDashboardClick = () => {
+    navigate("/dashboard");
   };
 
   const pricingPlans = [
@@ -104,10 +104,10 @@ const ServicePricing: React.FC = () => {
             </p>
             <div className="mt-4">
               <Button 
-                onClick={handleExampleClientClick}
+                onClick={handleClientDashboardClick}
                 className="bg-amber-600 hover:bg-amber-700"
               >
-                Ver exemplo da área do cliente
+                Acessar dashboard do cliente
               </Button>
             </div>
           </div>

@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import PrivateRoute from '@/components/PrivateRoute';
@@ -8,10 +7,9 @@ import Admin from '@/pages/Admin';
 import ClientManagement from '@/pages/admin/ClientManagement';
 import ContentManagement from '@/pages/admin/ContentManagement';
 import MediaContactsManagement from '@/pages/admin/MediaContactsManagement';
-import { AdminMonitoringDashboard } from '@/components/admin/monitoring/AdminMonitoringDashboard';
 
 // Client pages
-import ExampleClient from '@/pages/ExampleClient';
+import ClientDashboard from '@/pages/ClientDashboard';
 
 // Other pages
 import Index from '@/pages/Index';
@@ -37,12 +35,12 @@ function App() {
           <Route path="/client" element={<Client />} />
           <Route path="/payment" element={<Payment />} />
           
-          {/* Rota de exemplo para todos os tipos de cliente */}
+          {/* Área do cliente (antiga example-client) */}
           <Route 
-            path="/example-client" 
+            path="/dashboard" 
             element={
               <PrivateRoute>
-                <ExampleClient />
+                <ClientDashboard />
               </PrivateRoute>
             } 
           />
@@ -60,26 +58,6 @@ function App() {
             }
           />
           
-          {/* Rota para monitoramento (mantida mas acessível apenas via exemplo) */}
-          <Route
-            path="/admin/monitoring/*"
-            element={
-              <PrivateRoute>
-                <AdminMonitoringDashboard />
-              </PrivateRoute>
-            }
-          />
-
-          {/* Rota para análise e relatórios */}
-          <Route
-            path="/admin/analytics"
-            element={
-              <PrivateRoute>
-                <Admin />
-              </PrivateRoute>
-            }
-          />
-
           <Route
             path="/admin/clients"
             element={

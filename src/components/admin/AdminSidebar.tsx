@@ -8,8 +8,7 @@ import {
   LogOut,
   UserPlus,
   BarChart2,
-  Eye,
-  Activity
+  Mail
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -31,14 +30,8 @@ const AdminSidebar: React.FC = () => {
       path: "/admin/clients"
     },
     {
-      title: "Visualizar Cliente",
-      icon: <Eye className="h-4 w-4" />,
-      path: "/example-client",
-      description: "Visualizar a interface padrão do cliente para suporte"
-    },
-    {
       title: "Contatos de Mídia",
-      icon: <Users className="h-4 w-4" />,
+      icon: <Mail className="h-4 w-4" />,
       path: "/admin/contacts"
     },
     {
@@ -69,11 +62,6 @@ const AdminSidebar: React.FC = () => {
           >
             {item.icon}
             <span className="ml-2">{item.title}</span>
-            {item.description && (
-              <div className="absolute left-full ml-2 p-2 bg-black text-white text-xs rounded hidden group-hover:block w-48">
-                {item.description}
-              </div>
-            )}
           </Button>
         ))}
       </nav>
