@@ -89,7 +89,7 @@ const ReleaseTable: React.FC<ReleaseTableProps> = ({ releases }) => (
             <span>Visualizações: {release.views}</span>
           </div>
         </div>
-        <Badge variant={release.published ? "success" : "outline"}>
+        <Badge variant={release.published ? "default" : "outline"}>
           {release.published ? "Publicado" : release.status}
         </Badge>
       </div>
