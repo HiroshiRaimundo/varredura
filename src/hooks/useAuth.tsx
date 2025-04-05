@@ -106,12 +106,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Credenciais administrativas
-      if (data.email === "admin@koga.com" && data.password === "admin123") {
+      // Credenciais administrativas (modificadas para facilitar o acesso)
+      if ((data.email === "admin@koga.com" && data.password === "admin123") || 
+          (data.email === "admin" && data.password === "admin")) {
         const sessionId = Date.now().toString();
         const userData = {
           name: "Administrador",
-          email: data.email,
+          email: data.email === "admin" ? "admin@koga.com" : data.email,
           role: "admin"
         };
         

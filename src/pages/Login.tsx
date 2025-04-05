@@ -6,11 +6,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, EyeOff, LogIn, Loader2 } from "lucide-react";
+import { Eye, EyeOff, LogIn, Loader2, Info } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { toast } from "@/components/ui/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -34,6 +35,11 @@ const Login: React.FC = () => {
     }
   };
 
+  const fillAdminCredentials = () => {
+    auth.form.setValue("email", "admin");
+    auth.form.setValue("password", "admin");
+  };
+
   return (
     <div className="min-h-screen bg-background p-6 flex flex-col">
       <div className="max-w-7xl mx-auto space-y-6 flex-1">
@@ -52,7 +58,24 @@ const Login: React.FC = () => {
               </CardDescription>
             </CardHeader>
             
-            <CardContent>
+            <CardContent className="space-y-4">
+              <Alert className="bg-blue-50 border-blue-200">
+                <Info className="h-4 w-4 text-blue-500" />
+                <AlertDescription className="text-blue-700">
+                  Use <strong>admin</strong> / <strong>admin</strong> para acesso rápido ou 
+                  <strong> admin@koga.com</strong> / <strong>admin123</strong> para login completo.
+                </AlertDescription>
+              </Alert>
+
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full text-sm" 
+                onClick={fillAdminCredentials}
+              >
+                Preencher com credenciais de administrador
+              </Button>
+              
               <Form {...auth.form}>
                 <form onSubmit={auth.form.handleSubmit(handleSubmit)} className="space-y-4">
                   <FormField
@@ -61,9 +84,9 @@ const Login: React.FC = () => {
                     rules={{ required: "Email é obrigatório" }}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>Email ou usuário</FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="admin@koga.com" {...field} />
+                          <Input type="text" placeholder="admin" {...field} />
                         </FormControl>
                       </FormItem>
                     )}
@@ -80,7 +103,7 @@ const Login: React.FC = () => {
                           <div className="relative">
                             <Input 
                               type={showPassword ? "text" : "password"} 
-                              placeholder="••••••••"
+                              placeholder="admin"
                               {...field} 
                             />
                             <div 
