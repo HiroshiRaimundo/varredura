@@ -22,6 +22,7 @@ import ServiceLanding from '@/pages/ServiceLanding';
 import Client from '@/pages/Client';
 import Payment from '@/pages/Payment';
 import Unauthorized from '@/pages/Unauthorized';
+import ExampleClient from '@/pages/ExampleClient';
 
 function App() {
   return (
@@ -40,7 +41,17 @@ function App() {
           <Route path="/client" element={<Client />} />
           <Route path="/payment" element={<Payment />} />
           
-          {/* Área do cliente (antiga example-client) */}
+          {/* Rota de demonstração */}
+          <Route 
+            path="/example-client" 
+            element={
+              <PrivateRoute>
+                <ExampleClient />
+              </PrivateRoute>
+            } 
+          />
+          
+          {/* Área do cliente */}
           <Route 
             path="/dashboard" 
             element={

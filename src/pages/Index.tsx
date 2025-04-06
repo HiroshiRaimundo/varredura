@@ -9,16 +9,17 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import LoginDialog from "@/components/LoginDialog";
 
 const Index: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const auth = useAuth();
 
   return (
     <div className="min-h-screen bg-background">
       <Header 
-        isAuthenticated={isAuthenticated} 
-        onLoginClick={() => {}} 
-        onLogoutClick={() => {}} 
+        isAuthenticated={auth.isAuthenticated} 
+        onLoginClick={() => auth.setIsLoginDialogOpen(true)} 
+        onLogoutClick={auth.handleLogout} 
       />
       <main>
         <HeroSection />
@@ -27,6 +28,16 @@ const Index: React.FC = () => {
         <CTASection />
       </main>
       <Footer />
+      
+      {/* Login Dialog */}
+      {auth.isLoginDialogOpen && (
+        <LoginDialog 
+          isOpen={auth.isLoginDialogOpen}
+          onOpenChange={auth.setIsLoginDialogOpen}
+          form={auth.form}
+          onSubmit={auth.handleLogin}
+        />
+      )}
     </div>
   );
 };

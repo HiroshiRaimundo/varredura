@@ -87,13 +87,6 @@ const Header = ({
               >
                 Início
               </Button>
-              
-              <Button
-                variant="ghost"
-                onClick={() => navigate("/help")}
-              >
-                Ajuda
-              </Button>
             </>
           )}
           

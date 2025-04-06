@@ -3,9 +3,19 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BarChart2, CheckCircle, Eye, Search, Shield, Leaf } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const HeroSection: React.FC = () => {
   const navigate = useNavigate();
+  const auth = useAuth();
+
+  const handleDemoClick = () => {
+    if (!auth.isAuthenticated) {
+      auth.setIsLoginDialogOpen(true);
+    } else {
+      navigate("/example-client");
+    }
+  };
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900">
@@ -38,7 +48,7 @@ const HeroSection: React.FC = () => {
               
               <div className="flex flex-col sm:flex-row gap-4 mb-10">
                 <Button 
-                  onClick={() => navigate("/example-client")}
+                  onClick={handleDemoClick}
                   className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 py-6 h-auto text-lg rounded-xl hover:shadow-lg hover:shadow-blue-500/20 transition-all"
                 >
                   Ver Demonstração <ArrowRight className="ml-2 h-5 w-5" />
@@ -136,7 +146,7 @@ const HeroSection: React.FC = () => {
                     <Button 
                       variant="outline" 
                       className="text-blue-400 border-blue-400/30 hover:bg-blue-400/10 w-full"
-                      onClick={() => navigate("/example-client")}
+                      onClick={handleDemoClick}
                     >
                       Explorar Demo Interativa
                     </Button>

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/hooks/auth';
+import { useAuth } from '@/hooks/useAuth';
 
 interface PrivateRouteProps {
   children: React.ReactNode;
@@ -15,12 +15,14 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
   const { isAuthenticated, user } = useAuth();
   const location = useLocation();
 
+  // Verificar se o usuário está autenticado
   if (!isAuthenticated) {
-    // Redireciona para o login se não estiver autenticado
-    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+    // Se o usuário está tentando acessar uma rota protegida, abra o modal de login
+    const redirectTo = `/client-login?from=${encodeURIComponent(location.pathname)}`;
+    return <Navigate to={redirectTo} replace />;
   }
 
-  // Se houver um papel requerido e o usuário não tiver esse papel
+  // Verificar se o usuário tem a role necessária (se especificada)
   if (requiredRole && user?.role !== requiredRole) {
     return <Navigate to="/unauthorized" replace />;
   }
