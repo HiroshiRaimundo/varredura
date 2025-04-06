@@ -33,3 +33,6 @@ export interface WorkspaceAction {
   ipAddress?: string;
   userAgent?: string;
 }
+
+// Define service types for client type categorization
+export type ServiceType = 'institution' | 'politician' | 'researcher' | 'journalist' | 'observatory' | 'press';

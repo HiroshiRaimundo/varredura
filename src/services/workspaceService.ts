@@ -90,6 +90,11 @@ const logWorkspaceAction = (
 };
 
 export const workspaceService = {
+  // Get all workspaces
+  getAllWorkspaces: async (): Promise<Workspace[]> => {
+    return workspaces;
+  },
+  
   // Create a new workspace for a user
   createWorkspace: async (userId: string, initialConfig?: Partial<WorkspaceConfig>): Promise<Workspace> => {
     const existingWorkspace = workspaces.find(w => w.userId === userId);
