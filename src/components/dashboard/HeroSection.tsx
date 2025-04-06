@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BarChart2, CheckCircle, Eye, Search, Shield, Leaf } from "lucide-react";
@@ -147,7 +148,7 @@ const HeroSection: React.FC = () => {
                       className="text-blue-400 border-blue-400/30 hover:bg-blue-400/10 w-full"
                       onClick={handleDemoClick}
                     >
-                      Explorar Demo Interativa
+                      Conhecer PLATAFORMA
                     </Button>
                   </div>
                 </div>
