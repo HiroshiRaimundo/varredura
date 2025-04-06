@@ -8,11 +8,31 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff, LogIn, Loader2 } from "lucide-react";
+import { Eye, EyeOff, LogIn, Loader2, Mail, Github } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { ClientLoginFormValues } from "@/components/client-login/types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+// Lista de casos de sucesso para o banner dinâmico
+const successCases = [
+  {
+    organization: "Instituto Verde Amazônia",
+    result: "economizou 140 horas de análise manual"
+  },
+  {
+    organization: "Observatório Nacional",
+    result: "monitorou 5000 menções este mês"
+  },
+  {
+    organization: "Prefeitura de Belém",
+    result: "otimizou 60% do tempo de resposta à imprensa"
+  },
+  {
+    organization: "Secretaria de Comunicação",
+    result: "aumentou em 40% o alcance de seus releases"
+  }
+];
 
 const ClientLogin: React.FC = () => {
   const navigate = useNavigate();
@@ -20,6 +40,8 @@ const ClientLogin: React.FC = () => {
   const auth = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [activeTab, setActiveTab] = useState<'email' | 'sso'>('email');
+  const [successCaseIndex, setSuccessCaseIndex] = useState(0);
   
   // Get the redirect path from URL parameters or use a default
   const searchParams = new URLSearchParams(location.search);
@@ -37,6 +59,15 @@ const ClientLogin: React.FC = () => {
     setShowPassword(!showPassword);
   };
 
+  // Troca o caso de sucesso a cada 5 segundos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSuccessCaseIndex((prevIndex) => (prevIndex + 1) % successCases.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const handleClientLogin = async (data: ClientLoginFormValues) => {
     try {
       // Simulando login com as credenciais de cliente para esta demo
@@ -52,6 +83,12 @@ const ClientLogin: React.FC = () => {
     } catch (error) {
       console.error("Erro no login:", error);
     }
+  };
+
+  const handleSSOLogin = (provider: string) => {
+    console.log(`Iniciando login com provedor SSO: ${provider}`);
+    // Aqui seria implementada a lógica de autenticação SSO
+    // Por enquanto, apenas exibimos uma mensagem de log
   };
 
   return (
@@ -75,10 +112,11 @@ const ClientLogin: React.FC = () => {
               </p>
             </div>
             
-            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
+            {/* Banner dinâmico com casos de sucesso */}
+            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg transition-all duration-500 ease-in-out">
               <h3 className="text-lg font-medium mb-2">História de Sucesso</h3>
-              <h4 className="font-bold">Instituto Verde Amazônia</h4>
-              <p className="text-blue-100 text-sm">economizou 140 horas de análise manual</p>
+              <h4 className="font-bold">{successCases[successCaseIndex].organization}</h4>
+              <p className="text-blue-100 text-sm">{successCases[successCaseIndex].result}</p>
             </div>
           </div>
           
@@ -89,99 +127,156 @@ const ClientLogin: React.FC = () => {
             </div>
             
             <div className="flex justify-center gap-2 mb-6">
-              <Button variant="outline" className="w-1/2">Email e Senha</Button>
-              <Button variant="outline" className="w-1/2">Login com SSO</Button>
+              <Button 
+                variant={activeTab === 'email' ? "default" : "outline"} 
+                className="w-1/2"
+                onClick={() => setActiveTab('email')}
+              >
+                Email e Senha
+              </Button>
+              <Button 
+                variant={activeTab === 'sso' ? "default" : "outline"} 
+                className="w-1/2"
+                onClick={() => setActiveTab('sso')}
+              >
+                Login com SSO
+              </Button>
             </div>
             
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleClientLogin)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  rules={{ required: "Email é obrigatório" }}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email corporativo</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="email" 
-                          placeholder="seu.email@empresa.com" 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="password"
-                  rules={{ required: "Senha é obrigatória" }}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Senha</FormLabel>
-                      <FormControl>
-                        <div className="relative">
+            {activeTab === 'email' ? (
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(handleClientLogin)} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    rules={{ required: "Email é obrigatório" }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email corporativo</FormLabel>
+                        <FormControl>
                           <Input 
-                            type={showPassword ? "text" : "password"} 
-                            placeholder="••••••••"
+                            type="email" 
+                            placeholder="seu.email@empresa.com" 
                             {...field} 
                           />
-                          <div 
-                            className="absolute right-0 top-0 h-full flex items-center pr-3 cursor-pointer"
-                            onClick={togglePasswordVisibility}
-                          >
-                            {showPassword ? 
-                              <EyeOff size={18} className="text-muted-foreground" /> : 
-                              <Eye size={18} className="text-muted-foreground" />
-                            }
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    rules={{ required: "Senha é obrigatória" }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Senha</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Input 
+                              type={showPassword ? "text" : "password"} 
+                              placeholder="••••••••"
+                              {...field} 
+                            />
+                            <div 
+                              className="absolute right-0 top-0 h-full flex items-center pr-3 cursor-pointer"
+                              onClick={togglePasswordVisibility}
+                            >
+                              {showPassword ? 
+                                <EyeOff size={18} className="text-muted-foreground" /> : 
+                                <Eye size={18} className="text-muted-foreground" />
+                              }
+                            </div>
                           </div>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="rememberMe" 
-                      checked={rememberMe}
-                      onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                    />
-                    <label
-                      htmlFor="rememberMe"
-                      className="text-sm font-medium leading-none text-gray-500"
-                    >
-                      Lembrar-me
-                    </label>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="rememberMe" 
+                        checked={rememberMe}
+                        onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                      />
+                      <label
+                        htmlFor="rememberMe"
+                        className="text-sm font-medium leading-none text-gray-500"
+                      >
+                        Lembrar-me
+                      </label>
+                    </div>
+                    <a href="#" className="text-sm text-blue-600 hover:underline">
+                      Esqueceu a senha?
+                    </a>
                   </div>
-                  <a href="#" className="text-sm text-blue-600 hover:underline">
-                    Esqueceu a senha?
-                  </a>
-                </div>
 
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-blue-600 hover:bg-blue-700" 
+                    disabled={auth.isLoggingIn}
+                  >
+                    {auth.isLoggingIn ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Entrando...
+                      </>
+                    ) : (
+                      <>
+                        <LogIn className="mr-2 h-4 w-4" />
+                        Entrar
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </Form>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600 text-center mb-4">
+                  Escolha um dos provedores abaixo para fazer login com o seu email corporativo
+                </p>
+                
                 <Button 
-                  type="submit" 
-                  className="w-full bg-blue-600 hover:bg-blue-700" 
-                  disabled={auth.isLoggingIn}
+                  onClick={() => handleSSOLogin('google')}
+                  variant="outline" 
+                  className="w-full flex items-center justify-center gap-2 py-6"
                 >
-                  {auth.isLoggingIn ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Entrando...
-                    </>
-                  ) : (
-                    <>
-                      <LogIn className="mr-2 h-4 w-4" />
-                      Entrar
-                    </>
-                  )}
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className="h-5 w-5">
+                    <path fill="#EA4335" d="M5.26620003,9.76452941 C6.19878754,6.93863203 8.85444915,4.90909091 12,4.90909091 C13.6909091,4.90909091 15.2181818,5.50909091 16.4181818,6.49090909 L19.9090909,3 C17.7818182,1.14545455 15.0545455,0 12,0 C7.27006974,0 3.1977497,2.69829785 1.23999023,6.65002441 L5.26620003,9.76452941 Z"/>
+                    <path fill="#34A853" d="M16.0407269,18.0125889 C14.9509167,18.7163016 13.5660892,19.0909091 12,19.0909091 C8.86648613,19.0909091 6.21911939,17.076871 5.27698177,14.2678769 L1.23746264,17.3349879 C3.19279051,21.2970142 7.26500293,24 12,24 C14.9328362,24 17.7353462,22.9573905 19.834192,20.9995801 L16.0407269,18.0125889 Z"/>
+                    <path fill="#4A90E2" d="M19.834192,20.9995801 C22.0291676,18.9520994 23.4545455,15.903663 23.4545455,12 C23.4545455,11.2909091 23.3454545,10.5818182 23.1272727,9.90909091 L12,9.90909091 L12,14.7272727 L18.4363636,14.7272727 C18.1187732,16.2818291 17.2662994,17.5163575 16.0407269,18.0125889 L19.834192,20.9995801 Z"/>
+                    <path fill="#FBBC05" d="M5.27698177,14.2678769 C5.03832634,13.556323 4.90909091,12.7937589 4.90909091,12 C4.90909091,11.2182781 5.03443647,10.4668121 5.26620003,9.76452941 L1.23999023,6.65002441 C0.43658717,8.26043162 0,10.0753848 0,12 C0,13.9195484 0.444780743,15.7301709 1.23746264,17.3349879 L5.27698177,14.2678769 Z"/>
+                  </svg>
+                  Continuar com Google
                 </Button>
-              </form>
-            </Form>
+                
+                <Button 
+                  onClick={() => handleSSOLogin('microsoft')} 
+                  variant="outline" 
+                  className="w-full flex items-center justify-center gap-2 py-6"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21">
+                    <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
+                    <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
+                    <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
+                    <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+                  </svg>
+                  Continuar com Microsoft
+                </Button>
+                
+                <Button 
+                  onClick={() => handleSSOLogin('github')} 
+                  variant="outline" 
+                  className="w-full flex items-center justify-center gap-2 py-6"
+                >
+                  <Github className="h-5 w-5" />
+                  Continuar com GitHub
+                </Button>
+              </div>
+            )}
             
             <div className="mt-6 text-center text-sm text-gray-600 space-y-2">
               <p>Primeiro acesso? <a href="#" className="text-blue-600 hover:underline">Crie uma conta</a></p>
