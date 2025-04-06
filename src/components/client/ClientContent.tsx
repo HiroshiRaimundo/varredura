@@ -1,5 +1,4 @@
 
-// Corrigindo os dados simulados para incluir a propriedade source
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClientType } from "@/types/clientTypes";
@@ -9,6 +8,7 @@ import MonitoringTab from "@/components/client/monitoring/MonitoringTab";
 import ClientAlerts from "@/components/client/alerts/ClientAlerts";
 import PressTab from "@/components/client/press/PressTab";
 import AnalysisToolsSection from "@/components/client/tools/AnalysisToolsSection";
+import AnalysisTab from "@/components/client/analysis/AnalysisTab";
 import { getColorClasses } from "@/components/service/utils/colorUtils";
 
 // Dados simulados para alertas de legislação
@@ -61,6 +61,9 @@ const ClientContent: React.FC<ClientContentProps> = ({ clientType }) => {
           <TabsTrigger value="monitoring" className={`${activeTab === "monitoring" ? colorClasses.text + " border-b-2 " + colorClasses.border : ""}`}>
             Monitoramento
           </TabsTrigger>
+          <TabsTrigger value="analysis" className={`${activeTab === "analysis" ? colorClasses.text + " border-b-2 " + colorClasses.border : ""}`}>
+            Análise Avançada
+          </TabsTrigger>
           <TabsTrigger value="alerts" className={`${activeTab === "alerts" ? colorClasses.text + " border-b-2 " + colorClasses.border : ""}`}>
             Alertas
           </TabsTrigger>
@@ -80,6 +83,10 @@ const ClientContent: React.FC<ClientContentProps> = ({ clientType }) => {
         
         <TabsContent value="monitoring" className="mt-0">
           <MonitoringTab />
+        </TabsContent>
+        
+        <TabsContent value="analysis" className="mt-0">
+          <AnalysisTab />
         </TabsContent>
         
         <TabsContent value="alerts" className="mt-0">
