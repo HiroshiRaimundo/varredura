@@ -48,7 +48,7 @@ const PressTab: React.FC<PressTabProps> = ({ clientType }) => {
   ];
 
   // Converte clientType para string se necessário
-  const clientTypeString = typeof clientType === 'string' ? clientType : clientType.toString();
+  const clientTypeString = typeof clientType === 'string' ? clientType : String(clientType);
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab}>
