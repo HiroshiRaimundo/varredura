@@ -20,6 +20,7 @@ import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TrendingUp, Search, Smile, BarChart, Database, Plug } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 
 interface NewMonitoringFormProps {
   onSubmitSuccess: () => void;
@@ -236,9 +237,11 @@ const NewMonitoringForm: React.FC<NewMonitoringFormProps> = ({ onSubmitSuccess }
                   onCheckedChange={setShowApiFields}
                   id="api-toggle"
                 />
-                <Label htmlFor="api-toggle" className="flex items-center">
-                  <Plug className="h-4 w-4 mr-2" />
-                  Adicionar fonte via API
+                <Label htmlFor="api-toggle">
+                  <div className="flex items-center">
+                    <Plug className="h-4 w-4 mr-2" />
+                    Adicionar fonte via API
+                  </div>
                 </Label>
               </div>
 
@@ -422,13 +425,5 @@ const NewMonitoringForm: React.FC<NewMonitoringFormProps> = ({ onSubmitSuccess }
     </Form>
   );
 };
-
-function Label({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) {
-  return (
-    <div className="text-sm font-medium" id={htmlFor}>
-      {children}
-    </div>
-  );
-}
 
 export default NewMonitoringForm;
