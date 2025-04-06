@@ -2,7 +2,7 @@
 import { Workspace, WorkspaceUpdatePayload } from "@/types/workspaceTypes";
 import { getDefaultWorkspaceSettings } from "./workspaceDefaults";
 import { logWorkspaceAction } from "./workspaceLogger";
-import { saveWorkspaceToStorage, loadWorkspacesFromStorage } from "./storageUtils";
+import { saveWorkspacesToStorage, loadWorkspacesFromStorage } from "./storageUtils";
 
 // Create a new workspace
 export const createWorkspace = async (ownerId: string): Promise<Workspace> => {
@@ -24,7 +24,7 @@ export const createWorkspace = async (ownerId: string): Promise<Workspace> => {
   // Save to storage/database
   const workspaces = loadWorkspacesFromStorage();
   workspaces.push(newWorkspace);
-  saveWorkspaceToStorage(workspaces);
+  saveWorkspacesToStorage(workspaces);
   
   // Log action
   logWorkspaceAction("create", {
@@ -58,7 +58,7 @@ export const updateWorkspace = async (
   };
   
   workspaces[workspaceIndex] = updatedWorkspace;
-  saveWorkspaceToStorage(workspaces);
+  saveWorkspacesToStorage(workspaces);
   
   // Log action
   logWorkspaceAction("update", {
@@ -94,7 +94,7 @@ export const resetWorkspace = async (
   };
   
   workspaces[workspaceIndex] = resetWorkspace;
-  saveWorkspaceToStorage(workspaces);
+  saveWorkspacesToStorage(workspaces);
   
   // Log action
   logWorkspaceAction("reset", {
@@ -121,7 +121,7 @@ export const deleteWorkspace = async (
   
   // Remove the workspace
   workspaces.splice(workspaceIndex, 1);
-  saveWorkspaceToStorage(workspaces);
+  saveWorkspacesToStorage(workspaces);
   
   // Log action
   logWorkspaceAction("delete", {
