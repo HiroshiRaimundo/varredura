@@ -7,7 +7,6 @@ import PaymentList from '@/components/admin/payments/PaymentList';
 import PasswordResetList from '@/components/admin/password-reset/PasswordResetList';
 import { ClientAccount, Payment, PasswordReset } from '@/types/adminTypes';
 import BackToAdminButton from "@/components/admin/BackToAdminButton";
-import { useClientManagement } from "@/components/admin/clients/hooks/useClientManagement";
 import { Button } from "@/components/ui/button";
 import { Plus, Download } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -51,33 +50,148 @@ const mockResets: PasswordReset[] = [
 ];
 
 const ClientManagement: React.FC = () => {
-  const {
-    clients,
-    isLoading,
-    loadClients,
-    handleStatusToggle,
-    newClient,
-    setNewClient,
-    handleAddClient,
-    handleDeleteClient,
-    selectedClientId,
-    setSelectedClientId,
-    generatedPassword,
-    setGeneratedPassword,
-    handleResetPassword,
-  } = useClientManagement();
-
-  const [activeTab, setActiveTab] = useState('clients');
+  // Create simplified hooks with only the properties we're actually using
+  const [clients, setClients] = useState<Client[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [activeTab, setActiveTab] = useState('clients');
+  const [newClient, setNewClient] = useState({
+    name: "",
+    email: "",
+    serviceType: "OBSERVATORY" as const,
+    status: "active" as const
+  });
 
+  // Load clients
+  const loadClients = async () => {
+    try {
+      setIsLoading(true);
+      const data = await clientService.getAll();
+      setClients(data);
+    } catch (error) {
+      toast({
+        title: "Erro ao carregar clientes",
+        description: "Não foi possível carregar a lista de clientes.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle status toggle
+  const handleStatusToggle = async (clientId: string) => {
+    try {
+      const client = clients.find(c => c.id === clientId);
+      if (!client) return;
+
+      const newStatus = client.status === "active" ? "inactive" : "active";
+      const updatedClient = await clientService.updateStatus(clientId, newStatus);
+      
+      setClients(clients.map(c => c.id === clientId ? updatedClient : c));
+
+      toast({
+        title: "Status atualizado",
+        description: `O cliente foi marcado como ${newStatus === "active" ? "ativo" : "inativo"}.`
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao atualizar status",
+        description: "Não foi possível atualizar o status do cliente.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Handle add client
+  const handleAddClient = async () => {
+    if (!newClient.name || !newClient.email) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Por favor, preencha todos os campos obrigatórios.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const client = await clientService.create({
+        ...newClient,
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      });
+
+      setClients([...clients, client]);
+      setShowAddDialog(false);
+      setNewClient({
+        name: "",
+        email: "",
+        serviceType: "OBSERVATORY",
+        status: "active"
+      });
+      
+      toast({
+        title: "Cliente adicionado com sucesso",
+        description: "As credenciais foram geradas."
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao adicionar cliente",
+        description: error instanceof Error ? error.message : "Ocorreu um erro ao adicionar o cliente.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Handle delete client
+  const handleDeleteClient = async () => {
+    if (!selectedClientId) return;
+
+    try {
+      await clientService.delete(selectedClientId);
+      setClients(clients.filter(client => client.id !== selectedClientId));
+      setSelectedClientId(null);
+
+      toast({
+        title: "Cliente removido",
+        description: "O cliente foi removido com sucesso."
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao remover cliente",
+        description: "Não foi possível remover o cliente.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Handle reset password
+  const handleResetPassword = async (clientId: string) => {
+    try {
+      const newPassword = await clientService.resetPassword(clientId);
+      
+      toast({
+        title: "Senha redefinida",
+        description: `Nova senha gerada: ${newPassword}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao redefinir senha",
+        description: "Não foi possível redefinir a senha do cliente.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Add client
   const addClient = () => {
     setShowAddDialog(true);
   };
 
+  // Edit client
   const editClient = async (clientId: string) => {
     try {
       const client = await clientService.getById(clientId);
@@ -94,20 +208,13 @@ const ClientManagement: React.FC = () => {
     }
   };
 
+  // Delete client
   const deleteClient = (clientId: string) => {
     setSelectedClientId(clientId);
     setShowDeleteDialog(true);
   };
 
-  const resetPassword = async (clientId: string) => {
-    await handleResetPassword(clientId);
-    // Aqui você pode adicionar lógica para mostrar a senha gerada em um modal
-    toast({
-      title: "Senha redefinida",
-      description: `Uma nova senha foi gerada para o cliente.`,
-    });
-  };
-
+  // Save client edit
   const handleSaveClientEdit = async () => {
     if (!selectedClient) return;
     
@@ -128,6 +235,7 @@ const ClientManagement: React.FC = () => {
     }
   };
 
+  // Handle client change
   const handleClientChange = (field: string, value: any) => {
     if (selectedClient) {
       setSelectedClient({
@@ -137,6 +245,7 @@ const ClientManagement: React.FC = () => {
     }
   };
 
+  // Export payments
   const exportPayments = () => {
     toast({
       title: "Exportando pagamentos",
@@ -158,6 +267,7 @@ const ClientManagement: React.FC = () => {
     }, 1000);
   };
 
+  // Confirm delete client
   const onConfirmDeleteClient = async () => {
     if (selectedClientId) {
       await handleDeleteClient();
@@ -167,7 +277,7 @@ const ClientManagement: React.FC = () => {
 
   useEffect(() => {
     loadClients();
-  }, [loadClients]);
+  }, []);
 
   if (isLoading) {
     return (
@@ -176,6 +286,19 @@ const ClientManagement: React.FC = () => {
       </div>
     );
   }
+
+  // Fix the mapping of Client objects to ClientAccount format
+  // Here's where we fix the toISOString error by ensuring we handle the createdAt and expiresAt correctly
+  const clientsForList: ClientAccount[] = clients.map(client => ({
+    id: client.id,
+    name: client.name,
+    email: client.email,
+    type: client.serviceType, 
+    status: client.status === "active" ? "active" : "inactive",
+    plan: "basic",
+    createdAt: typeof client.createdAt === 'string' ? client.createdAt : client.createdAt.toISOString(),
+    trialEndsAt: client.expiresAt ? (typeof client.expiresAt === 'string' ? client.expiresAt : client.expiresAt.toISOString()) : undefined,
+  }));
 
   return (
     <div className="p-6 space-y-6">
@@ -212,16 +335,7 @@ const ClientManagement: React.FC = () => {
 
             <TabsContent value="clients" className="mt-6">
               <ClientList
-                clients={clients.map(client => ({
-                  id: client.id,
-                  name: client.name,
-                  email: client.email,
-                  type: client.serviceType, 
-                  status: client.status === "active" ? "active" : "inactive",
-                  plan: "basic",
-                  createdAt: client.createdAt.toISOString(),
-                  trialEndsAt: client.expiresAt?.toISOString(),
-                }))}
+                clients={clientsForList}
                 onAddClient={addClient}
                 onEditClient={(client) => editClient(client.id)}
                 onDeleteClient={(clientId) => deleteClient(clientId)}
@@ -238,7 +352,7 @@ const ClientManagement: React.FC = () => {
             <TabsContent value="resets" className="mt-6">
               <PasswordResetList
                 resets={mockResets}
-                onResetPassword={resetPassword}
+                onResetPassword={handleResetPassword}
               />
             </TabsContent>
           </Tabs>
