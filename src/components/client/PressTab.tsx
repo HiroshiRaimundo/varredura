@@ -3,7 +3,7 @@ import React from "react";
 import { ClientType } from "@/types/clientTypes";
 
 interface PressTabProps {
-  clientType: ClientType;
+  clientType: ClientType | string;
 }
 
 const PressTab: React.FC<PressTabProps> = ({ clientType }) => {

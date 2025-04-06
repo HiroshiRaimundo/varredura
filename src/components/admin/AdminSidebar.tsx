@@ -45,6 +45,11 @@ const AdminSidebar: React.FC = () => {
       path: "/admin/content"
     },
     {
+      title: "Visualizar Área Cliente",
+      icon: <Users className="h-4 w-4" />,
+      path: "/dashboard"
+    },
+    {
       title: "Análise e Relatórios",
       icon: <BarChart2 className="h-4 w-4" />,
       path: "/admin/analytics"

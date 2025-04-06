@@ -5,9 +5,10 @@ import PressReleaseForm from './PressReleaseForm';
 import PressReleaseDashboard from './PressReleaseDashboard';
 import ReleaseMonitoringDashboard from './ReleaseMonitoringDashboard';
 import PressReleaseHelp from './PressReleaseHelp';
+import { ClientType } from '@/types/clientTypes';
 
 export interface PressTabProps {
-  clientType: string;
+  clientType: string | ClientType;
 }
 
 interface ReleaseMonitoringItem {
@@ -46,6 +47,9 @@ const PressTab: React.FC<PressTabProps> = ({ clientType }) => {
     }
   ];
 
+  // Converte clientType para string se necessário
+  const clientTypeString = typeof clientType === 'string' ? clientType : clientType.toString();
+
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab}>
       <TabsList className="grid grid-cols-4 mb-8">
@@ -56,11 +60,11 @@ const PressTab: React.FC<PressTabProps> = ({ clientType }) => {
       </TabsList>
       
       <TabsContent value="dashboard">
-        <PressReleaseDashboard clientType={clientType} />
+        <PressReleaseDashboard clientType={clientTypeString} />
       </TabsContent>
       
       <TabsContent value="new">
-        <PressReleaseForm clientType={clientType} />
+        <PressReleaseForm clientType={clientTypeString} />
       </TabsContent>
       
       <TabsContent value="monitoring">
