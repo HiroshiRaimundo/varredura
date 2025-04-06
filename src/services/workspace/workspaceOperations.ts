@@ -2,9 +2,9 @@
 import { Workspace, WorkspaceConfig } from "@/types/workspaceTypes";
 import { loadWorkspacesFromStorage, saveWorkspacesToStorage } from "./storageUtils";
 import { DEFAULT_WORKSPACE_CONFIG } from "./workspaceDefaults";
-import { logWorkspaceAction, getWorkspaceActions } from "./workspaceLogger";
+import { logWorkspaceAction } from "./workspaceLogger";
 
-// Initialize from localStorage
+// Start with initial workspaces from storage
 let workspaces = loadWorkspacesFromStorage();
 
 export const workspaceOperations = {
@@ -13,99 +13,134 @@ export const workspaceOperations = {
     return workspaces;
   },
   
-  // Create a new workspace for a user
-  createWorkspace: async (userId: string, initialConfig?: Partial<WorkspaceConfig>): Promise<Workspace> => {
-    const existingWorkspace = workspaces.find(w => w.userId === userId);
-    if (existingWorkspace) {
-      return existingWorkspace; // User already has a workspace
-    }
-    
+  // Get workspace by ID
+  getWorkspaceById: async (id: string): Promise<Workspace | undefined> => {
+    return workspaces.find(workspace => workspace.id === id);
+  },
+  
+  // Get workspace by user ID
+  getWorkspaceByUserId: async (userId: string): Promise<Workspace | undefined> => {
+    return workspaces.find(workspace => workspace.userId === userId);
+  },
+  
+  // Create a new workspace
+  createWorkspace: async (userId: string, name: string): Promise<Workspace> => {
     const newWorkspace: Workspace = {
       id: crypto.randomUUID(),
       userId,
-      config: {
-        ...DEFAULT_WORKSPACE_CONFIG,
-        ...initialConfig
-      },
-      createdAt: new Date().toISOString()
+      name,
+      config: DEFAULT_WORKSPACE_CONFIG,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
     
-    workspaces.push(newWorkspace);
+    workspaces = [...workspaces, newWorkspace];
     saveWorkspacesToStorage(workspaces);
     
-    logWorkspaceAction(userId, newWorkspace.id, 'create', {
-      message: 'Workspace created',
-      initialConfig
-    });
+    logWorkspaceAction(
+      userId,
+      newWorkspace.id,
+      'create_workspace',
+      { name }
+    );
     
     return newWorkspace;
   },
   
-  // Get workspace by ID
-  getWorkspaceById: async (workspaceId: string): Promise<Workspace | null> => {
-    return workspaces.find(w => w.id === workspaceId) || null;
-  },
-  
-  // Get workspace by user ID
-  getWorkspaceByUserId: async (userId: string): Promise<Workspace | null> => {
-    return workspaces.find(w => w.userId === userId) || null;
-  },
-  
-  // Update workspace configuration
-  updateWorkspaceConfig: async (
-    workspaceId: string, 
-    userId: string,
-    updates: Partial<WorkspaceConfig>
-  ): Promise<Workspace> => {
-    const workspaceIndex = workspaces.findIndex(w => w.id === workspaceId);
+  // Update workspace
+  updateWorkspace: async (id: string, userId: string, updates: Partial<Workspace>): Promise<Workspace | undefined> => {
+    const workspaceIndex = workspaces.findIndex(workspace => workspace.id === id);
+    
     if (workspaceIndex === -1) {
-      throw new Error("Workspace não encontrado");
+      return undefined;
     }
     
-    const updatedWorkspace = {
-      ...workspaces[workspaceIndex],
-      config: {
-        ...workspaces[workspaceIndex].config,
-        ...updates
-      }
+    // Only allow updating certain fields
+    const allowedUpdates = {
+      name: updates.name,
+      config: updates.config,
+      updatedAt: new Date().toISOString()
     };
     
-    workspaces[workspaceIndex] = updatedWorkspace;
+    // Update the workspace
+    const updatedWorkspace = {
+      ...workspaces[workspaceIndex],
+      ...allowedUpdates
+    };
+    
+    workspaces = [
+      ...workspaces.slice(0, workspaceIndex),
+      updatedWorkspace,
+      ...workspaces.slice(workspaceIndex + 1)
+    ];
+    
     saveWorkspacesToStorage(workspaces);
     
-    logWorkspaceAction(userId, workspaceId, 'update', {
-      message: 'Workspace config updated',
+    logWorkspaceAction(
+      userId,
+      id,
+      'update_workspace',
       updates
-    });
+    );
     
     return updatedWorkspace;
   },
   
   // Reset workspace to default configuration
-  resetWorkspace: async (workspaceId: string, userId: string): Promise<Workspace> => {
-    const workspaceIndex = workspaces.findIndex(w => w.id === workspaceId);
+  resetWorkspaceConfig: async (id: string, userId: string): Promise<Workspace | undefined> => {
+    const workspaceIndex = workspaces.findIndex(workspace => workspace.id === id);
+    
     if (workspaceIndex === -1) {
-      throw new Error("Workspace não encontrado");
+      return undefined;
     }
     
+    // Reset only the config to default
     const resetWorkspace = {
       ...workspaces[workspaceIndex],
-      config: { ...DEFAULT_WORKSPACE_CONFIG }
+      config: DEFAULT_WORKSPACE_CONFIG,
+      updatedAt: new Date().toISOString()
     };
     
-    workspaces[workspaceIndex] = resetWorkspace;
+    workspaces = [
+      ...workspaces.slice(0, workspaceIndex),
+      resetWorkspace,
+      ...workspaces.slice(workspaceIndex + 1)
+    ];
+    
     saveWorkspacesToStorage(workspaces);
     
-    logWorkspaceAction(userId, workspaceId, 'reset', {
-      message: 'Workspace reset to defaults'
-    });
+    logWorkspaceAction(
+      userId,
+      id,
+      'reset_workspace',
+      { message: 'Reset to default configuration' }
+    );
     
     return resetWorkspace;
   },
   
-  // Get workspace actions/logs
-  getWorkspaceActions: async (workspaceId: string): Promise<WorkspaceAction[]> => {
-    const allActions = getWorkspaceActions();
-    return allActions.filter(action => action.workspaceId === workspaceId);
+  // Delete workspace
+  deleteWorkspace: async (id: string, userId: string): Promise<boolean> => {
+    const workspaceIndex = workspaces.findIndex(workspace => workspace.id === id);
+    
+    if (workspaceIndex === -1) {
+      return false;
+    }
+    
+    workspaces = [
+      ...workspaces.slice(0, workspaceIndex),
+      ...workspaces.slice(workspaceIndex + 1)
+    ];
+    
+    saveWorkspacesToStorage(workspaces);
+    
+    logWorkspaceAction(
+      userId,
+      id,
+      'delete_workspace',
+      { message: 'Workspace deleted' }
+    );
+    
+    return true;
   }
 };
