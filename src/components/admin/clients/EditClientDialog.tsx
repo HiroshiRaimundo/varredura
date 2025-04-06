@@ -12,9 +12,9 @@ import { toast } from "@/hooks/use-toast";
 interface EditClientDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  client: Client | null;
+  client: Client;
   onClientChange: (field: string, value: string) => void;
-  onSave: () => void;
+  onSave: (updatedClient: Client) => void;
 }
 
 const EditClientDialog: React.FC<EditClientDialogProps> = ({
@@ -24,28 +24,37 @@ const EditClientDialog: React.FC<EditClientDialogProps> = ({
   onClientChange,
   onSave
 }) => {
+  const [editedClient, setEditedClient] = useState<Client>(client);
   const [errors, setErrors] = useState<{
     name?: string;
     email?: string;
   }>({});
 
-  // Reset errors when dialog opens or client changes
+  // Reset errors and update edited client when dialog opens or client changes
   useEffect(() => {
     if (isOpen && client) {
+      setEditedClient(client);
       setErrors({});
     }
   }, [isOpen, client]);
 
+  const handleFieldChange = (field: keyof Client, value: any) => {
+    setEditedClient(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
   const validateForm = (): boolean => {
     const newErrors: {name?: string; email?: string} = {};
     
-    if (!client?.name?.trim()) {
+    if (!editedClient.name?.trim()) {
       newErrors.name = "Nome é obrigatório";
     }
     
-    if (!client?.email?.trim()) {
+    if (!editedClient.email?.trim()) {
       newErrors.email = "Email é obrigatório";
-    } else if (!/\S+@\S+\.\S+/.test(client.email)) {
+    } else if (!/\S+@\S+\.\S+/.test(editedClient.email)) {
       newErrors.email = "Email inválido";
     }
     
@@ -55,7 +64,7 @@ const EditClientDialog: React.FC<EditClientDialogProps> = ({
 
   const handleSave = () => {
     if (validateForm()) {
-      onSave();
+      onSave(editedClient);
     } else {
       toast({
         title: "Erro de validação",
@@ -64,8 +73,6 @@ const EditClientDialog: React.FC<EditClientDialogProps> = ({
       });
     }
   };
-
-  if (!client) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -83,8 +90,8 @@ const EditClientDialog: React.FC<EditClientDialogProps> = ({
             </Label>
             <Input
               id="name"
-              value={client.name}
-              onChange={(e) => onClientChange("name", e.target.value)}
+              value={editedClient.name}
+              onChange={(e) => handleFieldChange("name", e.target.value)}
               placeholder="Nome completo do cliente"
               className={errors.name ? "border-destructive" : ""}
             />
@@ -98,8 +105,8 @@ const EditClientDialog: React.FC<EditClientDialogProps> = ({
             <Input
               id="email"
               type="email"
-              value={client.email}
-              onChange={(e) => onClientChange("email", e.target.value)}
+              value={editedClient.email}
+              onChange={(e) => handleFieldChange("email", e.target.value)}
               placeholder="email@exemplo.com"
               className={errors.email ? "border-destructive" : ""}
             />
@@ -109,8 +116,8 @@ const EditClientDialog: React.FC<EditClientDialogProps> = ({
           <div className="space-y-2">
             <Label htmlFor="serviceType">Tipo de Serviço *</Label>
             <Select
-              value={client.serviceType}
-              onValueChange={(value) => onClientChange("serviceType", value)}
+              value={editedClient.serviceType}
+              onValueChange={(value) => handleFieldChange("serviceType", value)}
             >
               <SelectTrigger id="serviceType">
                 <SelectValue placeholder="Selecione o serviço" />
@@ -129,8 +136,8 @@ const EditClientDialog: React.FC<EditClientDialogProps> = ({
           <div className="space-y-2">
             <Label htmlFor="status">Status</Label>
             <Select
-              value={client.status}
-              onValueChange={(value) => onClientChange("status", value)}
+              value={editedClient.status}
+              onValueChange={(value) => handleFieldChange("status", value as "active" | "inactive")}
             >
               <SelectTrigger id="status">
                 <SelectValue placeholder="Selecione o status" />
@@ -147,8 +154,11 @@ const EditClientDialog: React.FC<EditClientDialogProps> = ({
             <Input
               id="expiresAt"
               type="date"
-              value={client.expiresAt ? new Date(client.expiresAt).toISOString().split('T')[0] : ''}
-              onChange={(e) => onClientChange("expiresAt", e.target.value)}
+              value={editedClient.expiresAt ? new Date(editedClient.expiresAt).toISOString().split('T')[0] : ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                handleFieldChange("expiresAt", value ? new Date(value) : undefined);
+              }}
             />
             <p className="text-xs text-muted-foreground">
               Deixe em branco para acesso sem expiração.

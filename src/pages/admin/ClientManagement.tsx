@@ -12,6 +12,7 @@ import EditClientDialog from "@/components/admin/clients/EditClientDialog";
 import DeleteClientDialog from "@/components/admin/clients/DeleteClientDialog";
 import PasswordDialog from "@/components/admin/clients/PasswordDialog";
 import ClientTable from "@/components/admin/clients/ClientTable";
+import { ServiceType } from "@/hooks/useClientAuth";
 
 const ClientManagement: React.FC = () => {
   const { toast } = useToast();
@@ -37,7 +38,8 @@ const ClientManagement: React.FC = () => {
   const [newClient, setNewClient] = useState<NewClientData>({
     name: "",
     email: "",
-    status: "active"
+    status: "active",
+    serviceType: ServiceType.OBSERVATORY
   });
 
   // Carregar dados dos clientes
@@ -69,7 +71,8 @@ const ClientManagement: React.FC = () => {
     setNewClient({
       name: "",
       email: "",
-      status: "active"
+      status: "active",
+      serviceType: ServiceType.OBSERVATORY
     });
     setIsAddDialogOpen(true);
   };
@@ -91,6 +94,7 @@ const ClientManagement: React.FC = () => {
         name: newClient.name,
         email: newClient.email,
         status: newClient.status,
+        serviceType: newClient.serviceType,
         expiresAt: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
       });
 
@@ -332,6 +336,7 @@ const ClientManagement: React.FC = () => {
           isOpen={isEditDialogOpen}
           onOpenChange={setIsEditDialogOpen}
           onSave={handleEditClient}
+          onClientChange={() => {}}
         />
       )}
 
