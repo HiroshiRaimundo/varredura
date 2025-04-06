@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, ArrowLeft } from "lucide-react";
 import ActiveMonitorings from "./ActiveMonitorings";
 import MonitoringResultsList from "./MonitoringResultsList";
 import NewMonitoringForm from "./NewMonitoringForm";
@@ -21,24 +21,27 @@ const MonitoringTab: React.FC = () => {
               Configure e acompanhe o monitoramento de termos na mídia
             </CardDescription>
           </div>
-          <Button 
-            onClick={() => setShowNewMonitoringForm(true)} 
-            className="flex items-center"
-          >
-            <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Novo Monitoramento</span>
-          </Button>
+          {!showNewMonitoringForm && (
+            <Button 
+              onClick={() => setShowNewMonitoringForm(true)} 
+              className="flex items-center"
+            >
+              <PlusCircle className="mr-2 h-4 w-4" />
+              <span>Novo Monitoramento</span>
+            </Button>
+          )}
         </div>
       </CardHeader>
       <CardContent>
         {showNewMonitoringForm ? (
-          <div className="mb-6">
+          <div className="space-y-6">
             <Button 
               variant="outline" 
               onClick={() => setShowNewMonitoringForm(false)} 
-              className="mb-4"
+              className="mb-4 flex items-center"
             >
-              Voltar
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Voltar para monitoramentos
             </Button>
             <NewMonitoringForm onSubmitSuccess={() => setShowNewMonitoringForm(false)} />
           </div>

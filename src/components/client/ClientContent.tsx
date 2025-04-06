@@ -79,7 +79,7 @@ const ClientContent: React.FC<ClientContentProps> = ({ clientType }) => {
         </TabsContent>
         
         <TabsContent value="monitoring" className="mt-0">
-          <MonitoringTab clientType={clientType} />
+          <MonitoringTab />
         </TabsContent>
         
         <TabsContent value="alerts" className="mt-0">
