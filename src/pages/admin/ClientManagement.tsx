@@ -11,6 +11,10 @@ import { useClientManagement } from "@/components/admin/clients/hooks/useClientM
 import { Button } from "@/components/ui/button";
 import { Plus, Download } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import AddClientDialog from "@/components/admin/clients/AddClientDialog";
+import EditClientDialog from "@/components/admin/clients/EditClientDialog";
+import DeleteClientDialog from "@/components/admin/clients/DeleteClientDialog";
+import { Client, clientService } from "@/services/clientService";
 
 // Mock data - substituir por dados reais da API
 const mockPayments: Payment[] = [
@@ -52,33 +56,83 @@ const ClientManagement: React.FC = () => {
     isLoading,
     loadClients,
     handleStatusToggle,
+    newClient,
+    setNewClient,
+    handleAddClient,
+    handleDeleteClient,
+    selectedClientId,
+    setSelectedClientId,
+    generatedPassword,
+    setGeneratedPassword,
+    handleResetPassword,
   } = useClientManagement();
 
   const [activeTab, setActiveTab] = useState('clients');
-  const [selectedClient, setSelectedClient] = useState<ClientAccount | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
 
   const addClient = () => {
     setShowAddDialog(true);
-    toast({
-      title: "Adicionar cliente",
-      description: "Funcionalidade de adicionar cliente ativada",
-    });
   };
 
-  const editClient = (client: ClientAccount) => {
-    setSelectedClient(client);
-    toast({
-      title: "Editar cliente",
-      description: `Editando cliente: ${client.name}`,
-    });
+  const editClient = async (clientId: string) => {
+    try {
+      const client = await clientService.getById(clientId);
+      if (client) {
+        setSelectedClient(client);
+        setShowEditDialog(true);
+      }
+    } catch (error) {
+      toast({
+        title: "Erro ao carregar cliente",
+        description: "Não foi possível carregar os dados do cliente.",
+        variant: "destructive"
+      });
+    }
   };
 
   const deleteClient = (clientId: string) => {
-    if (confirm(`Tem certeza que deseja excluir o cliente?`)) {
+    setSelectedClientId(clientId);
+    setShowDeleteDialog(true);
+  };
+
+  const resetPassword = async (clientId: string) => {
+    await handleResetPassword(clientId);
+    // Aqui você pode adicionar lógica para mostrar a senha gerada em um modal
+    toast({
+      title: "Senha redefinida",
+      description: `Uma nova senha foi gerada para o cliente.`,
+    });
+  };
+
+  const handleSaveClientEdit = async () => {
+    if (!selectedClient) return;
+    
+    try {
+      await clientService.update(selectedClient.id, selectedClient);
+      setShowEditDialog(false);
+      loadClients();
       toast({
-        title: "Cliente excluído",
-        description: `Cliente com ID ${clientId} foi removido`,
+        title: "Cliente atualizado",
+        description: "As informações do cliente foram atualizadas com sucesso.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao atualizar cliente",
+        description: error instanceof Error ? error.message : "Ocorreu um erro ao atualizar o cliente.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleClientChange = (field: string, value: any) => {
+    if (selectedClient) {
+      setSelectedClient({
+        ...selectedClient,
+        [field]: value
       });
     }
   };
@@ -104,11 +158,11 @@ const ClientManagement: React.FC = () => {
     }, 1000);
   };
 
-  const resetPassword = (resetId: string) => {
-    toast({
-      title: "Senha redefinida",
-      description: `A senha para o pedido ${resetId} foi redefinida e enviada ao cliente`,
-    });
+  const onConfirmDeleteClient = async () => {
+    if (selectedClientId) {
+      await handleDeleteClient();
+      setShowDeleteDialog(false);
+    }
   };
 
   useEffect(() => {
@@ -158,10 +212,19 @@ const ClientManagement: React.FC = () => {
 
             <TabsContent value="clients" className="mt-6">
               <ClientList
-                clients={clients}
+                clients={clients.map(client => ({
+                  id: client.id,
+                  name: client.name,
+                  email: client.email,
+                  type: client.serviceType, 
+                  status: client.status === "active" ? "active" : "inactive",
+                  plan: "basic",
+                  createdAt: client.createdAt.toISOString(),
+                  trialEndsAt: client.expiresAt?.toISOString(),
+                }))}
                 onAddClient={addClient}
-                onEditClient={editClient}
-                onDeleteClient={deleteClient}
+                onEditClient={(client) => editClient(client.id)}
+                onDeleteClient={(clientId) => deleteClient(clientId)}
               />
             </TabsContent>
 
@@ -181,6 +244,29 @@ const ClientManagement: React.FC = () => {
           </Tabs>
         </CardContent>
       </Card>
+
+      {/* Dialogs */}
+      <AddClientDialog
+        isOpen={showAddDialog}
+        onOpenChange={setShowAddDialog}
+        newClient={newClient}
+        onNewClientChange={setNewClient}
+        onAddClient={handleAddClient}
+      />
+
+      <EditClientDialog
+        isOpen={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        client={selectedClient}
+        onClientChange={handleClientChange}
+        onSave={handleSaveClientEdit}
+      />
+
+      <DeleteClientDialog
+        isOpen={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirmDelete={onConfirmDeleteClient}
+      />
     </div>
   );
 };
