@@ -6,13 +6,15 @@ import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/auth';
 import { workspaceService } from '@/services/workspaceService';
 import { Workspace, WorkspaceUpdatePayload } from '@/types/workspaceTypes';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import BackToAdminButton from '@/components/admin/BackToAdminButton';
 
 const WorkspaceManagement: React.FC = () => {
   const { user, impersonateClient, isImpersonating, exitImpersonation } = useAuth();
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const isImpersonatePage = location.pathname === '/admin/impersonate';
   
   // Load workspace data
@@ -81,7 +83,7 @@ const WorkspaceManagement: React.FC = () => {
   const handleResetWorkspace = async () => {
     if (!user || !workspace) return;
     
-    if (!confirm("Tem certeza que deseja resetar o workspace para as configurações padrão?")) {
+    if (!confirm("Tem certeza que deseja resetar o workspace para as configurações padrão? Isso irá restaurar o tema e outras configurações para os valores iniciais.")) {
       return;
     }
     
@@ -115,6 +117,10 @@ const WorkspaceManagement: React.FC = () => {
     
     try {
       await impersonateClient(clientId);
+      toast({
+        title: "Modo de visualização ativado",
+        description: "Você está visualizando o sistema como um cliente",
+      });
     } catch (error) {
       console.error("Erro ao impersonar cliente:", error);
       toast({
@@ -179,7 +185,7 @@ const WorkspaceManagement: React.FC = () => {
               <CardTitle>Impersonação de Cliente</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p>Esta ferramenta permite visualizar a interface como um cliente específico.</p>
+              <p>Esta ferramenta permite visualizar a interface como um cliente específico para fins de suporte e testes.</p>
               
               {isImpersonating ? (
                 <div className="space-y-4">
@@ -219,14 +225,24 @@ const WorkspaceManagement: React.FC = () => {
                 <p><strong>Última Atualização:</strong> {workspace?.updatedAt ? new Date(workspace.updatedAt).toLocaleString() : "Nunca"}</p>
               </div>
               
-              <div className="space-y-2">
-                <Button onClick={updateWorkspaceTheme} disabled={isLoading}>
-                  {workspace?.theme === 'dark' ? 'Mudar para Tema Claro' : 'Mudar para Tema Escuro'}
-                </Button>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    O botão abaixo alterna entre tema claro e escuro para a interface do administrador.
+                  </p>
+                  <Button onClick={updateWorkspaceTheme} disabled={isLoading}>
+                    {workspace?.theme === 'dark' ? 'Mudar para Tema Claro' : 'Mudar para Tema Escuro'}
+                  </Button>
+                </div>
                 
-                <Button onClick={handleResetWorkspace} variant="destructive" disabled={isLoading}>
-                  Resetar para Padrões
-                </Button>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Restaura todas as configurações visuais e preferências do workspace para os valores iniciais.
+                  </p>
+                  <Button onClick={handleResetWorkspace} variant="destructive" disabled={isLoading}>
+                    Resetar para Padrões
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -236,7 +252,9 @@ const WorkspaceManagement: React.FC = () => {
               <CardTitle>Ações Avançadas</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p>Estas ações são apenas para administradores avançados.</p>
+              <p className="text-sm text-muted-foreground">
+                Esta função permite baixar todos os dados do seu workspace, incluindo configurações, temas e preferências personalizadas para backup ou migração.
+              </p>
               
               <div className="space-y-2">
                 <Button 
@@ -256,6 +274,7 @@ const WorkspaceManagement: React.FC = () => {
   
   return (
     <div className="container mx-auto py-6 space-y-6">
+      <BackToAdminButton />
       {renderContent()}
     </div>
   );
