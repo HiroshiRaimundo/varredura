@@ -126,18 +126,25 @@ export interface RolePermission {
   };
 }
 
-// Adding new types to fix the build errors
+// Updated the PasswordReset interface to match the field names used in components
 export interface PasswordReset {
   id: string;
   userId: string;
   userName: string;
-  userEmail: string;
+  userEmail: string; // Was missing
+  email: string; // Added to match usage in PasswordResetList
   requestDate: string;
   status: 'pending' | 'completed' | 'expired';
   expiryDate: string;
   completedDate?: string;
+  // Added fields to match usage in components
+  requestedAt: string;
+  expiresAt: string;
+  completedAt?: string;
+  token?: string; // Added for ClientManagement mock data
 }
 
+// Updated Payment interface to match the field names used in components
 export interface Payment {
   id: string;
   clientId: string;
@@ -149,6 +156,11 @@ export interface Payment {
   planType: 'basic' | 'premium' | 'enterprise';
   invoiceUrl?: string;
   receiptUrl?: string;
+  // Added fields to match usage in components
+  description: string;
+  paymentMethod: string;
+  createdAt: string;
+  paidAt?: string;
 }
 
 // Mock data helper function

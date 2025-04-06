@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Table,
@@ -26,7 +27,8 @@ const PasswordResetList: React.FC<PasswordResetListProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredResets = resets.filter(reset =>
-    reset.email.toLowerCase().includes(searchTerm.toLowerCase())
+    reset.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    reset.userEmail.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusColor = (status: string) => {
@@ -69,16 +71,16 @@ const PasswordResetList: React.FC<PasswordResetListProps> = ({
           <TableBody>
             {filteredResets.map((reset) => (
               <TableRow key={reset.id}>
-                <TableCell>{reset.email}</TableCell>
+                <TableCell>{reset.email || reset.userEmail}</TableCell>
                 <TableCell>
                   <Badge className={getStatusColor(reset.status)}>
                     {reset.status}
                   </Badge>
                 </TableCell>
-                <TableCell>{formatDate(reset.requestedAt)}</TableCell>
-                <TableCell>{formatDate(reset.expiresAt)}</TableCell>
+                <TableCell>{formatDate(reset.requestedAt || reset.requestDate)}</TableCell>
+                <TableCell>{formatDate(reset.expiresAt || reset.expiryDate)}</TableCell>
                 <TableCell>
-                  {reset.completedAt ? formatDate(reset.completedAt) : '-'}
+                  {(reset.completedAt || reset.completedDate) ? formatDate(reset.completedAt || reset.completedDate) : '-'}
                 </TableCell>
                 <TableCell>
                   {reset.status === 'pending' && (

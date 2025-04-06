@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Table,
@@ -25,7 +26,7 @@ const PaymentList: React.FC<PaymentListProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredPayments = payments.filter(payment =>
-    payment.description.toLowerCase().includes(searchTerm.toLowerCase())
+    payment.description && payment.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusColor = (status: string) => {
@@ -95,8 +96,8 @@ const PaymentList: React.FC<PaymentListProps> = ({
                     {payment.status}
                   </Badge>
                 </TableCell>
-                <TableCell>{payment.paymentMethod}</TableCell>
-                <TableCell>{formatDate(payment.createdAt)}</TableCell>
+                <TableCell>{payment.paymentMethod || payment.method}</TableCell>
+                <TableCell>{formatDate(payment.createdAt || payment.date)}</TableCell>
                 <TableCell>{payment.paidAt ? formatDate(payment.paidAt) : '-'}</TableCell>
               </TableRow>
             ))}

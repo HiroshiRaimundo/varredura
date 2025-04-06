@@ -13,11 +13,15 @@ const mockPayments: Payment[] = [
   {
     id: '1',
     clientId: '1',
+    clientName: 'Cliente Teste',
     amount: 99.90,
     status: 'completed',
+    method: 'credit_card',
     paymentMethod: 'credit_card',
+    date: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     paidAt: new Date().toISOString(),
+    planType: 'basic',
     description: 'Assinatura Mensal - Plano Básico'
   }
 ];
@@ -25,12 +29,16 @@ const mockPayments: Payment[] = [
 const mockResets: PasswordReset[] = [
   {
     id: '1',
-    clientId: '1',
+    userId: '1',
+    userName: 'Cliente Teste',
+    userEmail: 'cliente@teste.com',
     email: 'cliente@teste.com',
-    status: 'pending',
+    requestDate: new Date().toISOString(),
     requestedAt: new Date().toISOString(),
-    token: 'token123',
-    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    status: 'pending',
+    expiryDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    token: 'token123'
   }
 ];
 
@@ -46,7 +54,6 @@ const ClientManagement: React.FC = () => {
   const [selectedClient, setSelectedClient] = useState<ClientAccount | null>(null);
 
   const addClient = () => {
-    // Implementar lógica de adicionar cliente
     console.log('Adicionar novo cliente');
   };
 
@@ -56,17 +63,14 @@ const ClientManagement: React.FC = () => {
   };
 
   const deleteClient = (clientId: string) => {
-    // Implementar lógica de deletar cliente
     console.log('Deletar cliente:', clientId);
   };
 
   const exportPayments = () => {
-    // Implementar lógica de exportar pagamentos
     console.log('Exportar pagamentos');
   };
 
   const resetPassword = (resetId: string) => {
-    // Implementar lógica de reset de senha
     console.log('Reset de senha:', resetId);
   };
 

@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BackToAdminButton from "@/components/admin/BackToAdminButton";
-import ReleasesList from "@/components/client/releases/ReleasesList";
+import ReleasesList from "@/components/admin/releases/ReleaseList";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import AdvancedModerationInterface from "@/components/admin/releases/AdvancedModerationInterface";
@@ -241,7 +240,8 @@ const ReleasesManagement: React.FC = () => {
                   
                   <div className="mt-6 pt-6 border-t">
                     <h2 className="text-lg font-medium mb-4">Modo Simples (Legado)</h2>
-                    <ReleasesList filter="pending" 
+                    <ReleasesList 
+                      filter="pending" 
                       onSelectRelease={handleToggleSelectRelease}
                       selectedReleases={selectedReleases}
                     />

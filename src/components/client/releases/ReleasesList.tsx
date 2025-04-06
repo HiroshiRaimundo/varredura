@@ -4,9 +4,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Eye, Download, AlertCircle } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface ReleasesListProps {
   filter: "all" | "pending" | "approved" | "rejected";
+  onSelectRelease?: (releaseId: string, isSelected: boolean) => void;
+  selectedReleases?: string[];
 }
 
 interface Release {
@@ -57,7 +60,11 @@ const mockReleases: Release[] = [
   }
 ];
 
-const ReleasesList: React.FC<ReleasesListProps> = ({ filter }) => {
+const ReleasesList: React.FC<ReleasesListProps> = ({ 
+  filter, 
+  onSelectRelease,
+  selectedReleases = []
+}) => {
   const filteredReleases = filter === "all" 
     ? mockReleases 
     : mockReleases.filter(release => release.status === filter);
@@ -80,6 +87,12 @@ const ReleasesList: React.FC<ReleasesListProps> = ({ filter }) => {
     }
   };
 
+  const handleCheckboxChange = (releaseId: string, checked: boolean) => {
+    if (onSelectRelease) {
+      onSelectRelease(releaseId, checked);
+    }
+  };
+
   return (
     <div>
       {filteredReleases.length === 0 ? (
@@ -90,6 +103,9 @@ const ReleasesList: React.FC<ReleasesListProps> = ({ filter }) => {
         <Table>
           <TableHeader>
             <TableRow>
+              {onSelectRelease && (
+                <TableHead className="w-12"></TableHead>
+              )}
               <TableHead>Título</TableHead>
               <TableHead>Data</TableHead>
               <TableHead>Status</TableHead>
@@ -100,6 +116,14 @@ const ReleasesList: React.FC<ReleasesListProps> = ({ filter }) => {
           <TableBody>
             {filteredReleases.map((release) => (
               <TableRow key={release.id}>
+                {onSelectRelease && (
+                  <TableCell>
+                    <Checkbox 
+                      checked={selectedReleases.includes(release.id)}
+                      onCheckedChange={(checked) => handleCheckboxChange(release.id, !!checked)}
+                    />
+                  </TableCell>
+                )}
                 <TableCell className="font-medium">{release.title}</TableCell>
                 <TableCell>{formatDate(release.date)}</TableCell>
                 <TableCell>{getStatusBadge(release.status)}</TableCell>
