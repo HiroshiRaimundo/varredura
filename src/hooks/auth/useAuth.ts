@@ -1,12 +1,10 @@
 
-import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "./AuthContext";
 import { LoginCredentials } from "./types";
 import { toast } from "@/hooks/use-toast";
 
 export const useAuth = () => {
   const auth = useAuthContext();
-  const navigate = useNavigate();
 
   const handleLogin = async (data: LoginCredentials) => {
     try {
@@ -37,4 +35,5 @@ export const useAuth = () => {
   };
 };
 
+// Make sure we export both as default and named export
 export default useAuth;
