@@ -3,7 +3,7 @@ import React from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Calendar, Trash, Check, X, BookOpen, UserCircle, Building, Newspaper, Bell, BellOff } from "lucide-react";
+import { FileText, Calendar, Trash, Check, X, BookOpen, UserCircle, Building, Newspaper, Bell, BellOff, Eye } from "lucide-react";
 import { ReleaseData } from "../types/releaseTypes";
 import { getStatusLabel, getStatusColor, getClientTypeLabel, getClientTypeIcon } from "../utils/releaseUtils";
 
@@ -94,8 +94,9 @@ const ReleaseList: React.FC<ReleaseListProps> = ({
                         size="sm"
                         onClick={() => handleView(release)}
                         className="h-8 w-8 p-0"
+                        title="Ver detalhes"
                       >
-                        <FileText className="h-4 w-4" />
+                        <Eye className="h-4 w-4" />
                         <span className="sr-only">Ver</span>
                       </Button>
                       
@@ -106,6 +107,7 @@ const ReleaseList: React.FC<ReleaseListProps> = ({
                             size="sm"
                             onClick={() => handleApprove(release.id)}
                             className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+                            title="Aprovar"
                           >
                             <Check className="h-4 w-4" />
                             <span className="sr-only">Aprovar</span>
@@ -116,6 +118,7 @@ const ReleaseList: React.FC<ReleaseListProps> = ({
                             size="sm"
                             onClick={() => handleReject(release.id)}
                             className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            title="Rejeitar"
                           >
                             <X className="h-4 w-4" />
                             <span className="sr-only">Rejeitar</span>
@@ -131,6 +134,7 @@ const ReleaseList: React.FC<ReleaseListProps> = ({
                           className={`h-8 w-8 p-0 ${release.monitoringActive 
                             ? 'text-blue-600 hover:text-blue-700 hover:bg-blue-50' 
                             : 'text-gray-600 hover:text-gray-700 hover:bg-gray-50'}`}
+                          title={release.monitoringActive ? 'Desativar Monitoramento' : 'Ativar Monitoramento'}
                         >
                           {release.monitoringActive ? (
                             <BellOff className="h-4 w-4" />
@@ -148,6 +152,7 @@ const ReleaseList: React.FC<ReleaseListProps> = ({
                         size="sm"
                         onClick={() => handleDelete(release.id)}
                         className="h-8 w-8 p-0 text-destructive hover:text-destructive/90 hover:bg-destructive/10"
+                        title="Excluir"
                       >
                         <Trash className="h-4 w-4" />
                         <span className="sr-only">Excluir</span>

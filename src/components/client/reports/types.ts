@@ -14,3 +14,20 @@ export interface ClientInfo {
   phone: string;
   address: string;
 }
+
+export interface ReportInclusions {
+  mediaAnalysis: boolean;
+  sentimentAnalysis: boolean;
+  competitorComparison: boolean;
+  contentAnalysis: boolean;
+}
+
+export interface CustomReportOptions {
+  title: string;
+  dateRange: {
+    start: Date;
+    end: Date;
+  };
+  format: "pdf" | "excel";
+  inclusions: ReportInclusions;
+}
