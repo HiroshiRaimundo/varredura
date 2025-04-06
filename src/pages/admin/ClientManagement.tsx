@@ -14,6 +14,8 @@ import AddClientDialog from "@/components/admin/clients/AddClientDialog";
 import EditClientDialog from "@/components/admin/clients/EditClientDialog";
 import DeleteClientDialog from "@/components/admin/clients/DeleteClientDialog";
 import { Client, clientService } from "@/services/clientService";
+import { ServiceType } from "@/hooks/useClientAuth";
+import { NewClientData } from "@/components/admin/clients/AddClientDialog";
 
 // Mock data - substituir por dados reais da API
 const mockPayments: Payment[] = [
@@ -59,11 +61,11 @@ const ClientManagement: React.FC = () => {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [activeTab, setActiveTab] = useState('clients');
-  const [newClient, setNewClient] = useState({
+  const [newClient, setNewClient] = useState<NewClientData>({
     name: "",
     email: "",
-    serviceType: "OBSERVATORY" as const,
-    status: "active" as const
+    serviceType: ServiceType.OBSERVATORY,
+    status: "active"
   });
 
   // Load clients
@@ -129,7 +131,7 @@ const ClientManagement: React.FC = () => {
       setNewClient({
         name: "",
         email: "",
-        serviceType: "OBSERVATORY",
+        serviceType: ServiceType.OBSERVATORY,
         status: "active"
       });
       
@@ -288,7 +290,7 @@ const ClientManagement: React.FC = () => {
   }
 
   // Fix the mapping of Client objects to ClientAccount format
-  // Here's where we fix the toISOString error by ensuring we handle the createdAt and expiresAt correctly
+  // Here we handle the createdAt and expiresAt more safely
   const clientsForList: ClientAccount[] = clients.map(client => ({
     id: client.id,
     name: client.name,
@@ -296,8 +298,14 @@ const ClientManagement: React.FC = () => {
     type: client.serviceType, 
     status: client.status === "active" ? "active" : "inactive",
     plan: "basic",
-    createdAt: typeof client.createdAt === 'string' ? client.createdAt : client.createdAt.toISOString(),
-    trialEndsAt: client.expiresAt ? (typeof client.expiresAt === 'string' ? client.expiresAt : client.expiresAt.toISOString()) : undefined,
+    createdAt: typeof client.createdAt === 'string' ? client.createdAt : 
+               client.createdAt instanceof Date ? client.createdAt.toISOString() : 
+               new Date().toISOString(),
+    trialEndsAt: client.expiresAt ? 
+                 (typeof client.expiresAt === 'string' ? client.expiresAt : 
+                  client.expiresAt instanceof Date ? client.expiresAt.toISOString() : 
+                  undefined) : 
+                 undefined,
   }));
 
   return (
