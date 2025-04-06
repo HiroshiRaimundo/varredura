@@ -1,12 +1,11 @@
-
 import React from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PlusCircle } from "lucide-react";
 import { ServiceType } from "@/hooks/useClientAuth";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Fix the type definition to match what's used in ClientManagement
 export interface NewClientData {
@@ -33,12 +32,6 @@ const AddClientDialog: React.FC<AddClientDialogProps> = ({
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Adicionar Cliente
-        </Button>
-      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Adicionar Novo Cliente</DialogTitle>
@@ -63,25 +56,6 @@ const AddClientDialog: React.FC<AddClientDialogProps> = ({
               onChange={(e) => onNewClientChange({ ...newClient, email: e.target.value })}
               placeholder="email@exemplo.com"
             />
-          </div>
-          <div className="space-y-2">
-            <Label>Tipo de Serviço *</Label>
-            <Select
-              value={newClient.serviceType}
-              onValueChange={(value) => onNewClientChange({ ...newClient, serviceType: value as ServiceType })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o serviço" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={ServiceType.OBSERVATORY}>Observatório</SelectItem>
-                <SelectItem value={ServiceType.PRESS}>Assessoria de Imprensa</SelectItem>
-                <SelectItem value={ServiceType.RESEARCHER}>Pesquisador</SelectItem>
-                <SelectItem value={ServiceType.POLITICIAN}>Político</SelectItem>
-                <SelectItem value={ServiceType.INSTITUTION}>Instituição</SelectItem>
-                <SelectItem value={ServiceType.JOURNALIST}>Jornalista</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </div>
         <DialogFooter>

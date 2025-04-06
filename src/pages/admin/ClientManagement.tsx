@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -289,7 +288,6 @@ const ClientManagement: React.FC = () => {
     );
   }
 
-  // Fix the mapping of Client objects to ClientAccount format
   // Here we handle the createdAt and expiresAt more safely
   const clientsForList: ClientAccount[] = clients.map(client => ({
     id: client.id,
@@ -320,18 +318,10 @@ const ClientManagement: React.FC = () => {
               Gerencie clientes, pagamentos e solicitações de recuperação de senha.
             </CardDescription>
           </div>
-          {activeTab === 'clients' && (
-            <Button onClick={addClient}>
-              <Plus className="h-4 w-4 mr-2" />
-              Adicionar Cliente
-            </Button>
-          )}
-          {activeTab === 'payments' && (
-            <Button onClick={exportPayments} variant="outline">
-              <Download className="h-4 w-4 mr-2" />
-              Exportar Pagamentos
-            </Button>
-          )}
+          <Button onClick={addClient}>
+            <Plus className="h-4 w-4 mr-2" />
+            Adicionar Cliente
+          </Button>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
