@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import ContentModerator from "@/components/admin/ContentModerator";
-import { AdminMonitoringDashboard } from "@/components/admin/monitoring/AdminMonitoringDashboard";
+import AdminMonitoringDashboard from "@/components/admin/monitoring/AdminMonitoringDashboard";
 import { AuditLog } from "@/types/adminTypes";
+import { Badge } from "@/components/ui/badge";
 
 interface Content {
   id: string;

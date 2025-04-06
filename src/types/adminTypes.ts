@@ -126,6 +126,31 @@ export interface RolePermission {
   };
 }
 
+// Adding new types to fix the build errors
+export interface PasswordReset {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  requestDate: string;
+  status: 'pending' | 'completed' | 'expired';
+  expiryDate: string;
+  completedDate?: string;
+}
+
+export interface Payment {
+  id: string;
+  clientId: string;
+  clientName: string;
+  amount: number;
+  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  date: string;
+  method: 'credit_card' | 'bank_transfer' | 'pix' | 'invoice';
+  planType: 'basic' | 'premium' | 'enterprise';
+  invoiceUrl?: string;
+  receiptUrl?: string;
+}
+
 // Mock data helper function
 export const getMockReleaseAnalysis = (releaseId: string): ReleaseAnalysis => ({
   id: `analysis-${releaseId}`,
@@ -148,4 +173,3 @@ export const getMockReleaseAnalysis = (releaseId: string): ReleaseAnalysis => ({
   suggestedAction: Math.random() > 0.7 ? "approve" as const : Math.random() > 0.5 ? "review" as const : "reject" as const,
   reasoning: "Baseado na análise de conteúdo e similaridade com releases anteriores."
 });
-
