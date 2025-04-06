@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
-import { PlusCircle, X, FileText } from "lucide-react";
+import { PlusCircle, X, FileText, Plus, Tag } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 export interface PressReleaseFormProps {
   clientType: string;
@@ -26,7 +27,8 @@ interface FormValues {
   targetOutlet: string;
 }
 
-const categories = [
+// Lista inicial de categorias
+const initialCategories = [
   { id: "business", label: "Negócios" },
   { id: "environment", label: "Meio Ambiente" },
   { id: "technology", label: "Tecnologia" },
@@ -41,6 +43,10 @@ const PressReleaseForm: React.FC<PressReleaseFormProps> = ({ clientType }) => {
   const [newMediaLink, setNewMediaLink] = useState("");
   const [activeTab, setActiveTab] = useState("basic");
   const [isOtherCategory, setIsOtherCategory] = useState(false);
+  const [categories, setCategories] = useState(initialCategories);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategoryId, setNewCategoryId] = useState("");
+  const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
 
   const form = useForm<FormValues>({
     defaultValues: {
@@ -82,6 +88,54 @@ const PressReleaseForm: React.FC<PressReleaseFormProps> = ({ clientType }) => {
     if (value !== "other") {
       form.setValue("customCategory", "");
     }
+  };
+
+  const addNewCategory = () => {
+    if (!newCategoryName.trim()) {
+      toast({
+        title: "Nome da categoria obrigatório",
+        description: "Por favor, insira um nome para a categoria",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Gerar um ID a partir do nome (se o ID personalizado não for fornecido)
+    const categoryId = newCategoryId.trim() || newCategoryName.toLowerCase().replace(/\s+/g, '_');
+    
+    // Verificar se já existe uma categoria com este ID
+    if (categories.some(cat => cat.id === categoryId)) {
+      toast({
+        title: "Categoria já existe",
+        description: "Uma categoria com este ID já existe. Por favor, use outro nome.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Adicionar a nova categoria
+    const newCategory = {
+      id: categoryId,
+      label: newCategoryName
+    };
+    
+    setCategories([...categories, newCategory]);
+    
+    // Limpar campos do formulário
+    setNewCategoryName("");
+    setNewCategoryId("");
+    
+    // Fechar o diálogo
+    setIsCategoryDialogOpen(false);
+    
+    // Selecionar a nova categoria no formulário
+    form.setValue("category", categoryId);
+    setIsOtherCategory(false);
+    
+    toast({
+      title: "Categoria adicionada",
+      description: `A categoria "${newCategoryName}" foi adicionada com sucesso.`
+    });
   };
 
   const onSubmit = (data: FormValues) => {
@@ -165,31 +219,86 @@ const PressReleaseForm: React.FC<PressReleaseFormProps> = ({ clientType }) => {
                 )}
               />
               
-              <FormField
-                control={form.control}
-                name="category"
-                rules={{ required: "A categoria é obrigatória" }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Categoria</FormLabel>
-                    <Select onValueChange={handleCategoryChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione uma categoria" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem key={category.id} value={category.id}>
-                            {category.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-2">
+                <FormField
+                  control={form.control}
+                  name="category"
+                  rules={{ required: "A categoria é obrigatória" }}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Categoria</FormLabel>
+                      <div className="flex gap-2">
+                        <Select onValueChange={handleCategoryChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="flex-1">
+                              <SelectValue placeholder="Selecione uma categoria" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {categories.map((category) => (
+                              <SelectItem key={category.id} value={category.id}>
+                                {category.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        
+                        <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="icon" type="button">
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                              <DialogTitle>Adicionar nova categoria</DialogTitle>
+                              <DialogDescription>
+                                Crie uma nova categoria para seus releases
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <FormLabel htmlFor="name" className="col-span-4">
+                                  Nome da categoria
+                                </FormLabel>
+                                <Input
+                                  id="name"
+                                  value={newCategoryName}
+                                  onChange={(e) => setNewCategoryName(e.target.value)}
+                                  placeholder="Ex: Marketing Digital"
+                                  className="col-span-4"
+                                />
+                              </div>
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <FormLabel htmlFor="id" className="col-span-4">
+                                  ID (opcional)
+                                </FormLabel>
+                                <Input
+                                  id="id"
+                                  value={newCategoryId}
+                                  onChange={(e) => setNewCategoryId(e.target.value)}
+                                  placeholder="Ex: marketing_digital"
+                                  className="col-span-4"
+                                />
+                                <p className="text-sm text-muted-foreground col-span-4">
+                                  Deixe em branco para gerar automaticamente a partir do nome
+                                </p>
+                              </div>
+                            </div>
+                            <DialogFooter>
+                              <Button type="button" onClick={addNewCategory}>
+                                <Tag className="mr-2 h-4 w-4" />
+                                Adicionar categoria
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               
               {isOtherCategory && (
                 <FormField

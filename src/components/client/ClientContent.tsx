@@ -30,6 +30,15 @@ const mockAlerts: LegislationAlert[] = [
     isRead: true,
     url: "https://example.com/decreto1",
     source: "Ministério do Meio Ambiente"
+  },
+  {
+    id: "3",
+    title: "Alerta de Monitoramento: Portal Terra",
+    description: "Detectamos 5 novas menções ao seu monitoramento de 'Sustentabilidade'",
+    date: "2023-04-16",
+    isRead: false,
+    url: "https://example.com/monitoramento1",
+    source: "Sistema de Monitoramento"
   }
 ];
 
