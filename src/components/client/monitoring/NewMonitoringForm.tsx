@@ -18,7 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrendingUp, Search, Smile, BarChart, Database, Plug, Globe } from "lucide-react";
+import { TrendingUp, Search, Smile, BarChart, Database, Plug, Globe, FileText } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 
@@ -29,8 +29,7 @@ interface NewMonitoringFormProps {
 interface FormValues {
   name: string;
   terms: string;
-  customUrls?: string[];
-  sources: string[];
+  monitoringUrls: string[];
   frequency: string;
   alertThreshold: string;
   apiUrl?: string;
@@ -38,20 +37,8 @@ interface FormValues {
   analysisTypes: string[];
   crossAnalysis: boolean;
   customCategories?: string;
+  includeFileAnalysis: boolean;
 }
-
-const sources = [
-  { id: "news", label: "Portais de Notícias" },
-  { id: "blogs", label: "Blogs" },
-  { id: "social", label: "Redes Sociais" },
-  { id: "press", label: "Releases de Imprensa" },
-  { id: "videos", label: "Plataformas de Vídeo" },
-  { id: "forums", label: "Fóruns de Discussão" },
-  { id: "academic", label: "Publicações Acadêmicas" },
-  { id: "legislative", label: "Documentos Legislativos" },
-  { id: "government", label: "Sites Governamentais" },
-  { id: "custom", label: "URLs Personalizadas" },
-];
 
 const analysisTypes = [
   { id: "content", label: "Análise de Conteúdo", icon: <Search className="h-4 w-4 mr-2" /> },
@@ -63,32 +50,31 @@ const analysisTypes = [
 const NewMonitoringForm: React.FC<NewMonitoringFormProps> = ({ onSubmitSuccess }) => {
   const [activeTab, setActiveTab] = useState("basic");
   const [showApiFields, setShowApiFields] = useState(false);
-  const [customUrls, setCustomUrls] = useState<string[]>([]);
+  const [monitoringUrls, setMonitoringUrls] = useState<string[]>([]);
   const [newUrl, setNewUrl] = useState("");
 
   const form = useForm<FormValues>({
     defaultValues: {
       name: "",
       terms: "",
-      sources: ["news"],
+      monitoringUrls: [],
       frequency: "daily",
       alertThreshold: "1",
       analysisTypes: ["content"],
       crossAnalysis: false,
       customCategories: "",
+      includeFileAnalysis: false,
     },
   });
 
   const selectedAnalysisTypes = form.watch("analysisTypes");
-  const selectedSources = form.watch("sources");
-  const showCustomUrls = selectedSources.includes("custom");
   const showCrossAnalysis = selectedAnalysisTypes.length > 1;
 
-  const addCustomUrl = () => {
+  const addMonitoringUrl = () => {
     if (newUrl) {
       try {
         new URL(newUrl); // Validar URL
-        setCustomUrls([...customUrls, newUrl]);
+        setMonitoringUrls([...monitoringUrls, newUrl]);
         setNewUrl("");
       } catch (e) {
         toast({
@@ -100,16 +86,16 @@ const NewMonitoringForm: React.FC<NewMonitoringFormProps> = ({ onSubmitSuccess }
     }
   };
 
-  const removeCustomUrl = (urlToRemove: string) => {
-    setCustomUrls(customUrls.filter(url => url !== urlToRemove));
+  const removeMonitoringUrl = (urlToRemove: string) => {
+    setMonitoringUrls(monitoringUrls.filter(url => url !== urlToRemove));
   };
 
   const onSubmit = async (data: FormValues) => {
     try {
-      // Adicionar as URLs personalizadas aos dados do formulário
+      // Adicionar as URLs monitoradas aos dados do formulário
       const formData = {
         ...data,
-        customUrls: showCustomUrls ? customUrls : undefined,
+        monitoringUrls: monitoringUrls,
       };
 
       // Log de dados para debug
@@ -214,99 +200,74 @@ const NewMonitoringForm: React.FC<NewMonitoringFormProps> = ({ onSubmitSuccess }
           </TabsContent>
 
           <TabsContent value="sources" className="space-y-6">
+            <Card>
+              <CardContent className="pt-6 space-y-4">
+                <div className="space-y-2">
+                  <Label>URLs para Monitoramento</Label>
+                  <div className="flex gap-2">
+                    <Input 
+                      placeholder="https://exemplo.com" 
+                      value={newUrl}
+                      onChange={(e) => setNewUrl(e.target.value)}
+                    />
+                    <Button type="button" onClick={addMonitoringUrl}>
+                      Adicionar
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Adicione URLs dos sites que deseja monitorar (portais de notícias, blogs, sites governamentais, diários oficiais, etc.)
+                  </p>
+                </div>
+
+                {monitoringUrls.length > 0 && (
+                  <div className="space-y-2">
+                    <Label>URLs adicionadas</Label>
+                    <div className="space-y-2">
+                      {monitoringUrls.map((url, index) => (
+                        <div key={index} className="flex items-center justify-between bg-muted p-2 rounded-md">
+                          <div className="flex items-center">
+                            <Globe className="h-4 w-4 mr-2" />
+                            <span className="text-sm truncate max-w-[300px]">{url}</span>
+                          </div>
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => removeMonitoringUrl(url)}
+                          >
+                            ×
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             <FormField
               control={form.control}
-              name="sources"
-              rules={{ required: "Selecione pelo menos uma fonte" }}
-              render={() => (
+              name="includeFileAnalysis"
+              render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Fontes a Monitorar</FormLabel>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
-                    {sources.map((source) => (
-                      <FormField
-                        key={source.id}
-                        control={form.control}
-                        name="sources"
-                        render={({ field }) => {
-                          return (
-                            <FormItem
-                              key={source.id}
-                              className="flex flex-row items-start space-x-3 space-y-0"
-                            >
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(source.id)}
-                                  onCheckedChange={(checked) => {
-                                    return checked
-                                      ? field.onChange([...field.value, source.id])
-                                      : field.onChange(
-                                          field.value?.filter(
-                                            (value) => value !== source.id
-                                          )
-                                        );
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                {source.label}
-                              </FormLabel>
-                            </FormItem>
-                          );
-                        }}
+                  <div className="flex items-center space-x-2">
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
                       />
-                    ))}
+                    </FormControl>
+                    <div className="space-y-0.5">
+                      <FormLabel>Analisar arquivos e documentos</FormLabel>
+                      <FormDescription>
+                        Ativa o download e análise de arquivos PDF, DOC e outros documentos encontrados nas URLs (como diários oficiais)
+                      </FormDescription>
+                    </div>
                   </div>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {showCustomUrls && (
-              <Card>
-                <CardContent className="pt-6 space-y-4">
-                  <div className="space-y-2">
-                    <Label>URLs Personalizadas</Label>
-                    <div className="flex gap-2">
-                      <Input 
-                        placeholder="https://exemplo.com" 
-                        value={newUrl}
-                        onChange={(e) => setNewUrl(e.target.value)}
-                      />
-                      <Button type="button" onClick={addCustomUrl}>
-                        Adicionar
-                      </Button>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Adicione URLs específicas para monitoramento
-                    </p>
-                  </div>
-
-                  {customUrls.length > 0 && (
-                    <div className="space-y-2">
-                      <Label>URLs adicionadas</Label>
-                      <div className="space-y-2">
-                        {customUrls.map((url, index) => (
-                          <div key={index} className="flex items-center justify-between bg-muted p-2 rounded-md">
-                            <div className="flex items-center">
-                              <Globe className="h-4 w-4 mr-2" />
-                              <span className="text-sm truncate max-w-[300px]">{url}</span>
-                            </div>
-                            <Button 
-                              type="button" 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => removeCustomUrl(url)}
-                            >
-                              ×
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
 
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
