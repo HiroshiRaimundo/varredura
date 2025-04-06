@@ -3,28 +3,15 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Plus, Download, FileText, Trash2, UserPlus, Wallet } from "lucide-react";
+import { Plus, Download, FileText, Wallet } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import BackToAdminButton from "@/components/admin/BackToAdminButton";
 import { clientService, Client } from "@/services/clientService";
-import AddClientDialog from "@/components/admin/clients/AddClientDialog";
+import AddClientDialog, { NewClientData } from "@/components/admin/clients/AddClientDialog";
 import EditClientDialog from "@/components/admin/clients/EditClientDialog";
 import DeleteClientDialog from "@/components/admin/clients/DeleteClientDialog";
 import PasswordDialog from "@/components/admin/clients/PasswordDialog";
-import { ServiceType } from "@/hooks/useClientAuth";
-import { NewClientData } from "@/components/admin/clients/AddClientDialog";
 import ClientTable from "@/components/admin/clients/ClientTable";
-
-// Definição do tipo ClientAccount para a tabela
-interface ClientAccount {
-  id: string;
-  name: string;
-  email: string;
-  serviceType: ServiceType;
-  status: "active" | "inactive";
-  createdAt: string | Date;
-  expiresAt?: string | Date;
-}
 
 const ClientManagement: React.FC = () => {
   const { toast } = useToast();
@@ -104,7 +91,6 @@ const ClientManagement: React.FC = () => {
         name: newClient.name,
         email: newClient.email,
         status: newClient.status,
-        serviceType: ServiceType.OBSERVATORY,
         expiresAt: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
       });
 
@@ -261,17 +247,6 @@ const ClientManagement: React.FC = () => {
     );
   }
 
-  // Convert all clients to ClientAccount type for the table
-  const clientsForTable: ClientAccount[] = clients.map(client => ({
-    id: client.id,
-    name: client.name,
-    email: client.email,
-    serviceType: client.serviceType,
-    status: client.status,
-    createdAt: client.createdAt instanceof Date ? client.createdAt : new Date(client.createdAt),
-    expiresAt: client.expiresAt ? (client.expiresAt instanceof Date ? client.expiresAt : new Date(client.expiresAt)) : undefined
-  }));
-
   return (
     <div className="container mx-auto py-6">
       <BackToAdminButton />
@@ -292,7 +267,7 @@ const ClientManagement: React.FC = () => {
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="mb-4">
               <TabsTrigger value="clients" className="flex items-center">
-                <UserPlus className="h-4 w-4 mr-2" /> Clientes
+                <Plus className="h-4 w-4 mr-2" /> Clientes
               </TabsTrigger>
               <TabsTrigger value="payments" className="flex items-center">
                 <Wallet className="h-4 w-4 mr-2" /> Pagamentos
@@ -305,7 +280,7 @@ const ClientManagement: React.FC = () => {
             <TabsContent value="clients">
               {clients.length > 0 ? (
                 <ClientTable
-                  clients={clientsForTable}
+                  clients={clients}
                   onStatusToggle={toggleClientStatus}
                   onResetPassword={resetPassword}
                   onEditClient={editClient}
