@@ -14,7 +14,7 @@ interface EditClientDialogProps {
   onOpenChange: (open: boolean) => void;
   client: Client;
   onClientChange: (field: string, value: string) => void;
-  onSave: (updatedClient: Client) => void;
+  onSave: (updatedClient: Client) => void;  // Updated to accept Client parameter
 }
 
 const EditClientDialog: React.FC<EditClientDialogProps> = ({
@@ -64,7 +64,7 @@ const EditClientDialog: React.FC<EditClientDialogProps> = ({
 
   const handleSave = () => {
     if (validateForm()) {
-      onSave(editedClient);
+      onSave(editedClient);  // Pass the edited client to the onSave function
     } else {
       toast({
         title: "Erro de validação",

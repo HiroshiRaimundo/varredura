@@ -4,12 +4,15 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ServiceType } from "@/hooks/useClientAuth";
 
-// Updated type definition without serviceType
+// Updated type definition to include serviceType
 export interface NewClientData {
   name: string;
   email: string;
   status: "active" | "inactive";
+  serviceType: ServiceType;
 }
 
 interface AddClientDialogProps {
@@ -53,6 +56,25 @@ const AddClientDialog: React.FC<AddClientDialogProps> = ({
               onChange={(e) => onNewClientChange({ ...newClient, email: e.target.value })}
               placeholder="email@exemplo.com"
             />
+          </div>
+          <div className="space-y-2">
+            <Label>Tipo de Serviço *</Label>
+            <Select
+              value={newClient.serviceType}
+              onValueChange={(value) => onNewClientChange({ ...newClient, serviceType: value as ServiceType })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o tipo de serviço" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ServiceType.OBSERVATORY}>Observatório</SelectItem>
+                <SelectItem value={ServiceType.PRESS}>Assessoria de Imprensa</SelectItem>
+                <SelectItem value={ServiceType.RESEARCHER}>Pesquisador</SelectItem>
+                <SelectItem value={ServiceType.POLITICIAN}>Político</SelectItem>
+                <SelectItem value={ServiceType.INSTITUTION}>Instituição</SelectItem>
+                <SelectItem value={ServiceType.JOURNALIST}>Jornalista</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <DialogFooter>
