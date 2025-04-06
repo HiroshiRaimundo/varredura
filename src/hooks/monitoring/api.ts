@@ -1,3 +1,4 @@
+
 import { MonitoringItem, LegislationAlert, ReleaseMonitoringItem } from './types';
 
 // Dados mockados para monitoramento
@@ -126,6 +127,29 @@ export const createMonitoring = async (
       };
       mockMonitorings.unshift(newMonitoring);
       resolve(newMonitoring);
+    }, 500);
+  });
+};
+
+// Add the missing updateMonitoring function
+export const updateMonitoring = async (
+  monitoring: Partial<MonitoringItem> & { id: string }
+): Promise<MonitoringItem> => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const index = mockMonitorings.findIndex(m => m.id === monitoring.id);
+      if (index !== -1) {
+        // Update the existing monitoring with new data
+        const updatedMonitoring = {
+          ...mockMonitorings[index],
+          ...monitoring,
+          lastUpdate: new Date().toISOString()
+        };
+        mockMonitorings[index] = updatedMonitoring;
+        resolve(updatedMonitoring);
+      } else {
+        reject(new Error(`Monitoring with id ${monitoring.id} not found`));
+      }
     }, 500);
   });
 };

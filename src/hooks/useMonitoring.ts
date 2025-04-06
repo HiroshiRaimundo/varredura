@@ -73,12 +73,12 @@ export function useMonitoring(clientId: string = 'default') {
           lastUpdate: new Date().toISOString()
         };
         
-        // In a real app, you would call API here
-        // const result = await updateMonitoring(updatedItem);
+        // Call the API to update the item
+        const result = await updateMonitoring(updatedItem as MonitoringItem & { id: string });
         
-        // For demo, we'll update the local state
+        // Update local state
         setMonitoringItems(prev => 
-          prev.map(item => item.id === monitoring.id ? { ...item, ...updatedItem } as MonitoringItem : item)
+          prev.map(item => item.id === monitoring.id ? result : item)
         );
         
         toast({
@@ -86,7 +86,7 @@ export function useMonitoring(clientId: string = 'default') {
           description: `Monitoramento "${monitoring.name}" foi atualizado com sucesso.`,
         });
         
-        return { ...monitoring } as MonitoringItem;
+        return result;
       } else {
         // This is a new monitoring
         const newMonitoring = await createMonitoring(monitoring as Omit<MonitoringItem, 'id' | 'status' | 'lastUpdate' | 'createdAt'>);
@@ -137,10 +137,11 @@ export function useMonitoring(clientId: string = 'default') {
 
   const updateMonitoringStatus = async (id: string, newStatus: string) => {
     try {
-      // In a real app, call the API here
-      // const result = await updateStatus(id, newStatus);
+      // Call the API to update the status
+      const updatedItem = { id, status: newStatus } as MonitoringItem & { id: string };
+      const result = await updateMonitoring(updatedItem);
       
-      // For demo, update locally
+      // Update local state
       setMonitoringItems(prev => 
         prev.map(item => item.id === id ? 
           { ...item, status: newStatus, lastUpdate: new Date().toISOString() } : item
