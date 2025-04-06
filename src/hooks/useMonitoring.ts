@@ -7,6 +7,7 @@ import {
   getLegislationAlerts, 
   getReleaseMonitoring,
   createMonitoring,
+  updateMonitoring,
   deleteMonitoring as apiDeleteMonitoring
 } from './monitoring/api';
 
@@ -62,22 +63,47 @@ export function useMonitoring(clientId: string = 'default') {
     }
   };
 
-  const addMonitoring = async (monitoring: Omit<MonitoringItem, 'id' | 'status' | 'lastUpdate' | 'createdAt'>) => {
+  const addMonitoring = async (monitoring: Partial<MonitoringItem>) => {
     try {
-      const newMonitoring = await createMonitoring(monitoring);
-      setMonitoringItems(prev => [newMonitoring, ...prev]);
-      
-      toast({
-        title: 'Monitoramento adicionado',
-        description: `Monitoramento "${monitoring.name}" foi configurado com sucesso.`,
-      });
-      
-      return newMonitoring;
+      // Check if this is an update or create operation
+      if (monitoring.id) {
+        // This is an update
+        const updatedItem = {
+          ...monitoring,
+          lastUpdate: new Date().toISOString()
+        };
+        
+        // In a real app, you would call API here
+        // const result = await updateMonitoring(updatedItem);
+        
+        // For demo, we'll update the local state
+        setMonitoringItems(prev => 
+          prev.map(item => item.id === monitoring.id ? { ...item, ...updatedItem } as MonitoringItem : item)
+        );
+        
+        toast({
+          title: 'Monitoramento atualizado',
+          description: `Monitoramento "${monitoring.name}" foi atualizado com sucesso.`,
+        });
+        
+        return { ...monitoring } as MonitoringItem;
+      } else {
+        // This is a new monitoring
+        const newMonitoring = await createMonitoring(monitoring as Omit<MonitoringItem, 'id' | 'status' | 'lastUpdate' | 'createdAt'>);
+        setMonitoringItems(prev => [newMonitoring, ...prev]);
+        
+        toast({
+          title: 'Monitoramento adicionado',
+          description: `Monitoramento "${monitoring.name}" foi configurado com sucesso.`,
+        });
+        
+        return newMonitoring;
+      }
     } catch (error) {
-      console.error('Erro ao adicionar monitoramento:', error);
+      console.error('Erro ao adicionar/atualizar monitoramento:', error);
       toast({
         title: 'Erro',
-        description: 'Não foi possível adicionar o monitoramento',
+        description: 'Não foi possível salvar o monitoramento',
         variant: 'destructive',
       });
       throw error;
@@ -109,6 +135,35 @@ export function useMonitoring(clientId: string = 'default') {
     }
   };
 
+  const updateMonitoringStatus = async (id: string, newStatus: string) => {
+    try {
+      // In a real app, call the API here
+      // const result = await updateStatus(id, newStatus);
+      
+      // For demo, update locally
+      setMonitoringItems(prev => 
+        prev.map(item => item.id === id ? 
+          { ...item, status: newStatus, lastUpdate: new Date().toISOString() } : item
+        )
+      );
+      
+      toast({
+        title: 'Status atualizado',
+        description: `O status do monitoramento foi atualizado para ${newStatus}.`,
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Erro ao atualizar status:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível atualizar o status do monitoramento',
+        variant: 'destructive',
+      });
+      return false;
+    }
+  };
+
   return {
     monitoringItems,
     legislationAlerts,
@@ -116,6 +171,7 @@ export function useMonitoring(clientId: string = 'default') {
     isLoading,
     addMonitoring,
     deleteMonitoring,
+    updateMonitoringStatus,
     refreshData: fetchMonitorings
   };
 }

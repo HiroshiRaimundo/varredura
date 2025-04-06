@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Eye, Clock, BarChart, FileText, AlertTriangle, Info } from "lucide-react";
+import { PlusCircle, Eye, Clock, BarChart, FileText, AlertTriangle } from "lucide-react";
 import { useMonitoring } from "@/hooks/useMonitoring";
 import { 
   Dialog, 
@@ -15,12 +15,33 @@ import {
 import NewMonitoringForm from "./NewMonitoringForm";
 import { Badge } from "@/components/ui/badge";
 import ScrapyInfo from "./ScrapyInfo";
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious 
+} from "@/components/ui/pagination";
 
 const MonitoringTab: React.FC = () => {
   const { monitoringItems, addMonitoring, deleteMonitoring, isLoading } = useMonitoring();
   const [showNewMonitoringForm, setShowNewMonitoringForm] = useState(false);
   const [activeMonitoringTab, setActiveMonitoringTab] = useState("active");
   const [showScrapyInfo, setShowScrapyInfo] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedDocumentType, setSelectedDocumentType] = useState("");
+  const [editingMonitoring, setEditingMonitoring] = useState<string | null>(null);
+  const [showResultsDialog, setShowResultsDialog] = useState(false);
+  const [showDocumentsDialog, setShowDocumentsDialog] = useState(false);
+
+  // Pagination settings
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(monitoringItems.length / itemsPerPage);
+  const paginatedItems = monitoringItems.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const handleAddMonitoring = () => {
     setShowNewMonitoringForm(true);
@@ -28,6 +49,27 @@ const MonitoringTab: React.FC = () => {
 
   const handleNewMonitoringSuccess = () => {
     setShowNewMonitoringForm(false);
+  };
+  
+  const handleEditMonitoring = (monitoringId: string) => {
+    setEditingMonitoring(monitoringId);
+    setShowNewMonitoringForm(true);
+  };
+  
+  const handleTogglePause = (monitoringId: string) => {
+    // In a real app, this would update the status in the backend
+    console.log(`Toggling pause status for monitoring: ${monitoringId}`);
+    // For demo purposes, we'll simply show a toast message
+    alert(`Status do monitoramento alterado com sucesso!`);
+  };
+  
+  const handleViewResults = () => {
+    setShowResultsDialog(true);
+  };
+  
+  const handleViewDocuments = (documentType: string) => {
+    setSelectedDocumentType(documentType);
+    setShowDocumentsDialog(true);
   };
 
   const getStatusBadge = (status: string) => {
@@ -54,33 +96,121 @@ const MonitoringTab: React.FC = () => {
     });
   };
 
-  const handleShowScrapyInfo = () => {
-    setShowScrapyInfo(true);
-  };
-
   return (
     <>
       <Dialog open={showNewMonitoringForm} onOpenChange={setShowNewMonitoringForm}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle>Novo Monitoramento</DialogTitle>
+            <DialogTitle>{editingMonitoring ? "Editar Monitoramento" : "Novo Monitoramento"}</DialogTitle>
             <DialogDescription>
-              Configure os parâmetros para o monitoramento de fontes
+              {editingMonitoring 
+                ? "Atualize os parâmetros do monitoramento" 
+                : "Configure os parâmetros para o monitoramento de fontes"}
             </DialogDescription>
           </DialogHeader>
-          <NewMonitoringForm onSubmitSuccess={handleNewMonitoringSuccess} />
+          <NewMonitoringForm 
+            onSubmitSuccess={handleNewMonitoringSuccess} 
+            editingId={editingMonitoring}
+          />
         </DialogContent>
       </Dialog>
-
-      <Dialog open={showScrapyInfo} onOpenChange={setShowScrapyInfo}>
+      
+      <Dialog open={showResultsDialog} onOpenChange={setShowResultsDialog}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Tecnologia de Monitoramento Scrapy</DialogTitle>
+            <DialogTitle>Resultados de Monitoramento</DialogTitle>
             <DialogDescription>
-              Detalhes sobre como o sistema monitora e processa fontes de dados
+              Visualize os resultados detalhados das execuções de monitoramento
             </DialogDescription>
           </DialogHeader>
-          <ScrapyInfo onClose={() => setShowScrapyInfo(false)} />
+          <div className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Resumo de Monitoramento</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="border rounded-md p-4 text-center">
+                      <div className="text-2xl font-bold text-green-600">42</div>
+                      <div className="text-sm text-muted-foreground">Menções Positivas</div>
+                    </div>
+                    <div className="border rounded-md p-4 text-center">
+                      <div className="text-2xl font-bold text-red-600">17</div>
+                      <div className="text-sm text-muted-foreground">Menções Negativas</div>
+                    </div>
+                    <div className="border rounded-md p-4 text-center">
+                      <div className="text-2xl font-bold text-blue-600">23</div>
+                      <div className="text-sm text-muted-foreground">Menções Neutras</div>
+                    </div>
+                  </div>
+                  
+                  <div className="border rounded-md p-4">
+                    <h3 className="font-medium mb-2">Principais Fontes</h3>
+                    <ul className="space-y-2">
+                      <li className="flex justify-between">
+                        <span>Portal G1</span>
+                        <span className="font-medium">28 menções</span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span>Folha de São Paulo</span>
+                        <span className="font-medium">15 menções</span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span>Twitter</span>
+                        <span className="font-medium">12 menções</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                
+                <div className="mt-6 flex justify-end">
+                  <Button>Gerar Relatório Completo</Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={showDocumentsDialog} onOpenChange={setShowDocumentsDialog}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{selectedDocumentType || "Documentos"}</DialogTitle>
+            <DialogDescription>
+              Lista de documentos coletados durante o monitoramento
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="divide-y">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="py-3 flex items-center justify-between">
+                      <div className="flex items-center">
+                        <FileText className="h-5 w-5 mr-2 text-blue-500" />
+                        <div>
+                          <div className="font-medium">{selectedDocumentType || "Documento"} {i}.pdf</div>
+                          <div className="text-sm text-muted-foreground">
+                            Adicionado em {new Date().toLocaleDateString('pt-BR')}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="space-x-2">
+                        <Button variant="outline" size="sm">Visualizar</Button>
+                        <Button variant="outline" size="sm">Baixar</Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="mt-6 flex justify-end">
+                  <Button variant="outline" className="mr-2">Baixar Todos</Button>
+                  <Button>Analisar Documentos</Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -93,15 +223,6 @@ const MonitoringTab: React.FC = () => {
             </CardDescription>
           </div>
           <div className="flex space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex items-center gap-1"
-              onClick={handleShowScrapyInfo}
-            >
-              <Info className="h-4 w-4" />
-              <span>Sobre o Scrapy</span>
-            </Button>
             <Button 
               className="flex items-center gap-1"
               onClick={handleAddMonitoring}
@@ -151,7 +272,7 @@ const MonitoringTab: React.FC = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {monitoringItems.map((item) => (
+                  {paginatedItems.map((item) => (
                     <Card key={item.id} className="overflow-hidden">
                       <div className="flex flex-col md:flex-row">
                         <div className="flex-1 p-4">
@@ -191,8 +312,20 @@ const MonitoringTab: React.FC = () => {
                           </div>
                         </div>
                         <div className="flex md:flex-col justify-end gap-2 p-4 bg-muted">
-                          <Button variant="ghost" size="sm">Pausar</Button>
-                          <Button variant="ghost" size="sm">Editar</Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleTogglePause(item.id)}
+                          >
+                            {item.status === "active" ? "Pausar" : "Ativar"}
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleEditMonitoring(item.id)}
+                          >
+                            Editar
+                          </Button>
                           <Button 
                             variant="ghost" 
                             size="sm"
@@ -205,6 +338,38 @@ const MonitoringTab: React.FC = () => {
                       </div>
                     </Card>
                   ))}
+                  
+                  {/* Pagination controls */}
+                  {totalPages > 1 && (
+                    <Pagination className="mt-4">
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                          />
+                        </PaginationItem>
+                        
+                        {Array.from({ length: totalPages }).map((_, index) => (
+                          <PaginationItem key={index}>
+                            <PaginationLink
+                              isActive={currentPage === index + 1}
+                              onClick={() => setCurrentPage(index + 1)}
+                            >
+                              {index + 1}
+                            </PaginationLink>
+                          </PaginationItem>
+                        ))}
+                        
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                            className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  )}
                 </div>
               )}
             </TabsContent>
@@ -264,7 +429,7 @@ const MonitoringTab: React.FC = () => {
                       <BarChart className="h-16 w-16 text-muted-foreground mb-4" />
                       <h4 className="text-lg font-medium mb-1">Análise de Resultados</h4>
                       <p className="text-muted-foreground mb-4">Visualize métricas, gráficos e detalhes sobre as menções encontradas</p>
-                      <Button>Ver Resultados Detalhados</Button>
+                      <Button onClick={handleViewResults}>Ver Resultados Detalhados</Button>
                     </div>
                   </div>
                 </CardContent>
@@ -300,7 +465,12 @@ const MonitoringTab: React.FC = () => {
                               <Badge className="bg-blue-500">Processado</Badge>
                             </div>
                           </div>
-                          <Button variant="outline" size="sm" className="w-full mt-4">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="w-full mt-4"
+                            onClick={() => handleViewDocuments("Diário Oficial da União")}
+                          >
                             Ver Todos
                           </Button>
                         </CardContent>
@@ -327,7 +497,12 @@ const MonitoringTab: React.FC = () => {
                               <Badge className="bg-blue-500">Processado</Badge>
                             </div>
                           </div>
-                          <Button variant="outline" size="sm" className="w-full mt-4">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="w-full mt-4"
+                            onClick={() => handleViewDocuments("Diário da Justiça")}
+                          >
                             Ver Todos
                           </Button>
                         </CardContent>
@@ -354,7 +529,12 @@ const MonitoringTab: React.FC = () => {
                               <Badge className="bg-blue-500">Processado</Badge>
                             </div>
                           </div>
-                          <Button variant="outline" size="sm" className="w-full mt-4">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="w-full mt-4"
+                            onClick={() => handleViewDocuments("Legislação Publicada")}
+                          >
                             Ver Todos
                           </Button>
                         </CardContent>
