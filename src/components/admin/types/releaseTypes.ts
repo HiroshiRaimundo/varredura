@@ -1,4 +1,3 @@
-
 export interface JournalistContact {
   id: string;
   name: string;
@@ -27,6 +26,9 @@ export interface ReleaseData {
   monitoringActive?: boolean;
   lastMonitoringCheck?: string;
   targetJournalists?: string[];
+  client?: string;
+  date?: string;
+  priority?: 'high' | 'medium' | 'low';
 }
 
 export interface JournalistFormValues {

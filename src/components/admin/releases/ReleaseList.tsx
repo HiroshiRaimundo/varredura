@@ -10,18 +10,18 @@ export interface ReleasesListProps {
   filter: 'all' | 'pending' | 'approved' | 'rejected';
   onSelectRelease?: (releaseId: string, isSelected: boolean) => void;
   selectedReleases?: string[];
-  filteredReleases?: ReleaseData[]; // Added to match usage in ReleaseManagement
-  handleView?: (release: ReleaseData) => void; // Added to match usage
-  handleApprove?: (id: string) => void; // Added to match usage
-  handleReject?: (id: string) => void; // Added to match usage
-  handleDelete?: (id: string) => void; // Added to match usage
+  filteredReleases?: ReleaseData[]; 
+  handleView?: (release: ReleaseData) => void;
+  handleApprove?: (id: string) => void;
+  handleReject?: (id: string) => void;
+  handleDelete?: (id: string) => void;
 }
 
 const ReleasesList: React.FC<ReleasesListProps> = ({ 
   filter,
   onSelectRelease,
   selectedReleases = [],
-  filteredReleases, // Accept the prefiltered releases
+  filteredReleases, 
   handleView,
   handleApprove,
   handleReject,
@@ -33,35 +33,59 @@ const ReleasesList: React.FC<ReleasesListProps> = ({
       id: 'rel1',
       title: 'Lançamento do Produto X',
       client: 'Empresa ABC',
+      clientName: 'Empresa ABC',
       date: '2025-03-15',
+      publicationDate: '2025-03-15',
       status: 'pending',
-      priority: 'high'
+      priority: 'high',
+      clientType: 'institution',
+      mediaOutlet: 'G1',
+      publicationUrl: 'https://example.com',
+      publicationTime: '12:00'
     },
     {
       id: 'rel2',
       title: 'Parceria Estratégica com XYZ',
       client: 'Empresa DEF',
+      clientName: 'Empresa DEF',
       date: '2025-03-14',
+      publicationDate: '2025-03-14',
       status: 'approved',
-      priority: 'medium'
+      priority: 'medium',
+      clientType: 'institution',
+      mediaOutlet: 'G1',
+      publicationUrl: 'https://example.com',
+      publicationTime: '12:00'
     },
     {
       id: 'rel3',
       title: 'Resultados Financeiros Q1',
       client: 'Empresa GHI',
+      clientName: 'Empresa GHI',
       date: '2025-03-12',
+      publicationDate: '2025-03-12',
       status: 'rejected',
-      priority: 'low'
+      priority: 'low',
+      clientType: 'institution',
+      mediaOutlet: 'G1',
+      publicationUrl: 'https://example.com',
+      publicationTime: '12:00'
     },
     {
       id: 'rel4',
       title: 'Nova Política Ambiental',
       client: 'Empresa JKL',
+      clientName: 'Empresa JKL',
       date: '2025-03-10',
+      publicationDate: '2025-03-10',
       status: 'pending',
-      priority: 'high'
+      priority: 'high',
+      clientType: 'institution',
+      mediaOutlet: 'G1',
+      publicationUrl: 'https://example.com',
+      publicationTime: '12:00'
     }
-  ];
+  ] as ReleaseData[];
 
   const releases = filteredReleases || defaultReleases;
   
@@ -105,7 +129,7 @@ const ReleasesList: React.FC<ReleasesListProps> = ({
                 )}
                 <TableCell className="font-medium">{release.title}</TableCell>
                 <TableCell>{release.client || release.clientName}</TableCell>
-                <TableCell>{new Date(release.date).toLocaleDateString('pt-BR')}</TableCell>
+                <TableCell>{new Date(release.date || release.publicationDate).toLocaleDateString('pt-BR')}</TableCell>
                 <TableCell>
                   <Badge
                     variant="outline"
@@ -124,20 +148,20 @@ const ReleasesList: React.FC<ReleasesListProps> = ({
                   <Badge
                     variant="outline"
                     className={
-                      release.priority === 'high' ? 'bg-red-100 text-red-800' :
-                      release.priority === 'medium' ? 'bg-blue-100 text-blue-800' :
+                      (release.priority === 'high') ? 'bg-red-100 text-red-800' :
+                      (release.priority === 'medium') ? 'bg-blue-100 text-blue-800' :
                       'bg-gray-100 text-gray-800'
                     }
                   >
-                    {release.priority === 'high' ? 'Alta' :
-                     release.priority === 'medium' ? 'Média' :
+                    {(release.priority === 'high') ? 'Alta' :
+                     (release.priority === 'medium') ? 'Média' :
                      'Baixa'}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     {handleView && (
-                      <Button size="sm" variant="outline" onClick={() => handleView(release)}>
+                      <Button size="sm" variant="outline" onClick={() => handleView(release as ReleaseData)}>
                         Detalhes
                       </Button>
                     )}

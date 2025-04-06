@@ -115,6 +115,7 @@ const ReleaseManagement: React.FC = () => {
           handleApprove={handleApprove}
           handleReject={handleReject}
           handleDelete={handleDelete}
+          filter="all"
         />
         
         <ReleaseDetail 
