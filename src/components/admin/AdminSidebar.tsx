@@ -37,6 +37,11 @@ const AdminSidebar: React.FC = () => {
     {
       title: "Releases e Reportagens",
       icon: <FileText className="h-4 w-4" />,
+      path: "/admin/releases"
+    },
+    {
+      title: "Gerenciar Conteúdo",
+      icon: <FileText className="h-4 w-4" />,
       path: "/admin/content"
     },
     {

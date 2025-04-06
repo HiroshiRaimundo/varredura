@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import PrivateRoute from '@/components/PrivateRoute';
@@ -7,6 +8,7 @@ import Admin from '@/pages/Admin';
 import ClientManagement from '@/pages/admin/ClientManagement';
 import ContentManagement from '@/pages/admin/ContentManagement';
 import MediaContactsManagement from '@/pages/admin/MediaContactsManagement';
+import ReleasesManagement from '@/pages/admin/ReleasesManagement';
 
 // Client pages
 import ClientDashboard from '@/pages/ClientDashboard';
@@ -81,6 +83,15 @@ function App() {
             element={
               <PrivateRoute>
                 <MediaContactsManagement />
+              </PrivateRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/releases"
+            element={
+              <PrivateRoute>
+                <ReleasesManagement />
               </PrivateRoute>
             }
           />
