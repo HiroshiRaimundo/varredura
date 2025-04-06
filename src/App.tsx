@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/hooks/auth';
 import PrivateRoute from '@/components/PrivateRoute';
@@ -86,7 +87,7 @@ function App() {
             }
           />
           
-          {/* Novas rotas de gerenciamento de workspace */}
+          {/* Rotas de gerenciamento de workspace com propósitos diferentes */}
           <Route
             path="/admin/workspace-settings"
             element={

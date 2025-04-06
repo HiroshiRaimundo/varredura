@@ -2,6 +2,7 @@
 import { Workspace } from "@/types/workspaceTypes";
 import { logWorkspaceAction } from "./workspaceLogger";
 import { loadWorkspacesFromStorage } from "./storageUtils";
+import { createWorkspace as createNewWorkspace } from "./workspaceOperations";
 
 // Get workspace by user ID
 export const getWorkspaceByUserId = async (userId: string): Promise<Workspace | undefined> => {
@@ -9,7 +10,9 @@ export const getWorkspaceByUserId = async (userId: string): Promise<Workspace | 
   await new Promise(resolve => setTimeout(resolve, 200));
   
   const workspaces = loadWorkspacesFromStorage();
-  return workspaces.find(workspace => workspace.ownerId === userId);
+  const workspace = workspaces.find(workspace => workspace.ownerId === userId);
+  
+  return workspace;
 };
 
 // Get workspace by ID
