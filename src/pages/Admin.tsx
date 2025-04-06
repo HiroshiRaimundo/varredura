@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -92,11 +91,6 @@ const Admin: React.FC = () => {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(mockAuditLogs);
 
   const quickActions = [
-    {
-      title: "Central de Monitoramento",
-      description: "Gerencie todos os monitoramentos do sistema",
-      path: "/admin/monitoring"
-    },
     {
       title: "Gerenciar Clientes",
       description: "Adicionar, editar e remover clientes do sistema",

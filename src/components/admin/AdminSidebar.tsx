@@ -7,7 +7,6 @@ import {
   Home,
   LogOut,
   UserPlus,
-  BarChart2,
   Mail
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -40,19 +39,9 @@ const AdminSidebar: React.FC = () => {
       path: "/admin/releases"
     },
     {
-      title: "Gerenciar Conteúdo",
-      icon: <FileText className="h-4 w-4" />,
-      path: "/admin/content"
-    },
-    {
       title: "Visualizar Área Cliente",
       icon: <Users className="h-4 w-4" />,
       path: "/dashboard"
-    },
-    {
-      title: "Análise e Relatórios",
-      icon: <BarChart2 className="h-4 w-4" />,
-      path: "/admin/analytics"
     }
   ];
   
