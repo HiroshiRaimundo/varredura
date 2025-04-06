@@ -1,108 +1,79 @@
-import { Workspace, WorkspaceUpdatePayload } from '@/types/workspaceTypes';
-import { logWorkspaceAction } from './workspaceLogger';
+
+import { Workspace } from "@/types/workspaceTypes";
+import { logWorkspaceAction } from "./workspaceLogger";
+import { loadWorkspacesFromStorage } from "./storageUtils";
 
 // Get workspace by user ID
-export const getWorkspaceByUserId = async (userId: string): Promise<Workspace | null> => {
-  try {
-    // In a real app, this would query a database
-    // For this demo, we'll just look through localStorage
-    const workspaces: Workspace[] = [];
-    
-    // Scan localStorage for workspaces
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('workspace_')) {
-        const workspace = JSON.parse(localStorage.getItem(key) || '{}');
-        if (workspace.ownerId === userId) {
-          workspaces.push(workspace);
-        }
-      }
-    }
-    
-    // Return the first workspace found for this user
-    return workspaces.length > 0 ? workspaces[0] : null;
-  } catch (error) {
-    console.error("Error getting workspace by user ID:", error);
-    return null;
-  }
+export const getWorkspaceByUserId = async (userId: string): Promise<Workspace | undefined> => {
+  // Simulate API call with timeout
+  await new Promise(resolve => setTimeout(resolve, 200));
+  
+  const workspaces = loadWorkspacesFromStorage();
+  return workspaces.find(workspace => workspace.ownerId === userId);
 };
 
 // Get workspace by ID
-export const getWorkspaceById = async (id: string): Promise<Workspace | null> => {
-  try {
-    const storedData = localStorage.getItem(`workspace_${id}`);
-    return storedData ? JSON.parse(storedData) : null;
-  } catch (error) {
-    console.error("Error getting workspace by ID:", error);
-    return null;
-  }
+export const getWorkspaceById = async (workspaceId: string): Promise<Workspace | undefined> => {
+  // Simulate API call with timeout
+  await new Promise(resolve => setTimeout(resolve, 200));
+  
+  const workspaces = loadWorkspacesFromStorage();
+  return workspaces.find(workspace => workspace.id === workspaceId);
 };
 
-// Validate workspace data
-export const validateWorkspaceData = (data: WorkspaceUpdatePayload): boolean => {
-  // Add validation logic here
-  return true;
+// Generate an impersonation token (simulated)
+export const generateImpersonationToken = async (
+  adminEmail: string,
+  workspaceId: string
+): Promise<string> => {
+  // In a real app, this would create a secure JWT with limited permissions
+  const tokenPayload = {
+    adminEmail,
+    workspaceId,
+    isImpersonating: true,
+    expiry: Date.now() + 3600000 // 1 hour from now
+  };
+  
+  // Simulate token generation with timeout
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // Log the impersonation attempt
+  logWorkspaceAction("impersonate", {
+    userId: adminEmail,
+    workspaceId,
+    details: { message: "Admin impersonated client workspace" }
+  });
+  
+  // Generate a mock token (in a real app, this would be a JWT)
+  return btoa(JSON.stringify(tokenPayload));
 };
 
-// Generate impersonation token for admin to view as client
-export const generateImpersonationToken = async (adminId: string, workspaceId: string): Promise<string> => {
-  try {
-    // In a real app, this would generate a JWT with limited permissions
-    const token = `imp_${adminId}_${workspaceId}_${Date.now()}`;
-    
-    // Store token in localStorage for this demo
-    localStorage.setItem(`imp_token_${token}`, JSON.stringify({
-      adminId,
-      workspaceId,
-      createdAt: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString() // 24 hour expiry
-    }));
-    
-    // Log action
-    logWorkspaceAction("impersonate", {
-      userId: adminId,
-      workspaceId,
-      details: "Admin impersonation token generated"
-    });
-    
-    return token;
-  } catch (error) {
-    console.error("Error generating impersonation token:", error);
-    throw new Error("Failed to generate impersonation token");
+// Export workspace data for analysis or backup
+export const exportWorkspaceData = async (
+  workspaceId: string, 
+  userId: string
+): Promise<object> => {
+  // Get the workspace
+  const workspace = await getWorkspaceById(workspaceId);
+  
+  if (!workspace) {
+    throw new Error("Workspace not found");
   }
-};
-
-// Export workspace data
-export const exportWorkspaceData = async (workspaceId: string, userId: string): Promise<object> => {
-  try {
-    // Get workspace data
-    const workspace = await getWorkspaceById(workspaceId);
-    if (!workspace) {
-      throw new Error("Workspace not found");
-    }
-    
-    // Check ownership
-    if (workspace.ownerId !== userId) {
-      throw new Error("Unauthorized to export this workspace data");
-    }
-    
-    // In a real app, this would compile all relevant data
-    const exportData = {
-      workspace,
-      // Other related data would be included here
-      exportedAt: new Date().toISOString()
-    };
-    
-    // Log action
-    logWorkspaceAction("export", {
-      userId,
-      workspaceId,
-      details: "Workspace data exported"
-    });
-    
-    return exportData;
-  } catch (error) {
-    console.error("Error exporting workspace data:", error);
-    throw new Error("Failed to export workspace data");
-  }
+  
+  // Create an export object with all relevant data
+  // In a real app, this would include related entities like metrics, settings, etc.
+  const exportData = {
+    workspace,
+    exportedAt: new Date().toISOString(),
+    exportedBy: userId
+  };
+  
+  // Log the export action
+  logWorkspaceAction("export", {
+    userId,
+    workspaceId,
+    details: { message: "Workspace data exported" }
+  });
+  
+  return exportData;
 };

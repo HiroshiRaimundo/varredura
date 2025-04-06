@@ -22,8 +22,8 @@ import Unauthorized from '@/pages/Unauthorized';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <Routes>
           {/* Página inicial pública */}
           <Route path="/" element={<Index />} />
@@ -126,8 +126,8 @@ function App() {
           {/* Rota 404 */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 
