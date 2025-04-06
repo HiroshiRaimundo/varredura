@@ -17,7 +17,10 @@ interface ClientAlertsProps {
 
 const ClientAlerts: React.FC<ClientAlertsProps> = ({ clientType, alerts = [] }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [alertsData, setAlertsData] = useState(alerts);
+  const [alertsData, setAlertsData] = useState(alerts.map(alert => ({
+    ...alert,
+    isImportant: alert.isImportant || false
+  })));
   const colorClasses = getColorClasses(clientType);
   
   // Filtrar alertas com base no termo de pesquisa
@@ -44,7 +47,8 @@ const ClientAlerts: React.FC<ClientAlertsProps> = ({ clientType, alerts = [] }) 
       alert.id === id ? { ...alert, isImportant: !alert.isImportant } : alert
     ));
     
-    const isNowImportant = alertsData.find(a => a.id === id)?.isImportant;
+    const alert = alertsData.find(a => a.id === id);
+    const isNowImportant = alert?.isImportant;
     
     toast({
       title: isNowImportant ? "Alerta desmarcado" : "Alerta marcado como importante",
@@ -115,7 +119,7 @@ const ClientAlerts: React.FC<ClientAlertsProps> = ({ clientType, alerts = [] }) 
                     )}
                     {alert.title}
                   </h3>
-                  <Badge className={`${colorClasses.bg} hover:${colorClasses.bgHover}`}>
+                  <Badge className={`${colorClasses.bg} hover:${colorClasses.hover}`}>
                     {alert.source}
                   </Badge>
                 </div>

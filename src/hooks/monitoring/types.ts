@@ -34,6 +34,7 @@ export interface LegislationAlert {
   description: string;
   date: string;
   isRead: boolean;
+  isImportant?: boolean;
   url: string;
   source: string;
 }
