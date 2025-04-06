@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,6 +16,26 @@ const ClientDashboard: React.FC = () => {
   const navigate = useNavigate();
   const auth = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
+
+  useEffect(() => {
+    // Escutar eventos personalizados do dashboard para trocar de aba
+    const handleTabChange = (event: CustomEvent<{ tab: string, subTab?: string }>) => {
+      setActiveTab(event.detail.tab);
+      
+      // Se houver uma subaba especificada, podemos criar outro estado para ela
+      // e passá-la para o componente apropriado
+      if (event.detail.subTab) {
+        // Aqui poderíamos armazenar a subaba em um estado se necessário
+        console.log("Subaba solicitada:", event.detail.subTab);
+      }
+    };
+
+    window.addEventListener("dashboard:tab:change", handleTabChange as EventListener);
+    
+    return () => {
+      window.removeEventListener("dashboard:tab:change", handleTabChange as EventListener);
+    };
+  }, []);
 
   if (!auth.isAuthenticated) {
     navigate("/login");

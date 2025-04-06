@@ -18,7 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrendingUp, Search, Smile, BarChart, Database, Plug } from "lucide-react";
+import { TrendingUp, Search, Smile, BarChart, Database, Plug, Globe } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 
@@ -29,6 +29,7 @@ interface NewMonitoringFormProps {
 interface FormValues {
   name: string;
   terms: string;
+  customUrls?: string[];
   sources: string[];
   frequency: string;
   alertThreshold: string;
@@ -49,6 +50,7 @@ const sources = [
   { id: "academic", label: "Publicações Acadêmicas" },
   { id: "legislative", label: "Documentos Legislativos" },
   { id: "government", label: "Sites Governamentais" },
+  { id: "custom", label: "URLs Personalizadas" },
 ];
 
 const analysisTypes = [
@@ -61,6 +63,8 @@ const analysisTypes = [
 const NewMonitoringForm: React.FC<NewMonitoringFormProps> = ({ onSubmitSuccess }) => {
   const [activeTab, setActiveTab] = useState("basic");
   const [showApiFields, setShowApiFields] = useState(false);
+  const [customUrls, setCustomUrls] = useState<string[]>([]);
+  const [newUrl, setNewUrl] = useState("");
 
   const form = useForm<FormValues>({
     defaultValues: {
@@ -76,12 +80,40 @@ const NewMonitoringForm: React.FC<NewMonitoringFormProps> = ({ onSubmitSuccess }
   });
 
   const selectedAnalysisTypes = form.watch("analysisTypes");
+  const selectedSources = form.watch("sources");
+  const showCustomUrls = selectedSources.includes("custom");
   const showCrossAnalysis = selectedAnalysisTypes.length > 1;
+
+  const addCustomUrl = () => {
+    if (newUrl) {
+      try {
+        new URL(newUrl); // Validar URL
+        setCustomUrls([...customUrls, newUrl]);
+        setNewUrl("");
+      } catch (e) {
+        toast({
+          title: "URL inválida",
+          description: "Por favor, insira uma URL válida.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const removeCustomUrl = (urlToRemove: string) => {
+    setCustomUrls(customUrls.filter(url => url !== urlToRemove));
+  };
 
   const onSubmit = async (data: FormValues) => {
     try {
+      // Adicionar as URLs personalizadas aos dados do formulário
+      const formData = {
+        ...data,
+        customUrls: showCustomUrls ? customUrls : undefined,
+      };
+
       // Log de dados para debug
-      console.log("Criando novo monitoramento:", data);
+      console.log("Criando novo monitoramento:", formData);
       
       // Simulação de delay de rede
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -109,7 +141,6 @@ const NewMonitoringForm: React.FC<NewMonitoringFormProps> = ({ onSubmitSuccess }
             <TabsTrigger value="basic">Informações Básicas</TabsTrigger>
             <TabsTrigger value="sources">Fontes</TabsTrigger>
             <TabsTrigger value="analysis">Tipos de Análise</TabsTrigger>
-            <TabsTrigger value="advanced">Configurações Avançadas</TabsTrigger>
           </TabsList>
 
           <TabsContent value="basic" className="space-y-6">
@@ -229,6 +260,53 @@ const NewMonitoringForm: React.FC<NewMonitoringFormProps> = ({ onSubmitSuccess }
                 </FormItem>
               )}
             />
+
+            {showCustomUrls && (
+              <Card>
+                <CardContent className="pt-6 space-y-4">
+                  <div className="space-y-2">
+                    <Label>URLs Personalizadas</Label>
+                    <div className="flex gap-2">
+                      <Input 
+                        placeholder="https://exemplo.com" 
+                        value={newUrl}
+                        onChange={(e) => setNewUrl(e.target.value)}
+                      />
+                      <Button type="button" onClick={addCustomUrl}>
+                        Adicionar
+                      </Button>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Adicione URLs específicas para monitoramento
+                    </p>
+                  </div>
+
+                  {customUrls.length > 0 && (
+                    <div className="space-y-2">
+                      <Label>URLs adicionadas</Label>
+                      <div className="space-y-2">
+                        {customUrls.map((url, index) => (
+                          <div key={index} className="flex items-center justify-between bg-muted p-2 rounded-md">
+                            <div className="flex items-center">
+                              <Globe className="h-4 w-4 mr-2" />
+                              <span className="text-sm truncate max-w-[300px]">{url}</span>
+                            </div>
+                            <Button 
+                              type="button" 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => removeCustomUrl(url)}
+                            >
+                              ×
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
@@ -362,9 +440,7 @@ const NewMonitoringForm: React.FC<NewMonitoringFormProps> = ({ onSubmitSuccess }
                 )}
               />
             )}
-          </TabsContent>
 
-          <TabsContent value="advanced" className="space-y-6">
             <FormField
               control={form.control}
               name="alertThreshold"
