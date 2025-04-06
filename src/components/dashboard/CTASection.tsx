@@ -13,7 +13,7 @@ const CTASection: React.FC = () => {
     if (!auth.isAuthenticated) {
       auth.setIsLoginDialogOpen(true);
     } else {
-      navigate("/example-client");
+      navigate("/example-dashboard");
     }
   };
 
@@ -25,8 +25,8 @@ const CTASection: React.FC = () => {
         </h2>
         <p className="text-xl text-blue-100 mb-10 max-w-3xl mx-auto">
           Nossa plataforma integrada oferece soluções personalizadas para 
-          diferentes perfis, desde observatórios e pesquisadores até 
-          instituições e assessorias de imprensa.
+          diferentes perfis, desde observatórios e instituições até 
+          assessorias de imprensa.
         </p>
         
         <div className="flex flex-col md:flex-row gap-4 justify-center">

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/hooks/auth';
@@ -14,6 +13,7 @@ import WorkspaceManagement from '@/pages/admin/WorkspaceManagement';
 // Client pages
 import ClientDashboard from '@/pages/ClientDashboard';
 import ClientLogin from '@/pages/ClientLogin';
+import ExampleDashboard from '@/pages/ExampleDashboard';
 
 // Other pages
 import Index from '@/pages/Index';
@@ -22,7 +22,6 @@ import ServiceLanding from '@/pages/ServiceLanding';
 import Client from '@/pages/Client';
 import Payment from '@/pages/Payment';
 import Unauthorized from '@/pages/Unauthorized';
-import ExampleClient from '@/pages/ExampleClient';
 
 function App() {
   return (
@@ -43,10 +42,10 @@ function App() {
           
           {/* Rota de demonstração */}
           <Route 
-            path="/example-client" 
+            path="/example-dashboard" 
             element={
               <PrivateRoute>
-                <ExampleClient />
+                <ExampleDashboard />
               </PrivateRoute>
             } 
           />

@@ -4,7 +4,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import LoginCard from "@/components/client-login/LoginCard";
-import ClientLoginForm from "@/components/client-login/ClientLoginForm";
 import { useClientLogin } from "@/components/client-login/useClientLogin";
 import { ClientLoginFormValues } from "@/components/client-login/types";
 import { useAuth } from "@/hooks/useAuth";

@@ -12,7 +12,7 @@ const HeroSection: React.FC = () => {
     if (!auth.isAuthenticated) {
       auth.setIsLoginDialogOpen(true);
     } else {
-      navigate("/example-client");
+      navigate("/example-dashboard");
     }
   };
 
