@@ -3,6 +3,7 @@ import { useState, useEffect, createContext, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate, useLocation } from "react-router-dom";
+import { workspaceService } from "@/services/workspaceService";
 
 interface LoginCredentials {
   email: string;
@@ -18,10 +19,14 @@ interface AuthContextType {
   handleLogin: (data: LoginCredentials) => Promise<void>;
   handleLogout: () => void;
   navigate: (to: string) => void;
+  impersonateClient: (clientId: string) => Promise<void>;
+  isImpersonating: boolean;
+  exitImpersonation: () => void;
   user?: {
     name: string;
     email: string;
     role: string;
+    workspaceId?: string;
   };
 }
 
@@ -58,7 +63,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState(validateSession);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [user, setUser] = useState<{name: string, email: string, role: string} | undefined>(undefined);
+  const [isImpersonating, setIsImpersonating] = useState(false);
+  const [user, setUser] = useState<{name: string, email: string, role: string, workspaceId?: string} | undefined>(undefined);
   
   const form = useForm<LoginCredentials>({
     defaultValues: {
@@ -97,8 +103,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (storedUser) {
         setUser(JSON.parse(storedUser));
       }
+      
+      // Verifica se há um parâmetro de impersonation na URL
+      const params = new URLSearchParams(location.search);
+      const impersonateId = params.get('impersonate');
+      if (impersonateId) {
+        setIsImpersonating(true);
+      }
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, location.search]);
 
   const handleLogin = async (data: LoginCredentials) => {
     setIsLoggingIn(true);
@@ -106,7 +119,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Credenciais administrativas (modificadas para facilitar o acesso)
+      // Credenciais administrativas
       if ((data.email === "admin@koga.com" && data.password === "admin123") || 
           (data.email === "admin" && data.password === "admin")) {
         const sessionId = Date.now().toString();
@@ -136,6 +149,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
       
+      // Aqui poderíamos adicionar a verificação de clientes
+      // Exemplo: verificar o client service e criar workspace
+      
       toast({
         title: "Erro de autenticação",
         description: "Email ou senha incorretos.",
@@ -160,11 +176,79 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem("user");
     setUser(undefined);
     setIsAuthenticated(false);
+    setIsImpersonating(false);
     navigate("/", { replace: true });
     
     toast({
       title: "Logout realizado",
       description: "Você saiu do sistema."
+    });
+  };
+  
+  // Função para impersonar um cliente
+  const impersonateClient = async (clientId: string) => {
+    if (!user) return;
+    
+    try {
+      // Em uma aplicação real, isso criaria um token JWT com permissões limitadas
+      // Simulamos o processo com nossa service
+      const workspace = await workspaceService.getWorkspaceByUserId(clientId);
+      
+      if (!workspace) {
+        throw new Error("Workspace não encontrado para este cliente");
+      }
+      
+      // Em um cenário real, geraria um token de impersonation
+      await workspaceService.generateImpersonationToken(user.email, workspace.id);
+      
+      // Define o usuário como impersonating
+      setIsImpersonating(true);
+      
+      // Atualiza o objeto user com o ID do workspace
+      const impersonatedUser = {
+        ...user,
+        workspaceId: workspace.id
+      };
+      
+      setUser(impersonatedUser);
+      
+      // Redireciona para o dashboard do cliente
+      navigate(`/dashboard?impersonate=${clientId}`);
+      
+      toast({
+        title: "Visualizando como cliente",
+        description: "Você está visualizando a área do cliente em modo somente leitura."
+      });
+    } catch (error) {
+      console.error("Erro ao impersonar cliente:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível visualizar como cliente.",
+        variant: "destructive"
+      });
+    }
+  };
+  
+  // Função para sair do modo de impersonation
+  const exitImpersonation = () => {
+    if (!user) return;
+    
+    setIsImpersonating(false);
+    
+    // Remove o workspaceId do objeto user
+    const normalUser = {
+      ...user
+    };
+    delete normalUser.workspaceId;
+    
+    setUser(normalUser);
+    
+    // Redireciona de volta para o painel admin
+    navigate("/admin");
+    
+    toast({
+      title: "Modo administrador",
+      description: "Você saiu do modo de visualização do cliente."
     });
   };
 
@@ -177,7 +261,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     form,
     handleLogin,
     handleLogout,
-    navigate
+    navigate,
+    impersonateClient,
+    isImpersonating,
+    exitImpersonation
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

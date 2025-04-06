@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -97,6 +98,11 @@ const Admin: React.FC = () => {
       path: "/admin/clients"
     },
     {
+      title: "Gerenciar Workspaces",
+      description: "Configurar e gerenciar ambientes de trabalho dos clientes",
+      path: "/admin/workspace-settings"
+    },
+    {
       title: "Contatos de Mídia",
       description: "Gerenciar contatos e relacionamentos com veículos de mídia",
       path: "/admin/contacts"
@@ -154,7 +160,7 @@ const Admin: React.FC = () => {
           </TabsList>
 
           <TabsContent value="overview">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
               {quickActions.map((action) => (
                 <Card key={action.path} className="hover:shadow-lg transition-shadow">
                   <CardHeader className="pb-2">

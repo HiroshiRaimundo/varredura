@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import PrivateRoute from '@/components/PrivateRoute';
@@ -6,9 +5,9 @@ import PrivateRoute from '@/components/PrivateRoute';
 // Admin pages
 import Admin from '@/pages/Admin';
 import ClientManagement from '@/pages/admin/ClientManagement';
-import ContentManagement from '@/pages/admin/ContentManagement';
 import MediaContactsManagement from '@/pages/admin/MediaContactsManagement';
 import ReleasesManagement from '@/pages/admin/ReleasesManagement';
+import WorkspaceManagement from '@/pages/admin/WorkspaceManagement';
 
 // Client pages
 import ClientDashboard from '@/pages/ClientDashboard';
@@ -70,15 +69,6 @@ function App() {
           />
           
           <Route
-            path="/admin/content"
-            element={
-              <PrivateRoute>
-                <ContentManagement />
-              </PrivateRoute>
-            }
-          />
-          
-          <Route
             path="/admin/contacts"
             element={
               <PrivateRoute>
@@ -92,6 +82,43 @@ function App() {
             element={
               <PrivateRoute>
                 <ReleasesManagement />
+              </PrivateRoute>
+            }
+          />
+          
+          {/* Novas rotas de gerenciamento de workspace */}
+          <Route
+            path="/admin/workspace-settings"
+            element={
+              <PrivateRoute>
+                <WorkspaceManagement />
+              </PrivateRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/impersonate"
+            element={
+              <PrivateRoute>
+                <WorkspaceManagement />
+              </PrivateRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/reset-workspace"
+            element={
+              <PrivateRoute>
+                <WorkspaceManagement />
+              </PrivateRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/raw-data"
+            element={
+              <PrivateRoute>
+                <WorkspaceManagement />
               </PrivateRoute>
             }
           />
