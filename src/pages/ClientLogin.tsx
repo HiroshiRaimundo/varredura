@@ -22,12 +22,13 @@ const ClientLogin: React.FC = () => {
   const handleClientLogin = async (data: ClientLoginFormValues) => {
     try {
       // Simulando login com as credenciais de cliente para esta demo
-      const loginSuccess = await auth.handleLogin({
+      await auth.handleLogin({
         email: data.email,
         password: data.password
       });
       
-      if (loginSuccess) {
+      // Verifique se o login foi bem-sucedido antes de navegar
+      if (auth.isAuthenticated) {
         navigate(redirectPath);
       }
     } catch (error) {

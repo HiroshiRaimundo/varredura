@@ -38,7 +38,7 @@ const CTASection: React.FC = () => {
           </Button>
           
           <Button
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-6 h-auto text-lg rounded-xl transition-all"
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-6 h-auto text-lg rounded-xl transition-all block"
             onClick={() => navigate("/client")}
           >
             Acesso Imediato <ArrowRight className="ml-2 h-5 w-5" />

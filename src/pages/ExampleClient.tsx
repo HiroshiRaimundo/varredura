@@ -1,80 +1,132 @@
 
 import React, { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import ClientHeader from "@/components/example-client/ClientHeader";
+import ClientTabs from "@/components/example-client/ClientTabs";
 import ClientInfo from "@/components/example-client/ClientInfo";
-import { ClientType } from "@/types/clientTypes";
-import { Mail, Eye } from "lucide-react";
-import PressContent from "@/components/press/PressContent";
-import MonitoringContent from "@/components/monitoring/MonitoringContent";
-import AnalysisContent from "@/components/analysis/AnalysisContent";
+import DefaultContent from "@/components/example-client/DefaultContent";
+import { Card } from "@/components/ui/card";
+import { Users, BarChart2, FileText, Search, Leaf, FileBarChart } from "lucide-react";
+import { ClientType } from "@/components/client/ClientTypes";
 
 const ExampleClient: React.FC = () => {
-  const [clientType] = useState<ClientType>("press");
-  const [activeTab, setActiveTab] = useState("press");
-  const [monitoringData, setMonitoringData] = useState<any>({}); // Added missing state
+  const navigate = useNavigate();
+  const auth = useAuth();
+  const [clientType, setClientType] = useState<ClientType>("observatory");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "monitoring" | "analysis" | "releases">("dashboard");
 
-  const getClientIcon = () => {
-    return <Mail className="h-6 w-6 text-indigo-600" />;
+  if (!auth.isAuthenticated) {
+    navigate("/client-login?from=/example-client");
+    return null;
+  }
+
+  // Função para obter o ícone do tipo de cliente
+  const getClientIcon = (type: ClientType) => {
+    switch (type) {
+      case "observatory":
+        return <Search className="h-5 w-5 text-green-600" />;
+      case "researcher":
+        return <FileBarChart className="h-5 w-5 text-blue-600" />;
+      case "politician":
+        return <Users className="h-5 w-5 text-purple-600" />;
+      case "institution":
+        return <Leaf className="h-5 w-5 text-amber-600" />;
+      case "journalist":
+        return <FileText className="h-5 w-5 text-cyan-600" />;
+      case "press":
+        return <BarChart2 className="h-5 w-5 text-indigo-600" />;
+      default:
+        return <Search className="h-5 w-5 text-green-600" />;
+    }
+  };
+
+  // Renderizar a guia de conteúdo de imprensa se for o tipo press
+  const renderPressContent = () => {
+    if (clientType === "press" && activeTab === "releases") {
+      return <DefaultContent activeTab="releases" clientType={clientType} />;
+    }
+    return null;
   };
 
   return (
-    <div className="container py-6 max-w-7xl">
-      {/* Alerta de visualização */}
-      <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-        <div className="flex">
-          <div className="flex-shrink-0">
-            <Eye className="h-5 w-5 text-yellow-400" aria-hidden="true" />
-          </div>
-          <div className="ml-3">
-            <p className="text-sm text-yellow-700">
-              Você está visualizando a interface do cliente como administrador.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Cabeçalho */}
-      <ClientHeader clientType={clientType} getClientIcon={getClientIcon} />
-      
-      {/* Conteúdo principal */}
-      <div className="grid md:grid-cols-4 gap-6 mt-6">
-        {/* Barra lateral */}
-        <div className="md:col-span-1">
-          <ClientInfo clientType={clientType} />
-        </div>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="container mx-auto px-4 py-6 flex-1">
+        <Header 
+          isAuthenticated={auth.isAuthenticated} 
+          onLoginClick={() => {}} 
+          onLogoutClick={auth.handleLogout}
+        />
         
-        {/* Conteúdo principal */}
-        <div className="md:col-span-3">
-          <Card className="shadow-sm">
-            <CardContent className="p-0">
-              <Tabs defaultValue="press" value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="w-full bg-muted/50 p-1 rounded-t-lg">
-                  <TabsTrigger value="press" className="flex-1 py-2">Assessoria de Imprensa</TabsTrigger>
-                  <TabsTrigger value="monitoring" className="flex-1 py-2">Monitoramento</TabsTrigger>
-                  <TabsTrigger value="analysis" className="flex-1 py-2">Análise</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="press" className="p-6">
-                  <PressContent clientType={clientType} />
-                </TabsContent>
-
-                <TabsContent value="monitoring" className="p-6">
-                  <MonitoringContent 
-                    monitoringToEdit={null} 
-                    setMonitoringData={setMonitoringData} // Added missing prop
+        <div className="my-8 max-w-7xl mx-auto">
+          <div className="mb-6">
+            <ClientHeader 
+              clientType={clientType}
+              getClientIcon={getClientIcon}
+            />
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="lg:col-span-3">
+              <Card className="p-6 shadow-sm">
+                <div className="space-y-6">
+                  <ClientTabs 
+                    activeTab={activeTab}
+                    setActiveTab={setActiveTab}
+                    clientType={clientType}
                   />
-                </TabsContent>
-
-                <TabsContent value="analysis" className="p-6">
-                  <AnalysisContent />
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
+                  
+                  {activeTab === "dashboard" && (
+                    <DefaultContent activeTab="dashboard" clientType={clientType} />
+                  )}
+                  
+                  {activeTab === "monitoring" && (
+                    <DefaultContent activeTab="monitoring" clientType={clientType} />
+                  )}
+                  
+                  {activeTab === "analysis" && (
+                    <DefaultContent activeTab="analysis" clientType={clientType} />
+                  )}
+                  
+                  {renderPressContent()}
+                </div>
+              </Card>
+            </div>
+            
+            <div className="lg:col-span-1">
+              <div className="space-y-4">
+                <Card className="p-4 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold">Tipo de Cliente</h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {["observatory", "researcher", "politician", "institution", "journalist", "press"].map((type) => (
+                      <button
+                        key={type}
+                        onClick={() => setClientType(type as ClientType)}
+                        className={`flex items-center justify-center p-2 rounded-md text-sm ${
+                          type === clientType 
+                            ? "bg-primary text-white" 
+                            : "bg-gray-100 hover:bg-gray-200"
+                        }`}
+                      >
+                        {getClientIcon(type as ClientType)}
+                        <span className="ml-1 hidden sm:inline">{type.charAt(0).toUpperCase() + type.slice(1)}</span>
+                      </button>
+                    ))}
+                  </div>
+                </Card>
+                
+                <ClientInfo clientType={clientType} />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+      
+      <Footer />
     </div>
   );
 };
