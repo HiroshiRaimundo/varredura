@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/hooks/auth';
 import PrivateRoute from '@/components/PrivateRoute';
@@ -12,6 +11,7 @@ import WorkspaceManagement from '@/pages/admin/WorkspaceManagement';
 
 // Client pages
 import ClientDashboard from '@/pages/ClientDashboard';
+import ClientLogin from '@/pages/ClientLogin';
 
 // Other pages
 import Index from '@/pages/Index';
@@ -31,6 +31,7 @@ function App() {
 
           {/* Rotas de login */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/client-login" element={<ClientLogin />} />
           
           {/* Rotas de serviço */}
           <Route path="/service/:serviceId" element={<ServiceLanding />} />

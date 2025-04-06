@@ -1,65 +1,52 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ClientList from '@/components/admin/clients/ClientList';
-import PaymentList from '@/components/admin/payments/PaymentList';
-import PasswordResetList from '@/components/admin/password-reset/PasswordResetList';
-import { ClientAccount, Payment, PasswordReset } from '@/types/adminTypes';
-import BackToAdminButton from "@/components/admin/BackToAdminButton";
 import { Button } from "@/components/ui/button";
-import { Plus, Download } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { Plus, Download, FileText, Trash2, UserPlus, Wallet } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import BackToAdminButton from "@/components/admin/BackToAdminButton";
+import { clientService, Client } from "@/services/clientService";
 import AddClientDialog from "@/components/admin/clients/AddClientDialog";
 import EditClientDialog from "@/components/admin/clients/EditClientDialog";
 import DeleteClientDialog from "@/components/admin/clients/DeleteClientDialog";
-import { Client, clientService } from "@/services/clientService";
+import PasswordDialog from "@/components/admin/clients/PasswordDialog";
 import { ServiceType } from "@/hooks/useClientAuth";
 import { NewClientData } from "@/components/admin/clients/AddClientDialog";
+import ClientTable from "@/components/admin/clients/ClientTable";
 
-// Mock data - substituir por dados reais da API
-const mockPayments: Payment[] = [
-  {
-    id: '1',
-    clientId: '1',
-    clientName: 'Cliente Teste',
-    amount: 99.90,
-    status: 'completed',
-    method: 'credit_card',
-    paymentMethod: 'credit_card',
-    date: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
-    paidAt: new Date().toISOString(),
-    planType: 'basic',
-    description: 'Assinatura Mensal - Plano Básico'
-  }
-];
-
-const mockResets: PasswordReset[] = [
-  {
-    id: '1',
-    userId: '1',
-    userName: 'Cliente Teste',
-    userEmail: 'cliente@teste.com',
-    email: 'cliente@teste.com',
-    requestDate: new Date().toISOString(),
-    requestedAt: new Date().toISOString(),
-    status: 'pending',
-    expiryDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    token: 'token123'
-  }
-];
+// Definição do tipo ClientAccount para a tabela
+interface ClientAccount {
+  id: string;
+  name: string;
+  email: string;
+  serviceType: ServiceType;
+  status: "active" | "inactive";
+  createdAt: string | Date;
+  expiresAt?: string | Date;
+}
 
 const ClientManagement: React.FC = () => {
-  // Create simplified hooks with only the properties we're actually using
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("clients");
   const [clients, setClients] = useState<Client[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [showAddDialog, setShowAddDialog] = useState(false);
-  const [showEditDialog, setShowEditDialog] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [activeTab, setActiveTab] = useState('clients');
+  const [error, setError] = useState<string | null>(null);
+  
+  // Estado para o cliente que está sendo editado
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  
+  // Estado para o cliente que está sendo excluído
+  const [deletingClient, setDeletingClient] = useState<Client | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  
+  // Estado para redefinição de senha
+  const [resetPasswordClient, setResetPasswordClient] = useState<Client | null>(null);
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  
+  // Estado para adicionar novo cliente
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newClient, setNewClient] = useState<NewClientData>({
     name: "",
     email: "",
@@ -67,223 +54,207 @@ const ClientManagement: React.FC = () => {
     status: "active"
   });
 
-  // Load clients
-  const loadClients = async () => {
+  // Carregar dados dos clientes
+  useEffect(() => {
+    fetchClients();
+  }, []);
+
+  const fetchClients = async () => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      const data = await clientService.getAll();
+      const data = await clientService.getClients();
       setClients(data);
-    } catch (error) {
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching clients:", err);
+      setError("Falha ao carregar a lista de clientes.");
       toast({
-        title: "Erro ao carregar clientes",
+        title: "Erro",
         description: "Não foi possível carregar a lista de clientes.",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Handle status toggle
-  const handleStatusToggle = async (clientId: string) => {
+  // Funções para gerenciar clientes
+  const addClient = () => {
+    setNewClient({
+      name: "",
+      email: "",
+      serviceType: ServiceType.OBSERVATORY,
+      status: "active"
+    });
+    setIsAddDialogOpen(true);
+  };
+
+  const handleAddClient = async () => {
     try {
-      const client = clients.find(c => c.id === clientId);
+      // Validar dados do formulário
+      if (!newClient.name.trim() || !newClient.email.trim()) {
+        toast({
+          title: "Dados incompletos",
+          description: "Por favor, preencha todos os campos obrigatórios.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Adicionar cliente
+      await clientService.addClient({
+        name: newClient.name,
+        email: newClient.email,
+        serviceType: newClient.serviceType,
+        status: newClient.status,
+        expiresAt: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+      });
+
+      // Atualizar lista de clientes
+      await fetchClients();
+      setIsAddDialogOpen(false);
+      toast({
+        title: "Cliente adicionado",
+        description: "Cliente adicionado com sucesso.",
+      });
+    } catch (err) {
+      console.error("Error adding client:", err);
+      toast({
+        title: "Erro",
+        description: "Não foi possível adicionar o cliente.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const editClient = (clientId: string) => {
+    const client = clients.find((c) => c.id === clientId);
+    if (client) {
+      setEditingClient(client);
+      setIsEditDialogOpen(true);
+    }
+  };
+
+  const handleEditClient = async (updatedClient: Client) => {
+    try {
+      await clientService.updateClient(updatedClient);
+      await fetchClients();
+      setIsEditDialogOpen(false);
+      toast({
+        title: "Cliente atualizado",
+        description: "Dados do cliente atualizados com sucesso.",
+      });
+    } catch (err) {
+      console.error("Error updating client:", err);
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar o cliente.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const deleteClient = (clientId: string) => {
+    const client = clients.find((c) => c.id === clientId);
+    if (client) {
+      setDeletingClient(client);
+      setIsDeleteDialogOpen(true);
+    }
+  };
+
+  const handleDeleteClient = async (clientId: string) => {
+    try {
+      await clientService.deleteClient(clientId);
+      await fetchClients();
+      setIsDeleteDialogOpen(false);
+      toast({
+        title: "Cliente excluído",
+        description: "Cliente excluído com sucesso.",
+      });
+    } catch (err) {
+      console.error("Error deleting client:", err);
+      toast({
+        title: "Erro",
+        description: "Não foi possível excluir o cliente.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const resetPassword = (clientId: string) => {
+    const client = clients.find((c) => c.id === clientId);
+    if (client) {
+      setResetPasswordClient(client);
+      setIsPasswordDialogOpen(true);
+    }
+  };
+
+  const handleResetPassword = async (clientId: string, newPassword: string) => {
+    try {
+      await clientService.resetPassword(clientId, newPassword);
+      setIsPasswordDialogOpen(false);
+      toast({
+        title: "Senha redefinida",
+        description: "A senha do cliente foi redefinida com sucesso.",
+      });
+    } catch (err) {
+      console.error("Error resetting password:", err);
+      toast({
+        title: "Erro",
+        description: "Não foi possível redefinir a senha.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const toggleClientStatus = async (clientId: string) => {
+    try {
+      const client = clients.find((c) => c.id === clientId);
       if (!client) return;
 
       const newStatus = client.status === "active" ? "inactive" : "active";
-      const updatedClient = await clientService.updateStatus(clientId, newStatus);
-      
-      setClients(clients.map(c => c.id === clientId ? updatedClient : c));
-
+      await clientService.updateClient({ ...client, status: newStatus });
+      await fetchClients();
       toast({
-        title: "Status atualizado",
-        description: `O cliente foi marcado como ${newStatus === "active" ? "ativo" : "inativo"}.`
+        title: "Status alterado",
+        description: `Cliente ${newStatus === "active" ? "ativado" : "desativado"} com sucesso.`,
       });
-    } catch (error) {
+    } catch (err) {
+      console.error("Error toggling client status:", err);
       toast({
-        title: "Erro ao atualizar status",
-        description: "Não foi possível atualizar o status do cliente.",
-        variant: "destructive"
+        title: "Erro",
+        description: "Não foi possível alterar o status do cliente.",
+        variant: "destructive",
       });
     }
   };
 
-  // Handle add client
-  const handleAddClient = async () => {
-    if (!newClient.name || !newClient.email) {
-      toast({
-        title: "Campos obrigatórios",
-        description: "Por favor, preencha todos os campos obrigatórios.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      const client = await clientService.create({
-        ...newClient,
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-      });
-
-      setClients([...clients, client]);
-      setShowAddDialog(false);
-      setNewClient({
-        name: "",
-        email: "",
-        serviceType: ServiceType.OBSERVATORY,
-        status: "active"
-      });
-      
-      toast({
-        title: "Cliente adicionado com sucesso",
-        description: "As credenciais foram geradas."
-      });
-    } catch (error) {
-      toast({
-        title: "Erro ao adicionar cliente",
-        description: error instanceof Error ? error.message : "Ocorreu um erro ao adicionar o cliente.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Handle delete client
-  const handleDeleteClient = async () => {
-    if (!selectedClientId) return;
-
-    try {
-      await clientService.delete(selectedClientId);
-      setClients(clients.filter(client => client.id !== selectedClientId));
-      setSelectedClientId(null);
-
-      toast({
-        title: "Cliente removido",
-        description: "O cliente foi removido com sucesso."
-      });
-    } catch (error) {
-      toast({
-        title: "Erro ao remover cliente",
-        description: "Não foi possível remover o cliente.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Handle reset password
-  const handleResetPassword = async (clientId: string) => {
-    try {
-      const newPassword = await clientService.resetPassword(clientId);
-      
-      toast({
-        title: "Senha redefinida",
-        description: `Nova senha gerada: ${newPassword}`,
-      });
-    } catch (error) {
-      toast({
-        title: "Erro ao redefinir senha",
-        description: "Não foi possível redefinir a senha do cliente.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Add client
-  const addClient = () => {
-    setShowAddDialog(true);
-  };
-
-  // Edit client
-  const editClient = async (clientId: string) => {
-    try {
-      const client = await clientService.getById(clientId);
-      if (client) {
-        setSelectedClient(client);
-        setShowEditDialog(true);
-      }
-    } catch (error) {
-      toast({
-        title: "Erro ao carregar cliente",
-        description: "Não foi possível carregar os dados do cliente.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Delete client
-  const deleteClient = (clientId: string) => {
-    setSelectedClientId(clientId);
-    setShowDeleteDialog(true);
-  };
-
-  // Save client edit
-  const handleSaveClientEdit = async () => {
-    if (!selectedClient) return;
-    
-    try {
-      await clientService.update(selectedClient.id, selectedClient);
-      setShowEditDialog(false);
-      loadClients();
-      toast({
-        title: "Cliente atualizado",
-        description: "As informações do cliente foram atualizadas com sucesso.",
-      });
-    } catch (error) {
-      toast({
-        title: "Erro ao atualizar cliente",
-        description: error instanceof Error ? error.message : "Ocorreu um erro ao atualizar o cliente.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Handle client change
-  const handleClientChange = (field: string, value: any) => {
-    if (selectedClient) {
-      setSelectedClient({
-        ...selectedClient,
-        [field]: value
-      });
-    }
-  };
-
-  // Export payments
   const exportPayments = () => {
     toast({
       title: "Exportando pagamentos",
-      description: "Os dados de pagamento estão sendo preparados para download",
+      description: "Os dados de pagamento estão sendo exportados.",
     });
-    
-    // Simulação de download após 1 segundo
-    setTimeout(() => {
-      const mockData = JSON.stringify(mockPayments, null, 2);
-      const blob = new Blob([mockData], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'pagamentos-exportados.json';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }, 1000);
   };
-
-  // Confirm delete client
-  const onConfirmDeleteClient = async () => {
-    if (selectedClientId) {
-      await handleDeleteClient();
-      setShowDeleteDialog(false);
-    }
-  };
-
-  useEffect(() => {
-    loadClients();
-  }, []);
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      <div className="container mx-auto py-6">
+        <BackToAdminButton />
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-pulse text-xl">Carregando dados...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-6">
+        <BackToAdminButton />
+        <div className="flex flex-col justify-center items-center h-64 space-y-4">
+          <div className="text-red-500 text-xl">{error}</div>
+          <Button onClick={fetchClients}>Tentar novamente</Button>
+        </div>
       </div>
     );
   }
@@ -293,27 +264,19 @@ const ClientManagement: React.FC = () => {
     id: client.id,
     name: client.name,
     email: client.email,
-    type: client.serviceType, 
-    status: client.status === "active" ? "active" : "inactive",
-    plan: "basic",
-    createdAt: typeof client.createdAt === 'string' ? client.createdAt : 
-               client.createdAt instanceof Date ? client.createdAt.toISOString() : 
-               new Date().toISOString(),
-    trialEndsAt: client.expiresAt ? 
-                 (typeof client.expiresAt === 'string' ? client.expiresAt : 
-                  client.expiresAt instanceof Date ? client.expiresAt.toISOString() : 
-                  undefined) : 
-                 undefined,
+    serviceType: client.serviceType,
+    status: client.status,
+    createdAt: client.createdAt instanceof Date ? client.createdAt : new Date(client.createdAt),
+    expiresAt: client.expiresAt ? (client.expiresAt instanceof Date ? client.expiresAt : new Date(client.expiresAt)) : undefined
   }));
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="container mx-auto py-6">
       <BackToAdminButton />
-      
-      <Card>
+      <Card className="w-full">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>Gerenciamento de Clientes</CardTitle>
+            <CardTitle className="text-2xl">Gerenciamento de Clientes</CardTitle>
             <CardDescription>
               Gerencie clientes, pagamentos e solicitações de recuperação de senha.
             </CardDescription>
@@ -325,60 +288,93 @@ const ClientManagement: React.FC = () => {
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList>
-              <TabsTrigger value="clients">Clientes</TabsTrigger>
-              <TabsTrigger value="payments">Pagamentos</TabsTrigger>
-              <TabsTrigger value="resets">Recuperação de Senha</TabsTrigger>
+            <TabsList className="mb-4">
+              <TabsTrigger value="clients" className="flex items-center">
+                <UserPlus className="h-4 w-4 mr-2" /> Clientes
+              </TabsTrigger>
+              <TabsTrigger value="payments" className="flex items-center">
+                <Wallet className="h-4 w-4 mr-2" /> Pagamentos
+              </TabsTrigger>
+              <TabsTrigger value="recovery-requests" className="flex items-center">
+                <FileText className="h-4 w-4 mr-2" /> Recuperação de Senha
+              </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="clients" className="mt-6">
-              <ClientList
-                clients={clientsForList}
-                onAddClient={addClient}
-                onEditClient={(client) => editClient(client.id)}
-                onDeleteClient={(clientId) => deleteClient(clientId)}
-              />
+            <TabsContent value="clients">
+              {clients.length > 0 ? (
+                <ClientTable
+                  clients={clientsForList}
+                  onStatusToggle={toggleClientStatus}
+                  onResetPassword={resetPassword}
+                  onEditClient={editClient}
+                  onDeleteClient={deleteClient}
+                />
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">
+                    Nenhum cliente encontrado. Adicione seu primeiro cliente.
+                  </p>
+                </div>
+              )}
             </TabsContent>
 
-            <TabsContent value="payments" className="mt-6">
-              <PaymentList
-                payments={mockPayments}
-                onExportPayments={exportPayments}
-              />
+            <TabsContent value="payments">
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">
+                  Histórico de pagamentos estará disponível em breve.
+                </p>
+                <Button variant="outline" className="mt-4" onClick={exportPayments}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Exportar Dados de Pagamento
+                </Button>
+              </div>
             </TabsContent>
 
-            <TabsContent value="resets" className="mt-6">
-              <PasswordResetList
-                resets={mockResets}
-                onResetPassword={handleResetPassword}
-              />
+            <TabsContent value="recovery-requests">
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">
+                  Não há solicitações de recuperação de senha no momento.
+                </p>
+              </div>
             </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
 
-      {/* Dialogs */}
       <AddClientDialog
-        isOpen={showAddDialog}
-        onOpenChange={setShowAddDialog}
+        isOpen={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
         newClient={newClient}
         onNewClientChange={setNewClient}
         onAddClient={handleAddClient}
       />
 
-      <EditClientDialog
-        isOpen={showEditDialog}
-        onOpenChange={setShowEditDialog}
-        client={selectedClient}
-        onClientChange={handleClientChange}
-        onSave={handleSaveClientEdit}
-      />
+      {editingClient && (
+        <EditClientDialog
+          client={editingClient}
+          isOpen={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          onSave={handleEditClient}
+        />
+      )}
 
-      <DeleteClientDialog
-        isOpen={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
-        onConfirmDelete={onConfirmDeleteClient}
-      />
+      {deletingClient && (
+        <DeleteClientDialog
+          client={deletingClient}
+          isOpen={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          onDelete={() => handleDeleteClient(deletingClient.id)}
+        />
+      )}
+
+      {resetPasswordClient && (
+        <PasswordDialog
+          client={resetPasswordClient}
+          isOpen={isPasswordDialogOpen}
+          onOpenChange={setIsPasswordDialogOpen}
+          onResetPassword={(password) => handleResetPassword(resetPasswordClient.id, password)}
+        />
+      )}
     </div>
   );
 };
