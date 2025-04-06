@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -58,7 +57,6 @@ const mockReports: Report[] = [
   }
 ];
 
-// Dados fictícios do cliente para o cabeçalho do relatório
 const clientInfo: ClientInfo = {
   name: "João da Silva",
   company: "Empresa XYZ Ltda.",
@@ -76,7 +74,6 @@ const ReportsTab: React.FC = () => {
   const [customReportDateFrom, setCustomReportDateFrom] = useState("");
   const [customReportDateTo, setCustomReportDateTo] = useState("");
   
-  // Estado para controlar a visualização prévia de relatórios
   const [showMonthlyPreview, setShowMonthlyPreview] = useState(false);
   const [showMentionsPreview, setShowMentionsPreview] = useState(false);
 
@@ -102,7 +99,6 @@ const ReportsTab: React.FC = () => {
     setIsGenerating(true);
     setShowMonthlyPreview(false);
     
-    // Simulação de geração de relatório
     setTimeout(() => {
       const newReport: Report = {
         id: `new-${Date.now()}`,
@@ -130,7 +126,6 @@ const ReportsTab: React.FC = () => {
     setIsGenerating(true);
     setShowMentionsPreview(false);
     
-    // Simulação de geração de relatório
     setTimeout(() => {
       const newReport: Report = {
         id: `new-${Date.now()}`,
@@ -162,7 +157,6 @@ const ReportsTab: React.FC = () => {
     
     setIsGenerating(true);
     
-    // Simulação de geração de relatório personalizado
     setTimeout(() => {
       const newReport: Report = {
         id: `new-${Date.now()}`,
@@ -176,7 +170,6 @@ const ReportsTab: React.FC = () => {
       setIsGenerating(false);
       setShowCustomReport(false);
       
-      // Limpar campos
       setCustomReportTitle("");
       setCustomReportDateFrom("");
       setCustomReportDateTo("");
@@ -194,10 +187,14 @@ const ReportsTab: React.FC = () => {
       description: `O download de "${report.title}" foi iniciado.`,
     });
     
-    // Aqui seria implementada a lógica real de download
+    setTimeout(() => {
+      toast({
+        title: "Download concluído",
+        description: `O download de "${report.title}" foi concluído.`,
+      });
+    }, 2000);
   };
 
-  // Componente para renderizar o cabeçalho do relatório
   const ReportHeader = () => (
     <div className="border-b pb-4 mb-4">
       <div className="flex justify-between items-start">
@@ -328,6 +325,10 @@ const ReportsTab: React.FC = () => {
                       <input type="checkbox" id="include-trends" defaultChecked />
                       <label htmlFor="include-trends">Tendências</label>
                     </div>
+                    <div className="flex items-center space-x-2">
+                      <input type="checkbox" id="include-content" defaultChecked />
+                      <label htmlFor="include-content">Análise de Conteúdo</label>
+                    </div>
                   </div>
                 </div>
 
@@ -359,7 +360,6 @@ const ReportsTab: React.FC = () => {
           </Dialog>
         </div>
 
-        {/* Dialog para pré-visualização do relatório mensal */}
         <Dialog open={showMonthlyPreview} onOpenChange={setShowMonthlyPreview}>
           <DialogContent className="max-w-4xl">
             <DialogHeader>
@@ -431,7 +431,6 @@ const ReportsTab: React.FC = () => {
           </DialogContent>
         </Dialog>
 
-        {/* Dialog para pré-visualização da análise de menções */}
         <Dialog open={showMentionsPreview} onOpenChange={setShowMentionsPreview}>
           <DialogContent className="max-w-4xl">
             <DialogHeader>
