@@ -1,17 +1,28 @@
 
-import { workspaceOperations } from "./workspaceOperations";
-import { workspaceUtils } from "./workspaceUtils";
+import {
+  createWorkspace,
+  updateWorkspace,
+  resetWorkspace,
+  deleteWorkspace
+} from './workspaceOperations';
+
+import {
+  getWorkspaceByUserId,
+  getWorkspaceById,
+  generateImpersonationToken,
+  exportWorkspaceData
+} from './workspaceUtils';
 
 // Create a combined service object that exposes all functionality
 export const workspaceService = {
-  ...workspaceOperations,
-  
-  // Add utilities
-  generateImpersonationToken: workspaceUtils.generateImpersonationToken,
-  
-  exportWorkspaceData: async (workspaceId: string, userId: string): Promise<object> => {
-    return workspaceUtils.exportWorkspaceData(workspaceId, userId, workspaceOperations.getWorkspaceById);
-  }
+  createWorkspace,
+  updateWorkspace,
+  resetWorkspace,
+  deleteWorkspace,
+  getWorkspaceByUserId,
+  getWorkspaceById,
+  generateImpersonationToken,
+  exportWorkspaceData
 };
 
 export default workspaceService;

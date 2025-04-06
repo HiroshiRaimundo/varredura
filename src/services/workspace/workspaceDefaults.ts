@@ -17,3 +17,14 @@ export const DEFAULT_WORKSPACE_CONFIG: WorkspaceConfig = {
     }
   }
 };
+
+// Add the missing getDefaultWorkspaceSettings function
+export const getDefaultWorkspaceSettings = () => {
+  return {
+    theme: DEFAULT_WORKSPACE_CONFIG.theme,
+    customization: {
+      logo: 'default-logo.png',
+      colors: DEFAULT_WORKSPACE_CONFIG.customization.colors
+    }
+  };
+};

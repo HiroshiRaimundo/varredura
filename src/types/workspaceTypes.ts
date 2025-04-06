@@ -18,3 +18,33 @@ export interface WorkspaceUpdatePayload {
     logo: string;
   };
 }
+
+// Add missing WorkspaceAction type
+export interface WorkspaceAction {
+  id: string;
+  workspaceId: string;
+  userId: string;
+  action: WorkspaceActionType;
+  details: Record<string, any>;
+  timestamp: string;
+  ipAddress: string;
+  userAgent: string;
+}
+
+// Add missing WorkspaceConfig type
+export interface WorkspaceConfig {
+  theme: string;
+  defaultWidgets: string[];
+  limits: {
+    monitorings: number;
+    releases: number;
+    storage: number;
+  };
+  customization: {
+    colors: {
+      primary: string;
+      secondary: string;
+    },
+    logo?: string;
+  };
+}

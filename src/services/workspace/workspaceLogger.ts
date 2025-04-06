@@ -1,5 +1,5 @@
 
-import { WorkspaceAction } from "@/types/workspaceTypes";
+import { WorkspaceAction, WorkspaceActionType } from "@/types/workspaceTypes";
 import { loadActionsFromStorage, saveActionsToStorage } from "./storageUtils";
 
 // Get current workspace actions
@@ -7,17 +7,19 @@ let workspaceActions = loadActionsFromStorage();
 
 // Helper to log workspace actions
 export const logWorkspaceAction = (
-  userId: string,
-  workspaceId: string,
-  action: WorkspaceAction['action'],
-  details: Record<string, any>
+  action: WorkspaceActionType,
+  data: {
+    userId: string,
+    workspaceId: string,
+    details: Record<string, any>
+  }
 ): void => {
   const newAction: WorkspaceAction = {
     id: crypto.randomUUID(),
-    workspaceId,
-    userId,
+    workspaceId: data.workspaceId,
+    userId: data.userId,
     action,
-    details,
+    details: data.details,
     timestamp: new Date().toISOString(),
     ipAddress: '127.0.0.1', // In a real app, this would be the actual IP
     userAgent: navigator.userAgent

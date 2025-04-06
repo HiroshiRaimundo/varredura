@@ -1,16 +1,13 @@
 
-import { createWorkspace, updateWorkspace, resetWorkspace, deleteWorkspace } from './workspace/workspaceOperations';
-import { getWorkspaceByUserId, getWorkspaceById } from './workspace/workspaceUtils';
-import { generateImpersonationToken } from './workspace/workspaceUtils';
-import { exportWorkspaceData } from './workspace/workspaceUtils';
+import { workspaceService as service } from './workspace';
 
 export const workspaceService = {
-  createWorkspace,
-  updateWorkspace,
-  resetWorkspace,
-  deleteWorkspace,
-  getWorkspaceByUserId,
-  getWorkspaceById,
-  generateImpersonationToken,
-  exportWorkspaceData
+  createWorkspace: service.createWorkspace,
+  updateWorkspace: service.updateWorkspace,
+  resetWorkspace: service.resetWorkspace,
+  deleteWorkspace: service.deleteWorkspace,
+  getWorkspaceByUserId: service.getWorkspaceByUserId,
+  getWorkspaceById: service.getWorkspaceById,
+  generateImpersonationToken: service.generateImpersonationToken,
+  exportWorkspaceData: service.exportWorkspaceData
 };
