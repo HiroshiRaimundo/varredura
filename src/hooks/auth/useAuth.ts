@@ -36,5 +36,3 @@ export const useAuth = () => {
     exitImpersonation: auth.exitImpersonation
   };
 };
-
-export default useAuth;

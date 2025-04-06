@@ -1,146 +1,162 @@
 
-import { Workspace, WorkspaceConfig } from "@/types/workspaceTypes";
-import { loadWorkspacesFromStorage, saveWorkspacesToStorage } from "./storageUtils";
-import { DEFAULT_WORKSPACE_CONFIG } from "./workspaceDefaults";
-import { logWorkspaceAction } from "./workspaceLogger";
+import { Workspace, WorkspaceActionType, WorkspaceUpdatePayload } from '@/types/workspaceTypes';
+import { logWorkspaceAction } from './workspaceLogger';
+import { getDefaultWorkspaceSettings } from './workspaceDefaults';
+import { validateWorkspaceData } from './workspaceUtils';
 
-// Start with initial workspaces from storage
-let workspaces = loadWorkspacesFromStorage();
-
-export const workspaceOperations = {
-  // Get all workspaces
-  getAllWorkspaces: async (): Promise<Workspace[]> => {
-    return workspaces;
-  },
-  
-  // Get workspace by ID
-  getWorkspaceById: async (id: string): Promise<Workspace | undefined> => {
-    return workspaces.find(workspace => workspace.id === id);
-  },
-  
-  // Get workspace by user ID
-  getWorkspaceByUserId: async (userId: string): Promise<Workspace | undefined> => {
-    return workspaces.find(workspace => workspace.userId === userId);
-  },
-  
-  // Create a new workspace
-  createWorkspace: async (userId: string, name: string): Promise<Workspace> => {
-    const newWorkspace: Workspace = {
-      id: crypto.randomUUID(),
-      userId,
-      name,
-      config: DEFAULT_WORKSPACE_CONFIG,
+// Create a new workspace
+export const createWorkspace = async (userId: string): Promise<Workspace> => {
+  try {
+    // In a real app, this would interact with a database
+    const workspaceId = `workspace_${Date.now()}`;
+    const defaultSettings = getDefaultWorkspaceSettings();
+    
+    // Create workspace with default settings
+    const workspace: Workspace = {
+      id: workspaceId,
+      ownerId: userId,
+      theme: defaultSettings.theme,
+      customization: defaultSettings.customization,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
     
-    workspaces = [...workspaces, newWorkspace];
-    saveWorkspacesToStorage(workspaces);
+    // Store in localStorage for demo purposes
+    localStorage.setItem(`workspace_${workspaceId}`, JSON.stringify(workspace));
     
-    logWorkspaceAction(
+    // Log action
+    logWorkspaceAction("create", {
       userId,
-      newWorkspace.id,
-      'create_workspace',
-      { name }
-    );
+      workspaceId,
+      details: "Workspace created with default settings"
+    });
     
-    return newWorkspace;
-  },
-  
-  // Update workspace
-  updateWorkspace: async (id: string, userId: string, updates: Partial<Workspace>): Promise<Workspace | undefined> => {
-    const workspaceIndex = workspaces.findIndex(workspace => workspace.id === id);
+    return workspace;
+  } catch (error) {
+    console.error("Error creating workspace:", error);
+    throw new Error("Failed to create workspace");
+  }
+};
+
+// Update workspace settings
+export const updateWorkspace = async (
+  id: string, 
+  userId: string, 
+  payload: WorkspaceUpdatePayload
+): Promise<Workspace> => {
+  try {
+    // Validate update data
+    validateWorkspaceData(payload);
     
-    if (workspaceIndex === -1) {
-      return undefined;
+    // Get current workspace data
+    const storedData = localStorage.getItem(`workspace_${id}`);
+    if (!storedData) {
+      throw new Error("Workspace not found");
     }
     
-    // Only allow updating certain fields
-    const allowedUpdates = {
-      name: updates.name,
-      config: updates.config,
+    const workspace: Workspace = JSON.parse(storedData);
+    
+    // Check ownership
+    if (workspace.ownerId !== userId) {
+      throw new Error("Unauthorized to update this workspace");
+    }
+    
+    // Update workspace with new data
+    const updatedWorkspace: Workspace = {
+      ...workspace,
+      ...(payload.theme && { theme: payload.theme }),
+      ...(payload.customization && { customization: payload.customization }),
       updatedAt: new Date().toISOString()
     };
     
-    // Update the workspace
-    const updatedWorkspace = {
-      ...workspaces[workspaceIndex],
-      ...allowedUpdates
-    };
+    // Save updated workspace
+    localStorage.setItem(`workspace_${id}`, JSON.stringify(updatedWorkspace));
     
-    workspaces = [
-      ...workspaces.slice(0, workspaceIndex),
-      updatedWorkspace,
-      ...workspaces.slice(workspaceIndex + 1)
-    ];
-    
-    saveWorkspacesToStorage(workspaces);
-    
-    logWorkspaceAction(
+    // Log action
+    logWorkspaceAction("update", {
       userId,
-      id,
-      'update_workspace',
-      updates
-    );
+      workspaceId: id,
+      details: "Workspace settings updated"
+    });
     
     return updatedWorkspace;
-  },
-  
-  // Reset workspace to default configuration
-  resetWorkspaceConfig: async (id: string, userId: string): Promise<Workspace | undefined> => {
-    const workspaceIndex = workspaces.findIndex(workspace => workspace.id === id);
-    
-    if (workspaceIndex === -1) {
-      return undefined;
+  } catch (error) {
+    console.error("Error updating workspace:", error);
+    throw new Error("Failed to update workspace");
+  }
+};
+
+// Reset workspace to default settings
+export const resetWorkspace = async (id: string, userId: string): Promise<Workspace> => {
+  try {
+    // Get current workspace data
+    const storedData = localStorage.getItem(`workspace_${id}`);
+    if (!storedData) {
+      throw new Error("Workspace not found");
     }
     
-    // Reset only the config to default
-    const resetWorkspace = {
-      ...workspaces[workspaceIndex],
-      config: DEFAULT_WORKSPACE_CONFIG,
+    const workspace: Workspace = JSON.parse(storedData);
+    
+    // Check ownership
+    if (workspace.ownerId !== userId) {
+      throw new Error("Unauthorized to reset this workspace");
+    }
+    
+    // Get default settings
+    const defaultSettings = getDefaultWorkspaceSettings();
+    
+    // Reset workspace to default settings
+    const resetWorkspace: Workspace = {
+      ...workspace,
+      theme: defaultSettings.theme,
+      customization: defaultSettings.customization,
       updatedAt: new Date().toISOString()
     };
     
-    workspaces = [
-      ...workspaces.slice(0, workspaceIndex),
-      resetWorkspace,
-      ...workspaces.slice(workspaceIndex + 1)
-    ];
+    // Save reset workspace
+    localStorage.setItem(`workspace_${id}`, JSON.stringify(resetWorkspace));
     
-    saveWorkspacesToStorage(workspaces);
-    
-    logWorkspaceAction(
+    // Log action
+    logWorkspaceAction("reset", {
       userId,
-      id,
-      'reset_workspace',
-      { message: 'Reset to default configuration' }
-    );
+      workspaceId: id,
+      details: "Workspace reset to default settings"
+    });
     
     return resetWorkspace;
-  },
-  
-  // Delete workspace
-  deleteWorkspace: async (id: string, userId: string): Promise<boolean> => {
-    const workspaceIndex = workspaces.findIndex(workspace => workspace.id === id);
-    
-    if (workspaceIndex === -1) {
-      return false;
+  } catch (error) {
+    console.error("Error resetting workspace:", error);
+    throw new Error("Failed to reset workspace");
+  }
+};
+
+// Delete workspace
+export const deleteWorkspace = async (id: string, userId: string): Promise<void> => {
+  try {
+    // Get current workspace data
+    const storedData = localStorage.getItem(`workspace_${id}`);
+    if (!storedData) {
+      throw new Error("Workspace not found");
     }
     
-    workspaces = [
-      ...workspaces.slice(0, workspaceIndex),
-      ...workspaces.slice(workspaceIndex + 1)
-    ];
+    const workspace: Workspace = JSON.parse(storedData);
     
-    saveWorkspacesToStorage(workspaces);
+    // Check ownership
+    if (workspace.ownerId !== userId) {
+      throw new Error("Unauthorized to delete this workspace");
+    }
     
-    logWorkspaceAction(
+    // Remove workspace from storage
+    localStorage.removeItem(`workspace_${id}`);
+    
+    // Log action
+    logWorkspaceAction("delete", {
       userId,
-      id,
-      'delete_workspace',
-      { message: 'Workspace deleted' }
-    );
-    
-    return true;
+      workspaceId: id,
+      details: "Workspace deleted"
+    });
+  } catch (error) {
+    console.error("Error deleting workspace:", error);
+    throw new Error("Failed to delete workspace");
   }
 };

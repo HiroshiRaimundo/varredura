@@ -1,38 +1,20 @@
 
 export interface Workspace {
   id: string;
-  userId: string;
-  config: WorkspaceConfig;
-  createdAt: string;
-}
-
-export interface WorkspaceConfig {
+  ownerId: string;
   theme: string;
-  defaultWidgets: string[];
-  limits?: {
-    monitorings?: number;
-    releases?: number;
-    storage?: number;
+  customization: {
+    logo: string;
   };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type WorkspaceActionType = "create" | "update" | "delete" | "reset" | "impersonate" | "export";
+
+export interface WorkspaceUpdatePayload {
+  theme?: string;
   customization?: {
-    logo?: string;
-    colors?: {
-      primary?: string;
-      secondary?: string;
-    };
+    logo: string;
   };
 }
-
-export interface WorkspaceAction {
-  id: string;
-  workspaceId: string;
-  userId: string;
-  action: 'create' | 'update' | 'delete' | 'reset' | 'impersonate' | 'export';
-  details: Record<string, any>;
-  timestamp: string;
-  ipAddress?: string;
-  userAgent?: string;
-}
-
-// Define service types for client type categorization
-export type ServiceType = 'institution' | 'politician' | 'researcher' | 'journalist' | 'observatory' | 'press';
