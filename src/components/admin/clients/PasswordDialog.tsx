@@ -1,49 +1,91 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Copy } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface PasswordDialogProps {
-  password: string;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onCopyPassword: (password: string) => void;
+  onResetPassword: (password: string) => void;
 }
 
 const PasswordDialog: React.FC<PasswordDialogProps> = ({
-  password,
   isOpen,
   onOpenChange,
-  onCopyPassword
+  onResetPassword
 }) => {
+  const { toast } = useToast();
+  const [newPassword, setNewPassword] = useState("");
+  const [generatedPassword, setGeneratedPassword] = useState("");
+
+  const generateRandomPassword = () => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+    let result = "";
+    for (let i = 0; i < 10; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setNewPassword(result);
+    setGeneratedPassword(result);
+    return result;
+  };
+
+  const handleCopyPassword = () => {
+    navigator.clipboard.writeText(newPassword || generatedPassword);
+    toast({
+      title: "Senha copiada",
+      description: "A senha foi copiada para a área de transferência.",
+    });
+  };
+
+  const handleResetPassword = () => {
+    const passwordToUse = newPassword || generateRandomPassword();
+    onResetPassword(passwordToUse);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Senha Gerada</DialogTitle>
+          <DialogTitle>Redefinir Senha</DialogTitle>
           <DialogDescription>
-            Guarde esta senha em um local seguro. Ela será necessária para o primeiro acesso do cliente.
+            Defina uma nova senha para o cliente ou utilize uma senha gerada automaticamente.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="p-4 bg-secondary rounded-lg flex items-center justify-between">
-            <code className="text-lg font-mono">{password}</code>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onCopyPassword(password)}
-              title="Copiar senha"
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label>Nova senha</Label>
+            <div className="flex gap-2">
+              <Input
+                type="text"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Digite uma nova senha"
+              />
+              <Button variant="outline" type="button" onClick={handleCopyPassword} className="flex-shrink-0">
+                <Copy className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Recomende ao cliente que altere esta senha no primeiro acesso.
-          </p>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={generateRandomPassword}
+            className="w-full"
+          >
+            Gerar Senha Aleatória
+          </Button>
         </div>
         <DialogFooter>
-          <Button onClick={() => onOpenChange(false)}>Fechar</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancelar
+          </Button>
+          <Button onClick={handleResetPassword}>
+            Redefinir Senha
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

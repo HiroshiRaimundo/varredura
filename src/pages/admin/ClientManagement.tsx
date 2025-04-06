@@ -50,7 +50,6 @@ const ClientManagement: React.FC = () => {
   const [newClient, setNewClient] = useState<NewClientData>({
     name: "",
     email: "",
-    serviceType: ServiceType.OBSERVATORY,
     status: "active"
   });
 
@@ -62,7 +61,7 @@ const ClientManagement: React.FC = () => {
   const fetchClients = async () => {
     setIsLoading(true);
     try {
-      const data = await clientService.getClients();
+      const data = await clientService.getAll();
       setClients(data);
       setError(null);
     } catch (err) {
@@ -83,7 +82,6 @@ const ClientManagement: React.FC = () => {
     setNewClient({
       name: "",
       email: "",
-      serviceType: ServiceType.OBSERVATORY,
       status: "active"
     });
     setIsAddDialogOpen(true);
@@ -102,11 +100,11 @@ const ClientManagement: React.FC = () => {
       }
 
       // Adicionar cliente
-      await clientService.addClient({
+      await clientService.create({
         name: newClient.name,
         email: newClient.email,
-        serviceType: newClient.serviceType,
         status: newClient.status,
+        serviceType: ServiceType.OBSERVATORY,
         expiresAt: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
       });
 
@@ -137,7 +135,7 @@ const ClientManagement: React.FC = () => {
 
   const handleEditClient = async (updatedClient: Client) => {
     try {
-      await clientService.updateClient(updatedClient);
+      await clientService.update(updatedClient.id, updatedClient);
       await fetchClients();
       setIsEditDialogOpen(false);
       toast({
@@ -162,9 +160,11 @@ const ClientManagement: React.FC = () => {
     }
   };
 
-  const handleDeleteClient = async (clientId: string) => {
+  const handleDeleteClient = async () => {
+    if (!deletingClient) return;
+    
     try {
-      await clientService.deleteClient(clientId);
+      await clientService.delete(deletingClient.id);
       await fetchClients();
       setIsDeleteDialogOpen(false);
       toast({
@@ -189,9 +189,11 @@ const ClientManagement: React.FC = () => {
     }
   };
 
-  const handleResetPassword = async (clientId: string, newPassword: string) => {
+  const handleResetPassword = async (newPassword: string) => {
+    if (!resetPasswordClient) return;
+    
     try {
-      await clientService.resetPassword(clientId, newPassword);
+      await clientService.resetPassword(resetPasswordClient.id);
       setIsPasswordDialogOpen(false);
       toast({
         title: "Senha redefinida",
@@ -213,7 +215,7 @@ const ClientManagement: React.FC = () => {
       if (!client) return;
 
       const newStatus = client.status === "active" ? "inactive" : "active";
-      await clientService.updateClient({ ...client, status: newStatus });
+      await clientService.update(client.id, { ...client, status: newStatus });
       await fetchClients();
       toast({
         title: "Status alterado",
@@ -259,8 +261,8 @@ const ClientManagement: React.FC = () => {
     );
   }
 
-  // Here we handle the createdAt and expiresAt more safely
-  const clientsForList: ClientAccount[] = clients.map(client => ({
+  // Convert all clients to ClientAccount type for the table
+  const clientsForTable: ClientAccount[] = clients.map(client => ({
     id: client.id,
     name: client.name,
     email: client.email,
@@ -303,7 +305,7 @@ const ClientManagement: React.FC = () => {
             <TabsContent value="clients">
               {clients.length > 0 ? (
                 <ClientTable
-                  clients={clientsForList}
+                  clients={clientsForTable}
                   onStatusToggle={toggleClientStatus}
                   onResetPassword={resetPassword}
                   onEditClient={editClient}
@@ -360,19 +362,17 @@ const ClientManagement: React.FC = () => {
 
       {deletingClient && (
         <DeleteClientDialog
-          client={deletingClient}
           isOpen={isDeleteDialogOpen}
           onOpenChange={setIsDeleteDialogOpen}
-          onDelete={() => handleDeleteClient(deletingClient.id)}
+          onDelete={handleDeleteClient}
         />
       )}
 
       {resetPasswordClient && (
         <PasswordDialog
-          client={resetPasswordClient}
           isOpen={isPasswordDialogOpen}
           onOpenChange={setIsPasswordDialogOpen}
-          onResetPassword={(password) => handleResetPassword(resetPasswordClient.id, password)}
+          onResetPassword={handleResetPassword}
         />
       )}
     </div>

@@ -4,13 +4,11 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ServiceType } from "@/hooks/useClientAuth";
 
-// Fix the type definition to match what's used in ClientManagement
+// Updated type definition without serviceType
 export interface NewClientData {
   name: string;
   email: string;
-  serviceType: ServiceType;
   status: "active" | "inactive";
 }
 
