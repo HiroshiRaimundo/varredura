@@ -30,39 +30,24 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
-          {/* Página inicial pública */}
+          {/* Public pages */}
           <Route path="/" element={<Index />} />
 
-          {/* Rotas de login */}
+          {/* Login routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/client-login" element={<ClientLogin />} />
           <Route path="/simple-login" element={<SimpleLogin />} />
           
-          {/* Rotas de serviço */}
+          {/* Service routes */}
           <Route path="/service/:serviceId" element={<ServiceLanding />} />
           <Route path="/client" element={<Client />} />
           <Route path="/payment" element={<Payment />} />
           
-          {/* Rotas de demonstração */}
-          <Route 
-            path="/example-dashboard" 
-            element={
-              <PrivateRoute>
-                <ExampleDashboard />
-              </PrivateRoute>
-            } 
-          />
+          {/* Example pages - demonstrating both private and public access */}
+          <Route path="/example-dashboard" element={<ExampleDashboard />} />
+          <Route path="/example-client" element={<ExampleClient />} />
           
-          <Route 
-            path="/example-client" 
-            element={
-              <PrivateRoute>
-                <ExampleClient />
-              </PrivateRoute>
-            } 
-          />
-          
-          {/* Área do cliente */}
+          {/* Client area */}
           <Route 
             path="/dashboard" 
             element={
@@ -72,14 +57,14 @@ function App() {
             } 
           />
           
-          {/* Rota de erro de autorização */}
+          {/* Authorization error */}
           <Route path="/unauthorized" element={<Unauthorized />} />
 
-          {/* Rotas administrativas */}
+          {/* Admin routes - all protected */}
           <Route
             path="/admin"
             element={
-              <PrivateRoute>
+              <PrivateRoute requiredRole="admin">
                 <Admin />
               </PrivateRoute>
             }
@@ -88,7 +73,7 @@ function App() {
           <Route
             path="/admin/clients"
             element={
-              <PrivateRoute>
+              <PrivateRoute requiredRole="admin">
                 <ClientManagement />
               </PrivateRoute>
             }
@@ -97,7 +82,7 @@ function App() {
           <Route
             path="/admin/contacts"
             element={
-              <PrivateRoute>
+              <PrivateRoute requiredRole="admin">
                 <MediaContactsManagement />
               </PrivateRoute>
             }
@@ -106,17 +91,17 @@ function App() {
           <Route
             path="/admin/releases"
             element={
-              <PrivateRoute>
+              <PrivateRoute requiredRole="admin">
                 <ReleasesManagement />
               </PrivateRoute>
             }
           />
           
-          {/* Rotas de gerenciamento de workspace com propósitos diferentes */}
+          {/* Workspace management routes */}
           <Route
             path="/admin/workspace-settings"
             element={
-              <PrivateRoute>
+              <PrivateRoute requiredRole="admin">
                 <WorkspaceManagement />
               </PrivateRoute>
             }
@@ -125,7 +110,7 @@ function App() {
           <Route
             path="/admin/impersonate"
             element={
-              <PrivateRoute>
+              <PrivateRoute requiredRole="admin">
                 <WorkspaceManagement />
               </PrivateRoute>
             }
@@ -134,7 +119,7 @@ function App() {
           <Route
             path="/admin/reset-workspace"
             element={
-              <PrivateRoute>
+              <PrivateRoute requiredRole="admin">
                 <WorkspaceManagement />
               </PrivateRoute>
             }
@@ -143,13 +128,13 @@ function App() {
           <Route
             path="/admin/raw-data"
             element={
-              <PrivateRoute>
+              <PrivateRoute requiredRole="admin">
                 <WorkspaceManagement />
               </PrivateRoute>
             }
           />
 
-          {/* Rota 404 */}
+          {/* 404 route */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>

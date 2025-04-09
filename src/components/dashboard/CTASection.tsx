@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Eye } from "lucide-react";
@@ -10,12 +9,12 @@ const CTASection: React.FC = () => {
   const auth = useAuth();
   
   const handleDemoClick = () => {
-    // Sempre direcionar para o login simplificado com redirecionamento para example-dashboard
+    // Always direct to simple login with redirect to example-dashboard
     navigate("/simple-login?from=/example-dashboard");
   };
 
   const handleClientAccess = () => {
-    // Sempre direcionar para o login simplificado com redirecionamento para example-client
+    // Always direct to simple login with redirect to example-client
     navigate("/simple-login?from=/example-client");
   };
 

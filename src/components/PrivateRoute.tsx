@@ -15,15 +15,17 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
   const { isAuthenticated, user } = useAuth();
   const location = useLocation();
 
-  // Verificar se o usuário está autenticado
+  // Check if user is authenticated
   if (!isAuthenticated) {
-    // Se o usuário está tentando acessar uma rota protegida, redirecione para o login simplificado
+    // If user is trying to access a protected route, redirect to simple login
     const redirectTo = `/simple-login?from=${encodeURIComponent(location.pathname)}`;
     return <Navigate to={redirectTo} replace />;
   }
 
-  // Verificar se o usuário tem a role necessária (se especificada)
+  // Check if user has the required role (if specified)
   if (requiredRole && user?.role !== requiredRole) {
+    // Track attempted access to restricted areas for administrative monitoring
+    console.log(`User ${user?.email} attempted to access ${location.pathname} without required role ${requiredRole}`);
     return <Navigate to="/unauthorized" replace />;
   }
 
