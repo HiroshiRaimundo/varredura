@@ -11,7 +11,7 @@ const SimpleLogin: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Get the redirect path from URL parameters or use a default path to example page
+  // Get the redirect path from URL parameters or use a default path to example client
   const searchParams = new URLSearchParams(location.search);
   const redirectPath = searchParams.get('from') || '/example-client';
   
