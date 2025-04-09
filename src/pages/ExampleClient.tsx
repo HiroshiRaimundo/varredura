@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/layout/Header";
@@ -19,8 +19,15 @@ const ExampleClient: React.FC = () => {
   const [clientType, setClientType] = useState<ClientType>("observatory");
   const [activeTab, setActiveTab] = useState<"dashboard" | "monitoring" | "analysis" | "releases">("dashboard");
 
+  // Utilizar useEffect para o redirecionamento
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      navigate("/simple-login?from=/example-client");
+    }
+  }, [auth.isAuthenticated, navigate]);
+
+  // Se não estiver autenticado, não renderizar o conteúdo
   if (!auth.isAuthenticated) {
-    navigate("/simple-login?from=/example-client");
     return null;
   }
 

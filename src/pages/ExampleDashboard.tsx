@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,8 +17,15 @@ const ExampleDashboard: React.FC = () => {
   const auth = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
 
+  // Utilizar useEffect para o redirecionamento
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      navigate("/simple-login?from=/example-dashboard");
+    }
+  }, [auth.isAuthenticated, navigate]);
+
+  // Se não estiver autenticado, não renderizar o conteúdo
   if (!auth.isAuthenticated) {
-    navigate("/client-login?from=/example-dashboard");
     return null;
   }
 

@@ -10,12 +10,12 @@ const CTASection: React.FC = () => {
   const auth = useAuth();
   
   const handleDemoClick = () => {
-    // Always direct to simple login with redirect to example-dashboard
+    // Sempre direcionar para o login simplificado com redirecionamento para o dashboard de exemplo
     navigate("/simple-login?from=/example-dashboard");
   };
 
   const handleClientAccess = () => {
-    // Always direct to simple login with redirect to example-client
+    // Sempre direcionar para o login simplificado com redirecionamento para o cliente de exemplo
     navigate("/simple-login?from=/example-client");
   };
 

@@ -61,14 +61,25 @@ const SimpleRegistration: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      await auth.handleLogin({
+      // Implementação simplificada - em demonstração, qualquer credencial funciona
+      // Simulamos autenticação sem verificar senha
+      localStorage.setItem('isAuthenticated', 'true');
+      const userData = {
+        name: data.email.split('@')[0],
         email: data.email,
-        password: data.password
+        role: 'client'
+      };
+      localStorage.setItem('user', JSON.stringify(userData));
+      
+      toast({
+        title: "Login realizado com sucesso!",
+        description: "Redirecionando para a página de exemplo.",
       });
       
-      if (auth.isAuthenticated) {
+      // Redirecionamos o usuário para a página de exemplo
+      setTimeout(() => {
         navigate(redirectPath);
-      }
+      }, 500);
     } catch (error) {
       console.error("Erro no login:", error);
       toast({
@@ -86,27 +97,24 @@ const SimpleRegistration: React.FC = () => {
     
     try {
       // Simulando registro - em produção, isso seria uma chamada API
-      // Note que estamos reutilizando o mecanismo de login existente para simplicidade
-      localStorage.setItem(`user_${data.email}`, JSON.stringify({
+      localStorage.setItem('isAuthenticated', 'true');
+      const userData = {
+        name: data.name || data.email.split('@')[0],
         email: data.email,
-        name: data.name || "Usuário",
-        phone: data.phone || "",
-        registered: new Date().toISOString()
-      }));
-      
-      // Fazer login com as credenciais recém-registradas
-      await auth.handleLogin({
-        email: data.email,
-        password: data.password
-      });
+        role: 'client',
+        phone: data.phone || ""
+      };
+      localStorage.setItem('user', JSON.stringify(userData));
       
       toast({
         title: "Cadastro realizado com sucesso!",
         description: "Bem-vindo à plataforma.",
       });
       
-      // Redirecionar para a página de exemplo
-      navigate(redirectPath);
+      // Redirecionar para a página de exemplo após um pequeno delay para dar tempo da toast aparecer
+      setTimeout(() => {
+        navigate(redirectPath);
+      }, 500);
     } catch (error) {
       console.error("Erro no cadastro:", error);
       toast({
