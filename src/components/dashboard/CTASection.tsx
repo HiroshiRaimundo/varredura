@@ -10,17 +10,13 @@ const CTASection: React.FC = () => {
   const auth = useAuth();
   
   const handleDemoClick = () => {
-    if (!auth.isAuthenticated) {
-      // If not authenticated, go to login first
-      auth.setIsLoginDialogOpen(true);
-    } else {
-      navigate("/example-dashboard");
-    }
+    // Sempre direcionar para o login simplificado com redirecionamento para example-dashboard
+    navigate("/simple-login?from=/example-dashboard");
   };
 
   const handleClientAccess = () => {
-    // Navigate to client login with redirect to example-client
-    navigate("/client-login?from=/example-client");
+    // Sempre direcionar para o login simplificado com redirecionamento para example-client
+    navigate("/simple-login?from=/example-client");
   };
 
   return (

@@ -17,8 +17,8 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
 
   // Verificar se o usuário está autenticado
   if (!isAuthenticated) {
-    // Se o usuário está tentando acessar uma rota protegida, redirecione para login
-    const redirectTo = `/client-login?from=${encodeURIComponent(location.pathname)}`;
+    // Se o usuário está tentando acessar uma rota protegida, redirecione para o login simplificado
+    const redirectTo = `/simple-login?from=${encodeURIComponent(location.pathname)}`;
     return <Navigate to={redirectTo} replace />;
   }
 

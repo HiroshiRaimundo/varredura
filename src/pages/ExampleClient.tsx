@@ -9,7 +9,8 @@ import ClientTabs from "@/components/example-client/ClientTabs";
 import ClientInfo from "@/components/example-client/ClientInfo";
 import DefaultContent from "@/components/example-client/DefaultContent";
 import { Card } from "@/components/ui/card";
-import { Users, BarChart2, FileText, Search, Leaf, FileBarChart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Users, BarChart2, FileText, Search, Leaf, FileBarChart, LogIn } from "lucide-react";
 import { ClientType } from "@/components/client/ClientTypes";
 
 const ExampleClient: React.FC = () => {
@@ -19,7 +20,7 @@ const ExampleClient: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"dashboard" | "monitoring" | "analysis" | "releases">("dashboard");
 
   if (!auth.isAuthenticated) {
-    navigate("/client-login?from=/example-client");
+    navigate("/simple-login?from=/example-client");
     return null;
   }
 
@@ -50,6 +51,11 @@ const ExampleClient: React.FC = () => {
     }
     return null;
   };
+  
+  const handleLogout = () => {
+    auth.handleLogout();
+    navigate("/simple-login?from=/example-client");
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -61,11 +67,19 @@ const ExampleClient: React.FC = () => {
         />
         
         <div className="my-8 max-w-7xl mx-auto">
-          <div className="mb-6">
+          <div className="flex justify-between items-center mb-6">
             <ClientHeader 
               clientType={clientType}
               getClientIcon={getClientIcon}
             />
+            
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2" 
+              onClick={handleLogout}
+            >
+              <LogIn className="h-4 w-4" /> Já tenho conta
+            </Button>
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">

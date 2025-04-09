@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BarChart2, CheckCircle, Eye, Search, Shield, Leaf } from "lucide-react";
@@ -10,16 +9,11 @@ const HeroSection: React.FC = () => {
   const auth = useAuth();
 
   const handleDemoClick = () => {
-    if (!auth.isAuthenticated) {
-      auth.setIsLoginDialogOpen(true);
-    } else {
-      navigate("/example-dashboard");
-    }
+    navigate("/simple-login?from=/example-dashboard");
   };
 
   const handleLoginClick = () => {
-    // Navigate to client login with redirect to example-client
-    navigate("/client-login?from=/example-client");
+    navigate("/simple-login?from=/example-client");
   };
 
   return (

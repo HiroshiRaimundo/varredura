@@ -15,6 +15,7 @@ import ClientDashboard from '@/pages/ClientDashboard';
 import ClientLogin from '@/pages/ClientLogin';
 import ExampleDashboard from '@/pages/ExampleDashboard';
 import ExampleClient from '@/pages/ExampleClient';
+import SimpleLogin from '@/pages/SimpleLogin';
 
 // Other pages
 import Index from '@/pages/Index';
@@ -35,6 +36,7 @@ function App() {
           {/* Rotas de login */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/client-login" element={<ClientLogin />} />
+          <Route path="/simple-login" element={<SimpleLogin />} />
           
           {/* Rotas de serviço */}
           <Route path="/service/:serviceId" element={<ServiceLanding />} />

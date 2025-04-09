@@ -10,8 +10,13 @@ const ServicesSection: React.FC = () => {
   const navigate = useNavigate();
 
   const handleKnowPlatform = () => {
-    // Navigate to client login first, with a redirect parameter to example-client
-    navigate("/client-login?from=/example-client");
+    // Direcionar para o login simplificado com redirecionamento para example-client
+    navigate("/simple-login?from=/example-client");
+  };
+
+  const handleServiceClick = (serviceType: string) => {
+    // Direcionar para o login simplificado com o tipo de serviço especificado
+    navigate(`/simple-login?from=/example-client&type=${serviceType}`);
   };
 
   return (
@@ -95,7 +100,7 @@ const ServicesSection: React.FC = () => {
               <div 
                 key={type.type}
                 className="bg-gray-50 p-4 rounded-lg border border-gray-100 text-center hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => navigate(`/service/${type.type}`)}
+                onClick={() => handleServiceClick(type.type)}
               >
                 {type.type === "observatory" && <Database className="h-8 w-8 text-blue-500 mx-auto mb-2" />}
                 {type.type === "researcher" && <Search className="h-8 w-8 text-purple-500 mx-auto mb-2" />}
