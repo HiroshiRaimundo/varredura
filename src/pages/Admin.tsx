@@ -118,7 +118,7 @@ const Admin: React.FC = () => {
     setContents(prevContents => 
       prevContents.map(content => 
         content.id === id 
-          ? { ...content, status } 
+          ? { ...content, status, feedback } 
           : content
       )
     );
@@ -134,7 +134,7 @@ const Admin: React.FC = () => {
       entityId: id,
       details: { 
         releaseTitle: contents.find(c => c.id === id)?.title || "Unknown content",
-        feedback: feedback
+        feedback: feedback || "Nenhum feedback fornecido"
       },
       ipAddress: "127.0.0.1", // In a real app, this would be the user's IP address
       userAgent: navigator.userAgent,

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircle, XCircle, Clock, Eye, Calendar } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Eye, Calendar, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 // Dados mockados para simular releases pendentes de moderação
@@ -52,7 +52,8 @@ const mockModeratedReleases = [
     clientName: "Empresa XYZ",
     date: "2024-05-16",
     status: "rejected",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget aliquam ultricies, nisl nisl aliquet nisl, eget aliquam ultricies nisl nisl aliquet nisl."
+    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget aliquam ultricies, nisl nisl aliquet nisl, eget aliquam ultricies nisl nisl aliquet nisl.",
+    feedback: "O conteúdo contém informações financeiras que precisam ser verificadas. Por favor, adicione fontes para os dados apresentados e detalhe melhor a metodologia utilizada para os cálculos."
   },
   {
     id: "6",
@@ -108,7 +109,8 @@ const ReleaseModerationSection: React.FC<ReleaseModerationSectionProps> = ({ onR
       setModeratedReleases([
         {
           ...rejectedRelease,
-          status: "rejected"
+          status: "rejected",
+          feedback: viewingRelease.feedback || "Seu release foi rejeitado. Entre em contato com o moderador para mais informações."
         },
         ...moderatedReleases
       ]);
@@ -123,11 +125,22 @@ const ReleaseModerationSection: React.FC<ReleaseModerationSectionProps> = ({ onR
   };
 
   const viewRelease = (release: any) => {
-    setViewingRelease(release);
+    // Inicialize o feedback como vazio se estiver vendo um release para dar feedback
+    setViewingRelease({
+      ...release,
+      feedback: release.feedback || ""
+    });
   };
 
   const closeViewRelease = () => {
     setViewingRelease(null);
+  };
+
+  const handleFeedbackChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setViewingRelease({
+      ...viewingRelease,
+      feedback: e.target.value
+    });
   };
 
   const getStatusBadge = (status: string) => {
@@ -220,15 +233,23 @@ const ReleaseModerationSection: React.FC<ReleaseModerationSectionProps> = ({ onR
                         <div className="ml-2">{getStatusBadge(release.status)}</div>
                       </div>
                     </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => viewRelease(release)}
-                      className="flex items-center gap-1"
-                    >
-                      <Eye className="h-4 w-4" />
-                      Ver
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => viewRelease(release)}
+                        className="flex items-center gap-1"
+                      >
+                        <Eye className="h-4 w-4" />
+                        Ver
+                      </Button>
+                      {release.status === 'rejected' && release.feedback && (
+                        <Badge className="bg-red-50 text-red-700 flex items-center gap-1 cursor-help" title={release.feedback}>
+                          <AlertCircle className="h-3 w-3" />
+                          Feedback disponível
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))
@@ -261,6 +282,16 @@ const ReleaseModerationSection: React.FC<ReleaseModerationSectionProps> = ({ onR
               <div className="border-t border-b py-4 my-4">
                 <p className="whitespace-pre-line">{viewingRelease.content}</p>
               </div>
+              
+              {viewingRelease.status === 'rejected' && viewingRelease.feedback && (
+                <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
+                  <h3 className="text-red-700 font-medium flex items-center gap-2 mb-2">
+                    <AlertCircle className="h-4 w-4" />
+                    Feedback do moderador
+                  </h3>
+                  <p className="text-red-700 whitespace-pre-line">{viewingRelease.feedback}</p>
+                </div>
+              )}
               
               {viewingRelease.status === 'pending' && (
                 <div className="flex justify-end gap-2 mt-4">

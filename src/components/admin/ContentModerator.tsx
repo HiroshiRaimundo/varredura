@@ -12,6 +12,8 @@ import { getStatusLabel, getStatusColor } from './utils/releaseUtils';
 import { Badge } from '@/components/ui/badge';
 import AdvancedModerationInterface from './releases/AdvancedModerationInterface';
 import { toast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 
 interface ContentModeratorProps {
   releases?: ReleaseData[];
@@ -37,6 +39,9 @@ const ContentModerator: React.FC<ContentModeratorProps> = ({
   const [activeTab, setActiveTab] = useState("standard");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [rejectionFeedback, setRejectionFeedback] = useState("");
+  const [selectedReleaseId, setSelectedReleaseId] = useState<string | null>(null);
 
   useEffect(() => {
     if (propReleases) {
@@ -144,18 +149,38 @@ const ContentModerator: React.FC<ContentModeratorProps> = ({
     }
   };
 
-  const handleReject = (id: string, feedback?: string) => {
+  const openRejectDialog = (id: string) => {
+    setSelectedReleaseId(id);
+    setRejectionFeedback("");
+    setRejectDialogOpen(true);
+  };
+
+  const handleReject = () => {
+    if (!selectedReleaseId) return;
+    
+    const id = selectedReleaseId;
+    const feedback = rejectionFeedback.trim();
+    
     if (propOnReject) {
-      propOnReject(id, feedback);
+      propOnReject(id, feedback || undefined);
     } else {
       setReleases(releases.map(release =>
-        release.id === id ? { ...release, status: 'rejected' } : release
+        release.id === id ? { ...release, status: 'rejected', feedback } : release
       ));
     }
     
     if (onUpdateStatus && contents) {
-      onUpdateStatus(id, 'rejected', feedback);
+      onUpdateStatus(id, 'rejected', feedback || undefined);
     }
+
+    setRejectDialogOpen(false);
+    setSelectedReleaseId(null);
+    setRejectionFeedback("");
+    
+    toast({
+      title: "Conteúdo rejeitado",
+      description: "O feedback foi registrado e enviado para o cliente.",
+    });
   };
 
   const handleDelete = (id: string) => {
@@ -264,7 +289,7 @@ const ContentModerator: React.FC<ContentModeratorProps> = ({
                                   <Check className="h-4 w-4 mr-2" />
                                   Aprovar
                                 </Button>
-                                <Button size="sm" variant="destructive" onClick={() => handleReject(release.id)}>
+                                <Button size="sm" variant="destructive" onClick={() => openRejectDialog(release.id)}>
                                   <X className="h-4 w-4 mr-2" />
                                   Rejeitar
                                 </Button>
@@ -308,12 +333,37 @@ const ContentModerator: React.FC<ContentModeratorProps> = ({
               <AdvancedModerationInterface
                 releases={releases}
                 onApprove={handleApprove}
-                onReject={handleReject}
+                onReject={openRejectDialog}
                 onFilter={handleFilter}
               />
             )}
           </TabsContent>
         </Tabs>
+
+        <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Justificativa para rejeição</DialogTitle>
+              <DialogDescription>
+                Forneça uma justificativa para a rejeição do conteúdo. Esta informação ajudará o cliente a entender os problemas e fazer as correções necessárias.
+              </DialogDescription>
+            </DialogHeader>
+            <Textarea
+              placeholder="Descreva o motivo da rejeição e forneça orientações para correção..."
+              value={rejectionFeedback}
+              onChange={(e) => setRejectionFeedback(e.target.value)}
+              className="min-h-[120px]"
+            />
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button variant="outline" onClick={() => setRejectDialogOpen(false)}>
+                Cancelar
+              </Button>
+              <Button variant="destructive" onClick={handleReject}>
+                Rejeitar com Feedback
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );
