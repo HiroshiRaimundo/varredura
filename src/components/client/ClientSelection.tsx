@@ -11,8 +11,8 @@ const ClientSelection: React.FC = () => {
   const navigate = useNavigate();
 
   const handleClientSelect = (clientType: string) => {
-    // Go to login page instead of directly to client type
-    navigate("/client-login");
+    // Go to login page with redirect to example-client
+    navigate(`/client-login?from=/example-client&type=${clientType}`);
   };
 
   return (
@@ -29,7 +29,7 @@ const ClientSelection: React.FC = () => {
         </div>
 
         <Button 
-          onClick={() => navigate("/client-login")}
+          onClick={() => navigate("/client-login?from=/example-client")}
           className="mt-4 md:mt-0 w-full md:w-auto flex items-center gap-2"
         >
           <User className="h-4 w-4" />

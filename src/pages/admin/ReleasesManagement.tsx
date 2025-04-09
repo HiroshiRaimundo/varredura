@@ -116,7 +116,12 @@ const ReleasesManagement: React.FC = () => {
               status: release.status,
               content: release.content,
               publicationDate: release.date,
-              monitoringActive: release.status === 'approved'
+              monitoringActive: release.status === 'approved',
+              // Add missing properties required by ReleaseData type
+              clientType: "press",
+              mediaOutlet: "Não especificado",
+              publicationUrl: "",
+              publicationTime: ""
             }))}
             onApprove={handleApproveRelease}
             onReject={handleRejectRelease}

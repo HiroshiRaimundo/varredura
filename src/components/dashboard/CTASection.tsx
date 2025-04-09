@@ -11,10 +11,16 @@ const CTASection: React.FC = () => {
   
   const handleDemoClick = () => {
     if (!auth.isAuthenticated) {
+      // If not authenticated, go to login first
       auth.setIsLoginDialogOpen(true);
     } else {
       navigate("/example-dashboard");
     }
+  };
+
+  const handleClientAccess = () => {
+    // Navigate to client login with redirect to example-client
+    navigate("/client-login?from=/example-client");
   };
 
   return (
@@ -39,7 +45,7 @@ const CTASection: React.FC = () => {
           
           <Button
             className="bg-green-600 hover:bg-green-700 text-white px-6 py-6 h-auto text-lg rounded-xl transition-all"
-            onClick={() => navigate("/client")}
+            onClick={handleClientAccess}
           >
             Acesso Imediato <ArrowRight className="ml-2 h-5 w-5" />
           </Button>

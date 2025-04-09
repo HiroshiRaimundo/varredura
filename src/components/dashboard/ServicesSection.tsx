@@ -9,6 +9,11 @@ import { clientTypes } from "@/components/client/ClientTypes";
 const ServicesSection: React.FC = () => {
   const navigate = useNavigate();
 
+  const handleKnowPlatform = () => {
+    // Navigate to client login first, with a redirect parameter to example-client
+    navigate("/client-login?from=/example-client");
+  };
+
   return (
     <section className="py-16 px-6">
       <div className="max-w-6xl mx-auto">
@@ -104,7 +109,7 @@ const ServicesSection: React.FC = () => {
           </div>
           
           <Button 
-            onClick={() => navigate("/client")}
+            onClick={handleKnowPlatform}
             size="lg"
             className="bg-primary hover:bg-primary/90"
           >

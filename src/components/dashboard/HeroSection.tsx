@@ -17,6 +17,11 @@ const HeroSection: React.FC = () => {
     }
   };
 
+  const handleLoginClick = () => {
+    // Navigate to client login with redirect to example-client
+    navigate("/client-login?from=/example-client");
+  };
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900">
       {/* Background elements */}
@@ -56,7 +61,7 @@ const HeroSection: React.FC = () => {
                 
                 <Button 
                   variant="outline" 
-                  onClick={() => navigate("/client-login")}
+                  onClick={handleLoginClick}
                   className="bg-white/10 backdrop-blur-sm text-white border border-white/20 px-6 py-6 h-auto text-lg rounded-xl hover:bg-white/20 transition-all"
                 >
                   Área de Login <Eye className="ml-2 h-5 w-5" />

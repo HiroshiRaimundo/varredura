@@ -14,6 +14,7 @@ import WorkspaceManagement from '@/pages/admin/WorkspaceManagement';
 import ClientDashboard from '@/pages/ClientDashboard';
 import ClientLogin from '@/pages/ClientLogin';
 import ExampleDashboard from '@/pages/ExampleDashboard';
+import ExampleClient from '@/pages/ExampleClient';
 
 // Other pages
 import Index from '@/pages/Index';
@@ -40,12 +41,21 @@ function App() {
           <Route path="/client" element={<Client />} />
           <Route path="/payment" element={<Payment />} />
           
-          {/* Rota de demonstração */}
+          {/* Rotas de demonstração */}
           <Route 
             path="/example-dashboard" 
             element={
               <PrivateRoute>
                 <ExampleDashboard />
+              </PrivateRoute>
+            } 
+          />
+          
+          <Route 
+            path="/example-client" 
+            element={
+              <PrivateRoute>
+                <ExampleClient />
               </PrivateRoute>
             } 
           />
