@@ -15,37 +15,25 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
   const { isAuthenticated, user } = useAuth();
   const location = useLocation();
 
-  // Verificar se o usuário está autenticado
+  // Check if user is authenticated
   if (!isAuthenticated) {
-    // Determinar para qual página de login redirecionar com base no caminho atual
+    // Se o usuário estiver tentando acessar a página de exemplo, redirecionamos para o login simplificado
     const currentPath = location.pathname;
-    let redirectTo = '/login';
-    
-    if (currentPath.includes('example-')) {
-      // Páginas de exemplo vão para login simplificado
-      redirectTo = `/simple-login?from=${encodeURIComponent(currentPath)}`;
-    } else if (currentPath.includes('admin')) {
-      // Páginas de admin vão para login administrativo
-      redirectTo = `/login?from=${encodeURIComponent(currentPath)}`;
-    } else {
-      // Outras páginas vão para client-login
-      redirectTo = `/client-login?from=${encodeURIComponent(currentPath)}`;
-    }
+    const isExamplePage = currentPath.includes('example-');
+    const redirectTo = `/simple-login?from=${encodeURIComponent(currentPath)}`;
     
     console.log(`Redirecionando usuário não autenticado para ${redirectTo}`);
     return <Navigate to={redirectTo} replace />;
   }
 
-  // Verificar permissão de acesso com base no papel do usuário
+  // Check if user has the required role (if specified)
+  // Para o modo de demonstração, vamos fazer essa verificação ser menos restritiva
   if (requiredRole && user?.role !== requiredRole) {
-    console.log(`User ${user?.email} attempted to access ${location.pathname} without required role ${requiredRole}`);
-    
-    // Se for uma página de exemplo, permitir acesso mais flexível
-    if (location.pathname.includes('example-') && !location.pathname.includes('admin')) {
-      return <>{children}</>;
+    // Para a visualização da página de exemplo, permitimos acesso mais flexível
+    if (requiredRole !== 'admin' || location.pathname.startsWith('/admin')) {
+      console.log(`User ${user?.email} attempted to access ${location.pathname} without required role ${requiredRole}`);
+      return <Navigate to="/unauthorized" replace />;
     }
-    
-    return <Navigate to="/unauthorized" replace />;
   }
 
   return <>{children}</>;
