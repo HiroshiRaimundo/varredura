@@ -17,6 +17,16 @@ import ExampleDashboard from '@/pages/ExampleDashboard';
 import ExampleClient from '@/pages/ExampleClient';
 import SimpleLogin from '@/pages/SimpleLogin';
 
+// New login pages
+import ExemploLogin from '@/pages/ExemploLogin';
+import ClienteLogin from '@/pages/ClienteLogin';
+import AdminLogin from '@/pages/AdminLogin';
+
+// Areas pages
+import AreaExemplo from '@/pages/AreaExemplo';
+import AreaCliente from '@/pages/AreaCliente';
+import AdminDashboard from '@/pages/AdminDashboard';
+
 // Other pages
 import Index from '@/pages/Index';
 import LoginPage from '@/pages/Login';
@@ -33,10 +43,34 @@ function App() {
           {/* Public pages */}
           <Route path="/" element={<Index />} />
 
-          {/* Login routes */}
+          {/* Legacy Login routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/client-login" element={<ClientLogin />} />
           <Route path="/simple-login" element={<SimpleLogin />} />
+          
+          {/* New separated login routes */}
+          <Route path="/exemplo-login" element={<ExemploLogin />} />
+          <Route path="/cliente-login" element={<ClienteLogin />} />
+          <Route path="/admin-login" element={<AdminLogin />} />
+          
+          {/* Destination routes for each login type */}
+          <Route path="/area-exemplo" element={
+            <PrivateRoute requiredRole="exemplo">
+              <AreaExemplo />
+            </PrivateRoute>
+          } />
+          
+          <Route path="/area-cliente" element={
+            <PrivateRoute requiredRole="cliente">
+              <AreaCliente />
+            </PrivateRoute>
+          } />
+          
+          <Route path="/admin-dashboard" element={
+            <PrivateRoute requiredRole="admin">
+              <AdminDashboard />
+            </PrivateRoute>
+          } />
           
           {/* Service routes */}
           <Route path="/service/:serviceId" element={<ServiceLanding />} />

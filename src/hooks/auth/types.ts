@@ -24,9 +24,10 @@ export interface AuthState {
 export interface AuthContextType extends AuthState {
   setIsLoginDialogOpen: (value: boolean) => void;
   form: UseFormReturn<LoginCredentials>;
-  handleLogin: (data: LoginCredentials) => Promise<void>;
+  handleLogin: (data: LoginCredentials) => Promise<boolean>;
   handleLogout: () => void;
-  navigate: (to: string) => void;
+  navigate: (to: string, options?: any) => void;
   impersonateClient: (clientId: string) => Promise<void>;
   exitImpersonation: () => void;
+  loginWithUser: (user: User) => Promise<boolean>;
 }

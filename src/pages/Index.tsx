@@ -10,6 +10,7 @@ import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import LoginDialog from "@/components/LoginDialog";
+import LoginOptions from "@/components/login/LoginOptions";
 
 const Index: React.FC = () => {
   const auth = useAuth();
@@ -24,12 +25,13 @@ const Index: React.FC = () => {
       <main>
         <HeroSection />
         <FeaturesSection />
+        <LoginOptions />
         <ServicesSection />
         <CTASection />
       </main>
       <Footer />
       
-      {/* Login Dialog */}
+      {/* Login Dialog (legado) */}
       {auth.isLoginDialogOpen && (
         <LoginDialog 
           isOpen={auth.isLoginDialogOpen}
