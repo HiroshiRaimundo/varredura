@@ -28,6 +28,7 @@ declare module '@supabase/supabase-js' {
     auth: {
       signUp: (options: { email: string; password: string; options?: any }) => Promise<AuthResponse>;
       signIn: (options: { email: string; password: string; }) => Promise<AuthResponse>;
+      signInWithPassword: (options: { email: string; password: string; }) => Promise<AuthResponse>; // Added this method
       signOut: () => Promise<{ error: Error | null }>;
       getSession: () => Promise<{ data: { session: Session | null }, error: Error | null }>;
     };

@@ -8,7 +8,7 @@ export interface AuthUser {
   id: string;
   email: string;
   role: string;
-  name?: string;
+  name: string; // Changed from optional to required to match User type
 }
 
 export const useSupabaseAuth = () => {
@@ -42,7 +42,7 @@ export const useSupabaseAuth = () => {
             id: data.session.user.id,
             email: data.session.user.email || '',
             role: data.session.user.app_metadata.role || 'client',
-            name: data.session.user.user_metadata.name || data.session.user.email?.split('@')[0]
+            name: data.session.user.user_metadata.name || data.session.user.email?.split('@')[0] || ''
           };
           
           setUser(userData);
@@ -74,7 +74,8 @@ export const useSupabaseAuth = () => {
     
     try {
       // Tentar login via Supabase
-      const { data, error } = await supabase.auth.signInWithPassword({
+      // Fix for signInWithPassword not in type definition
+      const { data, error } = await supabase.auth.signIn({
         email,
         password
       });
@@ -138,7 +139,7 @@ export const useSupabaseAuth = () => {
         id: data.user?.id || '',
         email: data.user?.email || '',
         role: data.user?.app_metadata?.role || 'client',
-        name: data.user?.user_metadata?.name || data.user?.email?.split('@')[0]
+        name: data.user?.user_metadata?.name || data.user?.email?.split('@')[0] || ''
       };
       
       setIsAuthenticated(true);
