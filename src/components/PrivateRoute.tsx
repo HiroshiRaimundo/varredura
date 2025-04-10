@@ -43,6 +43,8 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
     return <Navigate to="/unauthorized" replace />;
   }
 
+  // Usuário está autenticado e tem a função necessária
+  console.log(`Usuário ${user?.email} com função ${user?.role} acessando ${location.pathname}`);
   return <>{children}</>;
 };
 

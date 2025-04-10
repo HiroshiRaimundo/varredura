@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks/auth';
 import { authenticateExemplo } from '@/services/authService';
 import { toast } from '@/hooks/use-toast';
 
@@ -12,20 +12,38 @@ export const useExemploAuth = () => {
 
   const handleLogin = async (email: string, password: string, redirectPath?: string) => {
     setIsLoading(true);
+    console.log('Iniciando autenticação para exemplo:', email);
     
     try {
+      // Para fins de demonstração, simplesmente aceite qualquer credencial
       const user = authenticateExemplo(email, password);
       
+      // Log user object para debugging
+      console.log('User recebido do serviço de autenticação:', user);
+      
       if (user) {
-        await loginWithUser(user);
+        // Tenta realizar o login com o usuário
+        const success = await loginWithUser(user);
+        console.log('Resultado do login:', success);
         
-        toast({
-          title: "Acesso concedido",
-          description: "Bem-vindo à área de exemplo."
-        });
-        
-        navigate(redirectPath || '/area-exemplo');
-        return true;
+        if (success) {
+          toast({
+            title: "Acesso concedido",
+            description: "Bem-vindo à área de exemplo."
+          });
+          
+          // Navega para o caminho de redirecionamento
+          navigate(redirectPath || '/area-exemplo');
+          return true;
+        } else {
+          console.error('Login falhou após autenticação');
+          toast({
+            title: "Erro no login",
+            description: "Falha ao autenticar sessão.",
+            variant: "destructive"
+          });
+          return false;
+        }
       } else {
         toast({
           title: "Erro de acesso",

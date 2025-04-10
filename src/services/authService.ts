@@ -13,6 +13,7 @@ export interface AuthUser extends User {
 
 // Função para salvar usuário no localStorage
 export const saveUser = (user: AuthUser): void => {
+  console.log('Salvando usuário no localStorage:', user);
   localStorage.setItem('user', JSON.stringify(user));
   localStorage.setItem('isAuthenticated', 'true');
   localStorage.setItem('lastActivity', Date.now().toString());
@@ -60,6 +61,9 @@ export const logout = (): void => {
   localStorage.removeItem('lastActivity');
 };
 
+// Armazenamento em memória para usuários registrados (simulação)
+const registeredUsers: Record<string, {email: string, password: string, role: UserRole}> = {};
+
 // Verificação de credenciais para cada tipo de usuário
 export const authenticateAdmin = (email: string, password: string): AuthUser | null => {
   // Verificação simples para demonstração
@@ -71,12 +75,33 @@ export const authenticateAdmin = (email: string, password: string): AuthUser | n
       role: 'admin'
     };
   }
+  
+  // Verificar entre os usuários registrados
+  if (registeredUsers[email] && registeredUsers[email].password === password && 
+      registeredUsers[email].role === 'admin') {
+    return {
+      name: email.split('@')[0],
+      email: email,
+      role: 'admin'
+    };
+  }
+  
   return null;
 };
 
 export const authenticateCliente = (email: string, password: string): AuthUser | null => {
   // Verificação simples para demonstração
   if (email.includes('@') && password.length >= 6) {
+    // Verificar entre os usuários registrados
+    if (registeredUsers[email] && registeredUsers[email].password === password) {
+      return {
+        name: email.split('@')[0],
+        email: email,
+        role: 'cliente'
+      };
+    }
+    
+    // Para facilitar demonstração, qualquer email/senha é aceito
     return {
       name: email.split('@')[0],
       email: email,
@@ -87,10 +112,33 @@ export const authenticateCliente = (email: string, password: string): AuthUser |
 };
 
 export const authenticateExemplo = (email: string, password: string): AuthUser | null => {
+  // Verificar entre os usuários registrados
+  if (registeredUsers[email] && registeredUsers[email].password === password) {
+    console.log(`Usuário registrado encontrado: ${email}`);
+    return {
+      name: email.split('@')[0] || 'Visitante',
+      email: email,
+      role: 'exemplo'
+    };
+  }
+  
   // Para a demonstração, qualquer credencial é aceita
+  console.log(`Criando usuário de exemplo para: ${email}`);
   return {
     name: email.split('@')[0] || 'Visitante',
     email: email || 'visitante@exemplo.com',
     role: 'exemplo'
   };
+};
+
+// Função para registrar um novo usuário
+export const registerUser = (email: string, password: string, role: UserRole = 'exemplo'): boolean => {
+  if (!email || !password) return false;
+  
+  console.log(`Registrando novo usuário: ${email} com função: ${role}`);
+  
+  // Salvar no armazenamento em memória
+  registeredUsers[email] = { email, password, role };
+  
+  return true;
 };
