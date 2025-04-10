@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/hooks/auth';
@@ -26,7 +25,6 @@ import AdminLogin from '@/pages/AdminLogin';
 // Areas pages
 import AreaExemplo from '@/pages/AreaExemplo';
 import AreaCliente from '@/pages/AreaCliente';
-import AdminDashboard from '@/pages/AdminDashboard';
 
 // Other pages
 import Index from '@/pages/Index';
@@ -67,10 +65,9 @@ function App() {
             </PrivateRoute>
           } />
           
+          {/* Redirect admin-dashboard to the original admin page */}
           <Route path="/admin-dashboard" element={
-            <PrivateRoute requiredRole="admin">
-              <AdminDashboard />
-            </PrivateRoute>
+            <Navigate to="/admin" replace />
           } />
           
           {/* Service routes */}

@@ -23,13 +23,13 @@ const AdminLogin: React.FC = () => {
   // Check if user is already authenticated with admin role
   React.useEffect(() => {
     if (auth.isAuthenticated && auth.user?.role === 'admin') {
-      navigate('/admin-dashboard');
+      navigate('/admin');
     }
   }, [auth.isAuthenticated, auth.user, navigate]);
   
   // Extrair o caminho de redirecionamento
   const searchParams = new URLSearchParams(location.search);
-  const redirectPath = searchParams.get('from') || '/admin-dashboard';
+  const redirectPath = searchParams.get('from') || '/admin';
   
   const form = useForm<{ email: string; password: string; }>({
     defaultValues: {

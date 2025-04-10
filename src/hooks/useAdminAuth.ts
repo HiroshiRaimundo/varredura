@@ -24,7 +24,7 @@ export const useAdminAuth = () => {
           description: "Bem-vindo ao painel administrativo."
         });
         
-        navigate(redirectPath || '/admin-dashboard');
+        navigate(redirectPath || '/admin');
         return true;
       } else {
         toast({
