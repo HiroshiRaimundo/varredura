@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -14,10 +14,15 @@ import { toast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Login: React.FC = () => {
+  const location = useLocation();
   const navigate = useNavigate();
   const auth = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberPassword, setRememberPassword] = useState(false);
+
+  // Obtém o caminho de redirecionamento dos parâmetros de consulta
+  const searchParams = new URLSearchParams(location.search);
+  const redirectPath = searchParams.get('from') || '/admin';
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -26,6 +31,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (data: { email: string; password: string }) => {
     try {
       await auth.handleLogin(data);
+      // O redirecionamento é feito dentro do AuthProvider
     } catch (error) {
       toast({
         title: "Erro ao fazer login",
@@ -44,9 +50,9 @@ const Login: React.FC = () => {
     <div className="min-h-screen bg-background p-6 flex flex-col">
       <div className="max-w-7xl mx-auto space-y-6 flex-1">
         <Header 
-          isAuthenticated={false} 
+          isAuthenticated={auth.isAuthenticated} 
           onLoginClick={() => {}} 
-          onLogoutClick={() => {}} 
+          onLogoutClick={auth.handleLogout} 
         />
 
         <div className="flex items-center justify-center py-12">

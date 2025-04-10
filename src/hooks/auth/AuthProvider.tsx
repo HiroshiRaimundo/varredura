@@ -1,50 +1,52 @@
 
 import React from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useForm } from "react-hook-form";
 import { LoginCredentials, AuthContextType } from "./types";
 import AuthContext from "./AuthContext";
-import { useAuthState } from "./useAuthState";
-import { useAuthSession } from "./useAuthSession";
-import { 
-  handleUserLogin, 
-  handleUserLogout, 
-  impersonateClient as impersonateClientUtil,
-  exitImpersonation as exitImpersonationUtil
-} from "./authProviderUtils";
+import useSupabaseAuth from "../useSupabaseAuth";
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Get auth state from custom hook
-  const {
-    isAuthenticated,
-    setIsAuthenticated,
-    isLoginDialogOpen,
-    setIsLoginDialogOpen,
-    isLoggingIn,
-    setIsLoggingIn,
-    isImpersonating,
-    setIsImpersonating,
-    user,
-    setUser,
-    form,
-    navigate,
-    location
-  } = useAuthState();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = React.useState(false);
+  const [isLoggingIn, setIsLoggingIn] = React.useState(false);
+  const [isImpersonating, setIsImpersonating] = React.useState(false);
   
-  // Use session management hook
-  useAuthSession(isAuthenticated, setIsAuthenticated, navigate, location);
+  // Use o hook de autenticação do Supabase
+  const { 
+    isAuthenticated, 
+    user, 
+    isLoading,
+    login: supabaseLogin,
+    logout: supabaseLogout,
+    register: supabaseRegister
+  } = useSupabaseAuth();
+  
+  // Initialize form
+  const form = useForm<LoginCredentials>({
+    defaultValues: {
+      email: "",
+      password: ""
+    }
+  });
 
   // Handle login
   const handleLogin = async (data: LoginCredentials) => {
     setIsLoggingIn(true);
     
     try {
-      await handleUserLogin(
-        data, 
-        setUser, 
-        setIsAuthenticated, 
-        setIsLoginDialogOpen, 
-        navigate, 
-        location
-      );
+      const result = await supabaseLogin(data.email, data.password);
+      
+      if (result.success) {
+        setIsLoginDialogOpen(false);
+        
+        // Obter o caminho de redirecionamento dos parâmetros de consulta ou do estado da localização
+        const redirectPath = location.state?.from || 
+          (user?.role === 'admin' ? '/admin' : '/dashboard');
+        
+        navigate(redirectPath, { replace: true });
+      }
     } catch (error) {
       console.error("Erro durante o login:", error);
     } finally {
@@ -53,18 +55,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Handle logout
-  const handleLogout = () => {
-    handleUserLogout(setUser, setIsAuthenticated, setIsImpersonating, navigate);
+  const handleLogout = async () => {
+    const result = await supabaseLogout();
+    
+    if (result.success) {
+      setIsImpersonating(false);
+      navigate('/', { replace: true });
+    }
   };
   
-  // Impersonate client
+  // Impersonate client (função mantida para compatibilidade)
   const impersonateClient = async (clientId: string) => {
-    await impersonateClientUtil(clientId, user, setIsImpersonating, setUser, navigate);
+    if (!user) return;
+    
+    setIsImpersonating(true);
+    navigate(`/dashboard?impersonate=${clientId}`);
   };
   
-  // Exit impersonation
+  // Exit impersonation (função mantida para compatibilidade)
   const exitImpersonation = () => {
-    exitImpersonationUtil(user, setIsImpersonating, setUser, navigate);
+    setIsImpersonating(false);
+    navigate("/admin");
   };
 
   // Create context value
