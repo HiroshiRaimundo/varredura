@@ -13,12 +13,11 @@ const HeroSection: React.FC = () => {
   };
 
   const handleLoginClick = () => {
-    navigate("/simple-login?from=/example-client");
+    navigate("/client-login");
   };
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900">
-      {/* Background elements */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500 rounded-full"></div>
         <div className="absolute top-1/2 -left-20 w-60 h-60 bg-green-500 rounded-full"></div>
