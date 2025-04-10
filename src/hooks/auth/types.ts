@@ -29,5 +29,5 @@ export interface AuthContextType extends AuthState {
   navigate: (to: string, options?: any) => void;
   impersonateClient: (clientId: string) => Promise<void>;
   exitImpersonation: () => void;
-  loginWithUser: (user: User) => Promise<boolean>;
+  loginWithUser: (user: any) => Promise<boolean>;
 }

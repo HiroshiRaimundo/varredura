@@ -1,9 +1,12 @@
+
 import React from "react";
 import { LoginCredentials, AuthContextType } from "./types";
 import AuthContext from "./AuthContext";
 import { useAuthState } from "./useAuthState";
 import { useAuthSession } from "./useAuthSession";
-import { AuthUser, saveUser, logout as logoutService } from "@/services/authService";
+import { AuthUser, saveUser, logout as logoutService, UserRole } from "@/services/authService";
+import { toast } from "@/hooks/use-toast";
+import { workspaceService } from "@/services/workspaceService";
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Get auth state from custom hook
@@ -41,10 +44,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     try {
       // Tentativa de login como administrador primeiro
-      const adminUser = {
+      const adminUser: AuthUser = {
         name: "Administrador",
         email: data.email === "admin" ? "admin@koga.com" : data.email,
-        role: "admin"
+        role: "admin" as UserRole
       };
       
       // Simulando para compatibilidade com código existente

@@ -31,7 +31,8 @@ export const useAuth = () => {
     navigate: auth.navigate,
     impersonateClient: auth.impersonateClient,
     isImpersonating: auth.isImpersonating,
-    exitImpersonation: auth.exitImpersonation
+    exitImpersonation: auth.exitImpersonation,
+    loginWithUser: auth.loginWithUser
   };
 };
 
