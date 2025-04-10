@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -15,9 +15,17 @@ import { useAuth } from "@/hooks/useAuth";
 
 const AdminLogin: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const auth = useAuth();
   const { handleLogin, isLoading } = useAdminAuth();
   const [showPassword, setShowPassword] = useState(false);
+  
+  // Check if user is already authenticated with admin role
+  React.useEffect(() => {
+    if (auth.isAuthenticated && auth.user?.role === 'admin') {
+      navigate('/admin-dashboard');
+    }
+  }, [auth.isAuthenticated, auth.user, navigate]);
   
   // Extrair o caminho de redirecionamento
   const searchParams = new URLSearchParams(location.search);
@@ -31,7 +39,10 @@ const AdminLogin: React.FC = () => {
   });
   
   const onSubmit = async (data: { email: string; password: string; }) => {
-    await handleLogin(data.email, data.password, redirectPath);
+    const success = await handleLogin(data.email, data.password, redirectPath);
+    if (success) {
+      navigate(redirectPath);
+    }
   };
   
   const togglePasswordVisibility = () => {
@@ -155,7 +166,7 @@ const AdminLogin: React.FC = () => {
           </CardContent>
           
           <CardFooter className="flex justify-center">
-            <Button variant="outline" onClick={() => window.location.href = "/"}>
+            <Button variant="outline" onClick={() => navigate("/")}>
               Voltar para página inicial
             </Button>
           </CardFooter>

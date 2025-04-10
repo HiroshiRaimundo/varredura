@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/hooks/auth';
@@ -48,7 +49,7 @@ function App() {
           <Route path="/client-login" element={<ClientLogin />} />
           <Route path="/simple-login" element={<SimpleLogin />} />
           
-          {/* New separated login routes */}
+          {/* New separated login routes - These should be public */}
           <Route path="/exemplo-login" element={<ExemploLogin />} />
           <Route path="/cliente-login" element={<ClienteLogin />} />
           <Route path="/admin-login" element={<AdminLogin />} />
